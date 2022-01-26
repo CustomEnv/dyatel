@@ -13,22 +13,24 @@ Frameworks for testing is [Tox](https://pypi.org/project/tox/) (should be manual
 ### Android automation:
 
 Automated native app is a free project from [TestingBot](https://testingbot.com/appium/sample.apk).
-Environment (Emulator/PATH/Java etc.) must be pre-builded before test run. 
-
-Appium `ip=0.0.0.0` `port=1000`
+Settings: 
+- Appium parameters is `ip=0.0.0.0` `port=1000`
+- Environment (Emulator/PATH/Java etc.) must be pre-builded before test run. 
 
 This is how application looks like:
 
+![anroid](https://user-images.githubusercontent.com/36446855/151223751-cf3bd790-b71e-40b0-8874-f3523497b9d0.png)
 
 ### iOS automation:
 
 Automated native app is my custom project for iOS 15.2. 
-Environment (Simulator/PATH/Xcode etc.) must be pre-built before test run.
-
-Appium `ip=0.0.0.0` `port=2000`
+Settings:
+- Appium parameters is `ip=0.0.0.0` `port=2000`
+- Environment (Simulator/PATH/Xcode etc.) must be pre-built before test run.
 
 This is how application looks like:
 
+![iPhone](https://user-images.githubusercontent.com/36446855/151223800-b6fad673-3b8c-44e3-8c3f-6c9824e15bd9.jpg)
 
 ### Chrome Web automation:
 
@@ -38,3 +40,4 @@ and [W3C Tabs](https://www.w3schools.com/w3css/w3css_tabulators.asp).
 
 ### Example of report:
 
+![Report](https://user-images.githubusercontent.com/36446855/151223843-14fbd2c0-1da5-47e0-8be0-19855393a98a.jpg)
