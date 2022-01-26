@@ -1,6 +1,6 @@
 ## UI_Automation
 
-This project created to show [my](https://github.com/VladimirPodolyan) skills in UI automation process on Python with:
+This project created to show [my](https://github.com/VladimirPodolyan) skills in UI automation process with:
 - Python
 - [Selenium](https://pypi.org/project/selenium/) in web application
 - [Appium](https://pypi.org/project/Appium-Python-Client/) in Native app of iOS and Android
@@ -10,7 +10,7 @@ Frameworks for testing is [Tox](https://pypi.org/project/tox/) (should be manual
 & [Pytest](https://pypi.org/project/pytest/). For reports used [Allure](https://pypi.org/project/allure-pytest/).
 
 
-### Android automation:
+### Android automation with UiAutomator2:
 
 Automated native app is a free project from [TestingBot](https://testingbot.com/appium/sample.apk).
 Settings: 
@@ -21,7 +21,7 @@ This is how application looks like:
 
 ![anroid](https://user-images.githubusercontent.com/36446855/151223751-cf3bd790-b71e-40b0-8874-f3523497b9d0.png)
 
-### iOS automation:
+### iOS automation with XCUITest:
 
 Automated native app is my custom project for iOS 15.2. 
 Settings:
