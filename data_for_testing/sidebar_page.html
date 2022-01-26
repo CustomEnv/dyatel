@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+      .inline_title {
+        display: inline-block;
+        margin: auto;
+        text-align: center;
+        width: 90%;
+      }
+      .sidebar_style{ display: none; }
+    </style>
+</head>
+<title>W3.CSS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<body data-qa-marker="sidebar-page">
+
+<div class="w3-sidebar w3-bar-block w3-card w3-animate-left sidebar_style" id="mySidebar" data-qa-marker="sidebar">
+  <button
+          class="w3-bar-item w3-button w3-large"
+          onclick="w3_close()"
+          data-qa-marker="cross-button">
+    Close &times;
+  </button>
+
+  <a href="tabs_page.html"
+     class="w3-bar-item w3-button"
+     data-qa-marker="tabs-page"
+     data-qa-type="navigation-item">Tabs Page</a>
+</div>
+
+<div id="main">
+
+<div class="w3-black w3-bar">
+  <button
+          id="openNav"
+          class="w3-button w3-black w3-xlarge"
+          data-qa-marker="hamburger-button"
+          onclick="w3_open()">&#9776;</button>
+  <div class="w3-container inline_title">
+    <h3 data-qa-marker="sidebar-page-title">SeleniumMaster sidebar page</h3>
+  </div>
+</div>
+</div>
+
+<script>
+function w3_open() {
+  document.getElementById("main").style.marginLeft = "25%";
+  document.getElementById("mySidebar").style.width = "25%";
+  document.getElementById("mySidebar").style.display = "block";
+  document.getElementById("openNav").style.display = "none";
+}
+function w3_close() {
+  document.getElementById("main").style.marginLeft = "0%";
+  document.getElementById("mySidebar").style.display = "none";
+  document.getElementById("openNav").style.display = "inline-block";
+}
+</script>
+
+</body>
+</html>
