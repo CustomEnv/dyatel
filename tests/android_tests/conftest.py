@@ -39,7 +39,7 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope='session')
 def appium(request):
-    """ Programmatically start appium. TODO: Not used at this time """
+    """ Programmatically start appium. Note: Not used at this time """
     # TODO: There an error with available of emulator after killing him at previous session
     appium_ip = request.config.getoption('--appium-ip')
     appium_port = request.config.getoption('--appium-port')
@@ -58,7 +58,7 @@ def appium(request):
 
 @pytest.fixture(scope='session')
 def stop_appium(appium):
-    """ Programmatically stop appium. TODO: Not used at this time """
+    """ Programmatically stop appium. Note: Not used at this time """
     yield
     logging.info('Stop Appium server')
     appium.stop()
@@ -67,7 +67,7 @@ def stop_appium(appium):
 
 @pytest.fixture(scope='session')
 def emulator():
-    """ Programmatically start emulator. TODO: Not used at this time """
+    """ Programmatically start emulator. Note: Not used at this time """
     device_name = desired_caps['deviceName']
     logging.info(f'Start emulator {device_name}')
     process = Popen(f'emulator -avd {device_name}', shell=True, close_fds=True)
