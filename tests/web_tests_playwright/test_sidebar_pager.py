@@ -30,7 +30,7 @@ def opened_sidebar_page(playwright_driver):  # New page (based on existing) with
 
 
 def test_sidebar_page_page_title(sidebar_page):
-    assert sidebar_page.title.get_text == 'SeleniumMaster sidebar page'
+    assert sidebar_page.title.get_text() == 'SeleniumMaster sidebar page'
 
 
 def test_sidebar_page_open_sidebar(sidebar_page):

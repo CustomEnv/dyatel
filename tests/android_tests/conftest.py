@@ -1,5 +1,5 @@
 import logging
-from subprocess import run, Popen
+import time
 
 import pytest
 import allure
@@ -8,28 +8,11 @@ from appium.webdriver.appium_service import AppiumService
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium_master.driver.mobile_driver import MobileDriver
 
-from data_for_testing.utils import set_logging_settings
+from data_for_testing.utils import set_logging_settings, resize_image, shell_running_command, shell_command
+from data_for_testing.settings import android_desired_caps, android_device_start_timeout, appium_logs_path
 
 
 set_logging_settings()
-
-
-AVD_NAME = 'Pixel3'  # TODO: Change to default "Pixel" value or other. Or avd creation can be integrated
-
-
-desired_caps = {
-    'avd': AVD_NAME,
-    'deviceName': AVD_NAME,
-    'platformName': 'Android',
-    'platformVersion': '11.0',
-    'app': 'https://testingbot.com/appium/sample.apk',
-    'automationName': 'UiAutomator2',
-    'noReset': True,
-    'newCommandTimeout': 9000,
-    'avdLaunchTimeout': 120000,
-    'avdReadyTimeout': 120000,
-    'adbExecTimeout': 120000,
-}
 
 
 def pytest_addoption(parser):
@@ -37,10 +20,14 @@ def pytest_addoption(parser):
     parser.addoption('--appium-port', default='1000')
 
 
+def is_not_ready_state():
+    """ Return True if mobile device is not ready for manipulating """
+    return shell_command(f'adb shell getprop sys.boot_completed', capture_output=True).output != '1'
+
+
 @pytest.fixture(scope='session')
 def appium(request):
-    """ Programmatically start appium. Note: Not used at this time """
-    # TODO: There an error with available of emulator after killing him at previous session
+    """ Programmatically start and stop appium. """
     appium_ip = request.config.getoption('--appium-ip')
     appium_port = request.config.getoption('--appium-port')
     service = AppiumService()
@@ -50,50 +37,54 @@ def appium(request):
         args=[
             '-a', appium_ip,
             '-p', appium_port,
-        ]
+            '-g', appium_logs_path,
+        ],
+        timeout_ms=5000
     )
     assert service.is_running, 'Appium service isn\'t running'
-    return service
-
-
-@pytest.fixture(scope='session')
-def stop_appium(appium):
-    """ Programmatically stop appium. Note: Not used at this time """
-    yield
+    yield service
     logging.info('Stop Appium server')
-    appium.stop()
-    assert not appium.is_running, 'Appium service isn\'t stopped'
+    service.stop()
+    assert not service.is_running, 'Appium service isn\'t stopped'
 
 
 @pytest.fixture(scope='session')
 def emulator():
-    """ Programmatically start emulator. Note: Not used at this time """
-    device_name = desired_caps['deviceName']
-    logging.info(f'Start emulator {device_name}')
-    process = Popen(f'emulator -avd {device_name}', shell=True, close_fds=True)
-    return process
+    """ Programmatically start and stop emulator. """
+    device_name = android_desired_caps['deviceName']
+    logging.info(f'Starting emulator {device_name}')
+    process = shell_running_command(f'emulator -avd {device_name}')
+    logging.info(f'Wait until emulator {device_name} booted:')
+    shell_command(f'adb wait-for-device', capture_output=True)
+    logging.info(f'1.Emulator {device_name} started')
 
+    start_time = time.time()
+    while is_not_ready_state() and android_device_start_timeout > int(time.time() - start_time):
+        time.sleep(0.5)
 
-@pytest.fixture(scope='session')
-def stop_emulator():
-    yield
-    serial_number = run('adb get-serialno', shell=True, capture_output=True).stdout
+    logging.info(f'2.Emulator {device_name} ready')
+    yield process
+    serial_number = shell_command('adb get-serialno', capture_output=True).output
+
     if serial_number:
-        serial_number = serial_number.decode('utf8').replace('\n', '')
-        logging.info(f'Shutdown emulator {serial_number}')
-        assert run(f'adb -s {serial_number} emu kill', shell=True, check=True).returncode == 0
+        logging.info(f'Shutdown emulator "{serial_number}"')
+        assert shell_command(f'adb -s {serial_number} emu kill', check=True).is_success
+
+    if process.pid:
+        logging.info(f'Kill emulator process by pid "{process.pid}"')
+        assert shell_command(f'kill -9 {process.pid}', check=True).is_success
 
 
 @pytest.fixture
-def mobile_driver(request, stop_emulator):
+def mobile_driver(request, appium, emulator):
+    """ Starting android driver """
     appium_ip = request.config.getoption('--appium-ip')
     appium_port = request.config.getoption('--appium-port')
     command_exc = f'http://{appium_ip}:{appium_port}/wd/hub'
     all_pytest_markers = [marker.name for marker in request.node.own_markers]
 
-    logging.info(f'Start emulator {AVD_NAME}')
     logging.info('Installing & launching android app')
-    appium_driver = AppiumDriver(command_executor=command_exc, desired_capabilities=desired_caps)
+    appium_driver = AppiumDriver(command_executor=command_exc, desired_capabilities=android_desired_caps)
     mobile_driver = MobileDriver(driver=appium_driver)
     logging.info('Android app ready')
 
@@ -105,12 +96,30 @@ def mobile_driver(request, stop_emulator):
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
+    """ Generate report """
     outcome = yield
     result = outcome.get_result()
     driver = getattr(item, 'node_driver', None)
     xfail = hasattr(result, 'wasxfail')
     failure = (result.skipped and xfail) or (result.failed and not xfail)
+    is_allure_connected = item.config.getoption('--alluredir')
+    not_setup_and_teardown = call.when not in ('teardown', 'setup')
 
-    if failure and item.config.getoption('--alluredir') and call.when != 'setup' and driver:
-        screenshot_name = f'screenshot_{item.name}'
-        allure.attach(driver.get_screenshot_as_png(), name=screenshot_name, attachment_type=AttachmentType.PNG)
+    if failure and is_allure_connected:
+
+        with open(appium_logs_path, 'r+') as appium_logs_file:
+            appium_logs = appium_logs_file.read()
+            allure.attach(str(appium_logs), name='Appium logs', attachment_type=AttachmentType.TEXT)
+            appium_logs_file.seek(0)
+            appium_logs_file.truncate()
+
+        if driver:
+            device_logs = driver.get_log('logcat')
+            if device_logs:
+                device_logs = list(map(lambda log: log['message'], device_logs))  # TODO: find workaround
+                allure.attach(str(device_logs), name='Device logs', attachment_type=AttachmentType.TEXT)
+
+            if not_setup_and_teardown:
+                screenshot_name = f'screenshot_{item.name}'
+                screenshot_binary = driver.get_screenshot_as_png()
+                allure.attach(resize_image(screenshot_binary), name=screenshot_name, attachment_type=AttachmentType.JPG)

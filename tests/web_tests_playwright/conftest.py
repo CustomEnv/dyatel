@@ -16,9 +16,9 @@ def pytest_addoption(parser):
 
 @pytest.fixture
 def playwright_driver(request):
-    with sync_playwright() as p:
+    with sync_playwright() as connect:
         is_headless = request.config.getoption('headless')
-        playwright_driver = p.chromium.launch(headless=is_headless)
+        playwright_driver = connect.chromium.launch(headless=is_headless)
         driver = WebDriver(driver=playwright_driver)
         all_pytest_markers = [marker.name for marker in request.node.own_markers]
         yield driver
