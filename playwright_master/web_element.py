@@ -8,9 +8,7 @@ class WebElement:
         self.driver = WebDriver.driver
         self.context = WebDriver.context
         self.locator = locator
-        self.name = name
-        if not name:
-            self.name = self.locator
+        self.name = name if name else self.locator
 
     def element(self, *args, **kwargs):
         """ Get the current element by given locator """

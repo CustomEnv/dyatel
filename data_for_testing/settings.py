@@ -3,12 +3,14 @@ import os
 appium_logs_path = '.tox/.tmp/logs/android_appium.txt'
 android_device_start_timeout = 60
 android_desired_caps = {
-    'avd': 'Pixel3',
-    'deviceName': 'Pixel3',
+    'avd': 'Pixel5',
+    'deviceName': 'Pixel5',
     'platformName': 'Android',
-    'platformVersion': '11.0',
-    'app': 'https://testingbot.com/appium/sample.apk',
+    'platformVersion': '12.0',
+    # 'app': 'https://testingbot.com/appium/sample.apk',
+    # 'browserName': 'Chrome',
     'automationName': 'UiAutomator2',
+    # 'autoWebview': True,
     'noReset': True,
     'newCommandTimeout': 9000,
     'avdLaunchTimeout': 120000,

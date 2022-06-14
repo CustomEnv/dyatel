@@ -1,17 +1,12 @@
 import io
-import os
 import logging
 from subprocess import Popen, PIPE, run
 
 from PIL import Image
 
 
-sidebar_page_path = f'file://{os.getcwd()}/data_for_testing/sidebar_page.html'
-tabs_page_path = f'file://{os.getcwd()}/data_for_testing/tabs_page.html'
-available_tabs = ('London', 'Paris', 'Tokyo')
-
-
 def set_logging_settings(level=logging.INFO):
+    logging.getLogger('WDM').setLevel(logging.ERROR)
     logging.getLogger("urllib3").setLevel(logging.ERROR)
     logging.basicConfig(level=level, format='[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)s] %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
@@ -42,3 +37,13 @@ def shell_command(cmd,  **kwargs):
         process.is_success = process.returncode == 0
 
     return process
+
+
+def cut_log_data(data: str, length=50) -> str:
+    """
+    Cut given data for reducing log length
+    :param data: original data ~ 'very long string for typing. string endless continues'
+    :param length: length to cut given data ~ 20
+    :return: edited data ~ 'Type text: "very long string for >>> 36 characters"'
+    """
+    return f'{data[:length]} >>> {len(data[length:])} characters' if len(data) > length else data

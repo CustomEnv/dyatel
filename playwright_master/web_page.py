@@ -9,9 +9,7 @@ class WebPage:
         self.driver = WebDriver.driver
         self.context = WebDriver.context
         self.locator = locator
-        self.name = name
-        if not name:
-            self.name = locator
+        self.name = name if name else self.locator
 
     def get(self, url, *args, **kwargs):
         """ Navigate to page and wait until loaded """

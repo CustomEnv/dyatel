@@ -84,6 +84,7 @@ def mobile_driver(request, appium, emulator):
     all_pytest_markers = [marker.name for marker in request.node.own_markers]
 
     logging.info('Installing & launching android app')
+    android_desired_caps.update({'app': 'https://testingbot.com/appium/sample.apk'})
     appium_driver = AppiumDriver(command_executor=command_exc, desired_capabilities=android_desired_caps)
     mobile_driver = MobileDriver(driver=appium_driver)
     logging.info('Android app ready')

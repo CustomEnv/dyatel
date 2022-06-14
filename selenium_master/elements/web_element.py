@@ -1,30 +1,56 @@
 from logging import info
 
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver import ActionChains
+from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
 from selenium_master.driver.core_driver import CoreDriver
 from selenium_master.elements.core_element import CoreElement
 
 
 class WebElement(CoreElement):
-    def __init__(self, locator_type, locator, name):
-        self.driver = CoreDriver.driver
-        self.locator_type = locator_type
-        self.locator = locator
+    def __init__(self, locator, locator_type=None, name=None, **kwargs):
         self.name = name
-        super(WebElement, self).__init__(locator_type, locator, name)
+        self.locator = locator
+        self.locator_type = locator_type
+        self.driver: SeleniumWebDriver = CoreDriver.driver
+        super(WebElement, self).__init__(locator=locator, locator_type=locator_type, name=name, **kwargs)
 
     def click(self):
-        info(f'Click into {self.name}')
+        info(f'Click into "{self.name}"')
         self.wait_element(silent=True).element.click()
         return self
 
-    def is_displayed(self):
-        info(f'Check visibility of {self.name}')
-        return self.element.is_displayed()
-
-    def wait_element_hidden(self, silent=False):
-        if not silent:
-            info(f'Wait hidden of {self.name}')
-        self.wait.until_not(EC.visibility_of_element_located((self.locator_type, self.locator)))
+    def hover(self):
+        info(f'Hover over {self.name}')
+        ActionChains(self.driver)\
+            .move_to_element(self.element)\
+            .move_by_offset(1, 1)\
+            .move_to_element(self.element)\
+            .perform()
         return self
+
+    def click_outside(self, x=-1, y=-1):
+        dx, dy = self.calculate_coordinate_to_click(self.element, x, y)
+        ActionChains(self.driver).move_to_element_with_offset(self.element, dx, dy).click().perform()
+        return self
+
+    def calculate_coordinate_to_click(self, element, x, y):
+        """
+            calculate coordinates to click from element
+            :param element: element to calculate tap from
+            :param x: horizontal offset relative to either left (x < 0) or right side (x > 0)
+            :param y: vertical offset relative to either top (y > 0) or bottom side (y < 0)
+            Examples:
+                * (0, 0) -- center of the element
+                * (5, 0) -- 5 pixels to the right
+                * (-10, 0) -- 10 pixels to the left
+                * (0, -5) -- 5 pixels below
+                * (0, 10) -- 10 pixels above
+        """
+        half_width, half_height = element.size['width'] / 2, element.size['height'] / 2
+        dx, dy = half_width, half_height
+        if x:
+            dx += x + (-half_width if x < 0 else half_width)
+        if y:
+            dy += -y + (half_height if y < 0 else -half_height)
+        return dx, dy
