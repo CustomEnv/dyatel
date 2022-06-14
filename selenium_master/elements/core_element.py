@@ -3,13 +3,14 @@ from logging import info
 
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
+from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import WebDriverException
 
 from data_for_testing.utils import cut_log_data
 from selenium_master.driver.core_driver import CoreDriver
-from selenium_master.utils import get_locator_type
+from selenium_master.utils import get_locator_type, get_legacy_selector
 
 
 ELEMENT_WAIT = 10
@@ -17,14 +18,18 @@ ELEMENT_WAIT = 10
 
 class CoreElement:
     def __init__(self, locator, locator_type=None, name=None, parent=None):
-        self.locator = locator
-        self.name = name if name else locator
-        self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.driver: SeleniumWebDriver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)
         self.parent = parent if parent else None
         self.parent_selenium = getattr(self.parent, 'element') if self.parent else None
         self._elements = None
+
+        if isinstance(self.driver, AppiumWebDriver):
+            self.locator, self.locator_type = get_legacy_selector(locator, get_locator_type(locator))
+        else:
+            self.locator = locator
+            self.locator_type = locator_type if locator_type else get_locator_type(locator)
+        self.name = name if name else self.locator
 
     # Element
 

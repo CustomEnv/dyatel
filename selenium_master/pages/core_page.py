@@ -1,22 +1,27 @@
 from logging import info
 
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
+from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from selenium_master.driver.core_driver import CoreDriver
-from selenium_master.utils import get_locator_type
+from selenium_master.utils import get_locator_type, get_legacy_selector
 
 
 class CorePage:
     def __init__(self, locator, locator_type=None, name=None):
-        self.locator = locator
-        self.name = name if name else locator
-        self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.driver: SeleniumWebDriver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)
         self.wait = WebDriverWait(self.driver, 10)
         self.url = getattr(self, 'url', '')
+
+        if isinstance(self.driver, AppiumWebDriver):
+            self.locator, self.locator_type = get_legacy_selector(locator, get_locator_type(locator))
+        else:
+            self.locator = locator
+            self.locator_type = locator_type if locator_type else get_locator_type(locator)
+        self.name = name if name else self.locator
 
     def refresh(self, wait_page_load=True):
         info(f'Reload {self.name} page')

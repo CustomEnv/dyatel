@@ -1,19 +1,19 @@
 import pytest
 
-from selenium_master.elements.web_element import WebElement
-from selenium_master.pages.web_page import WebPage
+from selenium_master.elements.base_element import BaseElement
+from selenium_master.pages.base_page import BasePage
 
 
-class MouseEventPage(WebPage):
+class MouseEventPage(BasePage):
     def __init__(self):
         self.url = 'https://testautomation-playground.herokuapp.com/mouse_events.html'
         super().__init__('//h2[.="Mouse Click Actions"]', name='Mouse events page')
 
     def choose_language_button(self):
-        return WebElement('button.dropbtn', name='"Choose language" button')
+        return BaseElement('button.dropbtn', name='"Choose language" button')
 
     def dropdown(self):
-        return WebElement('div.dropdown-content', name='dropdown with languages')
+        return BaseElement('div.dropdown-content', name='dropdown with languages')
 
 
 @pytest.fixture

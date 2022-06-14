@@ -16,3 +16,26 @@ def get_locator_type(locator):
         return By.CSS_SELECTOR
     else:
         return By.ID
+
+
+def get_legacy_selector(locator, locator_type):
+    """
+    Workaround for using same locators for selenium and appium objects.
+    More info here https://github.com/appium/python-client/pull/724
+
+    :param locator: regular locator
+    :param locator_type: updated locator type from get_locator_type
+    :return: selenium like locator and locator_type
+    """
+    if locator_type == By.ID:
+        locator_type = By.CSS_SELECTOR
+        locator = f'[id="{locator}"]'
+    elif locator_type == By.TAG_NAME:
+        locator_type = By.CSS_SELECTOR
+    elif locator_type == By.CLASS_NAME:
+        locator_type = By.CSS_SELECTOR
+        locator = f".{locator}"
+    elif locator_type == By.NAME:
+        locator_type = By.CSS_SELECTOR
+        locator = f'[name="{locator}"]'
+    return locator, locator_type
