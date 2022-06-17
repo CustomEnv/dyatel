@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from selenium_master.core.core_driver import CoreDriver
+from selenium_master.core.core_element import CoreElement
 from selenium_master.utils import get_locator_type, get_legacy_selector
 
 
@@ -22,6 +23,11 @@ class CorePage:
             self.locator = locator
             self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.name = name if name else self.locator
+
+        self.page_elements = []
+        for el in self._get_page_elements():
+            if not el.driver:
+                el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
 
     def refresh(self, wait_page_load=True):
         info(f'Reload {self.name} page')
@@ -48,3 +54,13 @@ class CorePage:
             return self.driver.current_url == self.url
         else:
             return self.driver.find_element(by=self.locator_type, value=self.locator).is_displayed()
+
+    def _get_page_elements(self):
+        """Return page elements and page objects of this page object
+
+        :returns: list of page elements and page objects
+        """
+        for attribute, value in list(self.__class__.__dict__.items()):
+            if isinstance(value, CoreElement):
+                self.page_elements.append(value)
+        return self.page_elements

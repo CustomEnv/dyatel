@@ -7,11 +7,6 @@ class PizzaOrderPage(BasePage):
         self.url = 'https://dineshvelhal.github.io/testautomation-playground/order_submit.html'
         super().__init__('//h3[contains(., "Pizza House")]', name='Pizza order page')
 
-    def submit_button(self):
-        return BaseElement('submit_button', name='submit order button')
-
-    def error_modal(self):
-        return BaseElement('.modal-content', name='error modal popup')
-
-    def quantity_input(self):
-        return BaseElement('quantity', name='quantity input')
+    submit_button = BaseElement('submit_button', name='submit order button')
+    error_modal = BaseElement('.modal-content', name='error modal popup')
+    quantity_input = BaseElement('quantity', name='quantity input')

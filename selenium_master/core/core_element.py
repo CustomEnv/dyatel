@@ -12,7 +12,6 @@ from data_for_testing.utils import cut_log_data
 from selenium_master.core.core_driver import CoreDriver
 from selenium_master.utils import get_locator_type, get_legacy_selector
 
-
 ELEMENT_WAIT = 10
 
 
@@ -28,6 +27,11 @@ class CoreElement:
             self.locator = locator
             self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.name = name if name else self.locator
+
+        self.child_elements = []
+        for el in self._get_child_elements():
+            if not el.driver:
+                el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
 
     # Element
 
@@ -175,3 +179,13 @@ class CoreElement:
 
     def get_wait(self, timeout=ELEMENT_WAIT):
         return WebDriverWait(self.driver, timeout)
+
+    def _get_child_elements(self):
+        """Return page elements and page objects of this page object
+
+        :returns: list of page elements and page objects
+        """
+        for attribute, value in list(self.__class__.__dict__.items()):
+            if isinstance(value, CoreElement):
+                self.child_elements.append(value)
+        return self.child_elements
