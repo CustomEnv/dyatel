@@ -10,10 +10,10 @@ from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
-from data_for_testing.settings import android_desired_caps
-from data_for_testing.utils import set_logging_settings
-from selenium_master.driver.mobile_driver import MobileDriver
-from selenium_master.driver.web_driver import WebDriver
+from tests.settings import android_desired_caps
+from dyatel.utils import set_logging_settings
+from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
+from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import PlaygroundMainPage

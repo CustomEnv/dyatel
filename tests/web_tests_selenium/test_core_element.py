@@ -40,4 +40,3 @@ def test_type_clear_text_get_value(pizza_order_page):
     pizza_order_page.quantity_input.clear_text()
     text_erased = pizza_order_page.quantity_input.get_value == ''
     assert all((text_added, text_erased))
-

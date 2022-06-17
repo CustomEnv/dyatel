@@ -1,7 +1,7 @@
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 
-from selenium_master.core.core_driver import CoreDriver
-from selenium_master.core.core_page import CorePage
+from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from dyatel.dyatel_sel.core.core_page import CorePage
 
 
 class MobilePage(CorePage):

@@ -1,7 +1,7 @@
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 
-from selenium_master.core.core_driver import CoreDriver
-from selenium_master.core.core_element import CoreElement
+from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from dyatel.dyatel_sel.core.core_element import CoreElement
 
 
 class MobileElement(CoreElement):

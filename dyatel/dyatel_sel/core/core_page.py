@@ -5,9 +5,9 @@ from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from selenium_master.core.core_driver import CoreDriver
-from selenium_master.core.core_element import CoreElement
-from selenium_master.utils import get_locator_type, get_legacy_selector
+from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from dyatel.dyatel_sel.core.core_element import CoreElement
+from dyatel.dyatel_sel.utils import get_locator_type, get_legacy_selector
 
 
 class CorePage:

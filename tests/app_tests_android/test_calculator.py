@@ -4,7 +4,7 @@ from random import randint, getrandbits
 import allure
 import pytest
 
-from data_for_testing.mobile_pages.simple_calculator_page import CalculatorPage
+from tests.adata.mobile_pages.simple_calculator_page import CalculatorPage
 
 
 # TODO: Navigation by link in TextView test can be added:

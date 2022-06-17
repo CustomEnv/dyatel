@@ -8,9 +8,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import WebDriverException
 
-from data_for_testing.utils import cut_log_data
-from selenium_master.core.core_driver import CoreDriver
-from selenium_master.utils import get_locator_type, get_legacy_selector
+from dyatel.utils import cut_log_data
+from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from dyatel.dyatel_sel.utils import get_locator_type, get_legacy_selector
+
 
 ELEMENT_WAIT = 10
 

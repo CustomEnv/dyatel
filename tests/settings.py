@@ -7,10 +7,10 @@ android_desired_caps = {
     'deviceName': 'Pixel5',
     'platformName': 'Android',
     'platformVersion': '12.0',
+    # Update following capabilities before driver init
     # 'app': 'https://testingbot.com/appium/sample.apk',
     # 'browserName': 'Chrome',
     'automationName': 'UiAutomator2',
-    # 'autoWebview': True,
     'noReset': True,
     'newCommandTimeout': 9000,
     'avdLaunchTimeout': 120000,

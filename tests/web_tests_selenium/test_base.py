@@ -1,9 +1,9 @@
 import pytest
 from selenium.webdriver.common.by import By
 
-from selenium_master.core.core_element import CoreElement
-from selenium_master.core.core_page import CorePage
-from selenium_master.utils import tags
+from dyatel.dyatel_sel.core.core_element import CoreElement
+from dyatel.dyatel_sel.core.core_page import CorePage
+from dyatel.dyatel_sel.utils import tags
 
 
 @pytest.mark.parametrize('locator', ('.element', '[id *= element]'))

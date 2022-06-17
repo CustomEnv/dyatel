@@ -1,7 +1,7 @@
-from selenium_master.base.base_page import BasePage
+from dyatel.base.page import Page
 
 
-class PlaygroundResourcesPage(BasePage):
+class PlaygroundResourcesPage(Page):
 
     def __init__(self):
         self.url = "http://uitestingplayground.com/resources"

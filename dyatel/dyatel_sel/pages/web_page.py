@@ -1,8 +1,8 @@
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
-from selenium_master.core.core_driver import CoreDriver
-from selenium_master.core.core_page import CorePage
-from selenium_master.pages.mobile_page import MobilePage
+from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from dyatel.dyatel_sel.core.core_page import CorePage
+from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 
 
 class WebPage(CorePage):

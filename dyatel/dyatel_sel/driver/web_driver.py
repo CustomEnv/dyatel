@@ -1,4 +1,4 @@
-from selenium_master.core.core_driver import CoreDriver
+from dyatel.dyatel_sel.core.core_driver import CoreDriver
 
 
 class WebDriver(CoreDriver):
