@@ -1,5 +1,5 @@
 from appium.webdriver.common.appiumby import AppiumBy
-from selenium_master.driver.core_driver import CoreDriver
+from selenium_master.core.core_driver import CoreDriver
 from selenium_master.elements.mobile_element import MobileElement
 from selenium_master.pages.mobile_page import MobilePage
 

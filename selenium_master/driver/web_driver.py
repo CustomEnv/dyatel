@@ -1,4 +1,4 @@
-from selenium_master.driver.core_driver import CoreDriver
+from selenium_master.core.core_driver import CoreDriver
 
 
 class WebDriver(CoreDriver):

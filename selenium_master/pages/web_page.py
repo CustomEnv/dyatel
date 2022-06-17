@@ -1,7 +1,7 @@
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
-from selenium_master.driver.core_driver import CoreDriver
-from selenium_master.pages.core_page import CorePage
+from selenium_master.core.core_driver import CoreDriver
+from selenium_master.core.core_page import CorePage
 from selenium_master.pages.mobile_page import MobilePage
 
 

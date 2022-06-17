@@ -9,7 +9,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import WebDriverException
 
 from data_for_testing.utils import cut_log_data
-from selenium_master.driver.core_driver import CoreDriver
+from selenium_master.core.core_driver import CoreDriver
 from selenium_master.utils import get_locator_type, get_legacy_selector
 
 

@@ -1,7 +1,7 @@
 from appium.webdriver.applicationstate import ApplicationState
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 
-from selenium_master.driver.core_driver import CoreDriver
+from selenium_master.core.core_driver import CoreDriver
 
 
 class MobileDriver(CoreDriver):

@@ -5,7 +5,7 @@ from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from selenium_master.driver.core_driver import CoreDriver
+from selenium_master.core.core_driver import CoreDriver
 from selenium_master.utils import get_locator_type, get_legacy_selector
 
 

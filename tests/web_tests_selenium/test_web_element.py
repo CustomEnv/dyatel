@@ -1,7 +1,7 @@
 import pytest
 
-from selenium_master.elements.base_element import BaseElement
-from selenium_master.pages.base_page import BasePage
+from selenium_master.base.base_element import BaseElement
+from selenium_master.base.base_page import BasePage
 
 
 class MouseEventPage(BasePage):

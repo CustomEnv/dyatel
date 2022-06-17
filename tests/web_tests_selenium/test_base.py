@@ -1,8 +1,8 @@
 import pytest
 from selenium.webdriver.common.by import By
 
-from selenium_master.elements.core_element import CoreElement
-from selenium_master.pages.core_page import CorePage
+from selenium_master.core.core_element import CoreElement
+from selenium_master.core.core_page import CorePage
 from selenium_master.utils import tags
 
 
