@@ -19,9 +19,6 @@ class CoreDriver:
     def __init__(self, driver):
         self.driver = driver
 
-    # def __getattr__(self, name):
-    #     return getattr(self.driver, name)
-
     def is_driver_opened(self):
         return get_driver_status(self.driver) == 'Opened'
 

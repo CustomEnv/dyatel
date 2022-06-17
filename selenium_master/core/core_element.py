@@ -21,8 +21,6 @@ class CoreElement:
         self.driver: SeleniumWebDriver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)
         self.parent = parent if parent else None
-        self.parent_selenium = getattr(self.parent, 'element') if self.parent else None
-        self._elements = None
 
         if isinstance(self.driver, AppiumWebDriver):
             self.locator, self.locator_type = get_legacy_selector(locator, get_locator_type(locator))
@@ -35,18 +33,11 @@ class CoreElement:
 
     @property
     def element(self):
-        if not self._elements:
-            self._elements = self.get_driver().find_element(self.locator_type, self.locator)
-
-        is_multiple_elements = type(self._elements) in (list, tuple, dict, set, frozenset)
-        return self._elements[0] if is_multiple_elements else self._elements
+        return self.get_driver().find_element(self.locator_type, self.locator)
 
     @property
     def all_elements(self):
-        if not self._elements:
-            self._elements = self.get_driver().find_elements(self.locator_type, self.locator)
-
-        return self._elements
+        return self.get_driver().find_elements(self.locator_type, self.locator)
 
     # Element interaction
 
@@ -176,8 +167,9 @@ class CoreElement:
         """
         Get driver including parent element if available
         """
-        base = self.parent_selenium if self.parent_selenium else self.driver
+        base = self.driver
         if self.parent:
+            base = self.parent.element
             info(f'Get element "{self.name}" from parent element "{self.parent.name}"')
         return base
 

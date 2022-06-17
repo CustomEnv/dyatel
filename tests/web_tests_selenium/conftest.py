@@ -14,6 +14,7 @@ from data_for_testing.settings import android_desired_caps
 from data_for_testing.utils import set_logging_settings
 from selenium_master.driver.mobile_driver import MobileDriver
 from selenium_master.driver.web_driver import WebDriver
+from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import PlaygroundMainPage
 
@@ -108,3 +109,8 @@ def base_playground_page(driver_wrapper):
 @pytest.fixture
 def pizza_order_page(driver_wrapper):
     return PizzaOrderPage().open_page()
+
+
+@pytest.fixture
+def mouse_event_page(driver_wrapper):
+    return MouseEventPage().open_page()

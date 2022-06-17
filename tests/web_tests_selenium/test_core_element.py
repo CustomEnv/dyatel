@@ -3,17 +3,6 @@ import random
 import pytest
 
 
-def test_element_storage(base_playground_page):
-    page_element = base_playground_page.kube()
-    assert page_element.element == page_element._elements
-
-
-def test_elements_storage(base_playground_page):
-    page_element = base_playground_page.any_link()
-    storage_filled = page_element.all_elements == page_element._elements
-    assert all((storage_filled, len(page_element._elements) > 1))
-
-
 def test_element_displayed_positive(base_playground_page):
     assert base_playground_page.kube().is_displayed()
 

@@ -10,10 +10,10 @@ class PlaygroundMainPage(BasePage):
         super().__init__('//h1[.="UI Test AutomationPlayground"]', name='Playground main page')
 
     def description_section(self):
-        return DescriptionSection()
+        return BaseElement('description', name='description section')
 
     def overview_section(self):
-        return Group('overview', name='overview section')
+        return BaseElement('overview', name='overview section')
 
     def kube(self):
         return BaseElement('.img-fluid', name='rubik\'s cube')
@@ -29,13 +29,3 @@ class PlaygroundMainPage(BasePage):
 
     def kube_broken_parent(self):
         return BaseElement('.img-fluid', name='kube with broken parent', parent=self.overview_section())
-
-
-class DescriptionSection(Group):
-    def __init__(self):
-        super(DescriptionSection, self).__init__('description', name='description section')
-
-        self.cool_quote = BaseElement('//*[.="Quality is not an act, it is a habit."]', name='Aristotle quote')
-
-        self.broken_quote = BaseElement('//*[.="Ensure that a test is capable of waiting for a page to load"]',
-                                        name='not a Aristotle quote')
