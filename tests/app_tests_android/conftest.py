@@ -6,10 +6,10 @@ import allure
 from allure_commons.types import AttachmentType
 from appium.webdriver.appium_service import AppiumService
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
-from selenium_master.driver.mobile_driver import MobileDriver
+from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 
-from data_for_testing.utils import set_logging_settings, resize_image, shell_running_command, shell_command
-from data_for_testing.settings import android_desired_caps, android_device_start_timeout, appium_logs_path
+from dyatel.utils import set_logging_settings, resize_image, shell_running_command, shell_command
+from tests.settings import android_desired_caps, android_device_start_timeout, appium_logs_path
 
 
 set_logging_settings()
@@ -92,7 +92,7 @@ def mobile_driver(request, appium, emulator):
     request.node.node_driver = mobile_driver
     yield mobile_driver
     if 'no_teardown' not in all_pytest_markers:
-        mobile_driver.terminate_app(mobile_driver.desired_capabilities['appPackage'])
+        mobile_driver.terminate_app(mobile_driver.desired_capabilities['appPackage'])  # TODO: fxi issues
 
 
 @pytest.hookimpl(hookwrapper=True)

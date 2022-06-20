@@ -5,10 +5,10 @@ import pytest
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from appium.webdriver.appium_service import AppiumService
 from allure_commons.types import AttachmentType
-from selenium_master.driver.mobile_driver import MobileDriver
 
-from data_for_testing.settings import ios_desired_caps
-from data_for_testing.utils import set_logging_settings, resize_image, shell_running_command, shell_command
+from tests.settings import ios_desired_caps
+from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
+from dyatel.utils import set_logging_settings, resize_image, shell_running_command, shell_command
 
 
 set_logging_settings()
@@ -75,7 +75,7 @@ def mobile_driver(request, emulator):
     yield mobile_driver
     if 'no_teardown' not in all_pytest_markers:
         logging.info('Terminate application')
-        mobile_driver.terminate_app(ios_desired_caps['bundleId'])
+        mobile_driver.terminate_app(ios_desired_caps['bundleId'])  # TODO: add terminate_app func for mobile driver
 
 
 @pytest.hookimpl(hookwrapper=True)
