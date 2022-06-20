@@ -10,6 +10,18 @@ from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.utils import get_locator_type, get_legacy_selector
 
 
+def _get_page_elements(self):
+    """Return page elements and page objects of this page object
+
+    :returns: list of page elements and page objects
+    """
+    page_elements = []
+    for attribute, value in list(self.__class__.__dict__.items()):
+        if isinstance(value, CoreElement):
+            page_elements.append(value)
+    return page_elements
+
+
 class CorePage:
     def __init__(self, locator, locator_type=None, name=None):
         self.driver: SeleniumWebDriver = CoreDriver.driver
@@ -24,8 +36,8 @@ class CorePage:
             self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.name = name if name else self.locator
 
-        self.page_elements = []
-        for el in self._get_page_elements():
+        self.page_elements = _get_page_elements(self)
+        for el in self.page_elements:  # required for CoreElement
             if not el.driver:
                 el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
 
@@ -38,8 +50,7 @@ class CorePage:
 
     def open_page(self, url=''):
         url = self.url if not url else url
-        info(f'Navigating to url {url}')
-        self.driver.get(url)
+        self.driver_wrapper.get(url)
         self.wait_page_loaded()
         return self
 
@@ -54,13 +65,3 @@ class CorePage:
             return self.driver.current_url == self.url
         else:
             return self.driver.find_element(by=self.locator_type, value=self.locator).is_displayed()
-
-    def _get_page_elements(self):
-        """Return page elements and page objects of this page object
-
-        :returns: list of page elements and page objects
-        """
-        for attribute, value in list(self.__class__.__dict__.items()):
-            if isinstance(value, CoreElement):
-                self.page_elements.append(value)
-        return self.page_elements

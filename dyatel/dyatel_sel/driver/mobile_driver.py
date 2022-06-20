@@ -19,6 +19,7 @@ class MobileDriver(CoreDriver):
         CoreDriver.is_ios = self.is_ios
         CoreDriver.is_android = self.is_android
         CoreDriver.mobile = True
+        CoreDriver.desktop = False
 
         if self.is_app:
             if self.is_ios:

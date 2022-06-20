@@ -1,3 +1,5 @@
+from logging import info
+
 from selenium.webdriver.remote.command import Command
 
 
@@ -13,6 +15,7 @@ class CoreDriver:
     driver = None
 
     mobile = False
+    desktop = False
     is_ios = False
     is_android = False
 
@@ -24,3 +27,7 @@ class CoreDriver:
 
     def is_driver_closed(self):
         return get_driver_status(self.driver) == 'Closed'
+
+    def get(self, url):
+        info(f'Navigating to url {url}')
+        return self.driver.get(url)

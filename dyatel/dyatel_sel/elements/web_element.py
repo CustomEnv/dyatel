@@ -8,12 +8,10 @@ from dyatel.dyatel_sel.core.core_element import CoreElement
 
 
 class WebElement(CoreElement):
-    def __init__(self, locator, locator_type=None, name=None, **kwargs):
-        self.name = name
-        self.locator = locator
-        self.locator_type = locator_type
+
+    def __init__(self, locator, locator_type=None, name=None, parent=None):
         self.driver: SeleniumWebDriver = CoreDriver.driver
-        super(WebElement, self).__init__(locator=locator, locator_type=locator_type, name=name, **kwargs)
+        super(WebElement, self).__init__(locator=locator, locator_type=locator_type, name=name, parent=parent)
 
     def click(self):
         info(f'Click into "{self.name}"')

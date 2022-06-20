@@ -30,7 +30,7 @@ class CoreElement:
         self.name = name if name else self.locator
 
         self.child_elements = []
-        for el in self._get_child_elements():
+        for el in self._get_child_elements():  # required for Group
             if not el.driver:
                 el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
 

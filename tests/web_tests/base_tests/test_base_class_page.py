@@ -26,19 +26,23 @@ def mocked_web_driver():
 
 def test_base_page_mobile(mocked_mobile_driver):
     base_page = Page('locator')
-    assert all((base_page.root_page_class == MobilePage, CoreDriver.mobile))
+    assert all((base_page.page_class == MobilePage, CoreDriver.mobile))
 
 
 def test_base_element_mobile(mocked_mobile_driver):
     base_element = Element('locator')
-    assert all((base_element.root_element_class == MobileElement, CoreDriver.mobile))
+    assert all((base_element.element_class == MobileElement, CoreDriver.mobile))
 
 
+# @pytest.mark.xfail_platform(('androidn', 'ios'), reason='can not get text from that element')
+# @pytest.mark.xfail_platform('play', reason='can not get text from that element')
 def test_base_page_web(mocked_web_driver):
     base_page = Page('locator')
-    assert all((base_page.root_page_class == WebPage, not CoreDriver.mobile))
+    assert all((base_page.page_class == WebPage, not CoreDriver.mobile))
 
 
+# @pytest.mark.xfail_platform(('androidn', 'ios'), reason='can not get text from that element')
+# @pytest.mark.xfail_platform('play', reason='can not get text from that element')
 def test_base_element_web(mocked_web_driver):
     base_element = Element('locator')
-    assert all((base_element.root_element_class == WebElement, not CoreDriver.mobile))
+    assert all((base_element.element_class == WebElement, not CoreDriver.mobile))
