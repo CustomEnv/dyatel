@@ -24,6 +24,11 @@ from tests.adata.pages.playground_main_page import PlaygroundMainPage
 set_logging_settings()
 
 
+# FIXME: locator "header h4" is ID should be CSS
+# FIXME: other Group or Page as class variable of Group or Page
+# FIXME: parent doesn't work in waits
+
+
 def pytest_addoption(parser):
     parser.addoption('--engine', default='selenium', help='Specify driver engine')
     parser.addoption('--headless', action='store_true', help='Run in headless mode')
