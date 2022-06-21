@@ -6,7 +6,7 @@ from dyatel.dyatel_sel.core.core_driver import CoreDriver
 
 class MobileDriver(CoreDriver):
 
-    def __init__(self, driver):
+    def __init__(self, driver: AppiumDriver):
         self.mobile_driver: AppiumDriver = driver
         self.capabilities = self.mobile_driver.capabilities
 

@@ -40,3 +40,10 @@ def test_type_clear_text_get_value(pizza_order_page):
     pizza_order_page.quantity_input.clear_text()
     text_erased = pizza_order_page.quantity_input.get_value == ''
     assert all((text_added, text_erased))
+
+
+def test_hover(mouse_event_page):
+    initial_not_displayed = not mouse_event_page.dropdown.is_displayed()
+    mouse_event_page.choose_language_button.hover()
+    after_hover_displayed = mouse_event_page.dropdown.wait_element_without_error().is_displayed()
+    assert all((initial_not_displayed, after_hover_displayed))

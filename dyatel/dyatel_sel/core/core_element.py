@@ -2,7 +2,6 @@ import time
 from logging import info
 
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -18,7 +17,7 @@ ELEMENT_WAIT = 10
 
 class CoreElement:
     def __init__(self, locator, locator_type=None, name=None, parent=None):
-        self.driver: SeleniumWebDriver = CoreDriver.driver
+        self.driver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)
         self.parent = parent if parent else None
 
@@ -38,11 +37,11 @@ class CoreElement:
 
     @property
     def element(self):
-        return self.get_driver().find_element(self.locator_type, self.locator)
+        return self._get_driver().find_element(self.locator_type, self.locator)
 
     @property
     def all_elements(self):
-        return self.get_driver().find_elements(self.locator_type, self.locator)
+        return self._get_driver().find_elements(self.locator_type, self.locator)
 
     # Element interaction
 
@@ -80,8 +79,8 @@ class CoreElement:
         if not silent:
             info(f'Wait until presence of "{self.name}"')
 
-        message = f'Can\'t wait element "{self.name}". Locator type: "{self.locator_type}". Locator: "{self.locator}"'
-        self.get_wait(timeout).until(
+        message = f'Can\'t wait element "{self.name}". {self._get_element_logging_data(self)}'
+        self._get_wait(timeout).until(
             EC.visibility_of_element_located((self.locator_type, self.locator)), message=message
         )
         return self
@@ -90,9 +89,9 @@ class CoreElement:
         if not silent:
             info(f'Wait hidden of "{self.name}"')
 
-        message = f'Element "{self.name}" still visible. Locator type: "{self.locator_type}". Locator: "{self.locator}"'
-        self.get_wait(timeout).until_not(
-            EC.visibility_of_element_located((self.locator_type, self.locator)), message=message
+        message = f'Element "{self.name}" still visible. {self._get_element_logging_data(self)}'
+        self._get_wait(timeout).until(
+            EC.invisibility_of_element_located((self.locator_type, self.locator)), message=message
         )
         return self
 
@@ -110,8 +109,8 @@ class CoreElement:
         if not silent:
             info(f'Wait until clickable of "{self.name}"')
 
-        message = f'Element "{self.name}" not clickable. Locator type: "{self.locator_type}". Locator: "{self.locator}"'
-        self.get_wait(timeout).until(
+        message = f'Element "{self.name}" not clickable. {self._get_element_logging_data(self)}'
+        self._get_wait(timeout).until(
             EC.element_to_be_clickable((self.locator_type, self.locator)), message=message
         )
         return self
@@ -168,7 +167,16 @@ class CoreElement:
 
     # Mixin
 
-    def get_driver(self):
+    def _get_element_logging_data(self, element):
+        current = element
+        parent = current.parent
+        current_data = f'Selector: ["{self.locator_type}": "{self.locator}"]'
+        if parent:
+            parent_data = f'Parent selector: ["{parent.locator_type}": "{parent.locator}"]'
+            current_data = f'{current_data}. {parent_data}'
+        return current_data
+
+    def _get_driver(self):
         """
         Get driver including parent element if available
         """
@@ -178,8 +186,8 @@ class CoreElement:
             info(f'Get element "{self.name}" from parent element "{self.parent.name}"')
         return base
 
-    def get_wait(self, timeout=ELEMENT_WAIT):
-        return WebDriverWait(self.driver, timeout)
+    def _get_wait(self, timeout=ELEMENT_WAIT):
+        return WebDriverWait(self._get_driver(), timeout)
 
     def _get_child_elements(self):
         """Return page elements and page objects of this page object

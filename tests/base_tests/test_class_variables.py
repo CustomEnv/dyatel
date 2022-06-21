@@ -6,6 +6,9 @@ from dyatel.dyatel_sel.core.core_page import CorePage
 from dyatel.dyatel_sel.utils import tags
 
 
+tags = tags + ['header h4']
+
+
 @pytest.mark.parametrize('locator', ('.element', '[id *= element]'))
 @pytest.mark.parametrize('base_class', (CorePage, CoreElement))
 def test_base_class_auto_css_locator(locator, base_class):

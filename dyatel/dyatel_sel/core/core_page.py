@@ -1,6 +1,5 @@
 from logging import info
 
-from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -24,9 +23,8 @@ def _get_page_elements(self):
 
 class CorePage:
     def __init__(self, locator, locator_type=None, name=None):
-        self.driver: SeleniumWebDriver = CoreDriver.driver
+        self.driver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)
-        self.wait = WebDriverWait(self.driver, 10)
         self.url = getattr(self, 'url', '')
 
         if isinstance(self.driver, AppiumWebDriver):

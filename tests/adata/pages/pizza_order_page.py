@@ -8,5 +8,5 @@ class PizzaOrderPage(Page):
         super().__init__('//h3[contains(., "Pizza House")]', name='Pizza order page')
 
     submit_button = Element('submit_button', name='submit order button')
-    error_modal = Element('.modal-content', name='error modal popup')
+    error_modal = Element('.show .modal-dialog .modal-content', name='error modal popup')
     quantity_input = Element('quantity', name='quantity input')

@@ -32,7 +32,7 @@ class PlayPage:
         self.page_elements = _get_page_elements(self)
         for el in self.page_elements:
             if not el.driver:
-                el.__init__(locator=el.locator, name=el.name)
+                el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
 
     def open_page(self, url=''):
         url = self.url if not url else url

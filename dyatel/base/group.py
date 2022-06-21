@@ -1,8 +1,7 @@
-from dyatel.dyatel_sel.elements.mobile_element import MobileElement
-from dyatel.dyatel_sel.elements.web_element import WebElement
+from dyatel.base.element import Element
 
 
-class Group(WebElement, MobileElement):
+class Group(Element):
 
     def __init__(self, *args, **kwargs):
         super(Group, self).__init__(*args, **kwargs)
