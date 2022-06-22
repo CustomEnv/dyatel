@@ -39,6 +39,8 @@ class CorePage:
             if not el.driver:
                 el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
 
+        self.wait = WebDriverWait(self.driver, 10)
+
     def refresh(self, wait_page_load=True):
         info(f'Reload {self.name} page')
         self.driver.refresh()

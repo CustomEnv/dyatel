@@ -25,6 +25,7 @@ set_logging_settings()
 
 
 # FIXME: other Group or Page as class variable of Group or Page -> mb will be skipped
+# FIXME: make "silent" argument latest
 
 
 def pytest_addoption(parser):
