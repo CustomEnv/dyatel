@@ -25,6 +25,9 @@ set_logging_settings()
 
 
 # FIXME: other Group or Page as class variable of Group or Page -> mb will be skipped
+# TODO: timeout for playwright in ms
+# TODO: finish compatibility in PlayElement/CoreElement
+# TODO: fix some methods in PlayElement
 
 
 def pytest_addoption(parser):
