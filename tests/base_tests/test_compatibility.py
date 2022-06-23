@@ -12,7 +12,7 @@ from dyatel.dyatel_sel.pages.web_page import WebPage
 
 def get_class_static(class_object):
     all_static = list(dict(class_object.__dict__.items()).keys())
-    return sorted(filter(None, [item if item.count('_') != 4 else None for item in all_static]))
+    return sorted(filter(None, [item if '_' not in item else None for item in all_static]))
 
 
 @pytest.mark.xfail(reason='TODO: playwright and selenium compatibility')

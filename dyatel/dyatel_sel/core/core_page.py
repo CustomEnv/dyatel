@@ -7,24 +7,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.utils import get_locator_type, get_legacy_selector
-
-
-def _get_page_elements(self):
-    """Return page elements and page objects of this page object
-
-    :returns: list of page elements and page objects
-    """
-    page_elements = []
-
-    class_items = list(self.__dict__.items()) + list(self.__class__.__dict__.items())
-
-    for parent_class in self.__class__.__bases__:
-        class_items += list(parent_class.__dict__.items()) + list(parent_class.__class__.__dict__.items())
-
-    for attribute, value in list(self.__class__.__dict__.items()):
-        if isinstance(value, CoreElement):
-            page_elements.append(value)
-    return page_elements
+from dyatel.internal_utils import get_child_elements
 
 
 class CorePage:
@@ -40,7 +23,7 @@ class CorePage:
             self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.name = name if name else self.locator
 
-        self.page_elements: list = _get_page_elements(self)
+        self.page_elements = get_child_elements(self, CoreElement)
         for el in self.page_elements:  # required for CoreElement
             if not el.driver:
                 el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
