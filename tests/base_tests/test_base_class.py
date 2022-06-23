@@ -1,39 +1,13 @@
-import pytest
-from mock.mock import MagicMock
-
 from dyatel.base.group import Group
-from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_page import PlayPage
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
-from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
-from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.base.page import Page
 from dyatel.base.element import Element
 from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
-
-
-@pytest.fixture
-def mocked_mobile_driver():
-    driver = MagicMock()
-    driver.capabilities = MagicMock(return_value={'platformName': 'ios', 'browserName': 'safari'})()
-    yield MobileDriver(driver)
-    CoreDriver.driver = None
-
-
-@pytest.fixture
-def mocked_selenium_driver():
-    yield WebDriver(MagicMock())
-    CoreDriver.driver = None
-
-
-@pytest.fixture
-def mocked_play_driver():
-    yield PlayDriver(MagicMock())
-    PlayDriver.driver = None
 
 
 def test_base_page_mobile(mocked_mobile_driver):
