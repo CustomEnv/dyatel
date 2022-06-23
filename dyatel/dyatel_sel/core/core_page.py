@@ -15,6 +15,12 @@ def _get_page_elements(self):
     :returns: list of page elements and page objects
     """
     page_elements = []
+
+    class_items = list(self.__dict__.items()) + list(self.__class__.__dict__.items())
+
+    for parent_class in self.__class__.__bases__:
+        class_items += list(parent_class.__dict__.items()) + list(parent_class.__class__.__dict__.items())
+
     for attribute, value in list(self.__class__.__dict__.items()):
         if isinstance(value, CoreElement):
             page_elements.append(value)
@@ -34,7 +40,7 @@ class CorePage:
             self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.name = name if name else self.locator
 
-        self.page_elements = _get_page_elements(self)
+        self.page_elements: list = _get_page_elements(self)
         for el in self.page_elements:  # required for CoreElement
             if not el.driver:
                 el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)

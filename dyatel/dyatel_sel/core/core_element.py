@@ -1,7 +1,7 @@
 import time
 from logging import info
 
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -13,6 +13,40 @@ from dyatel.dyatel_sel.utils import get_locator_type, get_legacy_selector
 
 
 ELEMENT_WAIT = 10
+
+
+def get_dict_attr(obj, attr):
+    for obj in [obj] + obj.__class__.mro():
+        if attr in obj.__dict__:
+            return obj.__dict__[attr]  # issue here
+
+
+def _get_child_elements(self):
+    """Return page elements and page objects of this page object
+
+    :returns: list of page elements and page objects
+    """
+    elements = []
+
+    class_items = list(self.__dict__.items()) + list(self.__class__.__dict__.items())
+
+    for parent_class in self.__class__.__bases__:
+        class_items += list(parent_class.__dict__.items()) + list(parent_class.__class__.__dict__.items())
+
+    for attr_name in self.__dir__():
+        attr_value = get_dict_attr(self, attr_name)
+        if self.name == 'Parent Group':
+            breakpoint()
+        if attr_name == 'parent_element_init_var':
+            breakpoint()
+        class_items.append((attr_name, attr_value))
+
+    for attribute, value in class_items:
+        if attribute == 'parent_element_init_var':
+            breakpoint()
+        if isinstance(value, CoreElement):
+            elements.append(value)
+    return set(elements)
 
 
 class CoreElement:
@@ -28,8 +62,9 @@ class CoreElement:
             self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.name = name if name else self.locator
 
-        self.child_elements = []
-        for el in self._get_child_elements():  # required for Group
+        self.child_elements = _get_child_elements(self)
+
+        for el in self.child_elements:  # required for Group
             if not el.driver:
                 el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
 
@@ -89,10 +124,18 @@ class CoreElement:
         if not silent:
             info(f'Wait hidden of "{self.name}"')
 
-        message = f'Element "{self.name}" still visible. {self._get_element_logging_data(self)}'
-        self._get_wait(timeout).until(
-            EC.invisibility_of_element_located((self.locator_type, self.locator)), message=message
-        )
+        is_hidden = False
+        start_time = time.time()
+
+        while time.time() - start_time < timeout and not is_hidden:
+            try:
+                is_hidden = not self.element.is_displayed()
+            except (NoSuchElementException, StaleElementReferenceException):
+                is_hidden = True
+
+        if not is_hidden:
+            raise Exception(f'Element "{self.name}" still visible. {self._get_element_logging_data(self)}')
+
         return self
 
     def wait_element_without_error(self, silent=False, timeout=ELEMENT_WAIT):
@@ -188,13 +231,3 @@ class CoreElement:
 
     def _get_wait(self, timeout=ELEMENT_WAIT):
         return WebDriverWait(self._get_driver(), timeout)
-
-    def _get_child_elements(self):
-        """Return page elements and page objects of this page object
-
-        :returns: list of page elements and page objects
-        """
-        for attribute, value in list(self.__class__.__dict__.items()):
-            if isinstance(value, CoreElement):
-                self.child_elements.append(value)
-        return self.child_elements

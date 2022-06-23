@@ -26,6 +26,7 @@ set_logging_settings()
 
 # FIXME: other Group or Page as class variable of Group or Page -> mb will be skipped
 # FIXME: make "silent" argument latest
+# FIXME: group with parent group (with element in init) seems doesn't set "parent" for element
 
 
 def pytest_addoption(parser):
