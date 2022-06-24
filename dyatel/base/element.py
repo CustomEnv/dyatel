@@ -13,14 +13,14 @@ class Element(WebElement, MobileElement, PlayElement):
         self.name = name
         self.parent = parent
 
-        self.element_class = self.get_element_class()
+        self.element_class = self.__get_element_class()
         if self.element_class:
             if self.element_class is PlayElement:
                 PlayElement.__init__(self, locator, locator_type=locator_type, name=name, parent=parent)
             else:
                 super(self.element_class, self).__init__(locator, locator_type=locator_type, name=name, parent=parent)
 
-    def get_element_class(self):
+    def __get_element_class(self):
         if PlayDriver.driver:
             Element.__bases__ = PlayElement,
             return PlayElement

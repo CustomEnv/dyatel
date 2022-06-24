@@ -1,5 +1,8 @@
+from typing import Union
 from logging import info
 
+from appium.webdriver.webdriver import WebDriver as AppiumDriver
+from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from selenium.webdriver.remote.command import Command
 
 
@@ -12,15 +15,15 @@ def get_driver_status(driver):
 
 
 class CoreDriver:
-    driver = None
+    driver: Union[AppiumDriver, SeleniumWebDriver] = None
 
     mobile = False
     desktop = False
     is_ios = False
     is_android = False
 
-    def __init__(self, driver):
-        self.driver = driver
+    def __init__(self, driver: Union[AppiumDriver, SeleniumWebDriver]):
+        self.driver: Union[AppiumDriver, SeleniumWebDriver] = driver
 
     def is_driver_opened(self):
         return get_driver_status(self.driver) == 'Opened'

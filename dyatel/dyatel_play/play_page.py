@@ -4,18 +4,7 @@ import os
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
-
-
-def _get_page_elements(self):
-    """Return page elements and page objects of this page object
-
-    :returns: list of page elements and page objects
-    """
-    page_elements = []
-    for attribute, value in list(self.__class__.__dict__.items()):
-        if isinstance(value, PlayElement):
-            page_elements.append(value)
-    return page_elements
+from dyatel.internal_utils import get_child_elements
 
 
 class PlayPage:
@@ -29,10 +18,10 @@ class PlayPage:
         self.driver_wrapper = PlayDriver(self.driver, initial_page=False)
 
         self.url = getattr(self, 'url', '')
-        self.page_elements = _get_page_elements(self)
+        self.page_elements = get_child_elements(self, PlayElement)
         for el in self.page_elements:
             if not el.driver:
-                el.__init__(locator=el.locator, name=el.name)
+                el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
 
     def open_page(self, url=''):
         url = self.url if not url else url

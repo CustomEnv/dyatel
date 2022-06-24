@@ -7,15 +7,15 @@ from dyatel.dyatel_sel.pages.web_page import WebPage
 
 class Page(WebPage, MobilePage, PlayPage):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, locator, locator_type=None, name=None):
 
-        self.page_class = self.get_page_class()
+        self.page_class = self.__get_page_class()
         if self.page_class is PlayPage:
-            PlayPage.__init__(self, *args, **kwargs)
+            PlayPage.__init__(self, locator, locator_type, name)
         else:
-            super(self.page_class, self).__init__(*args, **kwargs)
+            super(self.page_class, self).__init__(locator, locator_type, name)
 
-    def get_page_class(self):
+    def __get_page_class(self):
         if PlayDriver.driver:
             Page.__bases__ = PlayPage,
             return PlayPage

@@ -28,6 +28,7 @@ class WebElement(CoreElement):
         return self
 
     def click_outside(self, x=-1, y=-1):
+        self.wait_element(silent=True)
         dx, dy = self.calculate_coordinate_to_click(self.element, x, y)
         ActionChains(self.driver).move_to_element_with_offset(self.element, dx, dy).click().perform()
         return self

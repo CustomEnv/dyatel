@@ -1,10 +1,11 @@
 from selenium.webdriver.common.by import By
 
-tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link']
+tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header']
 
 
 def get_locator_type(locator):
     brackets = '[' in locator and ']' in locator
+    is_only_tags = True
 
     if locator in tags:
         return By.TAG_NAME
@@ -14,8 +15,14 @@ def get_locator_type(locator):
         return By.CSS_SELECTOR
     elif '.' in locator and not brackets:
         return By.CSS_SELECTOR
-    else:
-        return By.ID
+
+    for tag in locator.split(' '):
+        is_only_tags = is_only_tags and tag in tags
+
+    if is_only_tags:
+        return By.TAG_NAME
+
+    return By.ID
 
 
 def get_legacy_selector(locator, locator_type):
