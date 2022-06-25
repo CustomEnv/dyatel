@@ -21,11 +21,13 @@ android_desired_caps = {
 ios_desired_caps = {
     'deviceName': 'iPhone 13',
     'platformName': 'iOS',
-    'platformVersion': '15.2',
+    'platformVersion': '15.4',
     'automationName': 'XCUITest',
-    'udid': 'A2A7D60B-921F-4EDB-8883-203249E9A6DB',
-    'app': f'{os.getcwd()}/data_for_testing/apps/sample_app_ios.zip',
-    'bundleId': 'io.appium.IosAppSeleniumMaster',
+    'udid': 'FD714443-9CA8-4B85-A767-7CD9A3168E39',
+    # Update following capabilities before driver init
+    # 'app': f'{os.getcwd()}/data_for_testing/apps/sample_app_ios.zip',
+    # 'browserName': 'Safari',
+    # 'bundleId': 'io.appium.IosAppSeleniumMaster',
     'newCommandTimeout': 9000,
     'wdaLaunchTimeout': 120000,
 }

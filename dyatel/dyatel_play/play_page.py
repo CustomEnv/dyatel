@@ -1,5 +1,4 @@
-import logging
-import os
+from logging import info
 
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_element import PlayElement
@@ -23,39 +22,52 @@ class PlayPage:
             if not el.driver:
                 el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
 
+    def reload_page(self, wait_page_load=True):
+        """
+        Reload current page
+
+        :param wait_page_load: wait until anchor will be element loaded
+        :return: self
+        """
+        info(f'Reload {self.name} page')
+        self.driver_wrapper.refresh()
+        if wait_page_load:
+            self.wait_page_loaded()
+        return self
+
     def open_page(self, url=''):
+        """
+        Open page with given url or use url from page class f url isn't given
+
+        :param url: url for navigation
+        :return: self
+        """
         url = self.url if not url else url
-        self.driver_wrapper.get(url)
+        if not self.is_page_opened():
+            self.driver_wrapper.get(url)
+            self.wait_page_loaded()
         return self
 
-    def get(self, url, *args, **kwargs):
-        """ Navigate to page and wait until loaded """
-        sensitive_url = url.replace(os.getcwd(), '****') if os.getcwd() in url else url
-        logging.info(f'Go to url {sensitive_url}')
-        self.context.goto(url, *args, **kwargs)
-        self.wait_until_opened()
-        return self
+    def wait_page_loaded(self, silent=False):
+        """
+        Wait until page loaded
 
-    def wait_until_opened(self):
-        """ Wait until page loaded """
-        logging.info(f'Wait until page opened {self.name}')
+        :param silent: erase log
+        :return: self
+        """
+        if not silent:
+            info(f'Wait until page "{self.name}" loaded')
         self.context.wait_for_selector(self.locator)
         return self
 
-    def refresh(self):
-        """ Reload current page """
-        logging.info('Reload current page')
-        self.context.reload()
-        return self
+    def is_page_opened(self):
+        """
+        Check is current page opened or not
 
-    def go_forward(self):
-        """ Go forward """
-        logging.info('Going forward')
-        self.context.go_forward()
-        return self
-
-    def go_back(self):
-        """ Go back """
-        logging.info('Going back')
-        self.context.go_back()
-        return self
+        :return: self
+        """
+        if self.url:
+            return self.driver_wrapper.current_url == self.url
+        else:
+            page_anchor = PlayElement(locator=self.locator, locator_type=self.locator_type, name=self.name)
+            return page_anchor.is_displayed()

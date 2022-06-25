@@ -8,7 +8,7 @@ from appium.webdriver.appium_service import AppiumService
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 
-from dyatel.utils import set_logging_settings, resize_image, shell_running_command, shell_command
+from dyatel.shared_utils import set_logging_settings, resize_image, shell_running_command, shell_command
 from tests.settings import android_desired_caps, android_device_start_timeout, appium_logs_path
 
 

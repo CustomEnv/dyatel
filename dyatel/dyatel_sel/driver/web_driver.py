@@ -10,4 +10,4 @@ class WebDriver(CoreDriver):
         CoreDriver.driver = self.web_driver
         CoreDriver.mobile = False
         CoreDriver.desktop = True
-        super(WebDriver, self).__init__(driver=self.web_driver)
+        CoreDriver.__init__(self, driver=self.web_driver)

@@ -29,7 +29,7 @@ class MobileDriver(CoreDriver):
             else:
                 raise Exception('Make sure that correct "platformName" capability specified')
 
-        super(MobileDriver, self).__init__(driver=self.mobile_driver)
+        CoreDriver.__init__(self, driver=self.mobile_driver)
 
     def is_app_installed(self):
         return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.RUNNING_IN_FOREGROUND

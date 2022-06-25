@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.core.core_page import CorePage
-from dyatel.dyatel_sel.utils import tags
+from dyatel.dyatel_sel.sel_utils import tags
 
 
 tags = tags + ['header h4']

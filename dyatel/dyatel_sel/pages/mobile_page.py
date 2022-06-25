@@ -8,4 +8,4 @@ class MobilePage(CorePage):
 
     def __init__(self, locator, locator_type=None, name=None):
         self.driver: AppiumWebDriver = CoreDriver.driver
-        super(MobilePage, self).__init__(locator=locator, locator_type=locator_type, name=name)
+        CorePage.__init__(self, locator=locator, locator_type=locator_type, name=name)

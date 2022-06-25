@@ -1,6 +1,30 @@
 import random
+import time
 
 import pytest
+from selenium.common.exceptions import NoSuchElementException
+
+from dyatel.internal_utils import Mixin
+
+
+def test_element_exception_without_parent_form_driver(base_playground_page):
+    el = base_playground_page.kube_broken
+    try:
+        el.element
+    except NoSuchElementException as exc:
+        logs = Mixin()._get_element_logging_data(el)
+        message = f'Cant find element "{el.name}". {logs}.'
+        assert exc.msg == message
+
+
+def test_element_exception_with_broken_parent_form_driver(base_playground_page):
+    el = base_playground_page.kube_broken_parent
+    try:
+        el.element
+    except NoSuchElementException as exc:
+        logs = Mixin()._get_element_logging_data(el.parent)
+        message = f'Cant find parent element "{el.parent.name}". {logs}.'
+        assert exc.msg == message
 
 
 def test_element_displayed_positive(base_playground_page):
@@ -16,7 +40,7 @@ def test_parent_element_positive(base_playground_page):
 
 
 def test_parent_element_negative(base_playground_page):
-    assert not base_playground_page.kube_broken_parent.is_displayed()
+    assert not base_playground_page.kube_wrong_parent.is_displayed()
 
 
 def test_parent_element_wait_visible_positive(base_playground_page):
@@ -24,12 +48,27 @@ def test_parent_element_wait_visible_positive(base_playground_page):
 
 
 def test_parent_element_wait_hidden_negative(base_playground_page):
-    assert base_playground_page.kube_broken_parent.wait_element_hidden()
+    assert base_playground_page.kube_wrong_parent.wait_element_hidden()
+
+
+def test_all_elements(base_playground_page):
+    assert len(base_playground_page.any_link.all_elements) > 1
+
+
+def test_all_elements_count(base_playground_page):
+    assert base_playground_page.any_link.get_elements_count() > 1
+
+
+def test_element_object_in_all_elements(base_playground_page):
+    expected_class = base_playground_page.any_link.__class__.__base__
+    for element_object in base_playground_page.any_link.all_elements:
+        assert element_object.__class__ is expected_class
 
 
 def test_click_and_wait(pizza_order_page):
     pizza_order_page.submit_button.click()
     after_click_displayed = pizza_order_page.error_modal.wait_element().is_displayed()
+    time.sleep(1)  # FIXME: use only for playwright
     pizza_order_page.error_modal.click_outside()
     after_click_outside_not_displayed = not pizza_order_page.error_modal.wait_element_hidden().is_displayed()
     assert all((after_click_displayed, after_click_outside_not_displayed))
@@ -40,7 +79,7 @@ def test_wait_without_error(pizza_order_page):
     assert not pizza_order_page.error_modal.is_displayed()
 
 
-@pytest.mark.xfail_platform('android', reason='can not get text from that element')
+@pytest.mark.xfail_platform('android', 'ios', reason='Can not get text from that element. TODO: Rework test')
 def test_type_clear_text_get_value(pizza_order_page):
     text_to_send = str(random.randint(100, 9999))
     pizza_order_page.quantity_input.type_text(text_to_send)
