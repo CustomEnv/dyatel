@@ -11,11 +11,9 @@ from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
-from tests.settings import android_desired_caps
+from dyatel.base.driver import Driver
+from tests.settings import android_desired_caps, ios_desired_caps
 from dyatel.utils import set_logging_settings
-from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
-from dyatel.dyatel_sel.driver.web_driver import WebDriver
-from dyatel.dyatel_play.play_driver import PlayDriver
 from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import PlaygroundMainPage
@@ -25,17 +23,30 @@ set_logging_settings()
 
 
 # FIXME: other Group or Page as class variable of Group or Page -> mb will be skipped
-# TODO: timeout for playwright in ms
-# TODO: finish compatibility in PlayElement/CoreElement
-# TODO: fix some methods in PlayElement
 
 
 def pytest_addoption(parser):
     parser.addoption('--engine', default='selenium', help='Specify driver engine')
     parser.addoption('--headless', action='store_true', help='Run in headless mode')
-    parser.addoption('--driver', default='chrome', help='Driver selecting')
+    parser.addoption('--driver', default='chrome', help='Browser name')
+    parser.addoption('--platform', default='desktop', help='Platform name')
     parser.addoption('--appium-port', default='1000')
     parser.addoption('--appium-ip', default='0.0.0.0')
+
+
+@pytest.fixture(scope='session')
+def driver_name(request):
+    return request.config.getoption('driver').lower()
+
+
+@pytest.fixture(scope='session')
+def driver_engine(request):
+    return request.config.getoption('engine').lower()
+
+
+@pytest.fixture(scope='session')
+def platform(request):
+    return request.config.getoption('platform').lower()
 
 
 @pytest.fixture(scope='session')
@@ -54,33 +65,16 @@ def firefox_options(request):
     return options
 
 
-@pytest.fixture(scope='session')
-def driver_name(request):
-    return request.config.getoption('driver').lower()
-
-
-@pytest.fixture(scope='session')
-def driver_engine(request):
-    return request.config.getoption('engine').lower()
-
-
 @pytest.fixture
-def driver_wrapper(driver, driver_name, markers, driver_engine, request):
+def driver_wrapper(platform, driver_name, driver_engine, request, driver):
     xfail_marks_iterator = tuple(request.node.iter_markers(name='xfail_platform'))
     xfail_platform = list(name for marker in xfail_marks_iterator for name in marker.args)
 
-    if driver_name in xfail_platform or driver_engine in xfail_platform:
+    if platform in xfail_platform or driver_engine in xfail_platform:
         xfail_reason = list(name for marker in xfail_marks_iterator for name in marker.kwargs.values())
-        pytest.xfail(f"Expected failed for {driver_name}. Reason={xfail_reason}")
+        pytest.xfail(f"Expected failed for {platform} with {driver_name}. Reason={xfail_reason}")
 
-    if driver_name in ('android', 'ios'):
-        driver_wrapper = MobileDriver(driver=driver)
-    elif 'selenium' in driver_engine:
-        driver_wrapper = WebDriver(driver=driver)
-    elif 'play' in driver_engine:
-        driver_wrapper = PlayDriver(driver=driver)
-    else:
-        raise Exception('Cant specify driver wrapper with given settings')
+    driver_wrapper = Driver(driver)
 
     yield driver_wrapper
     driver_wrapper.get('data:,')
@@ -92,40 +86,49 @@ def markers(request):
 
 
 @pytest.fixture(scope='session')
-def driver(chrome_options, firefox_options, driver_name, driver_engine, request):
+def driver(request, driver_name, driver_engine, chrome_options, firefox_options, platform):
     driver = None
-    appium_ip = request.config.getoption('--appium-ip')
-    appium_port = request.config.getoption('--appium-port')
-    command_exc = f'http://{appium_ip}:{appium_port}/wd/hub'
-    is_mobile = driver_name in ('android', 'ios')
     is_headless = request.config.getoption('headless')
 
-    if 'selenium' in driver_engine:
+    if 'appium' in driver_engine:
+        appium_ip = request.config.getoption('--appium-ip')
+        appium_port = request.config.getoption('--appium-port')
+        command_exc = f'http://{appium_ip}:{appium_port}/wd/hub'
+
+        caps = android_desired_caps if platform == 'android' else ios_desired_caps
+        caps.update({'browserName': driver_name.title()})
+        driver = AppiumDriver(command_executor=command_exc, desired_capabilities=caps)
+
+        yield driver
+        driver.quit()  # FIXME
+
+    elif 'selenium' in driver_engine:
         if driver_name == 'chrome':
             driver = ChromeWebDriver(executable_path=ChromeDriverManager().install(), options=chrome_options)
         elif driver_name == 'firefox':
             driver = GeckoWebDriver(executable_path=GeckoDriverManager().install(), options=firefox_options)
         elif driver_name == 'safari':
             driver = SafariWebDriver()
-        elif driver_name == 'android':
-            os.environ['mobile'] = 'True'
-            android_desired_caps.update({'browserName': 'Chrome'})
-            driver = AppiumDriver(command_executor=command_exc, desired_capabilities=android_desired_caps)
-            driver.use_selenium_search = True
 
-        if not is_mobile:
-            driver.implicitly_wait(0.01)
-            driver.set_window_size(1024, 900)
-            driver.set_window_position(0, 0)
+        driver.implicitly_wait(0.01)  # FIXME
+        driver.set_window_size(1024, 900)  # FIXME
+        driver.set_window_position(0, 0)  # FIXME
 
         yield driver
-        driver.quit()
+        driver.quit()  # FIXME
 
     elif 'play' in driver_engine:
-        with sync_playwright() as connect:
-            driver = connect.chromium.launch(headless=is_headless)
+        with sync_playwright() as playwright:
+            if driver_name == 'chrome':
+                browser = playwright.chromium
+            elif driver_name == 'firefox':
+                browser = playwright.firefox
+            elif driver_name == 'safari':
+                browser = playwright.webkit
+
+            driver = browser.launch(headless=is_headless)
             yield driver
-            driver.close()
+            driver.close()  # FIXME
 
     assert driver, 'Driver isn\'t selected. Check your settings'
 

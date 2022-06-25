@@ -8,12 +8,8 @@ from dyatel.dyatel_sel.pages.web_page import WebPage
 class Page(WebPage, MobilePage, PlayPage):
 
     def __init__(self, locator, locator_type=None, name=None):
-
         self.page_class = self.__get_page_class()
-        if self.page_class is PlayPage:
-            PlayPage.__init__(self, locator, locator_type, name)
-        else:
-            super(self.page_class, self).__init__(locator, locator_type, name)
+        self.page_class.__init__(self, locator, locator_type, name)
 
     def __get_page_class(self):
         if PlayDriver.driver:
