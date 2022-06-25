@@ -6,11 +6,12 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.dyatel_sel.utils import get_locator_type, get_legacy_selector
+from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
 from dyatel.internal_utils import get_child_elements
 
 
 class CorePage:
+
     def __init__(self, locator, locator_type=None, name=None):
         self.driver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)

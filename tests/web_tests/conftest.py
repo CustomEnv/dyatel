@@ -1,5 +1,3 @@
-import os
-
 import pytest
 from playwright.sync_api import sync_playwright
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
@@ -13,7 +11,7 @@ from webdriver_manager.firefox import GeckoDriverManager
 
 from dyatel.base.driver import Driver
 from tests.settings import android_desired_caps, ios_desired_caps
-from dyatel.utils import set_logging_settings
+from dyatel.shared_utils import set_logging_settings
 from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import PlaygroundMainPage

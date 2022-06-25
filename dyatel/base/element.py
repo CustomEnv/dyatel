@@ -6,6 +6,7 @@ from dyatel.dyatel_sel.elements.web_element import WebElement
 
 
 class Element(WebElement, MobileElement, PlayElement):
+
     def __init__(self, locator, locator_type=None, name=None, parent=None):
         self.driver = None
         self.locator = locator

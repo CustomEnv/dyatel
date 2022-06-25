@@ -9,16 +9,17 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import WebDriverException
 
-from dyatel.utils import cut_log_data
+from dyatel.shared_utils import cut_log_data
 from dyatel.internal_utils import get_child_elements, Mixin
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
-from dyatel.dyatel_sel.utils import get_locator_type, get_legacy_selector
+from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
 
 
 ELEMENT_WAIT = 10
 
 
 class CoreElement(Mixin):
+
     def __init__(self, locator, locator_type=None, name=None, parent=None):
         self.driver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)

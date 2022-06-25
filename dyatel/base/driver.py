@@ -8,6 +8,7 @@ from dyatel.dyatel_sel.driver.web_driver import WebDriver
 
 
 class Driver(WebDriver, MobileDriver, PlayDriver):
+
     def __init__(self, driver):
         self.driver = driver
         self.driver_class = self.__get_driver_class()

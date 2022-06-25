@@ -9,13 +9,14 @@ from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
 from dyatel.internal_utils import get_child_elements, get_timeout
 from playwright.sync_api import Page as PlayPage
-from dyatel.utils import cut_log_data
+from dyatel.shared_utils import cut_log_data
 
 
 ELEMENT_WAIT = get_timeout(10)
 
 
 class PlayElement:
+
     def __init__(self, locator, locator_type=None, name=None, parent=None):
         self.locator = get_selenium_completable_locator(locator)
         self.name = name if name else self.locator
