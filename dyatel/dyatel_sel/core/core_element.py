@@ -51,13 +51,13 @@ class CoreElement(Mixin):
         try:
             driver = self._get_driver()
         except NoSuchElementException:
-            message = f'Cant find parent element "{self.parent.name}". {self._get_element_logging_data(self.parent)}.'
+            message = f'Cant find parent element "{self.parent.name}". {self.get_element_logging_data(self.parent)}.'
             raise NoSuchElementException(message) from NoSuchElementException
 
         try:
             element = driver.find_element(self.locator_type, self.locator)
         except NoSuchElementException:
-            message = f'Cant find element "{self.name}". {self._get_element_logging_data()}.'
+            message = f'Cant find element "{self.name}". {self.get_element_logging_data()}.'
             raise NoSuchElementException(message) from NoSuchElementException
         return self._element if self._element else element
 
@@ -143,7 +143,7 @@ class CoreElement(Mixin):
         if not silent:
             info(f'Wait until presence of "{self.name}"')
 
-        message = f'Can\'t wait element "{self.name}". {self._get_element_logging_data()}'
+        message = f'Can\'t wait element "{self.name}". {self.get_element_logging_data()}'
         self._get_wait(timeout).until(
             ec.visibility_of_element_located((self.locator_type, self.locator)), message=message
         )
@@ -187,7 +187,7 @@ class CoreElement(Mixin):
                 is_hidden = True
 
         if not is_hidden:
-            raise Exception(f'Element "{self.name}" still visible. {self._get_element_logging_data()}')
+            raise Exception(f'Element "{self.name}" still visible. {self.get_element_logging_data()}')
 
         return self
 
@@ -203,13 +203,46 @@ class CoreElement(Mixin):
         if not silent:
             info(f'Wait until clickable of "{self.name}"')
 
-        message = f'Element "{self.name}" not clickable. {self._get_element_logging_data()}'
+        message = f'Element "{self.name}" not clickable. {self.get_element_logging_data()}'
         self._get_wait(timeout).until(
             ec.element_to_be_clickable((self.locator_type, self.locator)), message=message
         )
         return self
 
     # Element state
+
+    def scroll_into_view(self, block='center', behavior='instant', sleep=0):
+        """
+        Scroll element into view by js script
+
+        :param: block: start - element on the top; end - element at the bottom
+        :param: behavior: scroll type: smooth or instant
+        :return: self
+        """
+        info(f'Scroll element "{self.name}" into view')
+
+        self.wait_element(silent=True)
+
+        self.driver.execute_script(
+            'arguments[0].scrollIntoView({{block: "{}", behavior: "{}"}});'.format(block, behavior), self.element
+        )
+
+        if sleep:
+            time.sleep(sleep)
+
+        return self
+
+    def get_screenshot(self, filename):
+        info(f'Get screenshot of "{self.name}"')
+        image_binary = self.get_screenshot_base
+        image_binary.save(filename)
+        return image_binary
+
+    @property
+    def get_screenshot_base(self):
+        screenshot_binary = self.element.screenshot_as_png
+        el_width = self.element.size['width']
+        return self.scaled_screenshot(screenshot_binary, el_width)
 
     @property
     def get_text(self):
@@ -218,7 +251,7 @@ class CoreElement(Mixin):
 
         :return: element text
         """
-        info(f'Get text from {self.name}')
+        info(f'Get text from "{self.name}"')
         return self.element.text
 
     @property

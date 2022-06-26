@@ -12,7 +12,7 @@ def test_element_exception_without_parent_form_driver(base_playground_page):
     try:
         el.element
     except NoSuchElementException as exc:
-        logs = Mixin()._get_element_logging_data(el)
+        logs = Mixin().get_element_logging_data(el)
         message = f'Cant find element "{el.name}". {logs}.'
         assert exc.msg == message
 
@@ -22,7 +22,7 @@ def test_element_exception_with_broken_parent_form_driver(base_playground_page):
     try:
         el.element
     except NoSuchElementException as exc:
-        logs = Mixin()._get_element_logging_data(el.parent)
+        logs = Mixin().get_element_logging_data(el.parent)
         message = f'Cant find parent element "{el.parent.name}". {logs}.'
         assert exc.msg == message
 
@@ -65,10 +65,11 @@ def test_element_object_in_all_elements(base_playground_page):
         assert element_object.__class__ is expected_class
 
 
-def test_click_and_wait(pizza_order_page):
+def test_click_and_wait(pizza_order_page, driver, driver_engine):
     pizza_order_page.submit_button.click()
     after_click_displayed = pizza_order_page.error_modal.wait_element().is_displayed()
-    time.sleep(1)  # FIXME: use only for playwright
+    if 'play' in driver_engine:
+        time.sleep(1)
     pizza_order_page.error_modal.click_outside()
     after_click_outside_not_displayed = not pizza_order_page.error_modal.wait_element_hidden().is_displayed()
     assert all((after_click_displayed, after_click_outside_not_displayed))
@@ -91,6 +92,12 @@ def test_type_clear_text_get_value(pizza_order_page):
 
 def test_hover(mouse_event_page):
     initial_not_displayed = not mouse_event_page.dropdown.is_displayed()
-    mouse_event_page.choose_language_button.hover()
+    mouse_event_page.choose_language_button.scroll_into_view().hover()
     after_hover_displayed = mouse_event_page.dropdown.wait_element_without_error().is_displayed()
     assert all((initial_not_displayed, after_hover_displayed))
+
+
+def test_screenshot(base_playground_page, driver_engine, driver_name, platform, request):
+    node_name = request.node.name.replace('_', '-')
+    filename = f'{node_name}-{driver_engine}-{driver_name}-{platform}-kube'
+    base_playground_page.kube.scroll_into_view(sleep=0.5).assert_screenshot(filename, threshold=6)

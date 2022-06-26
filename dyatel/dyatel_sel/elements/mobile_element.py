@@ -52,8 +52,21 @@ class MobileElement(CoreElement):
         """
         self.wait_element(silent=True)
         dx, dy = calculate_coordinate_to_click(self, x, y)
-        self._action_chains.\
-            move_to_element_with_offset(self.element, dx, dy)\
+        self._action_chains\
+            .move_to_element_with_offset(self.element, dx, dy)\
             .click()\
             .perform()
         return self
+
+    def get_screenshot(self, filename, legacy=True):
+        if self.driver_wrapper.is_ios and legacy:
+            element_box = self.element_box()
+            window_width = self.driver.get_window_size()['width']
+            img_binary = self.driver_wrapper.driver.get_screenshot_as_png()  # FIXME
+            scaled_image = self.scaled_screenshot(img_binary, window_width)
+            image_binary = scaled_image.crop(element_box)
+            image_binary.save(filename)
+        else:
+            image_binary = super().get_screenshot(filename)
+
+        return image_binary

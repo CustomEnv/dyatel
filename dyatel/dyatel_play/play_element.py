@@ -1,3 +1,4 @@
+import time
 from logging import info
 from typing import Union
 
@@ -7,7 +8,7 @@ from playwright.sync_api import Locator
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
-from dyatel.internal_utils import get_child_elements, get_timeout
+from dyatel.internal_utils import get_child_elements, get_timeout, Mixin
 from playwright.sync_api import Page as PlayPage
 from dyatel.shared_utils import cut_log_data
 
@@ -15,7 +16,7 @@ from dyatel.shared_utils import cut_log_data
 ELEMENT_WAIT = get_timeout(10)
 
 
-class PlayElement:
+class PlayElement(Mixin):
 
     def __init__(self, locator, locator_type=None, name=None, parent=None):
         self.locator = get_selenium_completable_locator(locator)
@@ -210,6 +211,28 @@ class PlayElement:
         return self
 
     # Element state
+
+    def scroll_into_view(self, sleep=0):
+        """
+        Scroll element into view
+
+        :return: self
+        """
+        info(f'Scroll element "{self.name}" into view')
+        self.element.scroll_into_view_if_needed()
+
+        if sleep:
+            time.sleep(sleep)
+
+        return self
+
+    def get_screenshot(self, filename):
+        info(f'Get screenshot of "{self.name}"')
+        return self.element.screenshot(path=filename)
+
+    @property
+    def get_screenshot_base(self):
+        return self.element.screenshot()
 
     def get_text(self):
         """

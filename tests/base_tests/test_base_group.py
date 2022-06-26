@@ -1,23 +1,39 @@
-from dyatel.base.element import Element
-from dyatel.base.group import Group
+from tests.adata.base import GroupChild, GroupParent
 
 
-class GroupParent(Group):
-    def __init__(self, name='Parent'):
-        self.parent_element_before_init_var = Element('sample', name='parent element before init var')
-        super(GroupParent, self).__init__(locator='sample', name=f'{name} Group')
-        self.parent_element_after_init_var = Element('sample', name='parent element after init var')
-
-    parent_element_class_var = Element('sample', name='parent element class var')
+# Framework variables
 
 
-class GroupChild(GroupParent):
-    def __init__(self):
-        self.child_element_before_init_var = Element('sample', name='child element before init var')
-        super(GroupChild, self).__init__(name='Child')
-        self.child_element_after_init_var = Element('sample', name='child element after init var')
+def test_base_group_sel_framework_variables_access(mocked_selenium_driver):
+    group = GroupChild()
+    assert hasattr(group, 'driver')
+    assert hasattr(group, 'driver_wrapper')
+    assert hasattr(group, 'locator')
+    assert hasattr(group, 'locator_type')
+    assert hasattr(group, 'name')
+    assert hasattr(group.child_element_class_var, 'parent')
 
-    child_element_class_var = Element('sample', name='child element class var')
+
+def test_base_group_appium_framework_variables_access(mocked_mobile_driver):
+    group = GroupChild()
+    assert hasattr(group, 'driver')
+    assert hasattr(group, 'driver_wrapper')
+    assert hasattr(group, 'locator')
+    assert hasattr(group, 'locator_type')
+    assert hasattr(group, 'name')
+    assert hasattr(group.child_element_class_var, 'parent')
+
+
+def test_base_group_play_framework_variables_access(mocked_play_driver):
+    group = GroupChild()
+    parent_group = GroupParent()
+    assert hasattr(group, 'driver')
+    assert hasattr(group, 'driver_wrapper')
+    assert hasattr(group, 'locator')
+    assert hasattr(group, 'locator_type')
+    assert hasattr(group, 'name')
+    assert hasattr(group.child_element_class_var, 'parent')
+    assert hasattr(parent_group, 'context')
 
 
 # Class variables
