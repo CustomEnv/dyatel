@@ -350,7 +350,7 @@ class CoreElement(Mixin):
         """
         base = self.driver
         if self.parent:
-            base = self.parent.element
+            base = self.parent.driver.find_element(self.parent.locator_type, self.parent.locator)
             info(f'Get element "{self.name}" from parent element "{self.parent.name}"')
         return base
 
