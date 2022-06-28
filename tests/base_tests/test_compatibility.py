@@ -24,8 +24,8 @@ def test_playwright_and_selenium_element_compatibility():
 
 
 def test_selenium_mobile_and_web_element_compatibility():
-    web_static = sorted(get_class_static(WebElement) + get_class_static(CoreElement))
-    mobile_static = sorted(get_class_static(MobileElement) + get_class_static(CoreElement))
+    web_static = sorted(set(get_class_static(WebElement) + get_class_static(CoreElement)))
+    mobile_static = sorted(set(get_class_static(MobileElement) + get_class_static(CoreElement)))
     assert web_static == mobile_static
 
 

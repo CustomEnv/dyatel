@@ -12,6 +12,7 @@ setup(
         'selenium==4.1.0',
         'playwright==1.22.0',
         'webdriver-manager==3.7.0',
+        'Pillow==9.1.1'
     ],
     long_description=description,
 )

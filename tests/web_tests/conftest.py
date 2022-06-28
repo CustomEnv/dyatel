@@ -1,3 +1,5 @@
+import os
+
 import pytest
 from playwright.sync_api import sync_playwright
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
@@ -73,6 +75,11 @@ def driver_wrapper(platform, driver_name, driver_engine, request, driver):
         pytest.xfail(f"Expected failed for {platform} with {driver_name}. Reason={xfail_reason}")
 
     driver_wrapper = Driver(driver)
+
+    if 'play' in driver_engine:
+        driver_wrapper.context.set_viewport_size({'width': 1024, 'height': 900})
+
+    os.environ['visual'] = 'tests/adata/visual'
 
     yield driver_wrapper
     driver_wrapper.get('data:,')

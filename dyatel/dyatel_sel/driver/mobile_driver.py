@@ -12,8 +12,8 @@ class MobileDriver(CoreDriver):
 
         self.is_ios = self.capabilities.get('platformName') == 'iOS'
         self.is_android = self.capabilities.get('platformName') == 'Android'
-        self.is_web = self.capabilities.get('browserName')
-        self.is_app = self.capabilities.get('app')
+        self.is_web = self.capabilities.get('browserName', False)
+        self.is_app = self.capabilities.get('app', False)
 
         CoreDriver.driver = self.mobile_driver
         CoreDriver.is_ios = self.is_ios
