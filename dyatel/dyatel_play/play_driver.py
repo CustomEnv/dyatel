@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from logging import info
 
 from playwright.sync_api import Page as PlayPage
@@ -8,16 +10,28 @@ class PlayDriver:
     driver: Browser = None
     context: PlayPage = None
 
+    mobile = False
+    desktop = False
+    is_ios = False
+    is_android = False
+
     def __init__(self, driver: Browser, initial_page=True):
-        self.driver: Browser = driver
+        """
+        Initializing of desktop web driver with playwright
+
+        :param initial_page: open new page right after connect with driver
+        :param driver: playwright driver to initialize
+        """
+        self.driver = driver
 
         if initial_page and not self.driver.contexts:
             self.context: PlayPage = self.driver.new_page()
 
         PlayDriver.driver = self.driver
         PlayDriver.context = self.context
+        PlayDriver.desktop = True
 
-    def get(self, url):
+    def get(self, url) -> PlayDriver:
         """
         Navigate to given url
 
@@ -28,7 +42,7 @@ class PlayDriver:
         self.context.goto(url)
         return self
 
-    def is_driver_opened(self):
+    def is_driver_opened(self) -> bool:
         """
         Check is driver opened or not
 
@@ -36,7 +50,7 @@ class PlayDriver:
         """
         return self.driver.is_connected()
 
-    def is_driver_closed(self):
+    def is_driver_closed(self) -> bool:
         """
         Check is driver closed or not
 
@@ -45,7 +59,7 @@ class PlayDriver:
         return not self.driver.is_connected()
 
     @property
-    def current_url(self):
+    def current_url(self) -> str:
         """
         Get current page url
 
@@ -53,7 +67,7 @@ class PlayDriver:
         """
         return self.context.url
 
-    def refresh(self):
+    def refresh(self) -> PlayDriver:
         """
         Reload current page
 
@@ -63,7 +77,7 @@ class PlayDriver:
         self.context.reload()
         return self
 
-    def go_forward(self):
+    def go_forward(self) -> PlayDriver:
         """
         Go forward by driver
 
@@ -73,7 +87,7 @@ class PlayDriver:
         self.context.go_forward()
         return self
 
-    def go_back(self):
+    def go_back(self) -> PlayDriver:
         """
         Go back by driver
 
@@ -83,7 +97,7 @@ class PlayDriver:
         self.context.go_back()
         return self
 
-    def quit(self, silent=True):
+    def quit(self, silent=True) -> PlayDriver:
         """
         Quit the driver instance
 

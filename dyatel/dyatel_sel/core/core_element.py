@@ -1,9 +1,15 @@
-import time
-from logging import info
+from __future__ import annotations
 
+import time
+from io import BytesIO
+from logging import info
+from typing import Union
+
+from PIL import Image
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from selenium.webdriver import ActionChains
+from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
@@ -20,7 +26,16 @@ ELEMENT_WAIT = 10
 
 class CoreElement(Mixin):
 
-    def __init__(self, locator, locator_type=None, name=None, parent=None):
+    def __init__(self, locator: str, locator_type='', name='', parent=None):
+        """
+        Initializing of core element with appium/selenium driver
+        Contain same methods/data for both WebElement and MobileElement classes
+
+        :param locator: anchor locator of page. Can be defined without locator_type
+        :param locator_type: specific locator type
+        :param name: name of element (will be attached to logs)
+        :param parent: parent of element. Can be Web/MobileElement, Web/MobilePage or Group objects
+        """
         self.driver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)
         self.parent = parent if parent else None
@@ -72,7 +87,7 @@ class CoreElement(Mixin):
 
     # Element interaction
 
-    def click(self):
+    def click(self) -> CoreElement:
         """
         Click to current element
 
@@ -82,7 +97,7 @@ class CoreElement(Mixin):
         self.wait_element(silent=True).wait_clickable(silent=True).element.click()
         return self
 
-    def type_text(self, text, silent=False):
+    def type_text(self, text, silent=False) -> CoreElement:
         """
         Type text to current element
 
@@ -97,7 +112,7 @@ class CoreElement(Mixin):
         self.wait_element(silent=True).element.send_keys(text)
         return self
 
-    def type_slowly(self, text, sleep_gap=0.05, silent=False):
+    def type_slowly(self, text, sleep_gap=0.05, silent=False) -> CoreElement:
         """
         Type text to current element slowly
 
@@ -117,7 +132,7 @@ class CoreElement(Mixin):
             time.sleep(sleep_gap)
         return self
 
-    def clear_text(self, silent=False):
+    def clear_text(self, silent=False) -> CoreElement:
         """
         Clear text from current element
 
@@ -132,7 +147,7 @@ class CoreElement(Mixin):
 
     # Element waits
 
-    def wait_element(self, timeout=ELEMENT_WAIT, silent=False):
+    def wait_element(self, timeout=ELEMENT_WAIT, silent=False) -> CoreElement:
         """
         Wait for current element available in page
 
@@ -149,7 +164,7 @@ class CoreElement(Mixin):
         )
         return self
 
-    def wait_element_without_error(self, timeout=ELEMENT_WAIT, silent=False):
+    def wait_element_without_error(self, timeout=ELEMENT_WAIT, silent=False) -> CoreElement:
         """
         Wait until element hidden
 
@@ -166,7 +181,7 @@ class CoreElement(Mixin):
             info(f'Ignored exception: "{exception}"')
         return self
 
-    def wait_element_hidden(self, timeout=ELEMENT_WAIT, silent=False):
+    def wait_element_hidden(self, timeout=ELEMENT_WAIT, silent=False) -> CoreElement:
         """
         Wait until element hidden
 
@@ -191,7 +206,7 @@ class CoreElement(Mixin):
 
         return self
 
-    def wait_clickable(self, timeout=ELEMENT_WAIT, silent=False):
+    def wait_clickable(self, timeout=ELEMENT_WAIT, silent=False) -> CoreElement:
         """
         Compatibility placeholder
         Wait until element clickable
@@ -211,7 +226,7 @@ class CoreElement(Mixin):
 
     # Element state
 
-    def scroll_into_view(self, block='center', behavior='instant', sleep=0):
+    def scroll_into_view(self, block='center', behavior='instant', sleep=0) -> CoreElement:
         """
         Scroll element into view by js script
 
@@ -232,20 +247,31 @@ class CoreElement(Mixin):
 
         return self
 
-    def get_screenshot(self, filename):
+    def get_screenshot(self, filename) -> bin:
+        """
+        Taking element screenshot and saving with given path/filename
+
+        :param filename: path/filename
+        :return: image binary
+        """
         info(f'Get screenshot of "{self.name}"')
         image_binary = self.get_screenshot_base
         image_binary.save(filename)
         return image_binary
 
     @property
-    def get_screenshot_base(self):
+    def get_screenshot_base(self) -> bin:
+        """
+        Get driver width scaled screenshot binary of element without saving
+
+        :return: screenshot binary
+        """
         screenshot_binary = self.element.screenshot_as_png
         el_width = self.element.size['width']
-        return self.scaled_screenshot(screenshot_binary, el_width)
+        return self._scaled_screenshot(screenshot_binary, el_width)
 
     @property
-    def get_text(self):
+    def get_text(self) -> str:
         """
         Get current element text
 
@@ -255,7 +281,7 @@ class CoreElement(Mixin):
         return self.element.text
 
     @property
-    def get_inner_text(self):
+    def get_inner_text(self) -> str:
         """
         Get current element inner text
 
@@ -265,7 +291,7 @@ class CoreElement(Mixin):
         return text
 
     @property
-    def get_value(self):
+    def get_value(self) -> str:
         """
         Get value from current element
 
@@ -273,7 +299,7 @@ class CoreElement(Mixin):
         """
         return self.get_attribute('value')
 
-    def is_available(self):
+    def is_available(self) -> bool:
         """
         Check current element availability in DOM
 
@@ -281,7 +307,7 @@ class CoreElement(Mixin):
         """
         return bool(len(getattr(self, 'all_elements')))
 
-    def is_displayed(self):
+    def is_displayed(self) -> bool:
         """
         Check visibility of element
 
@@ -293,7 +319,7 @@ class CoreElement(Mixin):
         info(f'Check displaying of "{self.name}"')
         return result
 
-    def is_hidden(self):
+    def is_hidden(self) -> bool:
         """
         Check invisibility of current element
 
@@ -301,7 +327,7 @@ class CoreElement(Mixin):
         """
         return not self.is_displayed()
 
-    def get_attribute(self, attribute, silent=False):
+    def get_attribute(self, attribute, silent=False) -> str:
         """
         Get custom attribute from current element
 
@@ -314,7 +340,7 @@ class CoreElement(Mixin):
 
         return self.wait_element(silent=True).element.get_attribute(attribute)
 
-    def get_elements_texts(self, silent=False) -> list:
+    def get_elements_texts(self, silent=False) -> list[str]:
         """
         Get all texts from all matching elements
 
@@ -327,7 +353,7 @@ class CoreElement(Mixin):
         self.wait_element(silent=True)
         return list(element_item.text for element_item in getattr(self, 'all_elements'))
 
-    def get_elements_count(self, silent=False):
+    def get_elements_count(self, silent=False) -> int:
         """
         Get elements count
 
@@ -342,7 +368,7 @@ class CoreElement(Mixin):
 
     # Mixin
 
-    def _get_driver(self):
+    def _get_driver(self) -> Union[SeleniumWebDriver, SeleniumWebElement]:
         """
         Get driver with depends on parent element if available
 
@@ -370,3 +396,20 @@ class CoreElement(Mixin):
         :return: ActionChains
         """
         return ActionChains(self._get_driver())
+
+    def _scaled_screenshot(self, screenshot_binary, width) -> Image:
+        """
+        Get scaled screenshot to fit driver window / element size
+
+        :param screenshot_binary: original screenshot binary
+        :param width: driver or element width
+        :return: scaled image binary
+        """
+        img_binary = Image.open(BytesIO(screenshot_binary))
+        scale = img_binary.size[0] / width
+
+        if scale != 1:
+            new_image_size = (int(img_binary.size[0] / scale), int(img_binary.size[1] / scale))
+            img_binary = img_binary.resize(new_image_size, Image.ANTIALIAS)
+
+        return img_binary

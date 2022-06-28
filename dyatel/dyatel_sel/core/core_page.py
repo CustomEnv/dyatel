@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from logging import info
 
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
@@ -12,7 +14,15 @@ from dyatel.internal_utils import get_child_elements
 
 class CorePage:
 
-    def __init__(self, locator, locator_type=None, name=None):
+    def __init__(self, locator: str, locator_type='', name=''):
+        """
+        Initializing of core page with appium/selenium driver
+        Contain same methods/data for both WebPage and MobilePage classes
+
+        :param locator: anchor locator of page. Can be defined without locator_type
+        :param locator_type: specific locator type
+        :param name: name of page (will be attached to logs)
+        """
         self.driver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)
         self.url = getattr(self, 'url', '')
@@ -30,7 +40,7 @@ class CorePage:
             if not el.driver:
                 el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
 
-    def reload_page(self, wait_page_load=True):
+    def reload_page(self, wait_page_load=True) -> CorePage:
         """
         Reload current page
 
@@ -43,7 +53,7 @@ class CorePage:
             self.wait_page_loaded()
         return self
 
-    def open_page(self, url=''):
+    def open_page(self, url='') -> CorePage:
         """
         Open page with given url or use url from page class f url isn't given
 
@@ -56,7 +66,7 @@ class CorePage:
             self.wait_page_loaded()
         return self
 
-    def wait_page_loaded(self, silent=False):
+    def wait_page_loaded(self, silent=False) -> CorePage:
         """
         Wait until page loaded
 
@@ -69,7 +79,7 @@ class CorePage:
         wait.until(ec.visibility_of_element_located((self.locator_type, self.locator)))
         return self
 
-    def is_page_opened(self):
+    def is_page_opened(self) -> bool:
         """
         Check is current page opened or not
 

@@ -76,7 +76,7 @@ def emulator():
 
 
 @pytest.fixture
-def mobile_driver(request, appium, emulator):
+def mobile_driver(request, emulator):
     """ Starting android driver """
     appium_ip = request.config.getoption('--appium-ip')
     appium_port = request.config.getoption('--appium-port')
@@ -89,10 +89,10 @@ def mobile_driver(request, appium, emulator):
     mobile_driver = MobileDriver(driver=appium_driver)
     logging.info('Android app ready')
 
-    request.node.node_driver = mobile_driver
+    request.node.node_driver = mobile_driver.driver
     yield mobile_driver
     if 'no_teardown' not in all_pytest_markers:
-        mobile_driver.terminate_app(mobile_driver.desired_capabilities['appPackage'])  # TODO: fxi issues
+        mobile_driver.terminate_app(mobile_driver.capabilities['appPackage'])  # TODO: fix issues
 
 
 @pytest.hookimpl(hookwrapper=True)

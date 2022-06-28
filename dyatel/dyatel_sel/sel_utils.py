@@ -3,7 +3,18 @@ from selenium.webdriver.common.by import By
 tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header']
 
 
-def get_locator_type(locator):
+def get_locator_type(locator: str):
+    """
+    Get selenium completable locator type by given locator spell
+
+    :param locator: regular locator
+    :return:
+      By.TAG_NAME if locator contain tag name
+      By.XPATH if locator contain slashes and brackets
+      By.CSS_SELECTOR if locator contain brackets and no slash
+      By.CSS_SELECTOR if locator contain dot and no brackets
+      By.ID if there is no any match
+    """
     brackets = '[' in locator and ']' in locator
     is_only_tags = True
 

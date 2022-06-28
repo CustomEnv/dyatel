@@ -7,7 +7,12 @@ from dyatel.dyatel_sel.core.core_driver import CoreDriver
 class MobileDriver(CoreDriver):
 
     def __init__(self, driver: AppiumDriver):
-        self.mobile_driver: AppiumDriver = driver
+        """
+        Initializing of mobile driver with appium
+
+        :param driver: appium driver to initialize
+        """
+        self.mobile_driver = driver
         self.capabilities = self.mobile_driver.capabilities
 
         self.is_ios = self.capabilities.get('platformName') == 'iOS'
@@ -32,24 +37,58 @@ class MobileDriver(CoreDriver):
         CoreDriver.__init__(self, driver=self.mobile_driver)
 
     def is_app_installed(self):
+        """
+        Is app running checking
+
+        :return: True if the app running
+        """
         return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.RUNNING_IN_FOREGROUND
 
     def is_app_deleted(self):
+        """
+        Is app deleted checking
+
+        :return: True if the app deleted
+        """
         if self.is_ios:  # query_app_state return value equal 1(NOT_RUNNING), that not accurate
             return not self.is_app_installed()
 
         return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.NOT_INSTALLED
 
     def is_app_closed(self):
+        """
+        Is app closed checking
+
+        :return: True if the app closed
+        """
         return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.NOT_RUNNING
 
     def is_app_in_foreground(self):
+        """
+        Is app in foreground checking
+
+        :return: True if the app in foreground
+        """
         return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.RUNNING_IN_FOREGROUND
 
     def is_app_in_background(self):
+        """
+        Is app in background checking
+
+        :return: True if the app in background
+        """
         background_state = ApplicationState.RUNNING_IN_BACKGROUND
 
         if self.is_ios:  # iOS simulator are suspended the background app
             background_state = ApplicationState.RUNNING_IN_BACKGROUND_SUSPENDED
 
         return self.mobile_driver.query_app_state(self.bundle_id) == background_state
+
+    def terminate_app(self, bundle_id):
+        """
+        Terminates the application if it is running
+
+        :param bundle_id: the application id to be terminates
+        :return: True if the app has been successfully terminated
+        """
+        return self.driver.terminate_app(bundle_id)

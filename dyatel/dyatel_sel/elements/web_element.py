@@ -1,20 +1,32 @@
+from __future__ import annotations
+
 from logging import info
+from typing import Union
 
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
+from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.internal_utils import calculate_coordinate_to_click
 
 
 class WebElement(CoreElement):
 
-    def __init__(self, locator, locator_type=None, name=None, parent=None):
+    def __init__(self, locator: str, locator_type='', name='', parent: Union[WebElement, WebPage] = None):
+        """
+        Initializing of web element with selenium driver
+
+        :param locator: anchor locator of page. Can be defined without locator_type
+        :param locator_type: specific locator type
+        :param name: name of element (will be attached to logs)
+        :param parent: parent of element. Can be WebElement, WebPage, Group objects
+        """
         self.driver: SeleniumWebDriver = CoreDriver.driver
         CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent)
 
     @property
-    def all_elements(self) -> list:
+    def all_elements(self) -> list[WebElement]:
         """
         Get all WebElement elements, matching given locator
 
@@ -28,7 +40,7 @@ class WebElement(CoreElement):
 
         return wrapped_elements
 
-    def hover(self):
+    def hover(self) -> WebElement:
         """
         Hover over current element
 
@@ -42,7 +54,7 @@ class WebElement(CoreElement):
             .perform()
         return self
 
-    def click_outside(self, x=-1, y=-1):
+    def click_outside(self, x=-1, y=-1) -> WebElement:
         """
         Click outside of element. By default, 1px above and 1px left of element
 
