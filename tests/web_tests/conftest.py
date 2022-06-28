@@ -23,6 +23,7 @@ set_logging_settings()
 
 
 # FIXME: other Group or Page as class variable of Group or Page -> mb will be skipped
+# FIXME: execute_script, add_cookie, get_cookies functions in both drivers
 
 
 def pytest_addoption(parser):

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Union
 from logging import info
 
@@ -14,9 +16,15 @@ class CoreDriver:
     is_android = False
 
     def __init__(self, driver: Union[AppiumDriver, SeleniumWebDriver]):
-        self.driver: Union[AppiumDriver, SeleniumWebDriver] = driver
+        """
+        Initializing of core driver
+        Contain same methods/data for both WebDriver and MobileDriver classes
 
-    def get(self, url):
+        :param driver: appium or selenium driver to initialize
+        """
+        self.driver = driver
+
+    def get(self, url) -> CoreDriver:
         """
         Navigate to given url
 
@@ -24,9 +32,10 @@ class CoreDriver:
         :return: self
         """
         info(f'Navigating to url {url}')
-        return self.driver.get(url)
+        self.driver.get(url)
+        return self
 
-    def is_driver_opened(self):
+    def is_driver_opened(self) -> bool:
         """
         Check is driver opened or not
 
@@ -34,7 +43,7 @@ class CoreDriver:
         """
         return True if self.driver else False
 
-    def is_driver_closed(self):
+    def is_driver_closed(self) -> bool:
         """
         Check is driver closed or not
 
@@ -43,7 +52,7 @@ class CoreDriver:
         return False if self.driver else True
 
     @property
-    def current_url(self):
+    def current_url(self) -> str:
         """
         Get current page url
 
@@ -51,7 +60,7 @@ class CoreDriver:
         """
         return self.driver.current_url
 
-    def refresh(self):
+    def refresh(self) -> CoreDriver:
         """
         Reload current page
 
@@ -61,7 +70,7 @@ class CoreDriver:
         self.driver.refresh()
         return self
 
-    def go_forward(self):
+    def go_forward(self) -> CoreDriver:
         """
         Go forward by driver
 
@@ -71,7 +80,7 @@ class CoreDriver:
         self.driver.forward()
         return self
 
-    def go_back(self):
+    def go_back(self) -> CoreDriver:
         """
         Go back by driver
 
@@ -81,7 +90,7 @@ class CoreDriver:
         self.driver.back()
         return self
 
-    def quit(self, silent=True):
+    def quit(self, silent=True) -> CoreDriver:
         """
         Quit the driver instance
 
@@ -94,4 +103,3 @@ class CoreDriver:
         self.driver.close()
         self.driver.quit()
         return self
-
