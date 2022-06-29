@@ -36,10 +36,6 @@ class PlayDriver(Mixin):
         PlayDriver.context = self.context
         PlayDriver.desktop = True
 
-        glob = globals()
-        glob['WAIT_EL'] = get_timeout_in_ms(WAIT_EL)
-        glob['WAIT_PAGE'] = get_timeout_in_ms(WAIT_PAGE)
-
     def get(self, url) -> PlayDriver:
         """
         Navigate to given url
