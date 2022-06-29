@@ -23,7 +23,6 @@ set_logging_settings()
 
 
 # FIXME: other Group or Page as class variable of Group or Page -> mb will be skipped
-# FIXME: execute_script, add_cookie, get_cookies functions in both drivers
 
 
 def pytest_addoption(parser):
@@ -50,6 +49,11 @@ def platform(request):
     return request.config.getoption('platform').lower()
 
 
+@pytest.fixture
+def markers(request):
+    return request.node.own_markers
+
+
 @pytest.fixture(scope='session')
 def chrome_options(request):
     options = ChromeOptions()
@@ -67,7 +71,7 @@ def firefox_options(request):
 
 
 @pytest.fixture
-def driver_wrapper(platform, driver_name, driver_engine, request, driver):
+def driver_wrapper(platform, driver_name, driver_engine, request, driver_init):
     xfail_marks_iterator = tuple(request.node.iter_markers(name='xfail_platform'))
     xfail_platform = list(name for marker in xfail_marks_iterator for name in marker.args)
 
@@ -75,25 +79,13 @@ def driver_wrapper(platform, driver_name, driver_engine, request, driver):
         xfail_reason = list(name for marker in xfail_marks_iterator for name in marker.kwargs.values())
         pytest.xfail(f"Expected failed for {platform} with {driver_name}. Reason={xfail_reason}")
 
-    driver_wrapper = Driver(driver)
-
-    if 'play' in driver_engine:
-        driver_wrapper.context.set_viewport_size({'width': 1024, 'height': 900})
-
-    os.environ['visual'] = 'tests/adata/visual'
-
-    yield driver_wrapper
-    driver_wrapper.get('data:,')
-
-
-@pytest.fixture
-def markers(request):
-    return request.node.own_markers
+    yield driver_init
+    driver_init.get('data:,')
 
 
 @pytest.fixture(scope='session')
-def driver(request, driver_name, driver_engine, chrome_options, firefox_options, platform):
-    driver = None
+def driver_init(request, driver_name, driver_engine, chrome_options, firefox_options, platform):
+    driver, browser = None, None
     is_headless = request.config.getoption('headless')
 
     if 'appium' in driver_engine:
@@ -105,9 +97,6 @@ def driver(request, driver_name, driver_engine, chrome_options, firefox_options,
         caps.update({'browserName': driver_name.title()})
         driver = AppiumDriver(command_executor=command_exc, desired_capabilities=caps)
 
-        yield driver
-        driver.quit()  # FIXME
-
     elif 'selenium' in driver_engine:
         if driver_name == 'chrome':
             driver = ChromeWebDriver(executable_path=ChromeDriverManager().install(), options=chrome_options)
@@ -116,27 +105,27 @@ def driver(request, driver_name, driver_engine, chrome_options, firefox_options,
         elif driver_name == 'safari':
             driver = SafariWebDriver()
 
-        driver.implicitly_wait(0.01)  # FIXME
-        driver.set_window_size(1024, 900)  # FIXME
         driver.set_window_position(0, 0)  # FIXME
 
-        yield driver
-        driver.quit()  # FIXME
-
     elif 'play' in driver_engine:
-        with sync_playwright() as playwright:
-            if driver_name == 'chrome':
-                browser = playwright.chromium
-            elif driver_name == 'firefox':
-                browser = playwright.firefox
-            elif driver_name == 'safari':
-                browser = playwright.webkit
+        playwright = sync_playwright().start()
+        if driver_name == 'chrome':
+            browser = playwright.chromium
+        elif driver_name == 'firefox':
+            browser = playwright.firefox
+        elif driver_name == 'safari':
+            browser = playwright.webkit
 
-            driver = browser.launch(headless=is_headless)
-            yield driver
-            driver.close()  # FIXME
+        driver = browser.launch(headless=is_headless)
 
-    assert driver, 'Driver isn\'t selected. Check your settings'
+    driver_wrapper = Driver(driver)
+
+    if 'appium' not in driver_engine:
+        driver_wrapper.set_window_size(1024, 900)
+
+    os.environ['visual'] = 'tests/adata/visual'
+    yield driver_wrapper
+    driver_wrapper.quit()
 
 
 @pytest.fixture

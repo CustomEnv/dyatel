@@ -9,7 +9,7 @@ from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.internal_utils import calculate_coordinate_to_click
-from dyatel.js_scritpts import get_element_position_on_screen_js
+from dyatel.js_scripts import get_element_position_on_screen_js
 
 
 class MobileElement(CoreElement):
@@ -83,7 +83,7 @@ class MobileElement(CoreElement):
             element_box = self._element_box()
             window_width = self.driver.get_window_size()['width']
             img_binary = self.driver_wrapper.driver.get_screenshot_as_png()  # FIXME
-            scaled_image = self.scaled_screenshot(img_binary, window_width)
+            scaled_image = self._scaled_screenshot(img_binary, window_width)
             image_binary = scaled_image.crop(element_box)
             image_binary.save(filename)
         else:

@@ -8,13 +8,10 @@ from typing import Union
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
-from dyatel.internal_utils import get_child_elements, get_timeout, Mixin
+from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, get_timeout_in_ms
 from playwright.sync_api import Page as PlayPage
 from playwright.sync_api import Locator
 from dyatel.shared_utils import cut_log_data
-
-
-ELEMENT_WAIT = get_timeout(10)
 
 
 class PlayElement(Mixin):
@@ -160,7 +157,7 @@ class PlayElement(Mixin):
 
     # Element waits
 
-    def wait_element(self, timeout=ELEMENT_WAIT, silent=False) -> PlayElement:
+    def wait_element(self, timeout=WAIT_EL, silent=False) -> PlayElement:
         """
         Wait for current element available in page
 
@@ -171,11 +168,11 @@ class PlayElement(Mixin):
         if not silent:
             info(f'Wait until presence of "{self.name}"')
 
-        self.element.wait_for(state='attached', timeout=get_timeout(timeout))
-        self.element.wait_for(state='visible', timeout=get_timeout(timeout))
+        self.element.wait_for(state='attached', timeout=get_timeout_in_ms(timeout))
+        self.element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
         return self
 
-    def wait_element_without_error(self, timeout=ELEMENT_WAIT, silent=False) -> PlayElement:
+    def wait_element_without_error(self, timeout=WAIT_EL, silent=False) -> PlayElement:
         """
         Wait for current element available in page without raising error
 
@@ -191,7 +188,7 @@ class PlayElement(Mixin):
             info(f'Ignored exception: "{exception}"')
         return self
 
-    def wait_element_hidden(self, timeout=ELEMENT_WAIT, silent=False) -> PlayElement:
+    def wait_element_hidden(self, timeout=WAIT_EL, silent=False) -> PlayElement:
         """
         Wait until element hidden
 
@@ -202,10 +199,10 @@ class PlayElement(Mixin):
         if not silent:
             info(f'Wait hidden of "{self.name}"')
 
-        self.element.wait_for(state='hidden', timeout=get_timeout(timeout))
+        self.element.wait_for(state='hidden', timeout=get_timeout_in_ms(timeout))
         return self
 
-    def wait_clickable(self, timeout=ELEMENT_WAIT, silent=False) -> PlayElement:
+    def wait_clickable(self, timeout=WAIT_EL, silent=False) -> PlayElement:
         """
         Compatibility placeholder
         Wait until element clickable

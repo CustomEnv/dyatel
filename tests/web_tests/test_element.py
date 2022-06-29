@@ -65,7 +65,7 @@ def test_element_object_in_all_elements(base_playground_page):
         assert element_object.__class__ is expected_class
 
 
-def test_click_and_wait(pizza_order_page, driver, driver_engine):
+def test_click_and_wait(pizza_order_page, driver_engine):
     pizza_order_page.submit_button.click()
     after_click_displayed = pizza_order_page.error_modal.wait_element().is_displayed()
     if 'play' in driver_engine:
