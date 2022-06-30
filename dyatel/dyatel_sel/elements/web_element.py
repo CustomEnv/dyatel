@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from logging import info
-from typing import Union
+from typing import Union, List
 
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
@@ -26,7 +26,7 @@ class WebElement(CoreElement):
         CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent)
 
     @property
-    def all_elements(self) -> list[WebElement]:
+    def all_elements(self) -> List[WebElement]:
         """
         Get all WebElement elements, matching given locator
 

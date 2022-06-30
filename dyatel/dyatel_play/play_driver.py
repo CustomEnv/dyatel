@@ -6,7 +6,7 @@ from typing import List, Union
 from playwright.sync_api import Page as PlayPage, Locator
 from playwright.sync_api import Browser
 
-from dyatel.internal_utils import Mixin, WAIT_EL, WAIT_PAGE, get_timeout_in_ms
+from dyatel.internal_utils import Mixin, get_timeout_in_ms
 
 
 class PlayDriver(Mixin):

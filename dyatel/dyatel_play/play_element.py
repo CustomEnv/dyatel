@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import time
 from logging import info
-from typing import Union
+from typing import Union, List
 
 # noinspection PyProtectedMember
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
 from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, get_timeout_in_ms
-from playwright.sync_api import Page as PlayPage
+from playwright.sync_api import Page as PlayPage, Browser
 from playwright.sync_api import Locator
 from dyatel.shared_utils import cut_log_data
 
@@ -28,7 +28,7 @@ class PlayElement(Mixin):
         self.locator = get_selenium_completable_locator(locator)
         self.name = name if name else self.locator
         self.parent = parent if parent else None
-        self.driver = PlayDriver.driver
+        self.driver: Union[Browser, None] = PlayDriver.driver
         self.context = PlayDriver.context
         self.driver_wrapper = PlayDriver(self.driver, initial_page=False)
 
@@ -43,7 +43,7 @@ class PlayElement(Mixin):
     # Element
 
     @property
-    def element(self, *args, **kwargs) -> Locator:
+    def element(self) -> Locator:
         """
         Get playwright element
 
@@ -51,7 +51,7 @@ class PlayElement(Mixin):
         :param: kwargs: kwargs from Locator object
         :return: Locator
         """
-        return self._element if self._element else self._get_driver().locator(self.locator, *args, **kwargs)
+        return self._element if self._element else self._get_driver().locator(self.locator)
 
     @element.setter
     def element(self, play_element):
@@ -63,7 +63,7 @@ class PlayElement(Mixin):
         self._element = play_element
     
     @property
-    def all_elements(self) -> list[PlayElement]:
+    def all_elements(self) -> List[PlayElement]:
         """
         Get all PlayElement elements, matching given locator
 
@@ -232,7 +232,7 @@ class PlayElement(Mixin):
 
         return self
 
-    def get_screenshot(self, filename) -> bin:
+    def get_screenshot(self, filename) -> bytes:  # TODO: research
         """
         Taking element screenshot and saving with given path/filename
 
@@ -243,7 +243,7 @@ class PlayElement(Mixin):
         return self.element.screenshot(path=filename)
 
     @property
-    def get_screenshot_base(self) -> bin:
+    def get_screenshot_base(self) -> bytes:  # TODO: research
         """
         Get driver width scaled screenshot binary of element without saving
 
@@ -317,7 +317,7 @@ class PlayElement(Mixin):
 
         return self.element.get_attribute(attribute)
 
-    def get_elements_texts(self, silent=False) -> list:
+    def get_elements_texts(self, silent=False) -> List:
         """
         Get all texts from all matching elements
 
@@ -351,6 +351,6 @@ class PlayElement(Mixin):
         """
         base = self.context
         if self.parent:
-            base = self.parent.element
+            base = self.parent.context.locator(self.parent.locator)
             info(f'Get element "{self.name}" from parent element "{self.parent.name}"')
         return base

@@ -1,20 +1,20 @@
 from __future__ import annotations
 
 from logging import info
-from typing import Union
+from typing import Union, List, BinaryIO
 
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.dyatel_sel.pages.web_page import WebPage
+from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.internal_utils import calculate_coordinate_to_click
 from dyatel.js_scripts import get_element_position_on_screen_js
 
 
 class MobileElement(CoreElement):
 
-    def __init__(self, locator: str, locator_type='', name='', parent: Union[MobileElement, WebPage] = None):
+    def __init__(self, locator: str, locator_type='', name='', parent: Union[MobileElement, MobilePage] = None):
         """
         Initializing of mobile element with appium driver
 
@@ -27,7 +27,7 @@ class MobileElement(CoreElement):
         CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent)
 
     @property
-    def all_elements(self) -> list[MobileElement]:
+    def all_elements(self) -> List[MobileElement]:
         """
         Get all MobileElement elements, matching given locator
 
@@ -71,7 +71,7 @@ class MobileElement(CoreElement):
             .perform()
         return self
 
-    def get_screenshot(self, filename, legacy=True) -> bin:
+    def get_screenshot(self, filename, legacy=True) -> BinaryIO:
         """
         Taking element screenshot and saving with given path/filename
 

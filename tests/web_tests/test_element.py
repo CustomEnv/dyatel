@@ -7,20 +7,28 @@ from selenium.common.exceptions import NoSuchElementException
 from dyatel.internal_utils import Mixin
 
 
+@pytest.mark.skip_platform(
+    'play',
+    reason='Playwright doesnt throw error if element/parent isn\'t available/broken'
+)
 def test_element_exception_without_parent_form_driver(base_playground_page):
     el = base_playground_page.kube_broken
     try:
-        el.element
+        el._get_element(wait=False)
     except NoSuchElementException as exc:
         logs = Mixin().get_element_logging_data(el)
         message = f'Cant find element "{el.name}". {logs}.'
         assert exc.msg == message
 
 
+@pytest.mark.skip_platform(
+    'playwright',
+    reason='Playwright doesnt throw error if element/parent isn\'t available/broken'
+)
 def test_element_exception_with_broken_parent_form_driver(base_playground_page):
     el = base_playground_page.kube_broken_parent
     try:
-        el.element
+        el._get_element(wait=False)
     except NoSuchElementException as exc:
         logs = Mixin().get_element_logging_data(el.parent)
         message = f'Cant find parent element "{el.parent.name}". {logs}.'
