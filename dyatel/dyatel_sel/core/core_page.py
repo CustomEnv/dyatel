@@ -9,7 +9,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
-from dyatel.internal_utils import get_child_elements
+from dyatel.internal_utils import get_child_elements, WAIT_PAGE
 
 
 class CorePage:
@@ -75,7 +75,7 @@ class CorePage:
         """
         if not silent:
             info(f'Wait until page "{self.name}" loaded')
-        wait = WebDriverWait(self.driver, 10)
+        wait = WebDriverWait(self.driver, WAIT_PAGE)
         wait.until(ec.visibility_of_element_located((self.locator_type, self.locator)))
         return self
 

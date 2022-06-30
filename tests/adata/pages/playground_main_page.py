@@ -17,3 +17,9 @@ class PlaygroundMainPage(Page):
     kube_parent = Element('.img-fluid', name='kube with parent', parent=description_section)
     kube_wrong_parent = Element('.img-fluid', name='kube with wrong parent', parent=overview_section)
     kube_broken_parent = Element('.img-fluid', name='kube with broken parent', parent=overview_section_broken)
+    
+
+class SecondPlaygroundMainPage(Page):
+    def __init__(self):
+        self.url = 'https://testautomation-playground.herokuapp.com/index.html'
+        super(SecondPlaygroundMainPage, self).__init__('//h1[.="The Playground"]', name='Second playground main page')

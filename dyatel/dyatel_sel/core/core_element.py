@@ -16,12 +16,9 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import WebDriverException
 
 from dyatel.shared_utils import cut_log_data
-from dyatel.internal_utils import get_child_elements, Mixin
+from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
-
-
-ELEMENT_WAIT = 10
 
 
 class CoreElement(Mixin):
@@ -147,7 +144,7 @@ class CoreElement(Mixin):
 
     # Element waits
 
-    def wait_element(self, timeout=ELEMENT_WAIT, silent=False) -> CoreElement:
+    def wait_element(self, timeout=WAIT_EL, silent=False) -> CoreElement:
         """
         Wait for current element available in page
 
@@ -164,7 +161,7 @@ class CoreElement(Mixin):
         )
         return self
 
-    def wait_element_without_error(self, timeout=ELEMENT_WAIT, silent=False) -> CoreElement:
+    def wait_element_without_error(self, timeout=WAIT_EL, silent=False) -> CoreElement:
         """
         Wait until element hidden
 
@@ -181,7 +178,7 @@ class CoreElement(Mixin):
             info(f'Ignored exception: "{exception}"')
         return self
 
-    def wait_element_hidden(self, timeout=ELEMENT_WAIT, silent=False) -> CoreElement:
+    def wait_element_hidden(self, timeout=WAIT_EL, silent=False) -> CoreElement:
         """
         Wait until element hidden
 
@@ -206,7 +203,7 @@ class CoreElement(Mixin):
 
         return self
 
-    def wait_clickable(self, timeout=ELEMENT_WAIT, silent=False) -> CoreElement:
+    def wait_clickable(self, timeout=WAIT_EL, silent=False) -> CoreElement:
         """
         Compatibility placeholder
         Wait until element clickable
@@ -380,7 +377,7 @@ class CoreElement(Mixin):
             info(f'Get element "{self.name}" from parent element "{self.parent.name}"')
         return base
 
-    def _get_wait(self, timeout=ELEMENT_WAIT) -> WebDriverWait:
+    def _get_wait(self, timeout=WAIT_EL) -> WebDriverWait:
         """
         Get wait with depends on parent element if available
 

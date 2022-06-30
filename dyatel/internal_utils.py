@@ -13,6 +13,14 @@ from appium.webdriver.webelement import WebElement as AppiumWebElement
 from dyatel.visual_comparison import assert_same_images
 
 
+WAIT_EL = 15
+WAIT_PAGE = 30
+
+
+def get_timeout_in_ms(timeout):
+    return timeout * 1000 if timeout < 1000 else timeout
+
+
 def get_child_elements(self, instance):
     """Return page elements and page objects of this page object
 
@@ -29,12 +37,6 @@ def get_child_elements(self, instance):
         if isinstance(value, instance):
             elements.append(value)
     return set(elements)
-
-
-def get_timeout(timeout):
-    if timeout < 100:  # for timeout in ms
-        timeout *= 1000
-    return timeout
 
 
 def calculate_coordinate_to_click(element, x, y):
@@ -63,11 +65,11 @@ def calculate_coordinate_to_click(element, x, y):
 
 class Mixin:
     """ Mixin for PlayElement and CoreElement """
-    driver: Union[AppiumWebDriver, SeleniumWebDriver, Browser] = None  # variable placeholder
     parent = None  # variable placeholder
     locator: str = ''  # variable placeholder
     locator_type: str = ''  # variable placeholder
     get_screenshot = None  # variable placeholder
+    driver: Union[AppiumWebDriver, SeleniumWebDriver, Browser] = None  # variable placeholder
     element: Union[SeleniumWebElement, AppiumWebElement, PlaywrightWebElement] = None   # variable placeholder
 
     def get_element_logging_data(self, element=None) -> str:

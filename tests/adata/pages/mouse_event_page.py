@@ -10,6 +10,7 @@ class MouseEventPage(Page):
 
     choose_language_button = Element('button.dropbtn', name='"Choose language" button')
     dropdown = Element('div.dropdown-content', name='dropdown with languages')
+    header_logo = Element('[class = "navbar-brand abs"]', name='header logo')
 
     def mouse_click_card(self):
         return MouseClickCard()

@@ -6,6 +6,7 @@ def get_selenium_completable_locator(locator):
 
     if 'xpath=' in locator or 'id=' in locator:
         return locator
+
     if locator in tags:
         return locator
     elif '/' in locator:
