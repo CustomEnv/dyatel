@@ -24,6 +24,7 @@ class PlayElement(Mixin):
         :param locator_type: specific locator type
         :param name: name of element (will be attached to logs)
         :param parent: parent of element. Can be PlayElement, PlayPage, Group objects
+        :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
         self.locator = get_selenium_completable_locator(locator)
         self.name = name if name else self.locator

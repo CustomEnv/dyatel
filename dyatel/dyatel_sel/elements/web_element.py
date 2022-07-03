@@ -21,6 +21,7 @@ class WebElement(CoreElement):
         :param locator_type: specific locator type
         :param name: name of element (will be attached to logs)
         :param parent: parent of element. Can be WebElement, WebPage, Group objects
+        :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
         self.driver: SeleniumWebDriver = CoreDriver.driver
         CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)

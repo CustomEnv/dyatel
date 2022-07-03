@@ -6,6 +6,7 @@ with open('README.md') as f:
 setup(
     name='dyatel',
     version='1.0',
+    url='https://github.com/EnvInc/dyatel',
     packages=find_packages(),
     install_requires=[
         'Appium-Python-Client==2.1.2',
@@ -14,5 +15,7 @@ setup(
         'webdriver-manager==3.7.0',
         'Pillow==9.1.1'
     ],
+    keywords='selenium appium playwright web_automation mobile_automation',
+    description='Wrapper of Selenium, Appium, Playwright',
     long_description=description,
 )

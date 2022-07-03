@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Any
 
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
@@ -20,8 +20,9 @@ class Element(WebElement, MobileElement, PlayElement):
         :param locator_type: specific locator type
         :param name: name of element (will be attached to logs)
         :param parent: parent of element. Can be Group or Page objects
+        :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self.driver = None
+        self.driver: Any = None
         self.locator = locator
         self.locator_type = locator_type
         self.name = name
