@@ -16,8 +16,7 @@ from tests.settings import android_desired_caps, ios_desired_caps
 from dyatel.shared_utils import set_logging_settings
 from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
-from tests.adata.pages.playground_main_page import PlaygroundMainPage
-
+from tests.adata.pages.playground_main_page import PlaygroundMainPage, SecondPlaygroundMainPage
 
 set_logging_settings()
 
@@ -72,12 +71,18 @@ def firefox_options(request):
 
 @pytest.fixture
 def driver_wrapper(platform, driver_name, driver_engine, request, driver_init):
+    skip_marks_iterator = tuple(request.node.iter_markers(name='skip_platform'))
+    skip_platform = list(name for marker in skip_marks_iterator for name in marker.args)
     xfail_marks_iterator = tuple(request.node.iter_markers(name='xfail_platform'))
     xfail_platform = list(name for marker in xfail_marks_iterator for name in marker.args)
 
-    if platform in xfail_platform or driver_engine in xfail_platform:
+    if platform in str(xfail_platform) or driver_engine in str(xfail_platform):
         xfail_reason = list(name for marker in xfail_marks_iterator for name in marker.kwargs.values())
         pytest.xfail(f"Expected failed for {platform} with {driver_name}. Reason={xfail_reason}")
+
+    if platform in str(skip_platform) or driver_engine in str(skip_platform):
+        skip_reason = list(name for marker in skip_marks_iterator for name in marker.kwargs.values())
+        pytest.skip(f"Skip test {platform} with {driver_name}. Reason={skip_reason}")
 
     yield driver_init
     driver_init.get('data:,')
@@ -131,6 +136,11 @@ def driver_init(request, driver_name, driver_engine, chrome_options, firefox_opt
 @pytest.fixture
 def base_playground_page(driver_wrapper):
     return PlaygroundMainPage().open_page()
+
+
+@pytest.fixture
+def second_playground_page(driver_wrapper):
+    return SecondPlaygroundMainPage().open_page()
 
 
 @pytest.fixture

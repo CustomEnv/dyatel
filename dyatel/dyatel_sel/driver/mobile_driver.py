@@ -36,7 +36,7 @@ class MobileDriver(CoreDriver):
 
         CoreDriver.__init__(self, driver=self.mobile_driver)
 
-    def is_app_installed(self):
+    def is_app_installed(self) -> bool:
         """
         Is app running checking
 
@@ -44,7 +44,7 @@ class MobileDriver(CoreDriver):
         """
         return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.RUNNING_IN_FOREGROUND
 
-    def is_app_deleted(self):
+    def is_app_deleted(self) -> bool:
         """
         Is app deleted checking
 
@@ -55,7 +55,7 @@ class MobileDriver(CoreDriver):
 
         return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.NOT_INSTALLED
 
-    def is_app_closed(self):
+    def is_app_closed(self) -> bool:
         """
         Is app closed checking
 
@@ -63,7 +63,7 @@ class MobileDriver(CoreDriver):
         """
         return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.NOT_RUNNING
 
-    def is_app_in_foreground(self):
+    def is_app_in_foreground(self) -> bool:
         """
         Is app in foreground checking
 
@@ -71,7 +71,7 @@ class MobileDriver(CoreDriver):
         """
         return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.RUNNING_IN_FOREGROUND
 
-    def is_app_in_background(self):
+    def is_app_in_background(self) -> bool:
         """
         Is app in background checking
 
@@ -84,7 +84,7 @@ class MobileDriver(CoreDriver):
 
         return self.mobile_driver.query_app_state(self.bundle_id) == background_state
 
-    def terminate_app(self, bundle_id):
+    def terminate_app(self, bundle_id) -> bool:
         """
         Terminates the application if it is running
 

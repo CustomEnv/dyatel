@@ -1,20 +1,20 @@
 from __future__ import annotations
 
 from logging import info
-from typing import Union
+from typing import Union, List, BinaryIO, Any
 
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.internal_utils import calculate_coordinate_to_click
 from dyatel.js_scripts import get_element_position_on_screen_js
 
 
 class MobileElement(CoreElement):
 
-    def __init__(self, locator: str, locator_type='', name='', parent: Union[MobileElement, WebPage] = None):
+    def __init__(self, locator: str, locator_type='', name='',
+                 parent: Union[MobileElement, Any] = None, wait=False):
         """
         Initializing of mobile element with appium driver
 
@@ -24,22 +24,17 @@ class MobileElement(CoreElement):
         :param parent: parent of element. Can be MobileElement, MobilePage, Group objects
         """
         self.driver: AppiumWebDriver = CoreDriver.driver
-        CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent)
+        CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 
     @property
-    def all_elements(self) -> list[MobileElement]:
+    def all_elements(self) -> List[Any]:
         """
-        Get all MobileElement elements, matching given locator
+        Get all wrapped elements with selenium bases
 
-        :return: list of elements
+        :return: list of wrapped objects
         """
-        wrapped_elements = []
-        for element in self._get_driver().find_elements(self.locator_type, self.locator):
-            wrapped_object = MobileElement(self.locator, self.locator_type, self.name, self.parent)
-            wrapped_object.element = element
-            wrapped_elements.append(wrapped_object)
-
-        return wrapped_elements
+        appium_elements = self._get_driver(wait=False).find_elements(self.locator_type, self.locator)
+        return self._get_all_elements(appium_elements, MobileElement)
 
     def hover(self) -> MobileElement:
         """
@@ -71,7 +66,7 @@ class MobileElement(CoreElement):
             .perform()
         return self
 
-    def get_screenshot(self, filename, legacy=True) -> bin:
+    def get_screenshot(self, filename, legacy=True) -> BinaryIO:
         """
         Taking element screenshot and saving with given path/filename
 

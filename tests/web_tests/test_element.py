@@ -5,22 +5,31 @@ import pytest
 from selenium.common.exceptions import NoSuchElementException
 
 from dyatel.internal_utils import Mixin
+from tests.adata.pages.mouse_event_page import MouseEventPage
 
 
+@pytest.mark.skip_platform(
+    'playwright',
+    reason='Playwright doesnt throw error if element/parent isn\'t available/broken'
+)
 def test_element_exception_without_parent_form_driver(base_playground_page):
     el = base_playground_page.kube_broken
     try:
-        el.element
+        el._get_element(wait=False)
     except NoSuchElementException as exc:
         logs = Mixin().get_element_logging_data(el)
         message = f'Cant find element "{el.name}". {logs}.'
         assert exc.msg == message
 
 
+@pytest.mark.skip_platform(
+    'playwright',
+    reason='Playwright doesnt throw error if element/parent isn\'t available/broken'
+)
 def test_element_exception_with_broken_parent_form_driver(base_playground_page):
     el = base_playground_page.kube_broken_parent
     try:
-        el.element
+        el._get_element(wait=False)
     except NoSuchElementException as exc:
         logs = Mixin().get_element_logging_data(el.parent)
         message = f'Cant find parent element "{el.parent.name}". {logs}.'
@@ -60,9 +69,27 @@ def test_all_elements_count(base_playground_page):
 
 
 def test_element_object_in_all_elements(base_playground_page):
-    expected_class = base_playground_page.any_link.__class__.__base__
     for element_object in base_playground_page.any_link.all_elements:
-        assert element_object.__class__ is expected_class
+        assert 'WrappedElement' in str(element_object)
+
+
+def test_element_group_all_elements(second_playground_page):
+    all_cards = second_playground_page.get_all_cards()
+    for element_object in all_cards:
+        assert 'WrappedCard' in str(element_object)
+
+
+def test_element_group_all_elements_child(second_playground_page):
+    all_cards = second_playground_page.get_all_cards()
+
+    # following code takes too many time
+    # for index, element_object in enumerate(all_cards):
+    #     if 0 < index < len(all_cards) - 1:
+    #         assert element_object.button.element != all_cards[index - 1].button.element
+    #         assert element_object.button.element != all_cards[index + 1].button.element
+
+    all_cards[2].button.click()
+    assert MouseEventPage().wait_page_loaded().is_page_opened()
 
 
 def test_click_and_wait(pizza_order_page, driver_engine):

@@ -11,7 +11,7 @@ class Element(WebElement, MobileElement, PlayElement):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
     def __init__(self, locator: str, locator_type='', name='',
-                 parent: Union[WebElement, MobileElement, PlayElement] = None):
+                 parent: Union[WebElement, MobileElement, PlayElement] = None, wait=False):
         """
         Initializing of element based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group
@@ -26,10 +26,13 @@ class Element(WebElement, MobileElement, PlayElement):
         self.locator_type = locator_type
         self.name = name
         self.parent = parent
+        self.wait = wait
 
         self.element_class = self.__get_element_class()
         if self.element_class:
-            self.element_class.__init__(self, locator, locator_type=locator_type, name=name, parent=parent)
+            self.element_class.__init__(
+                self, locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait
+            )
 
     def __get_element_class(self):
         """

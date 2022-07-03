@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import time
 from io import BytesIO
-from logging import info
-from typing import Union
+from logging import info, debug
+from typing import Union, List, Any
 
 from PIL import Image
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
@@ -23,7 +23,7 @@ from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
 
 class CoreElement(Mixin):
 
-    def __init__(self, locator: str, locator_type='', name='', parent=None):
+    def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False):
         """
         Initializing of core element with appium/selenium driver
         Contain same methods/data for both WebElement and MobileElement classes
@@ -35,7 +35,8 @@ class CoreElement(Mixin):
         """
         self.driver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)
-        self.parent = parent if parent else None
+        self.parent: Union[CoreElement, Any] = parent if parent else None
+        self.wait = wait
 
         if isinstance(self.driver, AppiumWebDriver):
             self.locator, self.locator_type = get_legacy_selector(locator, get_locator_type(locator))
@@ -46,10 +47,16 @@ class CoreElement(Mixin):
 
         self._element = None
 
-        self.child_elements = get_child_elements(self, CoreElement)
-        for el in self.child_elements:  # required for Group # TODO: maybe need to replace with function call
+        self.child_elements: List[CoreElement] = get_child_elements(self, CoreElement)
+        for el in self.child_elements:  # required for Group  # TODO: maybe need to replace with function call
             if not el.driver:
-                el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
+                el.__init__(
+                    locator=el.locator,
+                    locator_type=el.locator_type,
+                    name=el.name,
+                    parent=el.parent,
+                    wait=el.wait,
+                )
 
     # Element
 
@@ -60,18 +67,7 @@ class CoreElement(Mixin):
 
         :return: Locator
         """
-        try:
-            driver = self._get_driver()
-        except NoSuchElementException:
-            message = f'Cant find parent element "{self.parent.name}". {self.get_element_logging_data(self.parent)}.'
-            raise NoSuchElementException(message) from NoSuchElementException
-
-        try:
-            element = driver.find_element(self.locator_type, self.locator)
-        except NoSuchElementException:
-            message = f'Cant find element "{self.name}". {self.get_element_logging_data()}.'
-            raise NoSuchElementException(message) from NoSuchElementException
-        return self._element if self._element else element
+        return self._get_element(wait=True)
 
     @element.setter
     def element(self, selenium_element):
@@ -175,7 +171,8 @@ class CoreElement(Mixin):
         try:
             self.wait_element(timeout=timeout, silent=True)
         except (NoSuchElementException, TimeoutException, WebDriverException) as exception:
-            info(f'Ignored exception: "{exception}"')
+            if not silent:
+                info(f'Ignored exception: "{exception}"')
         return self
 
     def wait_element_hidden(self, timeout=WAIT_EL, silent=False) -> CoreElement:
@@ -194,7 +191,7 @@ class CoreElement(Mixin):
 
         while time.time() - start_time < timeout and not is_hidden:
             try:
-                is_hidden = not self.element.is_displayed()
+                is_hidden = not self._get_element(wait=False).is_displayed()
             except (NoSuchElementException, StaleElementReferenceException):
                 is_hidden = True
 
@@ -244,7 +241,7 @@ class CoreElement(Mixin):
 
         return self
 
-    def get_screenshot(self, filename) -> bin:
+    def get_screenshot(self, filename) -> Image:
         """
         Taking element screenshot and saving with given path/filename
 
@@ -257,7 +254,7 @@ class CoreElement(Mixin):
         return image_binary
 
     @property
-    def get_screenshot_base(self) -> bin:
+    def get_screenshot_base(self) -> Image:
         """
         Get driver width scaled screenshot binary of element without saving
 
@@ -304,24 +301,33 @@ class CoreElement(Mixin):
         """
         return bool(len(getattr(self, 'all_elements')))
 
-    def is_displayed(self) -> bool:
+    def is_displayed(self, silent=False) -> bool:
         """
         Check visibility of element
 
+        :param: silent: erase log
         :return: True if element visible
         """
         result = False
+
+        if not silent:
+            info(f'Check displaying of "{self.name}"')
+
         if self.is_available():  # Check in DOM first due to selenium exception
-            result = self.element.is_displayed()
-        info(f'Check displaying of "{self.name}"')
+            result = self._get_element(wait=False).is_displayed()
+
         return result
 
-    def is_hidden(self) -> bool:
+    def is_hidden(self, silent=False) -> bool:
         """
         Check invisibility of current element
 
+        :param: silent: erase log
         :return: True if element hidden
         """
+        if not silent:
+            info(f'Check invisibility of "{self.name}"')
+
         return not self.is_displayed()
 
     def get_attribute(self, attribute, silent=False) -> str:
@@ -337,7 +343,7 @@ class CoreElement(Mixin):
 
         return self.wait_element(silent=True).element.get_attribute(attribute)
 
-    def get_elements_texts(self, silent=False) -> list[str]:
+    def get_elements_texts(self, silent=False) -> List[str]:
         """
         Get all texts from all matching elements
 
@@ -365,7 +371,7 @@ class CoreElement(Mixin):
 
     # Mixin
 
-    def _get_driver(self) -> Union[SeleniumWebDriver, SeleniumWebElement]:
+    def _get_driver(self, wait=True) -> Union[SeleniumWebDriver, SeleniumWebElement]:
         """
         Get driver with depends on parent element if available
 
@@ -373,8 +379,15 @@ class CoreElement(Mixin):
         """
         base = self.driver
         if self.parent:
-            base = self.parent.driver.find_element(self.parent.locator_type, self.parent.locator)
-            info(f'Get element "{self.name}" from parent element "{self.parent.name}"')
+            debug(f'Get element "{self.name}" from parent element "{self.parent.name}"')
+            if wait:
+                self.parent.wait_element(silent=True)
+
+            base = self.parent._element
+
+            if not base:
+                base = self.parent.driver.find_element(self.parent.locator_type, self.parent.locator)
+
         return base
 
     def _get_wait(self, timeout=WAIT_EL) -> WebDriverWait:
@@ -410,3 +423,30 @@ class CoreElement(Mixin):
             img_binary = img_binary.resize(new_image_size, Image.ANTIALIAS)
 
         return img_binary
+
+    def _get_element(self, wait=True) -> SeleniumWebElement:
+        """
+        Get selenium element from driver or parent element
+
+        :param wait: wait for element or element parent before grab
+        :return: Locator
+        """
+        element = self._element
+
+        if not element:
+            try:
+                driver = self._get_driver(wait=wait)
+            except NoSuchElementException:
+                parent = self.parent
+                message = f'Cant find parent element "{parent.name}". {self.get_element_logging_data(parent)}.'
+                raise NoSuchElementException(message) from NoSuchElementException
+
+            try:
+                if wait:
+                    self.wait_element(silent=True)
+                element = driver.find_element(self.locator_type, self.locator)
+            except NoSuchElementException:
+                message = f'Cant find element "{self.name}". {self.get_element_logging_data()}.'
+                raise NoSuchElementException(message) from NoSuchElementException
+
+        return element

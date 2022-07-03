@@ -14,7 +14,7 @@ class AfterInitMeta(type):
         :return: class object
         """
         obj = type.__call__(cls, *args, **kwargs)
-        obj.after_init()
+        obj.set_parent_for_children()
         return obj
 
 
@@ -31,7 +31,7 @@ class Group(Element, metaclass=AfterInitMeta):
         """
         Element.__init__(self, locator, locator_type, name)
 
-    def after_init(self):
+    def set_parent_for_children(self):
         """
         Initializing of Group class variables, if their instance os Element class
         Will be called automatically after __init__ by metaclass `AfterInitMeta`

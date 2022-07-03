@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 from logging import info
-from typing import Union
+from typing import Union, List, Any
 
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.internal_utils import calculate_coordinate_to_click
 
 
 class WebElement(CoreElement):
 
-    def __init__(self, locator: str, locator_type='', name='', parent: Union[WebElement, WebPage] = None):
+    def __init__(self, locator: str, locator_type='', name='',
+                 parent: Union[WebElement, Any] = None, wait=False):
         """
         Initializing of web element with selenium driver
 
@@ -23,22 +23,17 @@ class WebElement(CoreElement):
         :param parent: parent of element. Can be WebElement, WebPage, Group objects
         """
         self.driver: SeleniumWebDriver = CoreDriver.driver
-        CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent)
+        CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 
     @property
-    def all_elements(self) -> list[WebElement]:
+    def all_elements(self) -> List[Any]:
         """
-        Get all WebElement elements, matching given locator
+        Get all wrapped elements with selenium bases
 
-        :return: list of elements
+        :return: list of wrapped objects
         """
-        wrapped_elements = []
-        for element in self._get_driver().find_elements(self.locator_type, self.locator):
-            wrapped_object = WebElement(self.locator, self.locator_type, self.name, self.parent)
-            wrapped_object.element = element
-            wrapped_elements.append(wrapped_object)
-
-        return wrapped_elements
+        selenium_elements = self._get_driver(wait=False).find_elements(self.locator_type, self.locator)
+        return self._get_all_elements(selenium_elements, WebElement)
 
     def hover(self) -> WebElement:
         """
