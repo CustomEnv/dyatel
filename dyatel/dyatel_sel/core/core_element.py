@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import time
 from io import BytesIO
-from logging import info
-from typing import Union, Dict, List
+from logging import info, debug
+from typing import Union, List, Any
 
 from PIL import Image
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
@@ -23,7 +23,7 @@ from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
 
 class CoreElement(Mixin):
 
-    def __init__(self, locator: str, locator_type='', name='', parent: CoreElement = None):
+    def __init__(self, locator: str, locator_type='', name='', parent=None):
         """
         Initializing of core element with appium/selenium driver
         Contain same methods/data for both WebElement and MobileElement classes
@@ -35,7 +35,7 @@ class CoreElement(Mixin):
         """
         self.driver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)
-        self.parent = parent if parent else None
+        self.parent: Union[CoreElement, Any] = parent if parent else None
 
         if isinstance(self.driver, AppiumWebDriver):
             self.locator, self.locator_type = get_legacy_selector(locator, get_locator_type(locator))
@@ -46,7 +46,7 @@ class CoreElement(Mixin):
 
         self._element = None
 
-        self.child_elements: Dict[CoreElement] = get_child_elements(self, CoreElement)
+        self.child_elements: List[CoreElement] = get_child_elements(self, CoreElement)
         for el in self.child_elements:  # required for Group  # TODO: maybe need to replace with function call
             if not el.driver:
                 el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
@@ -300,10 +300,10 @@ class CoreElement(Mixin):
 
         :return: True if element visible
         """
+        info(f'Check displaying of "{self.name}"')
         result = False
         if self.is_available():  # Check in DOM first due to selenium exception
             result = self._get_element(wait=False).is_displayed()
-        info(f'Check displaying of "{self.name}"')
         return result
 
     def is_hidden(self) -> bool:
@@ -363,10 +363,15 @@ class CoreElement(Mixin):
         """
         base = self.driver
         if self.parent:
+            debug(f'Get element "{self.name}" from parent element "{self.parent.name}"')
             if wait:
-                self.parent.wait_element()
-            base = self.parent.driver.find_element(self.parent.locator_type, self.parent.locator)
-            info(f'Get element "{self.name}" from parent element "{self.parent.name}"')
+                self.parent.wait_element(silent=True)
+
+            base = self.parent._element
+
+            if not base:
+                base = self.parent.driver.find_element(self.parent.locator_type, self.parent.locator)
+
         return base
 
     def _get_wait(self, timeout=WAIT_EL) -> WebDriverWait:
@@ -410,7 +415,9 @@ class CoreElement(Mixin):
         :param wait: wait for element or element parent before grab
         :return: Locator
         """
-        if not self._element:
+        element = self._element
+
+        if not element:
             try:
                 driver = self._get_driver(wait=wait)
             except NoSuchElementException:
@@ -420,12 +427,10 @@ class CoreElement(Mixin):
 
             try:
                 if wait:
-                    self.wait_element()
+                    self.wait_element(silent=True)
                 element = driver.find_element(self.locator_type, self.locator)
             except NoSuchElementException:
                 message = f'Cant find element "{self.name}". {self.get_element_logging_data()}.'
                 raise NoSuchElementException(message) from NoSuchElementException
-        else:
-            element = self._element
 
         return element

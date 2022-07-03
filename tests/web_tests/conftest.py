@@ -16,8 +16,7 @@ from tests.settings import android_desired_caps, ios_desired_caps
 from dyatel.shared_utils import set_logging_settings
 from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
-from tests.adata.pages.playground_main_page import PlaygroundMainPage
-
+from tests.adata.pages.playground_main_page import PlaygroundMainPage, SecondPlaygroundMainPage
 
 set_logging_settings()
 
@@ -137,6 +136,11 @@ def driver_init(request, driver_name, driver_engine, chrome_options, firefox_opt
 @pytest.fixture
 def base_playground_page(driver_wrapper):
     return PlaygroundMainPage().open_page()
+
+
+@pytest.fixture
+def second_playground_page(driver_wrapper):
+    return SecondPlaygroundMainPage().open_page()
 
 
 @pytest.fixture

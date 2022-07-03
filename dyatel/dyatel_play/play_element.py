@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import time
-from logging import info
-from typing import Union, List
+from logging import info, debug
+from typing import Union, List, Any
 
 # noinspection PyProtectedMember
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
 from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, get_timeout_in_ms
-from playwright.sync_api import Page as PlayPage, Browser
+from playwright.sync_api import Page as PlayPage, ElementHandle
 from playwright.sync_api import Locator
 from dyatel.shared_utils import cut_log_data
 
@@ -27,15 +27,15 @@ class PlayElement(Mixin):
         """
         self.locator = get_selenium_completable_locator(locator)
         self.name = name if name else self.locator
-        self.parent = parent if parent else None
-        self.driver: Union[Browser, None] = PlayDriver.driver
+        self.parent: Union[PlayElement, Any] = parent if parent else None
+        self.driver = PlayDriver.driver
         self.context = PlayDriver.context
         self.driver_wrapper = PlayDriver(self.driver, initial_page=False)
 
         self.locator_type = f'{locator_type}: locator_type does not supported for playwright'
         self._element = None
 
-        self.child_elements = get_child_elements(self, PlayElement)
+        self.child_elements: List[PlayElement] = get_child_elements(self, PlayElement)
         for el in self.child_elements:
             if not el.driver:
                 el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
@@ -51,7 +51,16 @@ class PlayElement(Mixin):
         :param: kwargs: kwargs from Locator object
         :return: Locator
         """
-        return self._element if self._element else self._get_driver().locator(self.locator)
+        element = self._element
+        if not element:
+
+            driver = self._get_driver()
+            if isinstance(driver, ElementHandle):
+                element = driver.query_selector(self.locator)
+            else:
+                element = driver.locator(self.locator)
+
+        return element
 
     @element.setter
     def element(self, play_element):
@@ -63,19 +72,13 @@ class PlayElement(Mixin):
         self._element = play_element
     
     @property
-    def all_elements(self) -> List[PlayElement]:
+    def all_elements(self) -> List[Any]:
         """
-        Get all PlayElement elements, matching given locator
+        Get all wrapped elements with playwright bases
 
-        :return: list of elements
+        :return: list of wrapped objects
         """
-        wrapped_elements = []
-        for element in self.element.element_handles():
-            wrapped_object = PlayElement(self.locator, self.locator_type, self.name, self.parent)
-            wrapped_object.element = element
-            wrapped_elements.append(wrapped_object)
-
-        return wrapped_elements
+        return self._get_all_elements(self.element.element_handles(), PlayElement)
 
     # Element interaction
 
@@ -343,7 +346,7 @@ class PlayElement(Mixin):
 
     # Mixin
 
-    def _get_driver(self) -> Union[PlayPage, Locator]:
+    def _get_driver(self) -> Union[PlayPage, Locator, ElementHandle]:
         """
         Get driver depends on parent element if available
 
@@ -351,6 +354,10 @@ class PlayElement(Mixin):
         """
         base = self.context
         if self.parent:
-            base = self.parent.context.locator(self.parent.locator)
-            info(f'Get element "{self.name}" from parent element "{self.parent.name}"')
+            debug(f'Get element "{self.name}" from parent element "{self.parent.name}"')
+
+            base = self.parent._element
+
+            if not base:
+                base = self.parent.context.locator(self.parent.locator)
         return base

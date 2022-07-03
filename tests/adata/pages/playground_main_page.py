@@ -1,4 +1,9 @@
+from __future__ import annotations
+
+from typing import List
+
 from dyatel.base.element import Element
+from dyatel.base.group import Group
 from dyatel.base.page import Page
 
 
@@ -23,3 +28,13 @@ class SecondPlaygroundMainPage(Page):
     def __init__(self):
         self.url = 'https://testautomation-playground.herokuapp.com/index.html'
         super(SecondPlaygroundMainPage, self).__init__('//h1[.="The Playground"]', name='Second playground main page')
+
+    def get_all_cards(self) -> List[Card]:
+        return Card().all_elements
+
+
+class Card(Group):
+    def __init__(self):
+        super(Card, self).__init__('.card', name='action cards')
+
+    button = Element('a', name='proceed card button')
