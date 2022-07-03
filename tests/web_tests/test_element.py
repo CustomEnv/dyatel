@@ -82,10 +82,11 @@ def test_element_group_all_elements(second_playground_page):
 def test_element_group_all_elements_child(second_playground_page):
     all_cards = second_playground_page.get_all_cards()
 
-    for index, element_object in enumerate(all_cards):
-        if 0 < index < len(all_cards) - 1:
-            assert element_object.button.element != all_cards[index - 1].button.element
-            assert element_object.button.element != all_cards[index + 1].button.element
+    # following code takes too many time
+    # for index, element_object in enumerate(all_cards):
+    #     if 0 < index < len(all_cards) - 1:
+    #         assert element_object.button.element != all_cards[index - 1].button.element
+    #         assert element_object.button.element != all_cards[index + 1].button.element
 
     all_cards[2].button.click()
     assert MouseEventPage().wait_page_loaded().is_page_opened()

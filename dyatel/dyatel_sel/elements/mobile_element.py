@@ -7,14 +7,14 @@ from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.internal_utils import calculate_coordinate_to_click
 from dyatel.js_scripts import get_element_position_on_screen_js
 
 
 class MobileElement(CoreElement):
 
-    def __init__(self, locator: str, locator_type='', name='', parent: Union[MobileElement, MobilePage] = None):
+    def __init__(self, locator: str, locator_type='', name='',
+                 parent: Union[MobileElement, Any] = None, wait=False):
         """
         Initializing of mobile element with appium driver
 
@@ -24,7 +24,7 @@ class MobileElement(CoreElement):
         :param parent: parent of element. Can be MobileElement, MobilePage, Group objects
         """
         self.driver: AppiumWebDriver = CoreDriver.driver
-        CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent)
+        CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 
     @property
     def all_elements(self) -> List[Any]:

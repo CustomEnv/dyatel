@@ -16,7 +16,7 @@ from dyatel.shared_utils import cut_log_data
 
 class PlayElement(Mixin):
 
-    def __init__(self, locator: str, locator_type='', name='', parent=None):
+    def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False):
         """
         Initializing of web element with playwright driver
 
@@ -27,6 +27,7 @@ class PlayElement(Mixin):
         """
         self.locator = get_selenium_completable_locator(locator)
         self.name = name if name else self.locator
+        self.wait = wait
         self.parent: Union[PlayElement, Any] = parent if parent else None
         self.driver = PlayDriver.driver
         self.context = PlayDriver.context
@@ -38,7 +39,13 @@ class PlayElement(Mixin):
         self.child_elements: List[PlayElement] = get_child_elements(self, PlayElement)
         for el in self.child_elements:
             if not el.driver:
-                el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
+                el.__init__(
+                    locator=el.locator,
+                    locator_type=el.locator_type,
+                    name=el.name,
+                    parent=el.parent,
+                    wait=el.wait,
+                )
 
     # Element
 
@@ -186,7 +193,7 @@ class PlayElement(Mixin):
         if not silent:
             info(f'Wait until presence of "{self.name}" without error exception')
         try:
-            self.wait_element(timeout=timeout, silent=True)
+            self.wait_element(timeout=get_timeout_in_ms(timeout), silent=True)
         except PlayTimeoutError as exception:
             info(f'Ignored exception: "{exception}"')
         return self
@@ -289,22 +296,28 @@ class PlayElement(Mixin):
         """
         return bool(len(self.all_elements))
 
-    def is_displayed(self) -> bool:
+    def is_displayed(self, silent=False) -> bool:
         """
         Check visibility of current element
 
+        :param: silent: erase log
         :return: True if element visible
         """
-        info(f'Check visibility of "{self.name}"')
+        if not silent:
+            info(f'Check visibility of "{self.name}"')
+
         return self.element.is_visible()
 
-    def is_hidden(self) -> bool:
+    def is_hidden(self, silent=False) -> bool:
         """
         Check invisibility of current element
 
+        :param: silent: erase log
         :return: True if element hidden
         """
-        info(f'Check invisibility of "{self.name}"')
+        if not silent:
+            info(f'Check invisibility of "{self.name}"')
+
         return self.element.is_hidden()
 
     def get_attribute(self, attribute, silent=False) -> str:

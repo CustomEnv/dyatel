@@ -13,8 +13,8 @@ from appium.webdriver.webelement import WebElement as AppiumWebElement
 from dyatel.visual_comparison import assert_same_images
 
 
-WAIT_EL = 15
-WAIT_PAGE = 30
+WAIT_EL = 10
+WAIT_PAGE = 20
 
 
 def get_timeout_in_ms(timeout):
@@ -34,12 +34,12 @@ def get_child_elements_with_names(self, instance) -> dict:
 
     :returns: list of page elements and page objects
     """
-    elements = {}
-
-    class_items = list(self.__dict__.items()) + list(self.__class__.__dict__.items())
+    elements, class_items = {}, []
 
     for parent_class in self.__class__.__bases__:
         class_items += list(parent_class.__dict__.items()) + list(parent_class.__class__.__dict__.items())
+
+    class_items += list(list(self.__class__.__dict__.items()) + list(self.__dict__.items()))
 
     for attribute, value in class_items:
         if isinstance(value, instance):
@@ -131,7 +131,9 @@ class Mixin:
             try:
                 wrapped_object = wrapped_object()
             except TypeError:
-                wrapped_object = wrapped_object(self.locator, self.locator_type, self.name, self.parent)
+                wrapped_object = wrapped_object(
+                    locator=self.locator, locator_type=self.locator_type, name=self.name, parent=self.parent
+                )
 
             wrapped_object.element = element
 
@@ -139,7 +141,9 @@ class Mixin:
 
                 wrapped_child = type(f'Wrapped{type(self).__name__}', (child.__class__,), {'parent': wrapped_object})
                 try:
-                    wrapped_child = wrapped_child(child.locator, child.locator_type, child.name, wrapped_object)
+                    wrapped_child = wrapped_child(
+                        locator=child.locator, locator_type=child.locator_type, name=child.name, parent=wrapped_object
+                    )
                 except TypeError:
                     wrapped_child = wrapped_child()
 

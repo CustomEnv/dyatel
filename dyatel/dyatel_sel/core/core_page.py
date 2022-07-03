@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from logging import info
+from logging import info, debug
 
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 
+from dyatel.base.element import Element
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
@@ -38,7 +39,13 @@ class CorePage:
 
         for el in self.page_elements:  # required for CoreElement
             if not el.driver:
-                el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
+                el.__init__(
+                    locator=el.locator,
+                    locator_type=el.locator_type,
+                    name=el.name,
+                    parent=el.parent,
+                    wait=el.wait,
+                )
 
     def reload_page(self, wait_page_load=True) -> CorePage:
         """
@@ -61,32 +68,49 @@ class CorePage:
         :return: self
         """
         url = self.url if not url else url
-        if not self.is_page_opened():
-            self.driver_wrapper.get(url)
-            self.wait_page_loaded()
+        self.driver_wrapper.get(url)
+        self.wait_page_loaded()
         return self
 
-    def wait_page_loaded(self, silent=False) -> CorePage:
+    def wait_page_loaded(self, silent=False, timeout=WAIT_PAGE) -> CorePage:
         """
         Wait until page loaded
 
         :param silent: erase log
+        :param timeout: page/elements wait timeout
         :return: self
         """
         if not silent:
             info(f'Wait until page "{self.name}" loaded')
-        wait = WebDriverWait(self.driver, WAIT_PAGE)
+
+        wait = WebDriverWait(self.driver, timeout)
         wait.until(ec.visibility_of_element_located((self.locator_type, self.locator)))
+
+        for element in self.page_elements:
+            if getattr(element, 'wait'):
+                element.wait_element(timeout=timeout, silent=True)
         return self
 
-    def is_page_opened(self) -> bool:
+    def is_page_opened(self, with_elements=False) -> bool:
         """
         Check is current page opened or not
 
+        :param with_elements: is page opened with signed elements
         :return: self
         """
+        result = True
+        page_anchor = Element(locator=self.locator, locator_type=self.locator_type, name=self.name)
+
+        if with_elements:
+            for element in self.page_elements:
+                if getattr(element, 'wait'):
+                    result &= element.is_displayed(silent=True)
+                    if not result:
+                        debug(f'Element "{element.name}" is not displayed')
+
+        result &= page_anchor.is_displayed()
+
         if self.url:
-            return self.driver_wrapper.current_url == self.url
-        else:
-            page_anchor = CoreElement(locator=self.locator, locator_type=self.locator_type, name=self.name)
-            return page_anchor.is_displayed()
+            result &= self.driver_wrapper.current_url == self.url
+
+        return result

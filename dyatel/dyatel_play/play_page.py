@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from logging import info
+from logging import info, debug
 
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
-from dyatel.internal_utils import get_child_elements
+from dyatel.internal_utils import get_child_elements, WAIT_PAGE, get_timeout_in_ms
 
 
 class PlayPage:
@@ -29,7 +29,13 @@ class PlayPage:
         self.page_elements = get_child_elements(self, PlayElement)
         for el in self.page_elements:
             if not el.driver:
-                el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
+                el.__init__(
+                    locator=el.locator,
+                    locator_type=el.locator_type,
+                    name=el.name,
+                    parent=el.parent,
+                    wait=el.wait,
+                )
 
     def reload_page(self, wait_page_load=True) -> PlayPage:
         """
@@ -57,26 +63,44 @@ class PlayPage:
             self.wait_page_loaded()
         return self
 
-    def wait_page_loaded(self, silent=False) -> PlayPage:
+    def wait_page_loaded(self, silent=False, timeout=WAIT_PAGE) -> PlayPage:
         """
         Wait until page loaded
 
         :param silent: erase log
+        :param timeout: page/elements wait timeout
         :return: self
         """
         if not silent:
             info(f'Wait until page "{self.name}" loaded')
-        self.context.wait_for_selector(self.locator)
+
+        self.context.wait_for_selector(self.locator, timeout=get_timeout_in_ms(timeout))
+
+        for element in self.page_elements:
+            if getattr(element, 'wait'):
+                element.wait_element(timeout=timeout, silent=True)
         return self
 
-    def is_page_opened(self) -> bool:
+    def is_page_opened(self, with_elements=False) -> bool:
         """
         Check is current page opened or not
 
+        :param with_elements: is page opened with signed elements
         :return: self
         """
+        result = True
+        page_anchor = PlayElement(locator=self.locator, locator_type=self.locator_type, name=self.name)
+
+        if with_elements:
+            for element in self.page_elements:
+                if getattr(element, 'wait'):
+                    result &= element.is_displayed(silent=True)
+                    if not result:
+                        debug(f'Element "{element.name}" is not displayed')
+
+        result &= page_anchor.is_displayed()
+
         if self.url:
-            return self.driver_wrapper.current_url == self.url
-        else:
-            page_anchor = PlayElement(locator=self.locator, locator_type=self.locator_type, name=self.name)
-            return page_anchor.is_displayed()
+            result &= self.driver_wrapper.current_url == self.url
+
+        return result

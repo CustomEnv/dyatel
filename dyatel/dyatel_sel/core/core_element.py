@@ -23,7 +23,7 @@ from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
 
 class CoreElement(Mixin):
 
-    def __init__(self, locator: str, locator_type='', name='', parent=None):
+    def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False):
         """
         Initializing of core element with appium/selenium driver
         Contain same methods/data for both WebElement and MobileElement classes
@@ -36,6 +36,7 @@ class CoreElement(Mixin):
         self.driver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)
         self.parent: Union[CoreElement, Any] = parent if parent else None
+        self.wait = wait
 
         if isinstance(self.driver, AppiumWebDriver):
             self.locator, self.locator_type = get_legacy_selector(locator, get_locator_type(locator))
@@ -49,7 +50,13 @@ class CoreElement(Mixin):
         self.child_elements: List[CoreElement] = get_child_elements(self, CoreElement)
         for el in self.child_elements:  # required for Group  # TODO: maybe need to replace with function call
             if not el.driver:
-                el.__init__(locator=el.locator, locator_type=el.locator_type, name=el.name, parent=el.parent)
+                el.__init__(
+                    locator=el.locator,
+                    locator_type=el.locator_type,
+                    name=el.name,
+                    parent=el.parent,
+                    wait=el.wait,
+                )
 
     # Element
 
@@ -294,24 +301,33 @@ class CoreElement(Mixin):
         """
         return bool(len(getattr(self, 'all_elements')))
 
-    def is_displayed(self) -> bool:
+    def is_displayed(self, silent=False) -> bool:
         """
         Check visibility of element
 
+        :param: silent: erase log
         :return: True if element visible
         """
-        info(f'Check displaying of "{self.name}"')
         result = False
+
+        if not silent:
+            info(f'Check displaying of "{self.name}"')
+
         if self.is_available():  # Check in DOM first due to selenium exception
             result = self._get_element(wait=False).is_displayed()
+
         return result
 
-    def is_hidden(self) -> bool:
+    def is_hidden(self, silent=False) -> bool:
         """
         Check invisibility of current element
 
+        :param: silent: erase log
         :return: True if element hidden
         """
+        if not silent:
+            info(f'Check invisibility of "{self.name}"')
+
         return not self.is_displayed()
 
     def get_attribute(self, attribute, silent=False) -> str:
