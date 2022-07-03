@@ -9,7 +9,7 @@ from tests.adata.pages.mouse_event_page import MouseEventPage
 
 
 @pytest.mark.skip_platform(
-    'play',
+    'playwright',
     reason='Playwright doesnt throw error if element/parent isn\'t available/broken'
 )
 def test_element_exception_without_parent_form_driver(base_playground_page):
