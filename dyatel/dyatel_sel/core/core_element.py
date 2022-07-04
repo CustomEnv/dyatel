@@ -405,7 +405,7 @@ class CoreElement(Mixin):
 
         :return: ActionChains
         """
-        return ActionChains(self._get_driver())
+        return ActionChains(self.driver)
 
     def _scaled_screenshot(self, screenshot_binary, width) -> Image:
         """

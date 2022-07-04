@@ -132,7 +132,7 @@ class Mixin:
                 wrapped_object = wrapped_object()
             except TypeError:
                 wrapped_object = wrapped_object(
-                    locator=self.locator, locator_type=self.locator_type, name=self.name, parent=self.parent
+                    locator=self.locator, locator_type=self.locator_type, name=self.name
                 )
 
             wrapped_object.element = element
