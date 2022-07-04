@@ -10,8 +10,7 @@ from dyatel.dyatel_sel.elements.web_element import WebElement
 class Element(WebElement, MobileElement, PlayElement):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
-    def __init__(self, locator: str, locator_type='', name='',
-                 parent: Union[WebElement, MobileElement, PlayElement] = None, wait=False):
+    def __init__(self, locator: str, locator_type='', name='', parent: Any = None, wait=False):
         """
         Initializing of element based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group

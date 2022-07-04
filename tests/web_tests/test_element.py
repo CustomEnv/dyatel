@@ -44,22 +44,6 @@ def test_element_displayed_negative(base_playground_page):
     assert not base_playground_page.kube_broken.is_displayed()
 
 
-def test_parent_element_positive(base_playground_page):
-    assert base_playground_page.kube_parent.is_displayed()
-
-
-def test_parent_element_negative(base_playground_page):
-    assert not base_playground_page.kube_wrong_parent.is_displayed()
-
-
-def test_parent_element_wait_visible_positive(base_playground_page):
-    assert base_playground_page.kube_parent.wait_element()
-
-
-def test_parent_element_wait_hidden_negative(base_playground_page):
-    assert base_playground_page.kube_wrong_parent.wait_element_hidden()
-
-
 def test_all_elements(base_playground_page):
     assert len(base_playground_page.any_link.all_elements) > 1
 
@@ -71,25 +55,6 @@ def test_all_elements_count(base_playground_page):
 def test_element_object_in_all_elements(base_playground_page):
     for element_object in base_playground_page.any_link.all_elements:
         assert 'WrappedElement' in str(element_object)
-
-
-def test_element_group_all_elements(second_playground_page):
-    all_cards = second_playground_page.get_all_cards()
-    for element_object in all_cards:
-        assert 'WrappedCard' in str(element_object)
-
-
-def test_element_group_all_elements_child(second_playground_page):
-    all_cards = second_playground_page.get_all_cards()
-
-    # following code takes too many time
-    # for index, element_object in enumerate(all_cards):
-    #     if 0 < index < len(all_cards) - 1:
-    #         assert element_object.button.element != all_cards[index - 1].button.element
-    #         assert element_object.button.element != all_cards[index + 1].button.element
-
-    all_cards[2].button.click()
-    assert MouseEventPage().wait_page_loaded().is_page_opened()
 
 
 def test_click_and_wait(pizza_order_page, driver_engine):
@@ -128,3 +93,47 @@ def test_screenshot(base_playground_page, driver_engine, driver_name, platform, 
     node_name = request.node.name.replace('_', '-')
     filename = f'{node_name}-{driver_engine}-{driver_name}-{platform}-kube'
     base_playground_page.kube.scroll_into_view(sleep=0.5).assert_screenshot(filename, threshold=6)
+
+
+# Cases when parent is another element
+
+
+def test_parent_element_positive(base_playground_page):
+    assert base_playground_page.kube_parent.is_displayed()
+
+
+def test_parent_element_negative(base_playground_page):
+    assert not base_playground_page.kube_wrong_parent.is_displayed()
+
+
+def test_parent_element_wait_visible_positive(base_playground_page):
+    assert base_playground_page.kube_parent.wait_element()
+
+
+def test_parent_element_wait_hidden_negative(base_playground_page):
+    assert base_playground_page.kube_wrong_parent.wait_element_hidden()
+
+
+# Other cases with parent
+
+
+def test_all_elements_with_parent(base_playground_page):
+    """ all_elements when parent of Element is Page """
+    all_elements = base_playground_page.any_div_with_parent.all_elements
+    assert all_elements, 'did not find elements on page'
+
+    for element in all_elements:
+        assert element.parent == base_playground_page
+
+
+def test_element_group_all_elements_child(second_playground_page):
+    """ all_elements when parent of Element is Group """
+    all_cards = second_playground_page.get_all_cards()
+
+    for index, element_object in enumerate(all_cards):
+        if 0 < index < len(all_cards) - 1:
+            assert element_object.button.element != all_cards[index - 1].button.element
+            assert element_object.button.element != all_cards[index + 1].button.element
+
+    all_cards[2].button.click()
+    assert MouseEventPage().wait_page_loaded().is_page_opened()

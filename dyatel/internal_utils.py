@@ -6,7 +6,7 @@ from typing import Union, List, Any
 from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
-from playwright.sync_api import Locator as PlaywrightWebElement, Browser, Locator
+from playwright.sync_api import Locator as PlaywrightWebElement, Browser
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from appium.webdriver.webelement import WebElement as AppiumWebElement
 
@@ -15,6 +15,9 @@ from dyatel.visual_comparison import assert_same_images
 
 WAIT_EL = 10
 WAIT_PAGE = 20
+
+
+all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div']
 
 
 def get_timeout_in_ms(timeout):
@@ -126,28 +129,18 @@ class Mixin:
         wrapped_elements = []
 
         for element in sources:
-
             wrapped_object = type(f'Wrapped{type(self).__name__}', (self.__class__,), {})
-            try:
-                wrapped_object = wrapped_object()
-            except TypeError:
-                wrapped_object = wrapped_object(
-                    locator=self.locator, locator_type=self.locator_type, name=self.name
-                )
-
+            wrapped_object = wrapped_object(locator=self.locator, locator_type=self.locator_type, name=self.name,
+                                            parent=self.parent)
             wrapped_object.element = element
 
             for name, child in get_child_elements_with_names(self, instance).items():
-
                 wrapped_child = type(f'Wrapped{type(self).__name__}', (child.__class__,), {'parent': wrapped_object})
-                try:
-                    wrapped_child = wrapped_child(
-                        locator=child.locator, locator_type=child.locator_type, name=child.name, parent=wrapped_object
-                    )
-                except TypeError:
-                    wrapped_child = wrapped_child()
-
+                wrapped_child = wrapped_child(locator=child.locator, locator_type=child.locator_type, name=child.name,
+                                              parent=wrapped_object)
+                wrapped_child.element = child.element
                 setattr(wrapped_object, name, wrapped_child)
 
             wrapped_elements.append(wrapped_object)
+
         return wrapped_elements

@@ -194,7 +194,7 @@ class PlayElement(Mixin):
         if not silent:
             info(f'Wait until presence of "{self.name}" without error exception')
         try:
-            self.wait_element(timeout=get_timeout_in_ms(timeout), silent=True)
+            self.wait_element(timeout=timeout, silent=True)
         except PlayTimeoutError as exception:
             info(f'Ignored exception: "{exception}"')
         return self

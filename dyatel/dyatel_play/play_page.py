@@ -25,6 +25,7 @@ class PlayPage:
         self.context = PlayDriver.context
         self.driver_wrapper = PlayDriver(self.driver, initial_page=False)
 
+        self._element = None
         self.url = getattr(self, 'url', '')
         self.page_elements = get_child_elements(self, PlayElement)
         for el in self.page_elements:

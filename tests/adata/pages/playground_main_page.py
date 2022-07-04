@@ -11,7 +11,9 @@ class PlaygroundMainPage(Page):
 
     def __init__(self):
         self.url = "http://uitestingplayground.com/home"
-        super().__init__('//h1[.="UI Test AutomationPlayground"]', name='Playground main page')
+        self.any_div_with_parent = Element('div', name='any div inside page locator', parent=self)
+        super().__init__('//*[contains(@class, "container") and .//.="UI Test AutomationPlayground"]',
+                         name='Playground main page')
 
     description_section = Element('description', name='description section')
     overview_section = Element('overview', name='overview section')

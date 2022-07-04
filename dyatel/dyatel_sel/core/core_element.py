@@ -381,7 +381,11 @@ class CoreElement(Mixin):
         if self.parent:
             debug(f'Get element "{self.name}" from parent element "{self.parent.name}"')
             if wait:
-                self.parent.wait_element(silent=True)
+                if isinstance(self, CoreElement):
+                    self.wait_element(silent=True)
+                else:
+                    wait_page_loaded = getattr(self, 'wait_page_loaded')
+                    wait_page_loaded(silent=True)
 
             base = self.parent._element
 
@@ -396,7 +400,7 @@ class CoreElement(Mixin):
 
         :return: driver
         """
-        return WebDriverWait(self._get_driver(), timeout)
+        return WebDriverWait(self.driver, timeout)
 
     @property
     def _action_chains(self) -> ActionChains:

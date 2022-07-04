@@ -10,10 +10,10 @@ from dyatel.base.element import Element
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
-from dyatel.internal_utils import get_child_elements, WAIT_PAGE
+from dyatel.internal_utils import get_child_elements, WAIT_PAGE, Mixin
 
 
-class CorePage:
+class CorePage(Mixin):
 
     def __init__(self, locator: str, locator_type='', name=''):
         """
@@ -26,7 +26,6 @@ class CorePage:
         """
         self.driver = CoreDriver.driver
         self.driver_wrapper = CoreDriver(self.driver)
-        self.url = getattr(self, 'url', '')
 
         if isinstance(self.driver, AppiumWebDriver):
             self.locator, self.locator_type = get_legacy_selector(locator, get_locator_type(locator))
@@ -35,8 +34,9 @@ class CorePage:
             self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.name = name if name else self.locator
 
+        self._element = None
+        self.url = getattr(self, 'url', '')
         self.page_elements = get_child_elements(self, CoreElement)
-
         for el in self.page_elements:  # required for CoreElement
             if not el.driver:
                 el.__init__(

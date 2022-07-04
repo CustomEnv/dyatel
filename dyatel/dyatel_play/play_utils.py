@@ -1,4 +1,4 @@
-tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link']
+from dyatel.internal_utils import all_tags
 
 
 def get_selenium_completable_locator(locator):
@@ -7,7 +7,7 @@ def get_selenium_completable_locator(locator):
     if 'xpath=' in locator or 'id=' in locator:
         return locator
 
-    if locator in tags:
+    if locator in all_tags:
         return locator
     elif '/' in locator:
         return f'xpath={locator}'

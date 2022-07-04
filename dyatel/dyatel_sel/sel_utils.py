@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 
-tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header']
+from dyatel.internal_utils import all_tags
 
 
 def get_locator_type(locator: str):
@@ -18,7 +18,7 @@ def get_locator_type(locator: str):
     brackets = '[' in locator and ']' in locator
     is_only_tags = True
 
-    if locator in tags:
+    if locator in all_tags:
         return By.TAG_NAME
     elif '/' in locator:
         return By.XPATH
@@ -28,7 +28,7 @@ def get_locator_type(locator: str):
         return By.CSS_SELECTOR
 
     for tag in locator.split(' '):
-        is_only_tags = is_only_tags and tag in tags
+        is_only_tags = is_only_tags and tag in all_tags
 
     if is_only_tags:
         return By.TAG_NAME
