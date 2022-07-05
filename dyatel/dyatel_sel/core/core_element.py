@@ -299,7 +299,8 @@ class CoreElement(Mixin):
 
         :return: True if present in DOM
         """
-        return bool(len(getattr(self, 'all_elements')))
+        is_available = self._get_driver(wait=False).find_elements(self.locator_type, self.locator)
+        return bool(len(is_available))
 
     def is_displayed(self, silent=False) -> bool:
         """

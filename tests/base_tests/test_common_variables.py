@@ -3,10 +3,10 @@ from selenium.webdriver.common.by import By
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.core.core_page import CorePage
-from dyatel.dyatel_sel.sel_utils import tags
+from dyatel.internal_utils import all_tags
 
 
-tags = tags + ['header h4']
+tags = all_tags + ['header h4']
 
 
 @pytest.mark.parametrize('locator', ('.element', '[id *= element]'))

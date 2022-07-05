@@ -295,7 +295,7 @@ class PlayElement(Mixin):
 
         :return: True if present in DOM
         """
-        return bool(len(self.all_elements))
+        return bool(len(self.element.element_handles()))
 
     def is_displayed(self, silent=False) -> bool:
         """
