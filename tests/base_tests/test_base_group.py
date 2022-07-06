@@ -33,7 +33,7 @@ def test_base_group_play_framework_variables_access(mocked_play_driver):
     assert hasattr(group, 'locator_type')
     assert hasattr(group, 'name')
     assert hasattr(group.child_element_class_var, 'parent')
-    assert hasattr(parent_group, 'context')
+    assert hasattr(parent_group, 'driver')
 
 
 # Class variables

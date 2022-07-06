@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from logging import info, debug
+from typing import Union
 
+from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
@@ -9,6 +11,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 from dyatel.base.element import Element
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
+from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
+from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
 from dyatel.internal_utils import get_child_elements, WAIT_PAGE, Mixin
 
@@ -24,9 +28,6 @@ class CorePage(Mixin):
         :param locator_type: specific locator type
         :param name: name of page (will be attached to logs)
         """
-        self.driver = CoreDriver.driver
-        self.driver_wrapper = CoreDriver(self.driver)
-
         if isinstance(self.driver, AppiumWebDriver):
             self.locator, self.locator_type = get_legacy_selector(locator, get_locator_type(locator))
         else:
@@ -38,7 +39,7 @@ class CorePage(Mixin):
         self.url = getattr(self, 'url', '')
         self.page_elements = get_child_elements(self, CoreElement)
         for el in self.page_elements:  # required for CoreElement
-            if not el.driver:
+            if not getattr(el, '_initialized'):
                 el.__init__(
                     locator=el.locator,
                     locator_type=el.locator_type,
@@ -114,3 +115,32 @@ class CorePage(Mixin):
             result &= self.driver_wrapper.current_url == self.url
 
         return result
+
+    @property
+    def driver(self) -> Union[AppiumWebDriver, SeleniumWebDriver]:
+        """
+        Get source driver instance
+
+        :return: SeleniumWebDriver for web test or AppiumWebDriver for mobile tests
+        """
+        return CoreDriver.driver
+
+    @property
+    def driver_wrapper(self) -> CoreDriver:
+        """
+        Get source driver wrapper instance
+
+        :return: CoreDriver
+        """
+        return CoreDriver.driver_wrapper
+
+    def set_driver(self, driver_wrapper: Union[WebDriver, MobileDriver]):
+        """
+        Set driver session
+
+        :param driver_wrapper:
+        :return:
+        """
+        CoreDriver.driver = driver_wrapper.driver
+        CoreDriver.driver_wrapper = driver_wrapper
+        return self

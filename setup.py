@@ -1,12 +1,11 @@
 from setuptools import setup
 
-
 with open('README.md') as f:
     description = f.read()
 
 setup(
     name='dyatel-wrapper',
-    version='1.0.3',
+    version='1.0.4',
     url='https://github.com/EnvInc/dyatel',
     packages=[
         'dyatel',
@@ -28,11 +27,23 @@ setup(
     keywords='selenium appium playwright web_automation mobile_automation',
     description='Wrapper of Selenium, Appium, Playwright',
     long_description=description,
-    long_description_content_type="text/markdown",
-    author_email="vladimir.podolyan64@gmail.com",
+    long_description_content_type='text/markdown',
+    author_email='vladimir.podolyan64@gmail.com',
     author='Podolian Vladimir',
     project_urls={
-        "Source": "https://github.com/EnvInc/dyatel",
-        "Tracker": "https://github.com/EnvInc/dyatel/issues",
+        'Source': 'https://github.com/EnvInc/dyatel',
+        'Tracker': 'https://github.com/EnvInc/dyatel/issues',
+        'Changelog': 'https://github.com/EnvInc/dyatel/blob/master/CHANGELOG.md'
     },
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "License :: Apache Software License",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Software Development :: Quality Assurance",
+        "Topic :: Software Development :: Testing :: Acceptance",
+    ],
 )

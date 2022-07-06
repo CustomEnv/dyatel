@@ -18,7 +18,7 @@ class Driver(WebDriver, MobileDriver, PlayDriver):
 
         :param driver: appium or selenium or playwright driver to initialize
         """
-        self.driver = driver
+        self.__driver_source = driver
         self.driver_class = self.__get_driver_class()
         self.driver_class.__init__(self, driver)
 
@@ -28,13 +28,13 @@ class Driver(WebDriver, MobileDriver, PlayDriver):
 
         :return: driver wrapper class
         """
-        if isinstance(self.driver, PlaywrightDriver):
+        if isinstance(self.__driver_source, PlaywrightDriver):
             Driver.__bases__ = PlayDriver,
             return PlayDriver
-        if isinstance(self.driver, AppiumDriver):
+        if isinstance(self.__driver_source, AppiumDriver):
             Driver.__bases__ = MobileDriver,
             return MobileDriver
-        if isinstance(self.driver, SeleniumWebDriver):
+        if isinstance(self.__driver_source, SeleniumWebDriver):
             Driver.__bases__ = WebDriver,
             return WebDriver
         else:

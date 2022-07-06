@@ -24,7 +24,6 @@ class MobileElement(CoreElement):
         :param parent: parent of element. Can be MobileElement, MobilePage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self.driver: AppiumWebDriver = CoreDriver.driver
         CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 
     @property

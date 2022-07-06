@@ -12,15 +12,13 @@ class MobileDriver(CoreDriver):
 
         :param driver: appium driver to initialize
         """
-        self.mobile_driver = driver
-        self.capabilities = self.mobile_driver.capabilities
+        self.capabilities = driver.capabilities
 
         self.is_ios = self.capabilities.get('platformName') == 'iOS'
         self.is_android = self.capabilities.get('platformName') == 'Android'
         self.is_web = self.capabilities.get('browserName', False)
         self.is_app = self.capabilities.get('app', False)
 
-        CoreDriver.driver = self.mobile_driver
         CoreDriver.is_ios = self.is_ios
         CoreDriver.is_android = self.is_android
         CoreDriver.mobile = True
@@ -34,7 +32,7 @@ class MobileDriver(CoreDriver):
             else:
                 raise Exception('Make sure that correct "platformName" capability specified')
 
-        CoreDriver.__init__(self, driver=self.mobile_driver)
+        CoreDriver.__init__(self, driver=driver)
 
     def is_app_installed(self) -> bool:
         """
@@ -42,7 +40,7 @@ class MobileDriver(CoreDriver):
 
         :return: True if the app running
         """
-        return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.RUNNING_IN_FOREGROUND
+        return self.driver.query_app_state(self.bundle_id) == ApplicationState.RUNNING_IN_FOREGROUND
 
     def is_app_deleted(self) -> bool:
         """
@@ -53,7 +51,7 @@ class MobileDriver(CoreDriver):
         if self.is_ios:  # query_app_state return value equal 1(NOT_RUNNING), that not accurate
             return not self.is_app_installed()
 
-        return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.NOT_INSTALLED
+        return self.driver.query_app_state(self.bundle_id) == ApplicationState.NOT_INSTALLED
 
     def is_app_closed(self) -> bool:
         """
@@ -61,7 +59,7 @@ class MobileDriver(CoreDriver):
 
         :return: True if the app closed
         """
-        return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.NOT_RUNNING
+        return self.driver.query_app_state(self.bundle_id) == ApplicationState.NOT_RUNNING
 
     def is_app_in_foreground(self) -> bool:
         """
@@ -69,7 +67,7 @@ class MobileDriver(CoreDriver):
 
         :return: True if the app in foreground
         """
-        return self.mobile_driver.query_app_state(self.bundle_id) == ApplicationState.RUNNING_IN_FOREGROUND
+        return self.driver.query_app_state(self.bundle_id) == ApplicationState.RUNNING_IN_FOREGROUND
 
     def is_app_in_background(self) -> bool:
         """
@@ -82,7 +80,7 @@ class MobileDriver(CoreDriver):
         if self.is_ios:  # iOS simulator are suspended the background app
             background_state = ApplicationState.RUNNING_IN_BACKGROUND_SUSPENDED
 
-        return self.mobile_driver.query_app_state(self.bundle_id) == background_state
+        return self.driver.query_app_state(self.bundle_id) == background_state
 
     def terminate_app(self, bundle_id) -> bool:
         """

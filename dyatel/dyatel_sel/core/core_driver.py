@@ -9,6 +9,7 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
 class CoreDriver:
     driver: Union[AppiumDriver, SeleniumWebDriver] = None
+    driver_wrapper: CoreDriver = None
 
     mobile = False
     desktop = False
@@ -22,9 +23,10 @@ class CoreDriver:
 
         :param driver: appium or selenium driver to initialize
         """
+        driver.implicitly_wait(0.001)  # reduce selenium wait
         self.driver = driver
-        if self.driver:
-            self.driver.implicitly_wait(0.001)  # reduce selenium wait
+        CoreDriver.driver = driver
+        CoreDriver.driver_wrapper = self
 
     def get(self, url) -> CoreDriver:
         """

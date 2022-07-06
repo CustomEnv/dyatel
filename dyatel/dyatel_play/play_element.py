@@ -9,7 +9,7 @@ from playwright._impl._api_types import TimeoutError as PlayTimeoutError
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
 from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, get_timeout_in_ms
-from playwright.sync_api import Page as PlayPage, ElementHandle
+from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
 from dyatel.shared_utils import cut_log_data
 
@@ -30,16 +30,14 @@ class PlayElement(Mixin):
         self.name = name if name else self.locator
         self.wait = wait
         self.parent: Union[PlayElement, Any] = parent if parent else None
-        self.driver = PlayDriver.driver
-        self.context = PlayDriver.context
-        self.driver_wrapper = PlayDriver(self.driver, initial_page=False)
-
         self.locator_type = f'{locator_type}: locator_type does not supported for playwright'
+
         self._element = None
+        self._initialized = True
 
         self.child_elements: List[PlayElement] = get_child_elements(self, PlayElement)
         for el in self.child_elements:
-            if not el.driver:
+            if not getattr(el, '_initialized'):
                 el.__init__(
                     locator=el.locator,
                     locator_type=el.locator_type,
@@ -360,18 +358,36 @@ class PlayElement(Mixin):
 
     # Mixin
 
-    def _get_driver(self) -> Union[PlayPage, Locator, ElementHandle]:
+    def _get_driver(self) -> Union[PlaywrightPage, Locator, ElementHandle]:
         """
         Get driver depends on parent element if available
 
         :return: driver
         """
-        base = self.context
+        base = self.driver
         if self.parent:
             debug(f'Get element "{self.name}" from parent element "{self.parent.name}"')
 
             base = self.parent._element
 
             if not base:
-                base = self.parent.context.locator(self.parent.locator)
+                base = self.parent.driver.locator(self.parent.locator)
         return base
+
+    @property
+    def driver(self) -> PlaywrightPage:
+        """
+        Get source driver instance
+
+        :return: Browser
+        """
+        return PlayDriver.driver
+
+    @property
+    def driver_wrapper(self) -> PlayDriver:
+        """
+        Get source driver wrapper instance
+
+        :return: CoreDriver
+        """
+        return PlayDriver.driver_wrapper

@@ -3,15 +3,11 @@ from __future__ import annotations
 from logging import info
 from typing import Union, List, Any
 
-from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
-
-from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.internal_utils import calculate_coordinate_to_click
 
 
 class WebElement(CoreElement):
-
     def __init__(self, locator: str, locator_type='', name='',
                  parent: Union[WebElement, Any] = None, wait=False):
         """
@@ -23,7 +19,6 @@ class WebElement(CoreElement):
         :param parent: parent of element. Can be WebElement, WebPage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self.driver: SeleniumWebDriver = CoreDriver.driver
         CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 
     @property

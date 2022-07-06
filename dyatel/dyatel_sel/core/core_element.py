@@ -8,12 +8,12 @@ from typing import Union, List, Any
 from PIL import Image
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
-from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver import ActionChains
 
 from dyatel.shared_utils import cut_log_data
 from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL
@@ -33,8 +33,6 @@ class CoreElement(Mixin):
         :param name: name of element (will be attached to logs)
         :param parent: parent of element. Can be Web/MobileElement, Web/MobilePage or Group objects
         """
-        self.driver = CoreDriver.driver
-        self.driver_wrapper = CoreDriver(self.driver)
         self.parent: Union[CoreElement, Any] = parent if parent else None
         self.wait = wait
 
@@ -46,10 +44,11 @@ class CoreElement(Mixin):
         self.name = name if name else self.locator
 
         self._element = None
+        self._initialized = True
 
         self.child_elements: List[CoreElement] = get_child_elements(self, CoreElement)
         for el in self.child_elements:  # required for Group  # TODO: maybe need to replace with function call
-            if not el.driver:
+            if not getattr(el, '_initialized'):
                 el.__init__(
                     locator=el.locator,
                     locator_type=el.locator_type,
@@ -369,6 +368,24 @@ class CoreElement(Mixin):
 
         self.wait_element(silent=True)
         return len(getattr(self, 'all_elements'))
+
+    @property
+    def driver(self) -> Union[AppiumWebDriver, SeleniumWebDriver]:
+        """
+        Get source driver instance
+
+        :return: SeleniumWebDriver for web test or AppiumWebDriver for mobile tests
+        """
+        return CoreDriver.driver
+
+    @property
+    def driver_wrapper(self) -> CoreDriver:
+        """
+        Get source driver wrapper instance
+
+        :return: CoreDriver
+        """
+        return CoreDriver.driver_wrapper
 
     # Mixin
 
