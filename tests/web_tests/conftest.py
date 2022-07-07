@@ -12,6 +12,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
 from dyatel.base.driver import Driver
+from dyatel.dyatel_play.play_driver import PlayDriver
 from tests.settings import android_desired_caps, ios_desired_caps
 from dyatel.shared_utils import set_logging_settings
 from tests.adata.pages.mouse_event_page import MouseEventPage
@@ -77,11 +78,11 @@ def driver_wrapper(platform, driver_name, driver_engine, request, driver_init):
     xfail_marks_iterator = tuple(request.node.iter_markers(name='xfail_platform'))
     xfail_platform = list(name for marker in xfail_marks_iterator for name in marker.args)
 
-    if platform in str(xfail_platform) or driver_engine in str(xfail_platform):
+    if platform in str(xfail_platform) or driver_engine in str(xfail_platform) or driver_name in str(xfail_platform):
         xfail_reason = list(name for marker in xfail_marks_iterator for name in marker.kwargs.values())
         pytest.xfail(f"Expected failed for {platform} with {driver_name}. Reason={xfail_reason}")
 
-    if platform in str(skip_platform) or driver_engine in str(skip_platform):
+    if platform in str(skip_platform) or driver_engine in str(skip_platform) or driver_name in str(skip_platform):
         skip_reason = list(name for marker in skip_marks_iterator for name in marker.kwargs.values())
         pytest.skip(f"Skip test {platform} with {driver_name}. Reason={skip_reason}")
 
@@ -89,8 +90,21 @@ def driver_wrapper(platform, driver_name, driver_engine, request, driver_init):
     driver_init.get('data:,')
 
 
+@pytest.fixture
+def second_driver_wrapper(request, driver_name, driver_engine, chrome_options, firefox_options, platform):
+    driver = driver_func(request, driver_name, driver_engine, chrome_options, firefox_options, platform)
+    yield driver
+    driver.quit()
+
+
 @pytest.fixture(scope='session')
 def driver_init(request, driver_name, driver_engine, chrome_options, firefox_options, platform):
+    driver = driver_func(request, driver_name, driver_engine, chrome_options, firefox_options, platform)
+    yield driver
+    driver.quit()
+
+
+def driver_func(request, driver_name, driver_engine, chrome_options, firefox_options, platform):
     driver, browser = None, None
     is_headless = request.config.getoption('headless')
 
@@ -114,15 +128,19 @@ def driver_init(request, driver_name, driver_engine, chrome_options, firefox_opt
         driver.set_window_position(0, 0)  # FIXME
 
     elif 'play' in driver_engine:
-        playwright = sync_playwright().start()
-        if driver_name == 'chrome':
-            browser = playwright.chromium
-        elif driver_name == 'firefox':
-            browser = playwright.firefox
-        elif driver_name == 'safari':
-            browser = playwright.webkit
+        driver = PlayDriver.instance
 
-        driver = browser.launch(headless=is_headless)
+        if not driver:
+            playwright = sync_playwright().start()
+
+            if driver_name == 'chrome':
+                browser = playwright.chromium
+            elif driver_name == 'firefox':
+                browser = playwright.firefox
+            elif driver_name == 'safari':
+                browser = playwright.webkit
+
+            driver = browser.launch(headless=is_headless)
 
     driver_wrapper = Driver(driver)
 
@@ -130,8 +148,7 @@ def driver_init(request, driver_name, driver_engine, chrome_options, firefox_opt
         driver_wrapper.set_window_size(1024, 900)
 
     os.environ['visual'] = 'tests/adata/visual'
-    yield driver_wrapper
-    driver_wrapper.quit()
+    return driver_wrapper
 
 
 @pytest.fixture

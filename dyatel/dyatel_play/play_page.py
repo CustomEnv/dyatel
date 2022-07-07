@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from logging import info, debug
 
+from playwright.sync_api import Page as PlaywrightPage
+
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
@@ -21,15 +23,12 @@ class PlayPage:
         self.locator = get_selenium_completable_locator(locator)
         self.name = name if name else self.locator
         self.locator_type = f'{locator_type}: locator_type does not supported for playwright'
-        self.driver = PlayDriver.driver
-        self.context = PlayDriver.context
-        self.driver_wrapper = PlayDriver(self.driver, initial_page=False)
 
         self._element = None
         self.url = getattr(self, 'url', '')
         self.page_elements = get_child_elements(self, PlayElement)
         for el in self.page_elements:
-            if not el.driver:
+            if not getattr(el, '_initialized'):
                 el.__init__(
                     locator=el.locator,
                     locator_type=el.locator_type,
@@ -75,7 +74,7 @@ class PlayPage:
         if not silent:
             info(f'Wait until page "{self.name}" loaded')
 
-        self.context.wait_for_selector(self.locator, timeout=get_timeout_in_ms(timeout))
+        self.driver.wait_for_selector(self.locator, timeout=get_timeout_in_ms(timeout))
 
         for element in self.page_elements:
             if getattr(element, 'wait'):
@@ -105,3 +104,32 @@ class PlayPage:
             result &= self.driver_wrapper.current_url == self.url
 
         return result
+
+    @property
+    def driver(self) -> PlaywrightPage:
+        """
+        Get source driver instance
+
+        :return: Browser
+        """
+        return PlayDriver.driver
+
+    @property
+    def driver_wrapper(self) -> PlayDriver:
+        """
+        Get source driver wrapper instance
+
+        :return: CoreDriver
+        """
+        return PlayDriver.driver_wrapper
+
+    def set_driver(self, driver_wrapper: PlayDriver):
+        """
+        Set driver session
+
+        :param driver_wrapper:
+        :return:
+        """
+        PlayDriver.driver = driver_wrapper.driver
+        PlayDriver.driver_wrapper = driver_wrapper
+        return self

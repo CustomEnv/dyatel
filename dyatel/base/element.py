@@ -21,12 +21,12 @@ class Element(WebElement, MobileElement, PlayElement):
         :param parent: parent of element. Can be Group or Page objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self.driver: Any = None
         self.locator = locator
         self.locator_type = locator_type
         self.name = name
         self.parent = parent
         self.wait = wait
+        self._initialized = False
 
         self.element_class = self.__get_element_class()
         if self.element_class:

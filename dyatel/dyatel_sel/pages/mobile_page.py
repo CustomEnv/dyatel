@@ -1,6 +1,3 @@
-from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
-
-from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_page import CorePage
 
 
@@ -14,5 +11,4 @@ class MobilePage(CorePage):
         :param locator_type: specific locator type
         :param name: name of page (will be attached to logs)
         """
-        self.driver: AppiumWebDriver = CoreDriver.driver
         CorePage.__init__(self, locator=locator, locator_type=locator_type, name=name)
