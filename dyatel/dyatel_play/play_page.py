@@ -7,7 +7,7 @@ from playwright.sync_api import Page as PlaywrightPage
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
-from dyatel.internal_utils import get_child_elements, WAIT_PAGE, get_timeout_in_ms
+from dyatel.internal_utils import get_child_elements, WAIT_PAGE, get_timeout_in_ms, initialize_objects_with_args
 
 
 class PlayPage:
@@ -27,15 +27,7 @@ class PlayPage:
         self._element = None
         self.url = getattr(self, 'url', '')
         self.page_elements = get_child_elements(self, PlayElement)
-        for el in self.page_elements:
-            if not getattr(el, '_initialized'):
-                el.__init__(
-                    locator=el.locator,
-                    locator_type=el.locator_type,
-                    name=el.name,
-                    parent=el.parent,
-                    wait=el.wait,
-                )
+        initialize_objects_with_args(self.page_elements)
 
     def reload_page(self, wait_page_load=True) -> PlayPage:
         """

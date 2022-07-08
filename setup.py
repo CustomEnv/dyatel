@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setup(
     name='dyatel-wrapper',
-    version='1.0.4',
+    version='1.0.5',
     url='https://github.com/EnvInc/dyatel',
     packages=[
         'dyatel',
@@ -37,7 +37,6 @@ setup(
     },
     classifiers=[
         "Development Status :: 3 - Alpha",
-        "License :: Apache Software License",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",

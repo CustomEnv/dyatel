@@ -1,7 +1,7 @@
 from typing import Any
 
 from dyatel.base.element import Element
-from dyatel.internal_utils import get_child_elements
+from dyatel.internal_utils import get_child_elements, get_object_args
 
 
 class AfterInitMeta(type):
@@ -15,10 +15,7 @@ class AfterInitMeta(type):
         :param kwargs: original class kwargs
         :return: class object
         """
-        try:
-            obj = type.__call__(cls, *args, **kwargs)
-        except TypeError:
-            obj = type.__call__(cls)
+        obj = type.__call__(cls, **get_object_args(cls))
         obj.set_parent_for_children()
         return obj
 

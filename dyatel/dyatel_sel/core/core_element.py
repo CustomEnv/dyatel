@@ -16,7 +16,7 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver import ActionChains
 
 from dyatel.shared_utils import cut_log_data
-from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL
+from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, initialize_objects_with_args
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
 
@@ -47,15 +47,7 @@ class CoreElement(Mixin):
         self._initialized = True
 
         self.child_elements: List[CoreElement] = get_child_elements(self, CoreElement)
-        for el in self.child_elements:  # required for Group  # TODO: maybe need to replace with function call
-            if not getattr(el, '_initialized'):
-                el.__init__(
-                    locator=el.locator,
-                    locator_type=el.locator_type,
-                    name=el.name,
-                    parent=el.parent,
-                    wait=el.wait,
-                )
+        initialize_objects_with_args(self.child_elements)  # required for Group
 
     # Element
 

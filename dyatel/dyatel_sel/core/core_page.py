@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from logging import info, debug
-from typing import Union
+from typing import Union, List
 
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
@@ -14,7 +14,7 @@ from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
-from dyatel.internal_utils import get_child_elements, WAIT_PAGE, Mixin
+from dyatel.internal_utils import get_child_elements, WAIT_PAGE, Mixin, initialize_objects_with_args
 
 
 class CorePage(Mixin):
@@ -37,16 +37,8 @@ class CorePage(Mixin):
 
         self._element = None
         self.url = getattr(self, 'url', '')
-        self.page_elements = get_child_elements(self, CoreElement)
-        for el in self.page_elements:  # required for CoreElement
-            if not getattr(el, '_initialized'):
-                el.__init__(
-                    locator=el.locator,
-                    locator_type=el.locator_type,
-                    name=el.name,
-                    parent=el.parent,
-                    wait=el.wait,
-                )
+        self.page_elements: List[CoreElement] = get_child_elements(self, CoreElement)
+        initialize_objects_with_args(self.page_elements)
 
     def reload_page(self, wait_page_load=True) -> CorePage:
         """

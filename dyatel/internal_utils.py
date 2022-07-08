@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import inspect
 from typing import Union, List, Any
 
 from PIL import Image
@@ -18,6 +19,22 @@ WAIT_PAGE = 20
 
 
 all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div']
+
+
+def initialize_objects_with_args(objects):
+    for obj in objects:
+        if not getattr(obj, '_initialized'):
+            obj.__init__(**get_object_args(obj))
+
+
+def get_object_args(obj):
+    init_args = inspect.getfullargspec(obj.__init__).args
+
+    for index, key in enumerate(init_args):
+        if key == 'self':
+            init_args.pop(index)
+
+    return {item: getattr(obj, item, None) for item in init_args}  # FIXME: remove default value `None`
 
 
 def get_timeout_in_ms(timeout):
