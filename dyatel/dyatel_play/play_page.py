@@ -81,7 +81,6 @@ class PlayPage:
         :return: self
         """
         result = True
-        page_anchor = PlayElement(locator=self.locator, locator_type=self.locator_type, name=self.name)
 
         if with_elements:
             for element in self.page_elements:
@@ -90,7 +89,7 @@ class PlayPage:
                     if not result:
                         debug(f'Element "{element.name}" is not displayed')
 
-        result &= page_anchor.is_displayed()
+        result &= self._internal_element.is_displayed()
 
         if self.url:
             result &= self.driver_wrapper.current_url == self.url
@@ -125,3 +124,12 @@ class PlayPage:
         PlayDriver.driver = driver_wrapper.driver
         PlayDriver.driver_wrapper = driver_wrapper
         return self
+
+    @property
+    def _internal_element(self) -> PlayElement:
+        """
+        Get anchor PlayElement of page
+
+        :return: PlayElement object
+        """
+        return PlayElement(locator=self.locator, locator_type=self.locator_type, name=self.name)

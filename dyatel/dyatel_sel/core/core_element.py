@@ -390,17 +390,17 @@ class CoreElement(Mixin):
         base = self.driver
         if self.parent:
             debug(f'Get element "{self.name}" from parent element "{self.parent.name}"')
-            if wait:
-                if isinstance(self, CoreElement):
-                    self.wait_element(silent=True)
-                else:
-                    wait_page_loaded = getattr(self, 'wait_page_loaded')
-                    wait_page_loaded(silent=True)
 
-            base = self.parent._element
+            if isinstance(self.parent, CoreElement):
+                base = self.parent._get_element(wait=wait)
+            else:
+                base = self.parent._internal_element._get_element(wait=wait)
 
             if not base:
-                base = self.parent.driver.find_element(self.parent.locator_type, self.parent.locator)
+                raise NoSuchElementException('Can\'t specify parent element')
+
+        if not base:
+            raise Exception('Can\'t specify driver')
 
         return base
 
@@ -462,5 +462,8 @@ class CoreElement(Mixin):
             except NoSuchElementException:
                 message = f'Cant find element "{self.name}". {self.get_element_logging_data()}.'
                 raise NoSuchElementException(message) from NoSuchElementException
+
+        if not element:
+            raise NoSuchElementException('Can\'t find element')
 
         return element

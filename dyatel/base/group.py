@@ -15,7 +15,11 @@ class AfterInitMeta(type):
         :param kwargs: original class kwargs
         :return: class object
         """
-        obj = type.__call__(cls, **get_object_args(cls))
+        #  FIXME: required when Group defined without __init__
+        try:
+            obj = type.__call__(cls, *args, **kwargs)
+        except AttributeError:
+            obj = type.__call__(cls, **get_object_args(cls))
         obj.set_parent_for_children()
         return obj
 

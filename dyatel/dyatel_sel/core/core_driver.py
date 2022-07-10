@@ -4,7 +4,7 @@ from typing import Union, List
 from logging import info
 
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
-from selenium.common import WebDriverException
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
 

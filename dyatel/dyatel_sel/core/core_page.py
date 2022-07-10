@@ -5,8 +5,6 @@ from typing import Union, List
 
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.wait import WebDriverWait
 
 from dyatel.base.element import Element
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
@@ -76,8 +74,7 @@ class CorePage(Mixin):
         if not silent:
             info(f'Wait until page "{self.name}" loaded')
 
-        wait = WebDriverWait(self.driver, timeout)
-        wait.until(ec.visibility_of_element_located((self.locator_type, self.locator)))
+        self._internal_element.wait_element(timeout=timeout)
 
         for element in self.page_elements:
             if getattr(element, 'wait'):
@@ -92,7 +89,6 @@ class CorePage(Mixin):
         :return: self
         """
         result = True
-        page_anchor = Element(locator=self.locator, locator_type=self.locator_type, name=self.name)
 
         if with_elements:
             for element in self.page_elements:
@@ -101,7 +97,7 @@ class CorePage(Mixin):
                     if not result:
                         debug(f'Element "{element.name}" is not displayed')
 
-        result &= page_anchor.is_displayed()
+        result &= self._internal_element.is_displayed()
 
         if self.url:
             result &= self.driver_wrapper.current_url == self.url
@@ -136,3 +132,12 @@ class CorePage(Mixin):
         CoreDriver.driver = driver_wrapper.driver
         CoreDriver.driver_wrapper = driver_wrapper
         return self
+
+    @property
+    def _internal_element(self) -> Element:
+        """
+        Get anchor Element of page
+
+        :return: Element object
+        """
+        return Element(locator=self.locator, locator_type=self.locator_type, name=self.name)
