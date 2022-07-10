@@ -25,7 +25,7 @@ setup(
         'Pillow==9.1.1'
     ],
     keywords='selenium appium playwright web_automation mobile_automation',
-    description='Wrapper of Selenium, Appium, Playwright',
+    description='Wrapper of Selenium, Appium and Playwright with single API',
     long_description=description,
     long_description_content_type='text/markdown',
     author_email='vladimir.podolyan64@gmail.com',
@@ -36,13 +36,14 @@ setup(
         'Changelog': 'https://github.com/EnvInc/dyatel/blob/master/CHANGELOG.md'
     },
     classifiers=[
-        "Development Status :: 3 - Alpha",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-        "Topic :: Software Development :: Quality Assurance",
-        "Topic :: Software Development :: Testing :: Acceptance",
+        'Development Status :: 3 - Alpha',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Software Development :: Quality Assurance',
+        'Topic :: Software Development :: Testing :: Acceptance',
+        'License :: OSI Approved :: Apache Software License'
     ],
 )

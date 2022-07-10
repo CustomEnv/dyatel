@@ -22,23 +22,41 @@ WAIT_PAGE = 20
 all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div']
 
 
-def initialize_objects_with_args(objects):
+def initialize_objects_with_args(objects: list):
+    """
+    Initializing objects with itself args/kwargs
+
+    :param objects: list of objects to initialize
+    :return: None
+    """
     for obj in objects:
         if not getattr(obj, '_initialized'):
-            obj.__init__(**get_object_args(obj))
+            obj.__init__(**get_object_kwargs(obj))
 
 
-def get_object_args(obj):
+def get_object_kwargs(obj):
+    """
+    Get actual args/kwargs of object __init__
+
+    :param obj: object instance
+    :return: object kwargs
+    """
     init_args = inspect.getfullargspec(obj.__init__).args
 
     for index, key in enumerate(init_args):
         if key == 'self':
             init_args.pop(index)
 
-    return {item: getattr(obj, item, None) for item in init_args}  # FIXME: remove default value `None`
+    return {item: getattr(obj, item) for item in init_args}
 
 
-def get_timeout_in_ms(timeout):
+def get_timeout_in_ms(timeout: int):
+    """
+    Get timeout in milliseconds for playwright
+
+    :param timeout: timeout in seconds
+    :return: timeout in milliseconds
+    """
     return timeout * 1000 if timeout < 1000 else timeout
 
 
@@ -146,7 +164,7 @@ class Mixin:
 
     def _get_all_elements(self, sources, instance_class) -> List[Any]:
         """
-        Get all wrapped element from sources
+        Get all wrapped elements from sources
 
         :param sources: list of elements: `all_elements` from selenium or `element_handles` from playwright
         :param instance_class: attribute class to looking for
@@ -164,7 +182,7 @@ class Mixin:
 
     def __set_parent_for_attr(self, instance_class, base_obj):
         """
-        Copy attribute of given object and set new parent for him
+        Copy attributes of given object and set new parent for him
 
         :param instance_class: attribute class to looking for
         :param base_obj: object of attribute

@@ -19,3 +19,12 @@ def test_group_with_class_func_positive(mouse_event_page):
 def test_group_with_class_func_negative(mouse_event_page):
     mouse_click_card = MouseEventPage().mouse_click_card()
     assert not mouse_click_card.drag_source_func().is_displayed()
+
+
+def test_group_without_init(forms_page):
+    forms_page.validation_form.form_mixin.input.type_text('sample')
+    forms_page.validation_form.submit_form_button.click()
+    assert not forms_page.validation_form.invalid_city_error.is_displayed()
+    assert forms_page.validation_form.invalid_feedback_error.is_displayed()
+    assert forms_page.validation_form.invalid_zip_error.is_displayed()
+    assert forms_page.validation_form.invalid_terms_error.is_displayed()

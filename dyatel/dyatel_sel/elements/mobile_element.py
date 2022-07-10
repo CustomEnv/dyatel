@@ -3,9 +3,6 @@ from __future__ import annotations
 from logging import info
 from typing import Union, List, BinaryIO, Any
 
-from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
-
-from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.internal_utils import calculate_coordinate_to_click
 from dyatel.js_scripts import get_element_position_on_screen_js
@@ -103,9 +100,9 @@ class MobileElement(CoreElement):
         bars_size = outer_height - inner_height
 
         if bars_size > 110:  # FIXME: magick value
-            bar_size = bars_size / 4
+            bar_size = bars_size / 4  # top and bottom bar shown
         else:
-            bar_size = bars_size / 2
+            bar_size = bars_size / 2  # top bar shown
 
         if bar_size:
             start_y += bar_size
