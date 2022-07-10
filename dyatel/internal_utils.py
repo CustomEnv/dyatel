@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import inspect
+from copy import copy
 from typing import Union, List, Any
 
 from PIL import Image
@@ -20,7 +22,41 @@ WAIT_PAGE = 20
 all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div']
 
 
-def get_timeout_in_ms(timeout):
+def initialize_objects_with_args(objects: list):
+    """
+    Initializing objects with itself args/kwargs
+
+    :param objects: list of objects to initialize
+    :return: None
+    """
+    for obj in objects:
+        if not getattr(obj, '_initialized'):
+            obj.__init__(**get_object_kwargs(obj))
+
+
+def get_object_kwargs(obj):
+    """
+    Get actual args/kwargs of object __init__
+
+    :param obj: object instance
+    :return: object kwargs
+    """
+    init_args = inspect.getfullargspec(obj.__init__).args
+
+    for index, key in enumerate(init_args):
+        if key == 'self':
+            init_args.pop(index)
+
+    return {item: getattr(obj, item) for item in init_args}
+
+
+def get_timeout_in_ms(timeout: int):
+    """
+    Get timeout in milliseconds for playwright
+
+    :param timeout: timeout in seconds
+    :return: timeout in milliseconds
+    """
     return timeout * 1000 if timeout < 1000 else timeout
 
 
@@ -46,7 +82,8 @@ def get_child_elements_with_names(self, instance) -> dict:
 
     for attribute, value in class_items:
         if isinstance(value, instance):
-            elements.update({attribute: value})
+            if attribute != 'parent':
+                elements.update({attribute: value})
 
     return elements
 
@@ -125,22 +162,38 @@ class Mixin:
         assert_same_images(output_file, reference_file, filename, threshold)
         return self
 
-    def _get_all_elements(self, sources, instance) -> List[Any]:
+    def _get_all_elements(self, sources, instance_class) -> List[Any]:
+        """
+        Get all wrapped elements from sources
+
+        :param sources: list of elements: `all_elements` from selenium or `element_handles` from playwright
+        :param instance_class: attribute class to looking for
+        :return: wrapped elements
+        """
         wrapped_elements = []
 
         for element in sources:
-            wrapped_object = type(f'Wrapped{type(self).__name__}', (self.__class__,), {})
-            wrapped_object = wrapped_object(locator=self.locator, locator_type=self.locator_type, name=self.name,
-                                            parent=self.parent)
+            wrapped_object = copy(self)
             wrapped_object.element = element
-
-            for name, child in get_child_elements_with_names(self, instance).items():
-                wrapped_child = type(f'Wrapped{type(self).__name__}', (child.__class__,), {'parent': wrapped_object})
-                wrapped_child = wrapped_child(locator=child.locator, locator_type=child.locator_type, name=child.name,
-                                              parent=wrapped_object)
-                wrapped_child.element = child.element
-                setattr(wrapped_object, name, wrapped_child)
-
+            self.__set_parent_for_attr(instance_class, wrapped_object)
             wrapped_elements.append(wrapped_object)
 
         return wrapped_elements
+
+    def __set_parent_for_attr(self, instance_class, base_obj):
+        """
+        Copy attributes of given object and set new parent for him
+
+        :param instance_class: attribute class to looking for
+        :param base_obj: object of attribute
+        :return: self
+        """
+        child_elements = get_child_elements_with_names(base_obj, instance_class).items()
+
+        for name, child in child_elements:
+            wrapped_child = copy(child)
+            wrapped_child.parent = base_obj
+            setattr(base_obj, name, wrapped_child)
+            self.__set_parent_for_attr(instance_class, wrapped_child)
+
+        return self

@@ -52,11 +52,6 @@ def test_all_elements_count(base_playground_page):
     assert base_playground_page.any_link.get_elements_count() > 1
 
 
-def test_element_object_in_all_elements(base_playground_page):
-    for element_object in base_playground_page.any_link.all_elements:
-        assert 'WrappedElement' in str(element_object)
-
-
 def test_click_and_wait(pizza_order_page, driver_engine):
     pizza_order_page.submit_button.click()
     after_click_displayed = pizza_order_page.error_modal.wait_element().is_displayed()

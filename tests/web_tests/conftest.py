@@ -13,6 +13,7 @@ from webdriver_manager.firefox import GeckoDriverManager
 
 from dyatel.base.driver import Driver
 from dyatel.dyatel_play.play_driver import PlayDriver
+from tests.adata.pages.forms_page import FormsPage
 from tests.settings import android_desired_caps, ios_desired_caps
 from dyatel.shared_utils import set_logging_settings
 from tests.adata.pages.mouse_event_page import MouseEventPage
@@ -169,3 +170,8 @@ def pizza_order_page(driver_wrapper):
 @pytest.fixture
 def mouse_event_page(driver_wrapper):
     return MouseEventPage().open_page()
+
+
+@pytest.fixture
+def forms_page(driver_wrapper):
+    return FormsPage().open_page()

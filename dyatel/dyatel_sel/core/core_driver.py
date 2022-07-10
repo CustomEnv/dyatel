@@ -4,6 +4,7 @@ from typing import Union, List
 from logging import info
 
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
 
@@ -36,7 +37,12 @@ class CoreDriver:
         :return: self
         """
         info(f'Navigating to url {url}')
-        self.driver.get(url)
+
+        try:
+            self.driver.get(url)
+        except WebDriverException:
+            raise Exception(f'Can\'t proceed to {url}')
+
         return self
 
     def is_driver_opened(self) -> bool:

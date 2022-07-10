@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 from logging import info, debug
-from typing import Union
+from typing import Union, List
 
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.wait import WebDriverWait
 
 from dyatel.base.element import Element
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
@@ -14,7 +12,7 @@ from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
-from dyatel.internal_utils import get_child_elements, WAIT_PAGE, Mixin
+from dyatel.internal_utils import get_child_elements, WAIT_PAGE, Mixin, initialize_objects_with_args
 
 
 class CorePage(Mixin):
@@ -37,16 +35,8 @@ class CorePage(Mixin):
 
         self._element = None
         self.url = getattr(self, 'url', '')
-        self.page_elements = get_child_elements(self, CoreElement)
-        for el in self.page_elements:  # required for CoreElement
-            if not getattr(el, '_initialized'):
-                el.__init__(
-                    locator=el.locator,
-                    locator_type=el.locator_type,
-                    name=el.name,
-                    parent=el.parent,
-                    wait=el.wait,
-                )
+        self.page_elements: List[CoreElement] = get_child_elements(self, CoreElement)
+        initialize_objects_with_args(self.page_elements)
 
     def reload_page(self, wait_page_load=True) -> CorePage:
         """
@@ -84,8 +74,7 @@ class CorePage(Mixin):
         if not silent:
             info(f'Wait until page "{self.name}" loaded')
 
-        wait = WebDriverWait(self.driver, timeout)
-        wait.until(ec.visibility_of_element_located((self.locator_type, self.locator)))
+        self._internal_element.wait_element(timeout=timeout)
 
         for element in self.page_elements:
             if getattr(element, 'wait'):
@@ -100,7 +89,6 @@ class CorePage(Mixin):
         :return: self
         """
         result = True
-        page_anchor = Element(locator=self.locator, locator_type=self.locator_type, name=self.name)
 
         if with_elements:
             for element in self.page_elements:
@@ -109,7 +97,7 @@ class CorePage(Mixin):
                     if not result:
                         debug(f'Element "{element.name}" is not displayed')
 
-        result &= page_anchor.is_displayed()
+        result &= self._internal_element.is_displayed()
 
         if self.url:
             result &= self.driver_wrapper.current_url == self.url
@@ -144,3 +132,12 @@ class CorePage(Mixin):
         CoreDriver.driver = driver_wrapper.driver
         CoreDriver.driver_wrapper = driver_wrapper
         return self
+
+    @property
+    def _internal_element(self) -> Element:
+        """
+        Get anchor Element of page
+
+        :return: Element object
+        """
+        return Element(locator=self.locator, locator_type=self.locator_type, name=self.name)

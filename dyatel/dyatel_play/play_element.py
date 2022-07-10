@@ -8,7 +8,7 @@ from typing import Union, List, Any
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
-from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, get_timeout_in_ms
+from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, get_timeout_in_ms, initialize_objects_with_args
 from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
 from dyatel.shared_utils import cut_log_data
@@ -36,15 +36,7 @@ class PlayElement(Mixin):
         self._initialized = True
 
         self.child_elements: List[PlayElement] = get_child_elements(self, PlayElement)
-        for el in self.child_elements:
-            if not getattr(el, '_initialized'):
-                el.__init__(
-                    locator=el.locator,
-                    locator_type=el.locator_type,
-                    name=el.name,
-                    parent=el.parent,
-                    wait=el.wait,
-                )
+        initialize_objects_with_args(self.child_elements)
 
     # Element
 
@@ -97,7 +89,7 @@ class PlayElement(Mixin):
         :return: self
         """
         info(f'Click into "{self.name}"')
-        self.element.click(*args, **kwargs)
+        self._first_element.click(*args, **kwargs)
         return self
 
     def click_outside(self, x=-5.0, y=-5.0) -> PlayElement:
@@ -108,7 +100,7 @@ class PlayElement(Mixin):
         :param: y: y offset
         :return: self
         """
-        self.element.click(position={'x': x, 'y': y}, force=True)
+        self._first_element.click(position={'x': x, 'y': y}, force=True)
         return self
 
     def type_text(self, text, silent=False) -> PlayElement:
@@ -123,7 +115,7 @@ class PlayElement(Mixin):
         if not silent:
             info(f'Type text {cut_log_data(text)} into "{self.name}"')
 
-        self.element.type(text=text)
+        self._first_element.type(text=text)
         return self
 
     def type_slowly(self, text, sleep_gap=0.05, silent=False) -> PlayElement:
@@ -138,7 +130,7 @@ class PlayElement(Mixin):
         if not silent:
             info(f'Type text {cut_log_data(text)} into "{self.name}"')
 
-        self.element.type(text=text, delay=sleep_gap)
+        self._first_element.type(text=text, delay=sleep_gap)
         return self
 
     def clear_text(self, silent=False) -> PlayElement:
@@ -151,7 +143,7 @@ class PlayElement(Mixin):
         if not silent:
             info(f'Clear text in "{self.name}"')
 
-        self.element.fill('')
+        self._first_element.fill('')
         return self
 
     def hover(self) -> PlayElement:
@@ -161,7 +153,7 @@ class PlayElement(Mixin):
         :return: self
         """
         info(f'Hover over "{self.name}"')
-        self.element.hover()
+        self._first_element.hover()
         return self
 
     # Element waits
@@ -177,8 +169,8 @@ class PlayElement(Mixin):
         if not silent:
             info(f'Wait until presence of "{self.name}"')
 
-        self.element.wait_for(state='attached', timeout=get_timeout_in_ms(timeout))
-        self.element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
+        self._first_element.wait_for(state='attached', timeout=get_timeout_in_ms(timeout))
+        self._first_element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
         return self
 
     def wait_element_without_error(self, timeout=WAIT_EL, silent=False) -> PlayElement:
@@ -191,6 +183,7 @@ class PlayElement(Mixin):
         """
         if not silent:
             info(f'Wait until presence of "{self.name}" without error exception')
+
         try:
             self.wait_element(timeout=timeout, silent=True)
         except PlayTimeoutError as exception:
@@ -208,7 +201,7 @@ class PlayElement(Mixin):
         if not silent:
             info(f'Wait hidden of "{self.name}"')
 
-        self.element.wait_for(state='hidden', timeout=get_timeout_in_ms(timeout))
+        self._first_element.wait_for(state='hidden', timeout=get_timeout_in_ms(timeout))
         return self
 
     def wait_clickable(self, timeout=WAIT_EL, silent=False) -> PlayElement:
@@ -234,7 +227,7 @@ class PlayElement(Mixin):
         :return: self
         """
         info(f'Scroll element "{self.name}" into view')
-        self.element.scroll_into_view_if_needed()
+        self._first_element.scroll_into_view_if_needed()
 
         if sleep:
             time.sleep(sleep)
@@ -249,7 +242,7 @@ class PlayElement(Mixin):
         :return: image binary
         """
         info(f'Get screenshot of "{self.name}"')
-        return self.element.screenshot(path=filename)
+        return self._first_element.screenshot(path=filename)
 
     @property
     def get_screenshot_base(self) -> bytes:  # TODO: research
@@ -258,7 +251,7 @@ class PlayElement(Mixin):
 
         :return: screenshot binary
         """
-        return self.element.screenshot()
+        return self._first_element.screenshot()
 
     def get_text(self) -> str:
         """
@@ -267,7 +260,7 @@ class PlayElement(Mixin):
         :return: element text
         """
         info(f'Get text from "{self.name}"')
-        return self.element.text_content()
+        return self._first_element.text_content()
 
     @property
     def get_inner_text(self) -> str:
@@ -276,7 +269,7 @@ class PlayElement(Mixin):
 
         :return: element inner text
         """
-        return self.element.inner_text()
+        return self._first_element.inner_text()
 
     @property
     def get_value(self) -> str:
@@ -285,7 +278,7 @@ class PlayElement(Mixin):
 
         :return: element value
         """
-        return self.element.input_value()
+        return self._first_element.input_value()
 
     def is_available(self) -> bool:
         """
@@ -305,7 +298,7 @@ class PlayElement(Mixin):
         if not silent:
             info(f'Check visibility of "{self.name}"')
 
-        return self.element.is_visible()
+        return self._first_element.is_visible()
 
     def is_hidden(self, silent=False) -> bool:
         """
@@ -317,7 +310,7 @@ class PlayElement(Mixin):
         if not silent:
             info(f'Check invisibility of "{self.name}"')
 
-        return self.element.is_hidden()
+        return self._first_element.is_hidden()
 
     def get_attribute(self, attribute, silent=False) -> str:
         """
@@ -330,7 +323,7 @@ class PlayElement(Mixin):
         if not silent:
             info(f'Get "{attribute}" from "{self.name}"')
 
-        return self.element.get_attribute(attribute)
+        return self._first_element.get_attribute(attribute)
 
     def get_elements_texts(self, silent=False) -> List:
         """
@@ -358,22 +351,6 @@ class PlayElement(Mixin):
 
     # Mixin
 
-    def _get_driver(self) -> Union[PlaywrightPage, Locator, ElementHandle]:
-        """
-        Get driver depends on parent element if available
-
-        :return: driver
-        """
-        base = self.driver
-        if self.parent:
-            debug(f'Get element "{self.name}" from parent element "{self.parent.name}"')
-
-            base = self.parent._element
-
-            if not base:
-                base = self.parent.driver.locator(self.parent.locator)
-        return base
-
     @property
     def driver(self) -> PlaywrightPage:
         """
@@ -391,3 +368,29 @@ class PlayElement(Mixin):
         :return: CoreDriver
         """
         return PlayDriver.driver_wrapper
+
+    def _get_driver(self) -> Union[PlaywrightPage, Locator, ElementHandle]:
+        """
+        Get driver depends on parent element if available
+
+        :return: driver
+        """
+        base = self.driver
+        if self.parent:
+            debug(f'Get element "{self.name}" from parent element "{self.parent.name}"')
+
+            if isinstance(self.parent, PlayElement):
+                base = self.parent.element
+            else:
+                base = self.parent._internal_element.element
+
+        return base
+
+    @property
+    def _first_element(self):
+        """
+        Get first element
+
+        :return: first element
+        """
+        return self.element if isinstance(self.element, ElementHandle) else self.element.first

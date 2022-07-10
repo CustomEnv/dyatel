@@ -75,7 +75,7 @@ def mobile_driver(request, emulator):
     yield mobile_driver
     if 'no_teardown' not in all_pytest_markers:
         logging.info('Terminate application')
-        mobile_driver.terminate_app(ios_desired_caps['bundleId'])  # TODO: add terminate_app func for mobile driver
+        mobile_driver.terminate_app(ios_desired_caps['bundleId'])
 
 
 @pytest.hookimpl(hookwrapper=True)

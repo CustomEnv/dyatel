@@ -16,7 +16,7 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver import ActionChains
 
 from dyatel.shared_utils import cut_log_data
-from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL
+from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, initialize_objects_with_args
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
 
@@ -47,15 +47,7 @@ class CoreElement(Mixin):
         self._initialized = True
 
         self.child_elements: List[CoreElement] = get_child_elements(self, CoreElement)
-        for el in self.child_elements:  # required for Group  # TODO: maybe need to replace with function call
-            if not getattr(el, '_initialized'):
-                el.__init__(
-                    locator=el.locator,
-                    locator_type=el.locator_type,
-                    name=el.name,
-                    parent=el.parent,
-                    wait=el.wait,
-                )
+        initialize_objects_with_args(self.child_elements)  # required for Group
 
     # Element
 
@@ -398,17 +390,17 @@ class CoreElement(Mixin):
         base = self.driver
         if self.parent:
             debug(f'Get element "{self.name}" from parent element "{self.parent.name}"')
-            if wait:
-                if isinstance(self, CoreElement):
-                    self.wait_element(silent=True)
-                else:
-                    wait_page_loaded = getattr(self, 'wait_page_loaded')
-                    wait_page_loaded(silent=True)
 
-            base = self.parent._element
+            if isinstance(self.parent, CoreElement):
+                base = self.parent._get_element(wait=wait)
+            else:
+                base = self.parent._internal_element._get_element(wait=wait)
 
             if not base:
-                base = self.parent.driver.find_element(self.parent.locator_type, self.parent.locator)
+                raise NoSuchElementException('Can\'t specify parent element')
+
+        if not base:
+            raise Exception('Can\'t specify driver')
 
         return base
 
@@ -470,5 +462,8 @@ class CoreElement(Mixin):
             except NoSuchElementException:
                 message = f'Cant find element "{self.name}". {self.get_element_logging_data()}.'
                 raise NoSuchElementException(message) from NoSuchElementException
+
+        if not element:
+            raise NoSuchElementException('Can\'t find element')
 
         return element

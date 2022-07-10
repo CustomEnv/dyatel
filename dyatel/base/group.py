@@ -15,10 +15,7 @@ class AfterInitMeta(type):
         :param kwargs: original class kwargs
         :return: class object
         """
-        try:
-            obj = type.__call__(cls, *args, **kwargs)
-        except TypeError:
-            obj = type.__call__(cls)
+        obj = type.__call__(cls, *args, **kwargs)
         obj.set_parent_for_children()
         return obj
 
