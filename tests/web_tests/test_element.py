@@ -62,6 +62,44 @@ def test_click_and_wait(pizza_order_page, driver_engine):
     assert all((after_click_displayed, after_click_outside_not_displayed))
 
 
+def test_wait_element_value(expected_condition_page):
+    expected_condition_page.wait_value_card.trigger_button.click()
+    value_without_wait = expected_condition_page.wait_value_card.wait_for_value_input.get_value
+    expected_condition_page.wait_value_card.wait_for_value_input.wait_element_value()
+    value_with_wait = expected_condition_page.wait_value_card.wait_for_value_input.get_value == 'Dennis Ritchie'
+    assert all((not value_without_wait, value_with_wait))
+
+
+@pytest.mark.xfail(reason='Unexpected text')
+def test_wait_element_text(expected_condition_page):
+    expected_condition_page.wait_value_card.trigger_button.click()
+    value_without_wait = expected_condition_page.wait_value_card.wait_for_text_button.get_text
+    expected_condition_page.wait_value_card.wait_for_text_button.wait_element_text()
+    value_with_wait = expected_condition_page.wait_value_card.wait_for_text_button.get_text == 'Submit'
+    assert all((not value_without_wait, value_with_wait))
+
+
+def test_wait_elements_count(progressbar_page):
+    # TODO: Implementation
+    pass
+
+
+def test_wait_element_stop_changing(progressbar_page):
+    # TODO: Implementation
+    # bar = progressbar_page.progress_bar.element
+    # progressbar_page.start_button.click()
+    # locations_list = [tuple(bar.size.values()) for _ in range(200) if not time.sleep(0.1)]
+    pass
+
+
+def test_wait_element_stop_moving(progressbar_page):
+    # TODO: Implementation
+    # bar = progressbar_page.progress_bar.element
+    # progressbar_page.start_button.click()
+    # locations_list = [tuple(bar.location.values()) for _ in range(200) if not time.sleep(0.1)]
+    pass
+
+
 def test_wait_without_error(pizza_order_page):
     pizza_order_page.error_modal.wait_element_without_error(timeout=0.01)
     assert not pizza_order_page.error_modal.is_displayed()

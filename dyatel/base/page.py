@@ -13,11 +13,11 @@ class Page(WebPage, MobilePage, PlayPage):
         Initializing of page based on current driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
-        :param locator_type: specific locator type
+        :param locator_type: Selenium only: specific locator type
         :param name: name of page (will be attached to logs)
         """
         self.page_class = self.__get_page_class()
-        self.page_class.__init__(self, locator, locator_type, name)
+        super().__init__(locator=locator, locator_type=locator_type, name=name)
 
     def __get_page_class(self):
         """

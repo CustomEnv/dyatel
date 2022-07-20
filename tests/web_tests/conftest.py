@@ -13,7 +13,9 @@ from webdriver_manager.firefox import GeckoDriverManager
 
 from dyatel.base.driver import Driver
 from dyatel.dyatel_play.play_driver import PlayDriver
+from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
+from tests.adata.pages.progress_bar_page import ProgressBarPage
 from tests.settings import android_desired_caps, ios_desired_caps
 from dyatel.shared_utils import set_logging_settings
 from tests.adata.pages.mouse_event_page import MouseEventPage
@@ -175,3 +177,13 @@ def mouse_event_page(driver_wrapper):
 @pytest.fixture
 def forms_page(driver_wrapper):
     return FormsPage().open_page()
+
+
+@pytest.fixture
+def expected_condition_page(driver_wrapper):
+    return ExpectedConditionPage().open_page().set_min_and_max_wait()
+
+
+@pytest.fixture
+def progressbar_page(driver_wrapper):
+    return ProgressBarPage().open_page()

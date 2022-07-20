@@ -15,6 +15,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver import ActionChains
 
+from dyatel.dyatel_sel.core.core_checkbox import CoreCheckbox
 from dyatel.shared_utils import cut_log_data
 from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, initialize_objects_with_args
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
@@ -46,7 +47,7 @@ class CoreElement(Mixin):
         self._element = None
         self._initialized = True
 
-        self.child_elements: List[CoreElement] = get_child_elements(self, CoreElement)
+        self.child_elements: List[CoreElement] = get_child_elements(self, (CoreElement, CoreCheckbox))
         initialize_objects_with_args(self.child_elements)  # required for Group
 
     # Element
@@ -54,7 +55,7 @@ class CoreElement(Mixin):
     @property
     def element(self) -> SeleniumWebElement:
         """
-        Get selenium element
+        Get selenium WebElement object
 
         :return: Locator
         """
@@ -193,7 +194,6 @@ class CoreElement(Mixin):
 
     def wait_clickable(self, timeout=WAIT_EL, silent=False) -> CoreElement:
         """
-        Compatibility placeholder
         Wait until element clickable
 
         :param: timeout: time to stop waiting
@@ -457,7 +457,7 @@ class CoreElement(Mixin):
 
             try:
                 if wait:
-                    self.wait_element(silent=True)
+                    self._wait_availability(silent=True)
                 element = driver.find_element(self.locator_type, self.locator)
             except NoSuchElementException:
                 message = f'Cant find element "{self.name}". {self.get_element_logging_data()}.'
@@ -467,3 +467,24 @@ class CoreElement(Mixin):
             raise NoSuchElementException('Can\'t find element')
 
         return element
+
+    def _wait_availability(self, timeout=WAIT_EL, silent=False) -> CoreElement:
+        """
+        Wait for current element available in DOM
+
+        :param: timeout: time to stop waiting
+        :param: silent: erase log
+        :return: self
+        """
+        if not silent:
+            info(f'Wait until presence of "{self.name}"')
+
+        start_time = time.time()
+
+        while time.time() - start_time < timeout and not self.is_available():
+            pass
+
+        if not self.is_available():
+            raise Exception(f'Can\'t wait element in DOM "{self.name}". {self.get_element_logging_data()}')
+
+        return self

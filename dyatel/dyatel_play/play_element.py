@@ -6,6 +6,8 @@ from typing import Union, List, Any
 
 # noinspection PyProtectedMember
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError
+
+from dyatel.dyatel_play.play_checkbox import PlayCheckbox
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
 from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, get_timeout_in_ms, initialize_objects_with_args
@@ -21,7 +23,7 @@ class PlayElement(Mixin):
         Initializing of web element with playwright driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
-        :param locator_type: specific locator type
+        :param locator_type: compatibility arg - specific locator type
         :param name: name of element (will be attached to logs)
         :param parent: parent of element. Can be PlayElement, PlayPage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
@@ -35,7 +37,7 @@ class PlayElement(Mixin):
         self._element = None
         self._initialized = True
 
-        self.child_elements: List[PlayElement] = get_child_elements(self, PlayElement)
+        self.child_elements: List[PlayElement] = get_child_elements(self, (PlayElement, PlayCheckbox))
         initialize_objects_with_args(self.child_elements)
 
     # Element
@@ -43,7 +45,7 @@ class PlayElement(Mixin):
     @property
     def element(self) -> Locator:
         """
-        Get playwright element
+        Get playwright Locator object
 
         :param: args: args from Locator object
         :param: kwargs: kwargs from Locator object
@@ -253,6 +255,7 @@ class PlayElement(Mixin):
         """
         return self._first_element.screenshot()
 
+    @property
     def get_text(self) -> str:
         """
         Get current element text
