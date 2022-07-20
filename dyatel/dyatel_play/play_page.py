@@ -4,6 +4,7 @@ from logging import info, debug
 
 from playwright.sync_api import Page as PlaywrightPage
 
+from dyatel.dyatel_play.play_checkbox import PlayCheckbox
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
@@ -26,7 +27,7 @@ class PlayPage:
 
         self._element = None
         self.url = getattr(self, 'url', '')
-        self.page_elements = get_child_elements(self, PlayElement)
+        self.page_elements = get_child_elements(self, (PlayElement, PlayCheckbox))
         initialize_objects_with_args(self.page_elements)
 
     def reload_page(self, wait_page_load=True) -> PlayPage:

@@ -7,6 +7,7 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 
 from dyatel.base.element import Element
+from dyatel.dyatel_sel.core.core_checkbox import CoreCheckbox
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
@@ -35,7 +36,7 @@ class CorePage(Mixin):
 
         self._element = None
         self.url = getattr(self, 'url', '')
-        self.page_elements: List[CoreElement] = get_child_elements(self, CoreElement)
+        self.page_elements: List[CoreElement] = get_child_elements(self, (CoreElement, CoreCheckbox))
         initialize_objects_with_args(self.page_elements)
 
     def reload_page(self, wait_page_load=True) -> CorePage:

@@ -34,8 +34,8 @@ class Checkbox(SelCheckbox, PlayCheckbox):
 
         self.element_class = self.__get_checkbox_class()
         if self.element_class:
-            super(Checkbox, self).__init__(locator=locator, locator_type=locator_type, name=name, parent=parent,
-                                           wait=wait, by_attr=by_attr)
+            super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait,
+                             by_attr=by_attr)
 
     def __get_checkbox_class(self):
         """

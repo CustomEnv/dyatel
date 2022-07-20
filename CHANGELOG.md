@@ -1,8 +1,23 @@
 # Dyatel Changelog
 
 ---
-## v1.0.6
+## v1.1.1
 *Release date: In development*
+
+---
+
+## v1.1.0
+*Release date: 2022-20-07*
+
+### Added
+- `Checkbox` class for Playwright and Selenium 
+- `set_text` method in `Element` class
+- `wait_elements_count` method in `Element` class
+- `wait_element_text` method in `Element` class
+- `wait_element_value` method in `Element` class
+
+### Changed
+- Selenium element grabbing now wait element in DOM
 
 ---
 
