@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from playwright.sync_api import Locator
+
 
 class PlayCheckbox:
 
@@ -18,15 +20,15 @@ class PlayCheckbox:
         self.wrapped_element = PlayElement(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 
     @property
-    def element(self):
+    def element(self) -> Locator:
         """
         Get playwright Locator object
 
-        :return: selenium WebElement
+        :return: playwright WebElement
         """
         return self.wrapped_element.element
 
-    def is_checked(self):
+    def is_checked(self) -> bool:
         """
         Is checkbox checked
 
@@ -34,7 +36,7 @@ class PlayCheckbox:
         """
         return self.element.is_checked()
 
-    def check(self):
+    def check(self) -> PlayCheckbox:
         """
         Check current checkbox
 
@@ -44,7 +46,7 @@ class PlayCheckbox:
 
         return self
 
-    def uncheck(self):
+    def uncheck(self) -> PlayCheckbox:
         """
         Uncheck current checkbox
 
@@ -55,7 +57,7 @@ class PlayCheckbox:
         return self
 
     @property
-    def get_text(self):
+    def get_text(self) -> str:
         """
         Get text of current checkbox
 

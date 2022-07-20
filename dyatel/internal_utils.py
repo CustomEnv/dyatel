@@ -19,7 +19,8 @@ WAIT_EL = 10
 WAIT_PAGE = 20
 
 
-all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div']
+all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
+            'textarea', ]
 
 
 def initialize_objects_with_args(objects: list):
