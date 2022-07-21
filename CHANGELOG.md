@@ -7,7 +7,7 @@
 ---
 
 ## v1.1.0
-*Release date: 2022-20-07*
+*Release date: 2022-22-07*
 
 ### Added
 - `Checkbox` class for Playwright and Selenium 
@@ -15,10 +15,11 @@
 - `wait_elements_count` method in `Element` class
 - `wait_element_text` method in `Element` class
 - `wait_element_value` method in `Element` class
+- `driver_wrapper` arg for `Group` and `Page`
 
 ### Changed
-- Selenium element grabbing now wait element in DOM
 - Page/Group `set_driver` workflow
+- `CorePage` and `PlayPage` methods moved to `Page` 
 
 ---
 

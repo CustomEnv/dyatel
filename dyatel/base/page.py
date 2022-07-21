@@ -15,17 +15,24 @@ from dyatel.internal_utils import WAIT_PAGE
 class Page(WebPage, MobilePage, PlayPage):
     """ Page object crossroad. Should be defined as class """
 
-    def __init__(self, locator: str, locator_type='', name=''):
+    def __init__(self, locator: str, locator_type='', name='', driver_wrapper=None):
         """
         Initializing of page based on current driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
         :param locator_type: Selenium only: specific locator type
         :param name: name of page (will be attached to logs)
+        :param driver_wrapper: set custom driver for page and page elements
         """
-        self._driver_instance = Driver
+        self._driver_instance = driver_wrapper if driver_wrapper else Driver
         self.__set_page_class()
         super().__init__(locator=locator, locator_type=locator_type, name=name)
+
+        if driver_wrapper:
+            if isinstance(driver_wrapper, Driver):
+                self.set_driver(driver_wrapper)
+            else:
+                self.set_driver(driver_wrapper.driver_wrapper)
 
     def reload_page(self, wait_page_load=True) -> Page:
         """

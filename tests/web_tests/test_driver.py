@@ -70,3 +70,26 @@ def test_second_driver_same_page(driver_wrapper, second_driver_wrapper):
 
     assert mouse_page1.is_page_opened()
     assert mouse_page2.is_page_opened()
+
+
+@pytest.mark.skip_platform(
+    'appium', 'safari',  # FIXME: Unskip for playwright safari
+    reason='Safari browser/Mobile platforms doesnt support multiple drivers'
+)
+def test_second_driver_by_arg(driver_wrapper, second_driver_wrapper):
+    mouse_page = MouseEventPage(second_driver_wrapper)
+    pizza_page = PizzaOrderPage(driver_wrapper)
+
+    assert pizza_page.driver != mouse_page.driver
+    assert pizza_page.driver_wrapper != mouse_page.driver_wrapper
+    assert mouse_page.header_logo.driver != pizza_page.quantity_input.driver
+    assert mouse_page.header_logo.driver_wrapper != pizza_page.quantity_input.driver_wrapper
+
+    mouse_page.open_page()
+    pizza_page.open_page()
+
+    assert mouse_page.is_page_opened()
+    assert mouse_page.header_logo.is_displayed()
+
+    assert pizza_page.is_page_opened()
+    assert pizza_page.quantity_input.is_displayed()
