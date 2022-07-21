@@ -4,6 +4,7 @@ import time
 from logging import info
 from typing import Any
 
+from dyatel.base.driver import Driver
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_play.play_element import PlayElement
@@ -32,6 +33,7 @@ class Element(WebElement, MobileElement, PlayElement):
         self.parent = parent
         self.wait = wait
         self._initialized = False
+        self._driver_instance = Driver
 
         self.element_class = self.__get_element_class()
         if self.element_class:

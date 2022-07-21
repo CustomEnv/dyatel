@@ -79,21 +79,21 @@ def test_wait_element_text(expected_condition_page):
     assert all((not value_without_wait, value_with_wait))
 
 
+@pytest.mark.skip('TODO: Implementation')
 def test_wait_elements_count(progressbar_page):
-    # TODO: Implementation
     pass
 
 
+@pytest.mark.skip('TODO: Implementation')
 def test_wait_element_stop_changing(progressbar_page):
-    # TODO: Implementation
     # bar = progressbar_page.progress_bar.element
     # progressbar_page.start_button.click()
     # locations_list = [tuple(bar.size.values()) for _ in range(200) if not time.sleep(0.1)]
     pass
 
 
+@pytest.mark.skip('TODO: Implementation')
 def test_wait_element_stop_moving(progressbar_page):
-    # TODO: Implementation
     # bar = progressbar_page.progress_bar.element
     # progressbar_page.start_button.click()
     # locations_list = [tuple(bar.location.values()) for _ in range(200) if not time.sleep(0.1)]

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from playwright.sync_api import Locator
+from dyatel.dyatel_play.play_element import PlayElement
 
 
-class PlayCheckbox:
+class PlayCheckbox(PlayElement):
 
     def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False, **kwargs):
         """
@@ -16,17 +16,7 @@ class PlayCheckbox:
         :param wait: add element waiting in `wait_page_loaded` function of PlayPage
         :param by_attr: compatibility arg - does nothing
         """
-        from dyatel.dyatel_play.play_element import PlayElement
-        self.wrapped_element = PlayElement(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
-
-    @property
-    def element(self) -> Locator:
-        """
-        Get playwright Locator object
-
-        :return: playwright WebElement
-        """
-        return self.wrapped_element.element
+        super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 
     def is_checked(self) -> bool:
         """

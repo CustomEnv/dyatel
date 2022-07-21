@@ -6,9 +6,7 @@ from copy import copy
 from typing import Union, List, Any
 
 from PIL import Image
-from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
-from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
-from playwright.sync_api import Locator as PlaywrightWebElement, Browser
+from playwright.sync_api import Locator as PlaywrightWebElement
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from appium.webdriver.webelement import WebElement as AppiumWebElement
 
@@ -62,7 +60,8 @@ def get_timeout_in_ms(timeout: int):
 
 
 def get_child_elements(self, instance) -> list:
-    """Return page elements and page objects of this page object
+    """
+    Return page elements and page objects of this page object
 
     :returns: list of page elements and page objects
     """
@@ -70,7 +69,8 @@ def get_child_elements(self, instance) -> list:
 
 
 def get_child_elements_with_names(self, instance) -> dict:
-    """Return page elements and page objects of this page object
+    """
+    Return page elements and page objects of this page object
 
     :returns: list of page elements and page objects
     """
@@ -119,9 +119,7 @@ class Mixin:
     parent = None  # variable placeholder
     locator: str = ''  # variable placeholder
     locator_type: str = ''  # variable placeholder
-    get_screenshot = None  # variable placeholder
-    _get_driver = None  # variable placeholder
-    driver: Union[AppiumWebDriver, SeleniumWebDriver, Browser] = None  # variable placeholder
+    get_screenshot = None  # variable placeholder  #TODO: replace with get_attr in code
     element: Union[SeleniumWebElement, AppiumWebElement, PlaywrightWebElement] = None   # variable placeholder
 
     def get_element_logging_data(self, element=None) -> str:
@@ -196,5 +194,55 @@ class Mixin:
             wrapped_child.parent = base_obj
             setattr(base_obj, name, wrapped_child)
             self.__set_parent_for_attr(instance_class, wrapped_child)
+
+        return self
+
+
+class DriverMixin:
+
+    @property
+    def driver(self):
+        """
+        Get source driver instance
+
+        :return: SeleniumWebDriver for web test or AppiumWebDriver for mobile tests
+        """
+        return self._driver_instance.driver
+
+    @property
+    def driver_wrapper(self):
+        """
+        Get source driver wrapper instance
+
+        :return: CoreDriver
+        """
+        return self._driver_instance.driver_wrapper
+
+    def _set_driver(self, driver_wrapper, instance_class):
+        """
+
+        """
+        new_driver = copy(self.driver_wrapper)
+        setattr(new_driver, 'driver', copy(self.driver_wrapper.driver))
+        setattr(new_driver, 'driver_wrapper', copy(self.driver_wrapper))
+
+        new_driver.driver = driver_wrapper.driver
+        new_driver.driver_wrapper = driver_wrapper
+
+        self._driver_instance = new_driver
+        self.__set_driver_for_attr(instance_class, self, new_driver)
+        self.page_elements = get_child_elements(self, instance_class)
+
+    def __set_driver_for_attr(self, instance_class, base_obj, driver_wrapper):
+        """
+
+        """
+        child_elements = get_child_elements_with_names(base_obj, instance_class).items()
+
+        for name, child in child_elements:
+            wrapped_child = copy(child)
+            wrapped_child._driver_instance = driver_wrapper
+            setattr(base_obj, name, wrapped_child)
+            self.__set_driver_for_attr(instance_class, wrapped_child, driver_wrapper)
 
         return self

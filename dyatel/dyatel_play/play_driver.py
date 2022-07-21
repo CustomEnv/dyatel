@@ -29,9 +29,11 @@ class PlayDriver(Mixin):
         context = self.driver_context.new_page()
         self.driver = context
         PlayDriver.desktop = True
-        PlayDriver.driver = context
-        PlayDriver.instance = driver
-        PlayDriver.driver_wrapper = self
+
+        if not PlayDriver.driver:
+            PlayDriver.instance = driver
+            PlayDriver.driver = context
+            PlayDriver.driver_wrapper = self
 
     def get(self, url) -> PlayDriver:
         """

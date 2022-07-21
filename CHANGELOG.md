@@ -18,6 +18,7 @@
 
 ### Changed
 - Selenium element grabbing now wait element in DOM
+- Page/Group `set_driver` workflow
 
 ---
 

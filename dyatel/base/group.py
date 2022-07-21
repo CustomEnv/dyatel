@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 from dyatel.base.element import Element
@@ -42,3 +44,13 @@ class Group(Element, metaclass=AfterInitMeta):
         """
         for element in get_child_elements(self, Element):
             element.parent = self
+
+    def set_driver(self, driver_wrapper) -> Group:
+        """
+        Set driver instance for group and elements
+
+        :param driver_wrapper: driver wrapper object ~ Driver/WebDriver/MobileDriver/CoreDriver/PlayDriver
+        :return: self
+        """
+        self._set_driver(driver_wrapper, Element)
+        return self

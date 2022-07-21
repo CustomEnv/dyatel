@@ -7,16 +7,22 @@ from typing import Union, List, Any
 # noinspection PyProtectedMember
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError
 
-from dyatel.dyatel_play.play_checkbox import PlayCheckbox
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
-from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, get_timeout_in_ms, initialize_objects_with_args
 from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
 from dyatel.shared_utils import cut_log_data
+from dyatel.internal_utils import (
+    get_child_elements,
+    Mixin,
+    WAIT_EL,
+    get_timeout_in_ms,
+    initialize_objects_with_args,
+    DriverMixin,
+)
 
 
-class PlayElement(Mixin):
+class PlayElement(Mixin, DriverMixin):
 
     def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False):
         """
@@ -28,16 +34,17 @@ class PlayElement(Mixin):
         :param parent: parent of element. Can be PlayElement, PlayPage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
+        self._element = None
+        self._initialized = True
+        self._driver_instance = PlayDriver
+
         self.locator = get_selenium_completable_locator(locator)
         self.name = name if name else self.locator
         self.wait = wait
         self.parent: Union[PlayElement, Any] = parent if parent else None
         self.locator_type = f'{locator_type}: locator_type does not supported for playwright'
 
-        self._element = None
-        self._initialized = True
-
-        self.child_elements: List[PlayElement] = get_child_elements(self, (PlayElement, PlayCheckbox))
+        self.child_elements: List[PlayElement] = get_child_elements(self, PlayElement)
         initialize_objects_with_args(self.child_elements)
 
     # Element
@@ -354,24 +361,6 @@ class PlayElement(Mixin):
 
     # Mixin
 
-    @property
-    def driver(self) -> PlaywrightPage:
-        """
-        Get source driver instance
-
-        :return: Browser
-        """
-        return PlayDriver.driver
-
-    @property
-    def driver_wrapper(self) -> PlayDriver:
-        """
-        Get source driver wrapper instance
-
-        :return: CoreDriver
-        """
-        return PlayDriver.driver_wrapper
-
     def _get_driver(self) -> Union[PlaywrightPage, Locator, ElementHandle]:
         """
         Get driver depends on parent element if available
@@ -385,7 +374,7 @@ class PlayElement(Mixin):
             if isinstance(self.parent, PlayElement):
                 base = self.parent.element
             else:
-                base = self.parent._internal_element.element
+                base = self.parent.anchor.element
 
         return base
 
