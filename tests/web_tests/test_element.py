@@ -44,12 +44,12 @@ def test_element_displayed_negative(base_playground_page):
     assert not base_playground_page.kube_broken.is_displayed()
 
 
-def test_all_elements(base_playground_page):
-    assert len(base_playground_page.any_link.all_elements) > 1
-
-
-def test_all_elements_count(base_playground_page):
+def test_all_elements_count_positive(base_playground_page):
     assert base_playground_page.any_link.get_elements_count() > 1
+
+
+def test_all_elements_count_negative(base_playground_page):
+    assert base_playground_page.kube_broken.get_elements_count() == 0
 
 
 def test_click_and_wait(pizza_order_page, driver_engine):

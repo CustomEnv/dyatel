@@ -30,7 +30,7 @@ class MobileElement(CoreElement):
 
         :return: list of wrapped objects
         """
-        appium_elements = self._get_driver(wait=False).find_elements(self.locator_type, self.locator)
+        appium_elements = self._get_driver().find_elements(self.locator_type, self.locator)
         return self._get_all_elements(appium_elements, MobileElement)
 
     def hover(self) -> MobileElement:
