@@ -178,7 +178,6 @@ class PlayElement(Mixin, DriverMixin):
         if not silent:
             info(f'Wait until presence of "{self.name}"')
 
-        self._first_element.wait_for(state='attached', timeout=get_timeout_in_ms(timeout))
         self._first_element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
         return self
 
@@ -225,6 +224,20 @@ class PlayElement(Mixin, DriverMixin):
         if not silent:
             info(f'Skip wait until clickable of "{self.name}". Timeout: {timeout}')
 
+        return self
+
+    def wait_availability(self, timeout=WAIT_EL, silent=False) -> PlayElement:
+        """
+        Wait for current element available in DOM
+
+        :param: timeout: time to stop waiting
+        :param: silent: erase log
+        :return: self
+        """
+        if not silent:
+            info(f'Wait until presence of "{self.name}"')
+
+        self._first_element.wait_for(state='attached', timeout=get_timeout_in_ms(timeout))
         return self
 
     # Element state

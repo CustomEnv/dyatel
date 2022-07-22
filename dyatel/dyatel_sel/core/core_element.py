@@ -209,6 +209,27 @@ class CoreElement(Mixin, DriverMixin):
         )
         return self
 
+    def wait_availability(self, timeout=WAIT_EL, silent=False) -> CoreElement:
+        """
+        Wait for current element available in DOM
+
+        :param: timeout: time to stop waiting
+        :param: silent: erase log
+        :return: self
+        """
+        if not silent:
+            info(f'Wait until "{self.name}" will be available in DOM')
+
+        start_time = time.time()
+
+        while time.time() - start_time < timeout and not self.is_available():
+            pass
+
+        if not self.is_available():
+            raise Exception(f'Can\'t wait element in DOM "{self.name}". {self.get_element_logging_data()}')
+
+        return self
+
     # Element state
 
     def scroll_into_view(self, block='center', behavior='instant', sleep=0) -> CoreElement:
