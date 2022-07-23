@@ -44,12 +44,12 @@ def test_element_displayed_negative(base_playground_page):
     assert not base_playground_page.kube_broken.is_displayed()
 
 
-def test_all_elements(base_playground_page):
-    assert len(base_playground_page.any_link.all_elements) > 1
-
-
-def test_all_elements_count(base_playground_page):
+def test_all_elements_count_positive(base_playground_page):
     assert base_playground_page.any_link.get_elements_count() > 1
+
+
+def test_all_elements_count_negative(base_playground_page):
+    assert base_playground_page.kube_broken.get_elements_count() == 0
 
 
 def test_click_and_wait(pizza_order_page, driver_engine):
@@ -60,6 +60,44 @@ def test_click_and_wait(pizza_order_page, driver_engine):
     pizza_order_page.error_modal.click_outside()
     after_click_outside_not_displayed = not pizza_order_page.error_modal.wait_element_hidden().is_displayed()
     assert all((after_click_displayed, after_click_outside_not_displayed))
+
+
+def test_wait_element_value(expected_condition_page):
+    expected_condition_page.wait_value_card.trigger_button.click()
+    value_without_wait = expected_condition_page.wait_value_card.wait_for_value_input.get_value
+    expected_condition_page.wait_value_card.wait_for_value_input.wait_element_value()
+    value_with_wait = expected_condition_page.wait_value_card.wait_for_value_input.get_value == 'Dennis Ritchie'
+    assert all((not value_without_wait, value_with_wait))
+
+
+@pytest.mark.xfail(reason='Unexpected text')
+def test_wait_element_text(expected_condition_page):
+    expected_condition_page.wait_value_card.trigger_button.click()
+    value_without_wait = expected_condition_page.wait_value_card.wait_for_text_button.get_text
+    expected_condition_page.wait_value_card.wait_for_text_button.wait_element_text()
+    value_with_wait = expected_condition_page.wait_value_card.wait_for_text_button.get_text == 'Submit'
+    assert all((not value_without_wait, value_with_wait))
+
+
+@pytest.mark.skip('TODO: Implementation')
+def test_wait_elements_count(progressbar_page):
+    pass
+
+
+@pytest.mark.skip('TODO: Implementation')
+def test_wait_element_stop_changing(progressbar_page):
+    # bar = progressbar_page.progress_bar.element
+    # progressbar_page.start_button.click()
+    # locations_list = [tuple(bar.size.values()) for _ in range(200) if not time.sleep(0.1)]
+    pass
+
+
+@pytest.mark.skip('TODO: Implementation')
+def test_wait_element_stop_moving(progressbar_page):
+    # bar = progressbar_page.progress_bar.element
+    # progressbar_page.start_button.click()
+    # locations_list = [tuple(bar.location.values()) for _ in range(200) if not time.sleep(0.1)]
+    pass
 
 
 def test_wait_without_error(pizza_order_page):

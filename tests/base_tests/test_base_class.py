@@ -14,7 +14,6 @@ def test_base_page_mobile(mocked_mobile_driver):
     page = Page('locator')
     assert all(
         (
-            page.page_class == MobilePage,
             CoreDriver.mobile,
             page.__class__.__base__ == MobilePage
         )
@@ -36,7 +35,6 @@ def test_base_page_selenium(mocked_selenium_driver):
     page = Page('locator')
     assert all(
         (
-            page.page_class == WebPage,
             not CoreDriver.mobile,
             page.__class__.__base__ == WebPage
         )
@@ -56,12 +54,7 @@ def test_base_element_selenium(mocked_selenium_driver):
 
 def test_base_page_playwright(mocked_play_driver):
     page = Page('locator')
-    assert all(
-        (
-            page.page_class == PlayPage,
-            page.__class__.__base__ == PlayPage
-        )
-    )
+    assert page.__class__.__base__ == PlayPage
 
 
 def test_base_element_playwright(mocked_play_driver):

@@ -4,9 +4,9 @@ from dyatel.base.page import Page
 
 
 class MouseEventPage(Page):
-    def __init__(self):
+    def __init__(self, driver_wrapper=None):
         self.url = 'https://testautomation-playground.herokuapp.com/mouse_events.html'
-        super().__init__('//h2[.="Mouse Click Actions"]', name='Mouse events page')
+        super().__init__('//h2[.="Mouse Click Actions"]', name='Mouse events page', driver_wrapper=driver_wrapper)
 
     choose_language_button = Element('button.dropbtn', name='"Choose language" button', wait=True)
     dropdown = Element('div.dropdown-content', name='dropdown with languages')

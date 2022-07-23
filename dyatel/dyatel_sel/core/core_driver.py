@@ -26,8 +26,10 @@ class CoreDriver:
         """
         driver.implicitly_wait(0.001)  # reduce selenium wait
         self.driver = driver
-        CoreDriver.driver = driver
-        CoreDriver.driver_wrapper = self
+
+        if not CoreDriver.driver:
+            CoreDriver.driver = driver
+            CoreDriver.driver_wrapper = self
 
     def get(self, url) -> CoreDriver:
         """

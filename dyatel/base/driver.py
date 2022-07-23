@@ -18,23 +18,23 @@ class Driver(WebDriver, MobileDriver, PlayDriver):
 
         :param driver: appium or selenium or playwright driver to initialize
         """
-        self.__driver_source = driver
-        self.driver_class = self.__get_driver_class()
-        self.driver_class.__init__(self, driver)
+        self.driver = driver
+        self.__set_driver_class()
+        super().__init__(driver=driver)
 
-    def __get_driver_class(self):
+    def __set_driver_class(self):
         """
         Get driver wrapper class in according to given driver source, and set him as base class
 
         :return: driver wrapper class
         """
-        if isinstance(self.__driver_source, PlaywrightDriver):
+        if isinstance(self.driver, PlaywrightDriver):
             Driver.__bases__ = PlayDriver,
             return PlayDriver
-        if isinstance(self.__driver_source, AppiumDriver):
+        if isinstance(self.driver, AppiumDriver):
             Driver.__bases__ = MobileDriver,
             return MobileDriver
-        if isinstance(self.__driver_source, SeleniumWebDriver):
+        if isinstance(self.driver, SeleniumWebDriver):
             Driver.__bases__ = WebDriver,
             return WebDriver
         else:

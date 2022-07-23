@@ -28,7 +28,7 @@ class WebElement(CoreElement):
 
         :return: list of wrapped objects
         """
-        selenium_elements = self._get_driver(wait=False).find_elements(self.locator_type, self.locator)
+        selenium_elements = self._get_driver().find_elements(self.locator_type, self.locator)
         return self._get_all_elements(selenium_elements, WebElement)
 
     def hover(self) -> WebElement:

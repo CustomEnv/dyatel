@@ -16,12 +16,12 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver import ActionChains
 
 from dyatel.shared_utils import cut_log_data
-from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, initialize_objects_with_args
+from dyatel.internal_utils import get_child_elements, Mixin, WAIT_EL, initialize_objects_with_args, DriverMixin
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.sel_utils import get_locator_type, get_legacy_selector
 
 
-class CoreElement(Mixin):
+class CoreElement(Mixin, DriverMixin):
 
     def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False):
         """
@@ -33,18 +33,19 @@ class CoreElement(Mixin):
         :param name: name of element (will be attached to logs)
         :param parent: parent of element. Can be Web/MobileElement, Web/MobilePage or Group objects
         """
-        self.parent: Union[CoreElement, Any] = parent if parent else None
-        self.wait = wait
+        self._element = None
+        self._initialized = True
+        self._driver_instance = CoreDriver
 
         if isinstance(self.driver, AppiumWebDriver):
             self.locator, self.locator_type = get_legacy_selector(locator, get_locator_type(locator))
         else:
             self.locator = locator
             self.locator_type = locator_type if locator_type else get_locator_type(locator)
-        self.name = name if name else self.locator
 
-        self._element = None
-        self._initialized = True
+        self.name = name if name else self.locator
+        self.parent: Union[CoreElement, Any] = parent if parent else None
+        self.wait = wait
 
         self.child_elements: List[CoreElement] = get_child_elements(self, CoreElement)
         initialize_objects_with_args(self.child_elements)  # required for Group
@@ -54,7 +55,7 @@ class CoreElement(Mixin):
     @property
     def element(self) -> SeleniumWebElement:
         """
-        Get selenium element
+        Get selenium WebElement object
 
         :return: Locator
         """
@@ -193,7 +194,6 @@ class CoreElement(Mixin):
 
     def wait_clickable(self, timeout=WAIT_EL, silent=False) -> CoreElement:
         """
-        Compatibility placeholder
         Wait until element clickable
 
         :param: timeout: time to stop waiting
@@ -207,6 +207,27 @@ class CoreElement(Mixin):
         self._get_wait(timeout).until(
             ec.element_to_be_clickable((self.locator_type, self.locator)), message=message
         )
+        return self
+
+    def wait_availability(self, timeout=WAIT_EL, silent=False) -> CoreElement:
+        """
+        Wait for current element available in DOM
+
+        :param: timeout: time to stop waiting
+        :param: silent: erase log
+        :return: self
+        """
+        if not silent:
+            info(f'Wait until "{self.name}" will be available in DOM')
+
+        start_time = time.time()
+
+        while time.time() - start_time < timeout and not self.is_available():
+            pass
+
+        if not self.is_available():
+            raise Exception(f'Can\'t wait element in DOM "{self.name}". {self.get_element_logging_data()}')
+
         return self
 
     # Element state
@@ -358,26 +379,7 @@ class CoreElement(Mixin):
         if not silent:
             info(f'Get elements count of "{self.name}"')
 
-        self.wait_element(silent=True)
         return len(getattr(self, 'all_elements'))
-
-    @property
-    def driver(self) -> Union[AppiumWebDriver, SeleniumWebDriver]:
-        """
-        Get source driver instance
-
-        :return: SeleniumWebDriver for web test or AppiumWebDriver for mobile tests
-        """
-        return CoreDriver.driver
-
-    @property
-    def driver_wrapper(self) -> CoreDriver:
-        """
-        Get source driver wrapper instance
-
-        :return: CoreDriver
-        """
-        return CoreDriver.driver_wrapper
 
     # Mixin
 
@@ -394,7 +396,8 @@ class CoreElement(Mixin):
             if isinstance(self.parent, CoreElement):
                 base = self.parent._get_element(wait=wait)
             else:
-                base = self.parent._internal_element._get_element(wait=wait)
+                get_element_func = getattr(self.parent.anchor, '_get_element')
+                base = get_element_func(wait=wait)
 
             if not base:
                 raise NoSuchElementException('Can\'t specify parent element')

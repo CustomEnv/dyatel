@@ -12,3 +12,7 @@ function getPositionOnScreen(elem) {
 };
 return getPositionOnScreen(arguments[0])
 """
+
+check_element_js = 'arguments[0].checked = true'
+uncheck_element_js = 'arguments[0].checked = false'
+is_element_checked_js = 'return arguments[0].checked'

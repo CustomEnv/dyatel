@@ -1,13 +1,30 @@
 # Dyatel Changelog
 
 ---
-## v1.0.6
+## v1.1.1
 *Release date: In development*
 
 ---
 
+## v1.1.0
+*Release date: 2022-07-23*
+
+### Added
+- `Checkbox` class for Playwright and Selenium 
+- `set_text` method in `Element` class
+- `wait_elements_count` method in `Element` class
+- `wait_element_text` method in `Element` class
+- `wait_element_value` method in `Element` class
+- `driver_wrapper` arg for `Group` and `Page`
+
+### Changed
+- Page/Group `set_driver` workflow
+- `CorePage` and `PlayPage` methods moved to `Page` 
+
+---
+
 ## v1.0.5
-*Release date: 2022-10-07*
+*Release date: 2022-07-10*
 
 ### Added
 - `_first_element` property in `PlayElement`
