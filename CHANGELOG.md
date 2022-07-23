@@ -7,7 +7,7 @@
 ---
 
 ## v1.1.0
-*Release date: 2022-22-07*
+*Release date: 2022-07-23*
 
 ### Added
 - `Checkbox` class for Playwright and Selenium 
@@ -24,7 +24,7 @@
 ---
 
 ## v1.0.5
-*Release date: 2022-10-07*
+*Release date: 2022-07-10*
 
 ### Added
 - `_first_element` property in `PlayElement`
