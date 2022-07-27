@@ -15,7 +15,8 @@ class MobileDriver(CoreDriver):
         self.capabilities = driver.capabilities
 
         self.is_ios = self.capabilities.get('platformName') == 'iOS'
-        self.is_android = self.capabilities.get('platformName') == 'Android'
+        self.is_android = self.capabilities.get('platformName').title() == 'Android'
+        self.is_safari_driver = self.capabilities.get('automationName').title() == 'Safari'
         self.is_web = self.capabilities.get('browserName', False)
         self.is_app = self.capabilities.get('app', False)
 
@@ -23,6 +24,7 @@ class MobileDriver(CoreDriver):
         CoreDriver.is_android = self.is_android
         CoreDriver.mobile = True
         CoreDriver.desktop = False
+        CoreDriver.is_safari_driver = self.is_safari_driver
 
         if self.is_app:
             if self.is_ios:

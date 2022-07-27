@@ -1,5 +1,3 @@
-import os
-
 appium_logs_path = '.tox/.tmp/logs/android_appium.txt'
 android_device_start_timeout = 60
 android_desired_caps = {
@@ -30,4 +28,19 @@ ios_desired_caps = {
     # 'bundleId': 'io.appium.IosAppSeleniumMaster',
     'newCommandTimeout': 9000,
     'wdaLaunchTimeout': 120000,
+}
+
+ios_desired_caps_safari_driver = {
+    'deviceName': 'iPhone 13',
+    'platformName': 'iOS',
+    'platformVersion': '15.4',
+    'automationName': 'Safari',
+    'safari:deviceUDID': 'FD714443-9CA8-4B85-A767-7CD9A3168E39',
+    # Update following capabilities before driver init
+    # 'app': f'{os.getcwd()}/data_for_testing/apps/sample_app_ios.zip',
+    # 'browserName': 'Safari',
+    # 'bundleId': 'io.appium.IosAppSeleniumMaster',
+    'newCommandTimeout': 9000,
+    'wdaLaunchTimeout': 120000,
+    'safari:useSimulator': True,
 }

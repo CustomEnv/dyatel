@@ -3,9 +3,10 @@ from __future__ import annotations
 from logging import info
 from typing import Union, List, BinaryIO, Any
 
+from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.internal_utils import calculate_coordinate_to_click
-from dyatel.js_scripts import get_element_position_on_screen_js
+from dyatel.internal_utils import calculate_coordinate_to_click, WAIT_EL
+from dyatel.js_scripts import get_element_position_on_screen_js, click_js, is_displayed_js
 
 
 class MobileElement(CoreElement):
@@ -21,9 +22,9 @@ class MobileElement(CoreElement):
         :param parent: parent of element. Can be MobileElement, MobilePage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
+        self.is_safari_driver = CoreDriver.is_safari_driver
         CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 
-    @property
     def all_elements(self) -> List[Any]:
         """
         Get all wrapped elements with selenium bases
@@ -32,6 +33,56 @@ class MobileElement(CoreElement):
         """
         appium_elements = self._get_driver().find_elements(self.locator_type, self.locator)
         return self._get_all_elements(appium_elements, MobileElement)
+
+    def wait_element(self, timeout=WAIT_EL, silent=False) -> MobileElement:
+        """
+        Wait for current element available in page
+        SafariDriver: Wait for current element available in DOM
+
+        :param: timeout: time to stop waiting
+        :param: silent: erase log
+        :return: self
+        """
+        if self.is_safari_driver:
+            self.wait_availability(timeout=timeout, silent=silent)
+        else:
+            super().wait_element(timeout=timeout, silent=silent)
+
+        return self
+
+    def click(self) -> MobileElement:
+        """
+        Click to current element
+        SafariDriver: Click to current element by JS
+
+        :return: self
+        """
+        if self.is_safari_driver:
+            self.wait_element(silent=True).wait_clickable(silent=True)
+            self.driver.execute_script(click_js, self.element)
+        else:
+            super().click()
+
+        return self
+
+    def is_displayed(self, silent=False) -> bool:
+        """
+        Check visibility of element
+        SafariDriver: Check visibility by JS
+
+        :param: silent: erase log
+        :return: True if element visible
+        """
+        if self.is_safari_driver:
+            if not silent:
+                info(f'Check displaying of "{self.name}"')
+
+            try:
+                return self.driver.execute_script(is_displayed_js, self._get_element(wait=False))
+            except:
+                return False
+        else:
+            return super().is_displayed(silent=silent)
 
     def hover(self) -> MobileElement:
         """

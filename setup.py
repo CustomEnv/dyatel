@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setup(
     name='dyatel-wrapper',
-    version='1.1.0',
+    version='1.1.1',
     url='https://github.com/EnvInc/dyatel',
     packages=[
         'dyatel',
@@ -18,11 +18,11 @@ setup(
         'dyatel.dyatel_sel.pages',
     ],
     install_requires=[
-        'Appium-Python-Client==2.1.2',
-        'selenium==4.1.0',
-        'playwright==1.22.0',
-        'webdriver-manager==3.7.0',
-        'Pillow==9.1.1'
+        'Appium-Python-Client>=2.1.2',
+        'selenium>=4.1.0',
+        'playwright>=1.22.0',
+        'webdriver-manager>=3.7.0',
+        'Pillow>=9.1.1'
     ],
     keywords='selenium appium playwright web_automation mobile_automation',
     description='Wrapper of Selenium, Appium and Playwright with single API',

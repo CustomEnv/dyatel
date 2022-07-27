@@ -12,10 +12,12 @@ class CoreDriver:
     driver: Union[AppiumDriver, SeleniumWebDriver] = None
     driver_wrapper: CoreDriver = None
 
-    mobile = False
     desktop = False
+
+    mobile = False
     is_ios = False
     is_android = False
+    is_safari_driver = False
 
     def __init__(self, driver: Union[AppiumDriver, SeleniumWebDriver]):
         """

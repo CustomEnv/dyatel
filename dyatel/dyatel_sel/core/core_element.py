@@ -162,7 +162,7 @@ class CoreElement(Mixin, DriverMixin):
 
         try:
             self.wait_element(timeout=timeout, silent=True)
-        except (NoSuchElementException, TimeoutException, WebDriverException) as exception:
+        except (NoSuchElementException, TimeoutException, WebDriverException, Exception) as exception:
             if not silent:
                 info(f'Ignored exception: "{exception}"')
         return self
@@ -201,12 +201,15 @@ class CoreElement(Mixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Wait until clickable of "{self.name}"')
+            info(f'Wait until "{self.name}" become clickable')
 
-        message = f'Element "{self.name}" not clickable. {self.get_element_logging_data()}'
-        self._get_wait(timeout).until(
-            ec.element_to_be_clickable((self.locator_type, self.locator)), message=message
-        )
+        start_time = time.time()
+        while time.time() - start_time < timeout and not self.element.is_enabled():
+            pass
+
+        if not self.element.is_enabled():
+            raise Exception(f'"{self.name}" not clickable')
+
         return self
 
     def wait_availability(self, timeout=WAIT_EL, silent=False) -> CoreElement:
@@ -283,7 +286,6 @@ class CoreElement(Mixin, DriverMixin):
 
         :return: element text
         """
-        info(f'Get text from "{self.name}"')
         return self.element.text
 
     @property
@@ -293,8 +295,7 @@ class CoreElement(Mixin, DriverMixin):
 
         :return: element inner text
         """
-        text = self.get_attribute('textContent') or self.get_attribute('innerText')
-        return text
+        return self.get_attribute('textContent', silent=True) or self.get_attribute('innerText', silent=True)
 
     @property
     def get_value(self) -> str:
@@ -303,7 +304,7 @@ class CoreElement(Mixin, DriverMixin):
 
         :return: element value
         """
-        return self.get_attribute('value')
+        return self.get_attribute('value', silent=True)
 
     def is_available(self) -> bool:
         """

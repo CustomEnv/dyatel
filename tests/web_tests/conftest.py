@@ -22,11 +22,8 @@ from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import PlaygroundMainPage, SecondPlaygroundMainPage
 
+
 set_logging_settings()
-
-
-# FIXME: other Group or Page as class variable of Group or Page -> mb will be skipped
-# TODO: Research: why all_elements set parent WrappedObject to base object (need to rollback recent changes)
 
 
 def pytest_addoption(parser):
