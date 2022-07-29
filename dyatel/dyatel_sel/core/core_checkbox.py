@@ -1,12 +1,8 @@
 from __future__ import annotations
 
-import time
-from logging import info
-
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.internal_utils import WAIT_EL
 
 
 class CoreCheckbox(CoreElement):

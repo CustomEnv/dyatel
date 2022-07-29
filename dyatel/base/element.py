@@ -10,7 +10,7 @@ from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
-from dyatel.internal_utils import WAIT_EL
+from dyatel.mixins.internal_utils import WAIT_EL
 
 
 class Element(WebElement, MobileElement, PlayElement):

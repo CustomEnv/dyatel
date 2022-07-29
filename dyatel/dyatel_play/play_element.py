@@ -12,19 +12,20 @@ from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
 from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
 from dyatel.shared_utils import cut_log_data
-from dyatel.internal_utils import (
+from dyatel.mixins.internal_utils import (
     get_child_elements,
-    Mixin,
     WAIT_EL,
     get_timeout_in_ms,
     initialize_objects_with_args,
-    DriverMixin,
 )
+from dyatel.mixins.element_mixin import ElementMixin
+from dyatel.mixins.driver_mixin import DriverMixin
 
 
-class PlayElement(Mixin, DriverMixin):
+class PlayElement(ElementMixin, DriverMixin):
 
-    def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False):
+    def __init__(self, locator: str, locator_type: str = '', name: str = '',
+                 parent: Union[PlayElement, Any] = None, wait: bool = False):
         """
         Initializing of web element with playwright driver
 
@@ -70,7 +71,7 @@ class PlayElement(Mixin, DriverMixin):
         return element
 
     @element.setter
-    def element(self, play_element):
+    def element(self, play_element: Locator):
         """
         Current class element setter. Try to avoid usage of this function
 
@@ -101,7 +102,7 @@ class PlayElement(Mixin, DriverMixin):
         self._first_element.click(*args, **kwargs)
         return self
 
-    def click_outside(self, x=-5.0, y=-5.0) -> PlayElement:
+    def click_outside(self, x: int = -5.0, y: int = -5.0) -> PlayElement:
         """
         Click outside of element. By default, 5px above and 5px left of element
 
@@ -112,7 +113,7 @@ class PlayElement(Mixin, DriverMixin):
         self._first_element.click(position={'x': x, 'y': y}, force=True)
         return self
 
-    def type_text(self, text, silent=False) -> PlayElement:
+    def type_text(self, text: str, silent: bool = False) -> PlayElement:
         """
         Type text to current element
 
@@ -127,7 +128,7 @@ class PlayElement(Mixin, DriverMixin):
         self._first_element.type(text=text)
         return self
 
-    def type_slowly(self, text, sleep_gap=0.05, silent=False) -> PlayElement:
+    def type_slowly(self, text: str, sleep_gap: float = 0.05, silent: bool = False) -> PlayElement:
         """
         Type text to current element slowly
 
@@ -142,7 +143,7 @@ class PlayElement(Mixin, DriverMixin):
         self._first_element.type(text=text, delay=sleep_gap)
         return self
 
-    def clear_text(self, silent=False) -> PlayElement:
+    def clear_text(self, silent: bool = False) -> PlayElement:
         """
         Clear text from current element
 
@@ -167,7 +168,7 @@ class PlayElement(Mixin, DriverMixin):
 
     # Element waits
 
-    def wait_element(self, timeout=WAIT_EL, silent=False) -> PlayElement:
+    def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait for current element available in page
 
@@ -181,7 +182,7 @@ class PlayElement(Mixin, DriverMixin):
         self._first_element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
         return self
 
-    def wait_element_without_error(self, timeout=WAIT_EL, silent=False) -> PlayElement:
+    def wait_element_without_error(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait for current element available in page without raising error
 
@@ -198,7 +199,7 @@ class PlayElement(Mixin, DriverMixin):
             info(f'Ignored exception: "{exception}"')
         return self
 
-    def wait_element_hidden(self, timeout=WAIT_EL, silent=False) -> PlayElement:
+    def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait until element hidden
 
@@ -212,7 +213,7 @@ class PlayElement(Mixin, DriverMixin):
         self._first_element.wait_for(state='hidden', timeout=get_timeout_in_ms(timeout))
         return self
 
-    def wait_clickable(self, timeout=WAIT_EL, silent=False) -> PlayElement:
+    def wait_clickable(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Compatibility placeholder
         Wait until element clickable
@@ -226,7 +227,7 @@ class PlayElement(Mixin, DriverMixin):
 
         return self
 
-    def wait_availability(self, timeout=WAIT_EL, silent=False) -> PlayElement:
+    def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait for current element available in DOM
 
@@ -242,10 +243,11 @@ class PlayElement(Mixin, DriverMixin):
 
     # Element state
 
-    def scroll_into_view(self, sleep=0) -> PlayElement:
+    def scroll_into_view(self, sleep: Union[int, float] = 0) -> PlayElement:
         """
         Scroll element into view
 
+        :param sleep: delay after scroll
         :return: self
         """
         info(f'Scroll element "{self.name}" into view')
@@ -256,7 +258,7 @@ class PlayElement(Mixin, DriverMixin):
 
         return self
 
-    def get_screenshot(self, filename) -> bytes:  # TODO: research
+    def get_screenshot(self, filename: str) -> bytes:  # TODO: research
         """
         Taking element screenshot and saving with given path/filename
 
@@ -311,7 +313,7 @@ class PlayElement(Mixin, DriverMixin):
         """
         return bool(len(self.element.element_handles()))
 
-    def is_displayed(self, silent=False) -> bool:
+    def is_displayed(self, silent: bool = False) -> bool:
         """
         Check visibility of current element
 
@@ -323,7 +325,7 @@ class PlayElement(Mixin, DriverMixin):
 
         return self._first_element.is_visible()
 
-    def is_hidden(self, silent=False) -> bool:
+    def is_hidden(self, silent: bool = False) -> bool:
         """
         Check invisibility of current element
 
@@ -335,7 +337,7 @@ class PlayElement(Mixin, DriverMixin):
 
         return self._first_element.is_hidden()
 
-    def get_attribute(self, attribute, silent=False) -> str:
+    def get_attribute(self, attribute: str, silent: bool = False) -> str:
         """
         Get custom attribute from current element
 
@@ -348,7 +350,7 @@ class PlayElement(Mixin, DriverMixin):
 
         return self._first_element.get_attribute(attribute)
 
-    def get_elements_texts(self, silent=False) -> List:
+    def get_elements_texts(self, silent: bool = False) -> List:
         """
         Get all texts from all matching elements
 
@@ -360,7 +362,7 @@ class PlayElement(Mixin, DriverMixin):
 
         return self.element.all_text_contents()
 
-    def get_elements_count(self, silent=False) -> int:
+    def get_elements_count(self, silent: bool = False) -> int:
         """
         Get elements count
 

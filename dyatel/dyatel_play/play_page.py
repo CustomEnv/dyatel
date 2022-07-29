@@ -3,11 +3,11 @@ from __future__ import annotations
 
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
-from dyatel.internal_utils import (
+from dyatel.mixins.internal_utils import (
     get_child_elements,
     initialize_objects_with_args,
-    DriverMixin,
 )
+from dyatel.mixins.driver_mixin import DriverMixin
 
 
 class PlayPage(DriverMixin):

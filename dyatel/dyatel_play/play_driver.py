@@ -3,13 +3,14 @@ from __future__ import annotations
 from logging import info
 from typing import List, Union
 
-from playwright.sync_api import Page as PlaywrightPage, Locator
+from playwright.sync_api import Page as PlaywrightPage, Locator, Page
 from playwright.sync_api import Browser
 
-from dyatel.internal_utils import Mixin, get_timeout_in_ms
+from dyatel.mixins.internal_utils import get_timeout_in_ms
+from dyatel.mixins.element_mixin import ElementMixin
 
 
-class PlayDriver(Mixin):
+class PlayDriver(ElementMixin):
     instance: Browser = None
     driver: PlaywrightPage = None
     driver_wrapper: PlayDriver = None
@@ -18,6 +19,8 @@ class PlayDriver(Mixin):
     desktop = False
     is_ios = False
     is_android = False
+    is_safari_driver = False
+    is_xcui_driver = False
 
     def __init__(self, driver: Browser):
         """
@@ -26,16 +29,17 @@ class PlayDriver(Mixin):
         :param driver: playwright driver to initialize
         """
         self.driver_context = driver.new_context()
-        context = self.driver_context.new_page()
-        self.driver = context
+        self.driver = self.driver_context.new_page()
+        self.original_tab = self.driver
+
         PlayDriver.desktop = True
 
         if not PlayDriver.driver:
             PlayDriver.instance = driver
-            PlayDriver.driver = context
+            PlayDriver.driver = self.driver
             PlayDriver.driver_wrapper = self
 
-    def get(self, url) -> PlayDriver:
+    def get(self, url: str) -> PlayDriver:
         """
         Navigate to given url
 
@@ -101,7 +105,7 @@ class PlayDriver(Mixin):
         self.driver.go_back()
         return self
 
-    def quit(self, silent=True) -> PlayDriver:
+    def quit(self, silent: bool = True) -> PlayDriver:
         """
         Quit the driver instance
 
@@ -118,9 +122,19 @@ class PlayDriver(Mixin):
         """
         Adds a list of cookie dictionaries to current session
 
+        domain: should be ".google.com" for url "https://google.com/some/url/"
+
         :param cookies: cookies dictionaries list
         :return: self
         """
+        for cookie in cookies:
+
+            if 'path' not in cookie:
+                cookie.update({'path': '/'})
+
+            if 'domain' not in cookie:
+                cookie.update({'domain': f'.{self.current_url.split("://")[1].split("/")[0]}'})
+
         self.driver_context.add_cookies(cookies)
         return self
 
@@ -141,7 +155,7 @@ class PlayDriver(Mixin):
         """
         return self.driver_context.cookies()
 
-    def execute_script(self, script, *args) -> Union[None, str]:
+    def execute_script(self, script: str, *args) -> Union[None, str]:
         """
         Synchronously Executes JavaScript in the current window/frame.
         Completable with selenium `execute_script` method
@@ -163,17 +177,17 @@ class PlayDriver(Mixin):
 
         return self.driver.evaluate(script, script_args)
 
-    def set_page_load_timeout(self, timeout=30) -> PlayDriver:
+    def set_page_load_timeout(self, timeout: int = 30) -> PlayDriver:
         """
         Set the amount of time to wait for a page load to complete before throwing an error
 
-        :param timeout: timeout to set
+        :param timeout: timeout to set in seconds
         :return: self
         """
         self.driver.set_default_navigation_timeout(get_timeout_in_ms(timeout))
         return self
 
-    def set_window_size(self, width, height) -> PlayDriver:
+    def set_window_size(self, width: int, height: int) -> PlayDriver:
         """
         Sets the width and height of the current window
 
@@ -183,3 +197,71 @@ class PlayDriver(Mixin):
         """
         self.driver.set_viewport_size({'width': width, 'height': height})
         return self
+
+    def get_screenshot(self) -> bytes:
+        """
+        Gets the screenshot of the current window as a binary data.
+
+        :return: screenshot binary
+        """
+        return self.driver.screenshot()
+
+    def get_all_tabs(self) -> List[Page]:
+        """
+        Get all opened tabs
+
+        :return: list of tabs
+        """
+        return self.driver_context.pages
+
+    def create_new_tab(self) -> PlayDriver:
+        """
+        Create new tab and switch into it
+
+        :return: self
+        """
+        with self.driver_context.expect_page() as new_page:
+            self.execute_script("window.open(arguments[0], '_blank').focus();", self.current_url)
+
+        self.driver = new_page.value
+        return self
+
+    def switch_to_original_tab(self) -> PlayDriver:
+        """
+        Switch to original tab
+
+        :return: self
+        """
+        self.driver = self.original_tab
+        self.driver.bring_to_front()
+        return self
+
+    def switch_to_tab(self, tab: int = -1) -> PlayDriver:
+        """
+        Switch to specific tab
+
+        :param tab: tab index. Start from 1. Default: latest tab
+        :return: self
+        """
+        if tab == -1:
+            tab = self.get_all_tabs()[tab:]
+        else:
+            tab = self.get_all_tabs()[tab - 1]
+
+        self.driver = tab
+        self.driver.bring_to_front()
+        return self
+
+    def close_unused_tabs(self) -> PlayDriver:
+        """
+        Close all tabs except original
+
+        :return: self
+        """
+        tabs = self.get_all_tabs()
+        tabs.remove(self.original_tab)
+
+        for tab in tabs:
+            tab.close()
+
+        return self.switch_to_original_tab()

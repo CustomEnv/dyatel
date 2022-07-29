@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 
-from dyatel.internal_utils import all_tags
+from dyatel.mixins.internal_utils import all_tags
 
 
 def get_locator_type(locator: str):
@@ -20,6 +20,8 @@ def get_locator_type(locator: str):
 
     if locator in all_tags:
         return By.TAG_NAME
+    elif ':id' in locator:  # Mobile native app selector
+        return By.ID
     elif '/' in locator:
         return By.XPATH
     elif '/' not in locator and brackets:

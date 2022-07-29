@@ -27,9 +27,3 @@ def test_selenium_mobile_and_web_element_compatibility():
     web_static = sorted(set(get_class_static(WebElement) + get_class_static(CoreElement)))
     mobile_static = sorted(set(get_class_static(MobileElement) + get_class_static(CoreElement)))
     assert web_static == mobile_static
-
-
-def test_selenium_mobile_and_web_page_compatibility():
-    web_static = sorted(get_class_static(WebPage) + get_class_static(CorePage))
-    mobile_static = sorted(get_class_static(MobilePage) + get_class_static(CorePage))
-    assert web_static == mobile_static

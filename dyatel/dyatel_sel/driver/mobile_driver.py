@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+import time
+from typing import Union, List
+
 from appium.webdriver.applicationstate import ApplicationState
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 
@@ -14,17 +19,23 @@ class MobileDriver(CoreDriver):
         """
         self.capabilities = driver.capabilities
 
-        self.is_ios = self.capabilities.get('platformName') == 'iOS'
-        self.is_android = self.capabilities.get('platformName').title() == 'Android'
-        self.is_safari_driver = self.capabilities.get('automationName').title() == 'Safari'
         self.is_web = self.capabilities.get('browserName', False)
         self.is_app = self.capabilities.get('app', False)
+        self.is_android = self.capabilities.get('platformName').lower() == 'android'
 
-        CoreDriver.is_ios = self.is_ios
-        CoreDriver.is_android = self.is_android
+        self.is_ios = self.capabilities.get('platformName').lower() == 'ios'
+        self.is_safari_driver = self.capabilities.get('automationName').lower() == 'safari'
+        self.is_xcui_driver = self.capabilities.get('automationName').lower() == 'xcuitest'
+
         CoreDriver.mobile = True
         CoreDriver.desktop = False
+        CoreDriver.is_ios = self.is_ios
+        CoreDriver.is_android = self.is_android
         CoreDriver.is_safari_driver = self.is_safari_driver
+        CoreDriver.is_xcui_driver = self.is_xcui_driver
+
+        self.native_context = 'NATIVE_APP'
+        self.web_context = self.get_web_view_context() if self.is_xcui_driver else 'CHROMIUM'
 
         if self.is_app:
             if self.is_ios:
@@ -92,3 +103,47 @@ class MobileDriver(CoreDriver):
         :return: True if the app has been successfully terminated
         """
         return self.driver.terminate_app(bundle_id)
+
+    def switch_to_native(self) -> MobileDriver:
+        """
+        Switch to native app context
+
+        :return: self
+        """
+        self.driver.switch_to.context(self.native_context)
+        return self
+
+    def switch_to_web(self) -> MobileDriver:
+        """
+        Switch to web app context
+
+        :return: self
+        """
+        self.driver.switch_to.context(self.web_context)
+        return self
+
+    def get_web_view_context(self) -> Union[None, str]:
+        """
+        Get WEBVIEW context name
+
+        :return: None or WEBVIEW context name
+        """
+        for context in self.get_all_contexts():
+            if 'WEBVIEW' in context:
+                return context
+
+    def get_current_context(self) -> str:
+        """
+        Get current context name
+
+        :return: current context name
+        """
+        return self.driver.context
+
+    def get_all_contexts(self) -> List[str]:
+        """
+        Get the contexts within the current session
+
+        :return: list of available contexts
+        """
+        return self.driver.contexts

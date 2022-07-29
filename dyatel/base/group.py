@@ -4,7 +4,7 @@ from typing import Any
 
 from dyatel.base.driver import Driver
 from dyatel.base.element import Element
-from dyatel.internal_utils import get_child_elements
+from dyatel.mixins.internal_utils import get_child_elements
 
 
 class AfterInitMeta(type):

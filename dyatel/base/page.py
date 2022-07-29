@@ -9,7 +9,7 @@ from dyatel.dyatel_play.play_page import PlayPage
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
-from dyatel.internal_utils import WAIT_PAGE
+from dyatel.mixins.internal_utils import WAIT_PAGE
 
 
 class Page(WebPage, MobilePage, PlayPage):

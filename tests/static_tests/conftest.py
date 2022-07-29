@@ -7,14 +7,12 @@ from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
 
 
-def pytest_addoption(parser):
-    parser.addoption('--headless', action='store_true', help='compatibility flag. doenst affect anything')
-
-
 @pytest.fixture
 def mocked_mobile_driver():
     driver = MagicMock()
-    driver.capabilities = MagicMock(return_value={'platformName': 'ios', 'browserName': 'safari'})()
+    driver.capabilities = MagicMock(return_value={
+        'platformName': 'ios', 'browserName': 'safari', 'automationName': 'safari'
+    })()
     yield MobileDriver(driver)
     CoreDriver.driver = None
 
