@@ -40,8 +40,12 @@ class ElementMixin:
         :return: current driver instance (Web/Mobile/PlayDriver)
         """
         root_path = os.environ.get('visual', '')
+
+        if not root_path:
+            raise Exception('Provide visual regression path. Example: os.environ["visual"] = "tests/visual"')
+
         root_path = root_path if root_path.endswith('/') else f'{root_path}/'
-        reference_file = f'{root_path}/reference/{filename}.png'
+        reference_file = f'{root_path}reference/{filename}.png'
         get_screenshot = getattr(self, 'get_screenshot')
 
         try:
@@ -53,7 +57,7 @@ class ElementMixin:
             raise FileNotFoundError(message) from None
 
         time.sleep(delay)
-        output_file = f'{root_path}/output/{filename}.png'
+        output_file = f'{root_path}output/{filename}.png'
         get_screenshot(output_file)
         assert_same_images(output_file, reference_file, filename, threshold)
         return self
