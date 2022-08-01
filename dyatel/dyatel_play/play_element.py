@@ -40,10 +40,10 @@ class PlayElement(ElementMixin, DriverMixin):
         self._driver_instance = PlayDriver
 
         self.locator = get_selenium_completable_locator(locator)
+        self.locator_type = f'{locator_type}: locator_type does not supported for playwright'
         self.name = name if name else self.locator
         self.wait = wait
         self.parent: Union[PlayElement, Any] = parent if parent else None
-        self.locator_type = f'{locator_type}: locator_type does not supported for playwright'
 
         self.child_elements: List[PlayElement] = get_child_elements(self, PlayElement)
         initialize_objects_with_args(self.child_elements)
@@ -258,7 +258,7 @@ class PlayElement(ElementMixin, DriverMixin):
 
         return self
 
-    def get_screenshot(self, filename: str) -> bytes:  # TODO: research
+    def get_screenshot(self, filename: str) -> bytes:
         """
         Taking element screenshot and saving with given path/filename
 
@@ -269,7 +269,7 @@ class PlayElement(ElementMixin, DriverMixin):
         return self._first_element.screenshot(path=filename)
 
     @property
-    def get_screenshot_base(self) -> bytes:  # TODO: research
+    def get_screenshot_base(self) -> bytes:
         """
         Get driver width scaled screenshot binary of element without saving
 

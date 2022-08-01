@@ -30,6 +30,7 @@ class MobileElement(CoreElement):
 
         super().__init__(locator=self.locator, locator_type=self.locator_type, name=name, parent=parent, wait=wait)
 
+    @property
     def all_elements(self) -> List[Any]:
         """
         Get all wrapped elements with selenium bases
@@ -103,7 +104,7 @@ class MobileElement(CoreElement):
             .perform()
         return self
 
-    def click_outside(self, x: int = 0, y: int = -5) -> MobileElement:
+    def click_outside(self, x: int = 0, y: int = -5) -> MobileElement:  # TODO: Rework with `TouchAction`
         """
         Click outside of element. By default, 5px above  of element
 

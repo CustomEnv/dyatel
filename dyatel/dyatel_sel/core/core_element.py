@@ -6,7 +6,8 @@ from logging import info, debug
 from typing import Union, List, Any
 
 from PIL import Image
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException, \
+    InvalidArgumentException, InvalidSelectorException
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from selenium.webdriver.support import expected_conditions as ec
@@ -140,9 +141,12 @@ class CoreElement(ElementMixin, DriverMixin):
             info(f'Wait until presence of "{self.name}"')
 
         message = f'Can\'t wait element "{self.name}". {self.get_element_logging_data()}'
-        self._get_wait(timeout).until(
-            ec.visibility_of_element_located((self.locator_type, self.locator)), message=message
-        )
+        try:
+            self._get_wait(timeout).until(
+                ec.visibility_of_element_located((self.locator_type, self.locator)), message=message
+            )
+        except TimeoutException:
+            raise TimeoutException(message) from None
         return self
 
     def wait_element_without_error(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
@@ -160,7 +164,7 @@ class CoreElement(ElementMixin, DriverMixin):
             self.wait_element(timeout=timeout, silent=True)
         except (NoSuchElementException, TimeoutException, WebDriverException, Exception) as exception:
             if not silent:
-                info(f'Ignored exception: "{exception}"')
+                info(f'Ignored exception: "{exception.msg}"')
         return self
 
     def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
@@ -184,7 +188,7 @@ class CoreElement(ElementMixin, DriverMixin):
                 is_hidden = True
 
         if not is_hidden:
-            raise Exception(f'Element "{self.name}" still visible. {self.get_element_logging_data()}')
+            raise Exception(f'Element "{self.name}" still visible. {self.get_element_logging_data()}') from None
 
         return self
 
@@ -204,7 +208,7 @@ class CoreElement(ElementMixin, DriverMixin):
             pass
 
         if not self.element.is_enabled():
-            raise Exception(f'"{self.name}" not clickable')
+            raise Exception(f'"{self.name}" not clickable') from None
 
         return self
 
@@ -225,7 +229,7 @@ class CoreElement(ElementMixin, DriverMixin):
             pass
 
         if not self.is_available():
-            raise Exception(f'Can\'t wait element in DOM "{self.name}". {self.get_element_logging_data()}')
+            raise Exception(f'Can\'t wait element in DOM "{self.name}". {self.get_element_logging_data()}') from None
 
         return self
 
@@ -310,7 +314,15 @@ class CoreElement(ElementMixin, DriverMixin):
 
         :return: True if present in DOM
         """
-        is_available = self._get_driver(wait=False).find_elements(self.locator_type, self.locator)
+        try:
+            is_available = self._get_driver(wait=False).find_elements(self.locator_type, self.locator)
+        except (InvalidArgumentException, InvalidSelectorException) as exc:
+            if 'invalid locator' in exc.msg or 'is not a valid' in exc.msg:
+                msg = f'"{self.name}" have invalid selector: ["{self.locator_type}": "{self.locator}"]'
+                raise InvalidArgumentException(msg=msg) from None
+            else:
+                raise exc
+
         return bool(len(is_available))
 
     def is_displayed(self, silent: bool = False) -> bool:
@@ -366,7 +378,7 @@ class CoreElement(ElementMixin, DriverMixin):
             info(f'Get all texts from "{self.name}"')
 
         self.wait_element(silent=True)
-        return list(element_item.text for element_item in getattr(self, 'all_elements'))
+        return list(element_item.get_text for element_item in getattr(self, 'all_elements'))
 
     def get_elements_count(self, silent: bool = False) -> int:
         """
@@ -399,10 +411,10 @@ class CoreElement(ElementMixin, DriverMixin):
                 base = get_element_func(wait=wait)
 
             if not base:
-                raise NoSuchElementException('Can\'t specify parent element')
+                raise NoSuchElementException('Can\'t specify parent element') from None
 
         if not base:
-            raise Exception('Can\'t specify driver')
+            raise Exception('Can\'t specify driver') from None
 
         return base
 
@@ -455,7 +467,7 @@ class CoreElement(ElementMixin, DriverMixin):
             except NoSuchElementException:
                 parent = self.parent
                 message = f'Cant find parent element "{parent.name}". {self.get_element_logging_data(parent)}.'
-                raise NoSuchElementException(message) from NoSuchElementException
+                raise NoSuchElementException(message) from None
 
             try:
                 if wait:
@@ -463,9 +475,9 @@ class CoreElement(ElementMixin, DriverMixin):
                 element = driver.find_element(self.locator_type, self.locator)
             except NoSuchElementException:
                 message = f'Cant find element "{self.name}". {self.get_element_logging_data()}.'
-                raise NoSuchElementException(message) from NoSuchElementException
+                raise NoSuchElementException(message) from None
 
         if not element:
-            raise NoSuchElementException('Can\'t find element')
+            raise NoSuchElementException('Can\'t find element') from None
 
         return element

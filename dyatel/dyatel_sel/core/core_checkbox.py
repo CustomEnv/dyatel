@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from selenium.common import ElementNotSelectableException
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 
-from dyatel.dyatel_sel.core.core_element import CoreElement
+from dyatel.base.element import Element
 
 
-class CoreCheckbox(CoreElement):
+class CoreCheckbox(Element):
 
     def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False, by_attr=False):
         """
@@ -38,7 +39,11 @@ class CoreCheckbox(CoreElement):
 
         :return: bool
         """
-        is_checked_selenium = self.element.is_selected()
+        try:
+            is_checked_selenium = self.element.is_selected()
+        except ElementNotSelectableException:
+            is_checked_selenium = False
+
         return self.checked if self.by_attr else is_checked_selenium
 
     def check(self) -> CoreCheckbox:

@@ -62,6 +62,7 @@ def test_click_and_wait(pizza_order_page, driver_engine):
     assert all((after_click_displayed, after_click_outside_not_displayed))
 
 
+@pytest.mark.xfail_platform('android', 'ios', reason='Can not get value from that element. TODO: Rework test')
 def test_wait_element_value(expected_condition_page):
     expected_condition_page.wait_value_card.trigger_button.click()
     value_without_wait = expected_condition_page.wait_value_card.wait_for_value_input.get_value
@@ -79,12 +80,12 @@ def test_wait_element_text(expected_condition_page):
     assert all((not value_without_wait, value_with_wait))
 
 
-@pytest.mark.skip('TODO: Implementation')
+@pytest.mark.xfail(reason='TODO: Implementation')
 def test_wait_elements_count(progressbar_page):
     pass
 
 
-@pytest.mark.skip('TODO: Implementation')
+@pytest.mark.xfail(reason='TODO: Implementation')
 def test_wait_element_stop_changing(progressbar_page):
     # bar = progressbar_page.progress_bar.element
     # progressbar_page.start_button.click()
@@ -92,7 +93,7 @@ def test_wait_element_stop_changing(progressbar_page):
     pass
 
 
-@pytest.mark.skip('TODO: Implementation')
+@pytest.mark.xfail(reason='TODO: Implementation')
 def test_wait_element_stop_moving(progressbar_page):
     # bar = progressbar_page.progress_bar.element
     # progressbar_page.start_button.click()
@@ -125,7 +126,7 @@ def test_hover(mouse_event_page):
 def test_screenshot(base_playground_page, driver_engine, driver_name, platform, request):
     node_name = request.node.name.replace('_', '-')
     filename = f'{node_name}-{driver_engine}-{driver_name}-{platform}-kube'
-    base_playground_page.kube.scroll_into_view(sleep=0.5).assert_screenshot(filename, threshold=6)
+    base_playground_page.kube.scroll_into_view().assert_screenshot(filename, threshold=6)
 
 
 # Cases when parent is another element

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import os
+import time
 from copy import copy
-from typing import List, Any
+from typing import List, Any, Union
 
 from PIL import Image
 
@@ -28,12 +29,14 @@ class ElementMixin:
             current_data = f'{current_data}. {parent_data}'
         return current_data
 
-    def assert_screenshot(self, filename, threshold=0) -> ElementMixin:
+    def assert_screenshot(self, filename: str, threshold: Union[int, float] = 0,
+                          delay: Union[int, float] = 0.5) -> ElementMixin:
         """
         Assert given (by name) and taken screenshot equals
 
         :param filename: screenshot path/name
         :param threshold: possible threshold
+        :param delay: delay before taking screenshot
         :return: current driver instance (Web/Mobile/PlayDriver)
         """
         root_path = os.environ.get('visual', '')
@@ -49,6 +52,7 @@ class ElementMixin:
                       'If it CI run, then you need to commit reference files.'
             raise FileNotFoundError(message) from None
 
+        time.sleep(delay)
         output_file = f'{root_path}/output/{filename}.png'
         get_screenshot(output_file)
         assert_same_images(output_file, reference_file, filename, threshold)

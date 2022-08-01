@@ -10,6 +10,8 @@ def assert_same_images(actual_file, reference_file, filename, threshold):
     reference_image = Image.open(reference_file).convert('RGB')
     output_image = Image.open(actual_file).convert('RGB')
     diff, actual_threshold = get_difference(reference_image, output_image)
+    # TODO: Same size check
+    # TODO: Same pixel ratio check
     if actual_threshold > threshold:
         root_path = os.environ.get('visual', '')
         diff_file = f'{root_path}/difference/diff-{filename}.png'
