@@ -117,6 +117,10 @@ class CoreDriver:
             info('Quit driver instance')
 
         self.driver.quit()
+
+        if self.driver == CoreDriver.driver:  # Clear only if original driver closed
+            CoreDriver.driver = None
+            CoreDriver.driver_wrapper = None
         return self
 
     def set_cookie(self, cookies: List[dict]) -> CoreDriver:

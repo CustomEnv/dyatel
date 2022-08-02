@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from selenium.common import ElementNotSelectableException
+from selenium.common.exceptions import ElementNotSelectableException
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 
 from dyatel.base.element import Element

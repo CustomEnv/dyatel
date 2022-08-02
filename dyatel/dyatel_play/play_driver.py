@@ -116,6 +116,11 @@ class PlayDriver(ElementMixin):
             info('Quit driver instance')
 
         self.driver.close()
+
+        if self.driver == PlayDriver.driver:  # Clear only if original driver closed
+            PlayDriver.driver = None
+            PlayDriver.instance = None
+            PlayDriver.driver_wrapper = None
         return self
 
     def set_cookie(self, cookies: List[dict]) -> PlayDriver:
