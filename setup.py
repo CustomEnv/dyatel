@@ -10,6 +10,7 @@ setup(
     packages=[
         'dyatel',
         'dyatel.base',
+        'dyatel.mixins',
         'dyatel.dyatel_play',
         'dyatel.dyatel_sel',
         'dyatel.dyatel_sel.core',
