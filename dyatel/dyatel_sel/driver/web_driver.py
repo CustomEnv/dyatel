@@ -11,6 +11,5 @@ class WebDriver(CoreDriver):
 
         :param driver: selenium driver to initialize
         """
-        CoreDriver.mobile = False
         CoreDriver.desktop = True
-        CoreDriver.__init__(self, driver=driver)
+        super().__init__(driver=driver)

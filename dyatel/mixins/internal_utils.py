@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import inspect
 
+
 WAIT_EL = 10
 WAIT_PAGE = 20
 
 
 all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
-            'textarea', ]
+            'textarea', 'svg', 'circle']
 
 
 def initialize_objects_with_args(objects: list):

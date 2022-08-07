@@ -28,7 +28,6 @@ class MobileDriver(CoreDriver):
         self.is_xcui_driver = self.capabilities.get('automationName').lower() == 'xcuitest'
 
         CoreDriver.mobile = True
-        CoreDriver.desktop = False
         CoreDriver.is_ios = self.is_ios
         CoreDriver.is_android = self.is_android
         CoreDriver.is_safari_driver = self.is_safari_driver

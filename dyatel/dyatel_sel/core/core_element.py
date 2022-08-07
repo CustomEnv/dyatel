@@ -143,7 +143,7 @@ class CoreElement(ElementMixin, DriverMixin):
         message = f'Can\'t wait element "{self.name}". {self.get_element_logging_data()}'
         try:
             self._get_wait(timeout).until(
-                ec.visibility_of_element_located((self.locator_type, self.locator)), message=message
+                ec.visibility_of_any_elements_located((self.locator_type, self.locator)), message=message
             )
         except TimeoutException:
             raise TimeoutException(message) from None

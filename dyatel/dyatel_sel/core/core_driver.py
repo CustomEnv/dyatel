@@ -29,6 +29,7 @@ class CoreDriver:
         """
         driver.implicitly_wait(0.001)  # reduce selenium wait
         self.driver = driver
+        self.driver_wrapper = self
         self.original_tab = driver.current_window_handle
 
         if not CoreDriver.driver:

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from logging import info
+
 from selenium.common.exceptions import ElementNotSelectableException
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 
@@ -30,7 +32,7 @@ class CoreCheckbox(Element):
 
         :return: selenium WebElement
         """
-        self.wait_availability()
+        self.wait_availability(silent=True)
         return self._get_element(wait=False)
 
     def is_checked(self) -> bool:
@@ -53,6 +55,7 @@ class CoreCheckbox(Element):
         :return: self
         """
         if not self.is_checked():
+            info(f'Select "{self.name}"')
             self.wait_clickable(silent=True).element.click()
             self.checked = True
 
@@ -65,6 +68,7 @@ class CoreCheckbox(Element):
         :return: self
         """
         if self.is_checked():
+            info(f'Unselect "{self.name}"')
             self.wait_clickable(silent=True).element.click()
             self.checked = False
 

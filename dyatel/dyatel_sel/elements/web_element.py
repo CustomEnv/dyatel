@@ -40,11 +40,23 @@ class WebElement(CoreElement):
 
         :return: self
         """
-        info(f'Hover over {self.name}')
+        info(f'Hover over :{self.name}"')
         self._action_chains\
             .move_to_element(self.element)\
             .move_by_offset(1, 1)\
             .move_to_element(self.element)\
+            .perform()
+        return self
+
+    def hover_outside(self, x: int = -100, y: int = -100) -> WebElement:
+        """
+        Hover outside from current element
+
+        :return: self
+        """
+        info(f'Hover outside from "{self.name}"')
+        self._action_chains\
+            .move_by_offset(x, y)\
             .perform()
         return self
 

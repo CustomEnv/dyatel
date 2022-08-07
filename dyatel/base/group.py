@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from dyatel.base.driver import Driver
+from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.mixins.internal_utils import get_child_elements
 
@@ -55,11 +55,11 @@ class Group(Element, metaclass=AfterInitMeta):
         Set parent and custom driver for Group class variables, if their instance is Element class
         Will be called automatically after __init__ by metaclass `AfterInitMeta`
         """
-        for element in get_child_elements(self, Element):
-            element.parent = self
-
         if self.__custom_driver_wrapper:
-            if isinstance(self.__custom_driver_wrapper, Driver):
+            if isinstance(self.__custom_driver_wrapper, DriverWrapper):
                 self.set_driver(self.__custom_driver_wrapper)
             else:
                 self.set_driver(self.__custom_driver_wrapper.driver_wrapper)
+
+        for element in get_child_elements(self, Element):
+            element.parent = self

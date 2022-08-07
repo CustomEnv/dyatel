@@ -29,10 +29,6 @@ def test_driver_execute_script_with_args(driver_wrapper, mouse_event_page):
     assert SecondPlaygroundMainPage().wait_page_loaded().is_page_opened()
 
 
-@pytest.mark.skip_platform(
-    'appium', 'safari',  # FIXME: Unskip for playwright safari
-    reason='Safari browser/Mobile platforms doesnt support multiple drivers'
-)
 def test_second_driver_different_page(driver_wrapper, second_driver_wrapper):
     mouse_page = MouseEventPage().set_driver(second_driver_wrapper)
     pizza_page = PizzaOrderPage().set_driver(driver_wrapper)
@@ -52,10 +48,6 @@ def test_second_driver_different_page(driver_wrapper, second_driver_wrapper):
     assert pizza_page.quantity_input.is_displayed()
 
 
-@pytest.mark.skip_platform(
-    'appium', 'safari',  # FIXME: Unskip for playwright safari
-    reason='Safari browser/Mobile platforms doesnt support multiple drivers'
-)
 def test_second_driver_same_page(driver_wrapper, second_driver_wrapper):
     mouse_page1 = MouseEventPage().set_driver(second_driver_wrapper)
     mouse_page2 = MouseEventPage().set_driver(driver_wrapper)
@@ -72,13 +64,9 @@ def test_second_driver_same_page(driver_wrapper, second_driver_wrapper):
     assert mouse_page2.is_page_opened()
 
 
-@pytest.mark.skip_platform(
-    'appium', 'safari',  # FIXME: Unskip for playwright safari
-    reason='Safari browser/Mobile platforms doesnt support multiple drivers'
-)
 def test_second_driver_by_arg(driver_wrapper, second_driver_wrapper):
-    mouse_page = MouseEventPage(second_driver_wrapper)
     pizza_page = PizzaOrderPage(driver_wrapper)
+    mouse_page = MouseEventPage(second_driver_wrapper)
 
     assert pizza_page.driver != mouse_page.driver
     assert pizza_page.driver_wrapper != mouse_page.driver_wrapper
@@ -95,10 +83,7 @@ def test_second_driver_by_arg(driver_wrapper, second_driver_wrapper):
     assert pizza_page.quantity_input.is_displayed()
 
 
-@pytest.mark.skip_platform(
-    'appium',
-    reason='Appium doesnt support tabs creating'
-)
+@pytest.mark.skip_platform('appium', reason='Appium doesnt support tabs creating')
 def test_driver_tabs(driver_wrapper, second_playground_page):
     driver_wrapper.create_new_tab()
     driver_wrapper.switch_to_original_tab()

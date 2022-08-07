@@ -11,13 +11,15 @@ from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
-from dyatel.base.driver import Driver
+from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_driver import PlayDriver
+from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from dyatel.dyatel_sel.driver.web_driver import WebDriver
+from dyatel.shared_utils import set_logging_settings
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
 from tests.adata.pages.progress_bar_page import ProgressBarPage
 from tests.settings import android_desired_caps, ios_desired_caps
-from dyatel.shared_utils import set_logging_settings
 from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import PlaygroundMainPage, SecondPlaygroundMainPage
@@ -109,13 +111,16 @@ def driver_func(request, driver_name, driver_engine, chrome_options, firefox_opt
     is_headless = request.config.getoption('headless')
 
     if 'appium' in driver_engine:
-        appium_ip = request.config.getoption('--appium-ip')
-        appium_port = request.config.getoption('--appium-port')
-        command_exc = f'http://{appium_ip}:{appium_port}/wd/hub'
+        if not DriverWrapper.driver:
+            appium_ip = request.config.getoption('--appium-ip')
+            appium_port = request.config.getoption('--appium-port')
+            command_exc = f'http://{appium_ip}:{appium_port}/wd/hub'
 
-        caps = android_desired_caps if platform == 'android' else ios_desired_caps
-        caps.update({'browserName': driver_name.title()})
-        driver = AppiumDriver(command_executor=command_exc, desired_capabilities=caps)
+            caps = android_desired_caps if platform == 'android' else ios_desired_caps
+            caps.update({'browserName': driver_name.title()})
+            driver = AppiumDriver(command_executor=command_exc, desired_capabilities=caps)
+        else:
+            driver = ChromeWebDriver(executable_path=ChromeDriverManager().install(), options=chrome_options)
 
     elif 'selenium' in driver_engine:
         if driver_name == 'chrome':
@@ -123,7 +128,10 @@ def driver_func(request, driver_name, driver_engine, chrome_options, firefox_opt
         elif driver_name == 'firefox':
             driver = GeckoWebDriver(executable_path=GeckoDriverManager().install(), options=firefox_options)
         elif driver_name == 'safari':
-            driver = SafariWebDriver()
+            if not DriverWrapper.driver:
+                driver = SafariWebDriver()
+            else:
+                driver = ChromeWebDriver(executable_path=ChromeDriverManager().install(), options=chrome_options)
 
         driver.set_window_position(0, 0)  # FIXME
 
@@ -142,7 +150,10 @@ def driver_func(request, driver_name, driver_engine, chrome_options, firefox_opt
 
             driver = browser.launch(headless=is_headless)
 
-    driver_wrapper = Driver(driver)
+    if not CoreDriver.driver:
+        driver_wrapper = DriverWrapper(driver)
+    else:
+        driver_wrapper = WebDriver(driver)
 
     if 'appium' not in driver_engine:
         driver_wrapper.set_window_size(1024, 900)

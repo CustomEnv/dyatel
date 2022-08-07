@@ -4,6 +4,28 @@
 ## v1.1.1
 *Release date: In development*
 
+### Added
+- iOS SafariDriver basic support 
+- Different second driver support (for mobile/desktop safari)
+- Tabs manipulating methods for desktop in `CoreDriver/PlayDriver`
+- Context manipulating methods for mobile in `MobileDriver`
+- Type annotations for most of code
+- Auto `locator_type` support for `com.android` locator 
+- `element.hover` support on mobiles
+- `element.hover_outside` method, that moves pointer outside from current position
+- `page.swipe(_up/_down)` methods for mobile  
+- Default cookie path/domain in `driver_wrapper.set_cookie` method
+
+### Changed
+- `Driver` becomes `DriverWrapper` for more readability
+- Mixins classes renamed and moved to `dyatel.mixins` folder
+- Selenium `element.wait_element` now using `visibility_of_any_elements_located`
+- Selenium exception stacktrace reduced in most cases
+
+### Fixed
+- Custom `driver_wrapper`/`driver` for child elements
+- Selenium `KeyError` of `driver_wrapper.set_cookie` without `domain` 
+
 ---
 
 ## v1.1.0

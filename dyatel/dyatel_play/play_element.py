@@ -166,6 +166,16 @@ class PlayElement(ElementMixin, DriverMixin):
         self._first_element.hover()
         return self
 
+    def hover_outside(self, x: int = -100, y: int = -100) -> PlayElement:
+        """
+        Hover outside from current element
+
+        :return: self
+        """
+        info(f'Hover outside from "{self.name}"')
+        self._first_element.hover(position={'x': float(x), 'y': float(y)})
+        return self
+
     # Element waits
 
     def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:

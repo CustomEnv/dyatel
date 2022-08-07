@@ -9,6 +9,7 @@ def get_locator_type(locator: str):
 
     :param locator: regular locator
     :return:
+      By.ID if locator contain ":id" - com.android locator
       By.TAG_NAME if locator contain tag name
       By.XPATH if locator contain slashes and brackets
       By.CSS_SELECTOR if locator contain brackets and no slash
@@ -20,7 +21,7 @@ def get_locator_type(locator: str):
 
     if locator in all_tags:
         return By.TAG_NAME
-    elif ':id' in locator:  # Mobile native app selector
+    elif ':id' in locator:  # Mobile com.android selector
         return By.ID
     elif '/' in locator:
         return By.XPATH

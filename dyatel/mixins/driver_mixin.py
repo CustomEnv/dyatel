@@ -7,7 +7,9 @@ from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from playwright.sync_api import Browser as PlaywrightWebDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
-from dyatel.base.driver import Driver
+from dyatel.dyatel_play.play_driver import PlayDriver
+from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
+from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.mixins.internal_utils import get_child_elements, get_child_elements_with_names
 
 
@@ -23,7 +25,7 @@ class DriverMixin:
         return self._driver_instance.driver
 
     @property
-    def driver_wrapper(self) -> Driver:
+    def driver_wrapper(self) -> Union[WebDriver, MobileDriver, PlayDriver]:
         """
         Get source driver wrapper instance
 
@@ -31,12 +33,13 @@ class DriverMixin:
         """
         return self._driver_instance.driver_wrapper
 
-    def _set_driver(self, driver_wrapper, instance_class):
+    def _set_driver(self, driver_wrapper, instance_class) -> DriverMixin:
         """
+        Set driver_wrapper/driver instances for class
 
-        :param driver_wrapper:
-        :param instance_class:
-        :return:
+        :param driver_wrapper: driver wrapper to be set
+        :param instance_class: instance of attributes of the class
+        :return: self
         """
         new_driver = copy(self.driver_wrapper)
         setattr(new_driver, 'driver', copy(self.driver_wrapper.driver))
@@ -46,16 +49,19 @@ class DriverMixin:
         new_driver.driver_wrapper = driver_wrapper
 
         self._driver_instance = new_driver
-        self.__set_driver_for_attr(instance_class, self, new_driver)
+        self.__set_driver_for_attr(self, instance_class, new_driver)
         self.page_elements = get_child_elements(self, instance_class)
 
-    def __set_driver_for_attr(self, instance_class, base_obj, driver_wrapper):
-        """
+        return self
 
-        :param instance_class:
-        :param base_obj:
-        :param driver_wrapper:
-        :return:
+    def __set_driver_for_attr(self, base_obj, instance_class, driver_wrapper) -> DriverMixin:
+        """
+        Set driver_wrapper/driver instances for attributes
+
+        :param base_obj: class of attributes
+        :param instance_class: instance of attributes to be changed
+        :param driver_wrapper: driver wrapper to be set
+        :return: self
         """
         child_elements = get_child_elements_with_names(base_obj, instance_class).items()
 
@@ -63,6 +69,10 @@ class DriverMixin:
             wrapped_child = copy(child)
             wrapped_child._driver_instance = driver_wrapper
             setattr(base_obj, name, wrapped_child)
-            self.__set_driver_for_attr(instance_class, wrapped_child, driver_wrapper)
+
+            if getattr(wrapped_child, 'parent', None):
+                wrapped_child.parent._driver_instance = driver_wrapper
+
+            self.__set_driver_for_attr(wrapped_child, instance_class, driver_wrapper)
 
         return self
