@@ -115,7 +115,7 @@ class MobileElement(CoreElement):
             self._action_chains.click(on_element=self.element).perform()
         return self
 
-    def hover_outside(self, x: int = -100, y: int = -100) -> MobileElement:
+    def hover_outside(self, x: int = 0, y: int = -5) -> MobileElement:
         """
         Hover outside from current element
 
@@ -142,7 +142,7 @@ class MobileElement(CoreElement):
         else:
             dx, dy = calculate_coordinate_to_click(self, x, y)
             self._action_chains\
-                .move_to_element_with_offset(self.element, dx, dy)\
+                .move_by_offset(dx, dy)\
                 .click()\
                 .perform()
         return self

@@ -118,13 +118,14 @@ class Page(WebPage, MobilePage, PlayPage):
 
         :return: page class
         """
-        if isinstance(self.driver, PlaywrightDriver):
+        driver = self.driver_wrapper.driver
+        if isinstance(driver, PlaywrightDriver):
             Page.__bases__ = PlayPage,
             return PlayPage
-        elif isinstance(self.driver, AppiumDriver):
+        elif isinstance(driver, AppiumDriver):
             Page.__bases__ = MobilePage,
             return MobilePage
-        elif isinstance(self.driver, SeleniumDriver):
+        elif isinstance(driver, SeleniumDriver):
             Page.__bases__ = WebPage,
             return WebPage
         else:

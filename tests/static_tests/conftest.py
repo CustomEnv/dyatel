@@ -1,7 +1,7 @@
 import pytest
 from mock.mock import MagicMock
 
-from playwright.sync_api import Page as PlaywrightDriver
+from playwright.sync_api import Page as PlaywrightDriver, Browser
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
@@ -42,7 +42,8 @@ def mocked_selenium_driver():
 
 @pytest.fixture
 def mocked_play_driver():
-    driver_wrapper = PlayDriver(MagicMock())
-    DriverWrapper.driver = PlaywrightDriver(MagicMock())
+    driver_wrapper = DriverWrapper(Browser(MagicMock()))
+    DriverWrapper.driver_wrapper = MagicMock()
+    DriverWrapper.driver_wrapper.driver = PlaywrightDriver(MagicMock())
     yield driver_wrapper
     PlayDriver.driver = None

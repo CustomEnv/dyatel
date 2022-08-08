@@ -7,6 +7,7 @@ from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from playwright.sync_api import Browser as PlaywrightWebDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
+from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
@@ -25,7 +26,7 @@ class DriverMixin:
         return self._driver_instance.driver
 
     @property
-    def driver_wrapper(self) -> Union[WebDriver, MobileDriver, PlayDriver]:
+    def driver_wrapper(self) -> Union[WebDriver, MobileDriver, PlayDriver, DriverWrapper]:
         """
         Get source driver wrapper instance
 

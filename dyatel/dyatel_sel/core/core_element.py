@@ -7,12 +7,10 @@ from typing import Union, List, Any
 
 from PIL import Image
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException, \
-    InvalidArgumentException, InvalidSelectorException
+    InvalidArgumentException, InvalidSelectorException, WebDriverException
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
-from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import WebDriverException
 from selenium.webdriver import ActionChains
 
 from dyatel.shared_utils import cut_log_data
@@ -140,13 +138,19 @@ class CoreElement(ElementMixin, DriverMixin):
         if not silent:
             info(f'Wait until presence of "{self.name}"')
 
-        message = f'Can\'t wait element "{self.name}". {self.get_element_logging_data()}'
-        try:
-            self._get_wait(timeout).until(
-                ec.visibility_of_any_elements_located((self.locator_type, self.locator)), message=message
-            )
-        except TimeoutException:
-            raise TimeoutException(message) from None
+        def safe_is_displayed():
+            try:
+                return self._get_element(wait=False).is_displayed()
+            except (NoSuchElementException, TimeoutException, WebDriverException, Exception):
+                return False
+
+        start_time = time.time()
+        while time.time() - start_time < timeout and not safe_is_displayed():
+            pass
+
+        if not safe_is_displayed():
+            raise TimeoutException(f'Can\'t wait element "{self.name}". {self.get_element_logging_data()}') from None
+
         return self
 
     def wait_element_without_error(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:

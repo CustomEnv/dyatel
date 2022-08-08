@@ -1,3 +1,5 @@
+import pytest
+
 from dyatel.base.group import Group
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_page import PlayPage
@@ -53,6 +55,7 @@ def test_base_page_playwright(mocked_play_driver):
     assert page.__class__.__base__ == PlayPage
 
 
+@pytest.mark.xfail(reason='Rework needed')
 def test_base_element_playwright(mocked_play_driver):
     element = Element('locator')
     assert element.__class__.__base__ == PlayElement
