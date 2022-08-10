@@ -1,8 +1,12 @@
 # Dyatel Changelog
 
 ---
-## v1.1.1
+## v1.1.2
 *Release date: In development*
+
+---
+## v1.1.1
+*Release date: 2022-08-10*
 
 ### Added
 - iOS SafariDriver basic support 
