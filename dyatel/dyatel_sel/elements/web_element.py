@@ -4,12 +4,13 @@ from logging import info
 from typing import Union, List, Any
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.internal_utils import calculate_coordinate_to_click
+from dyatel.dyatel_sel.sel_utils import get_locator_type
+from dyatel.mixins.internal_utils import calculate_coordinate_to_click
 
 
 class WebElement(CoreElement):
-    def __init__(self, locator: str, locator_type='', name='',
-                 parent: Union[WebElement, Any] = None, wait=False):
+    def __init__(self, locator: str, locator_type: str = '', name: str = '',
+                 parent: Union[WebElement, Any] = None, wait: bool = False):
         """
         Initializing of web element with selenium driver
 
@@ -19,7 +20,9 @@ class WebElement(CoreElement):
         :param parent: parent of element. Can be WebElement, WebPage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        CoreElement.__init__(self, locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
+        self.locator_type = locator_type if locator_type else get_locator_type(locator)
+
+        super().__init__(locator=locator, locator_type=self.locator_type, name=name, parent=parent, wait=wait)
 
     @property
     def all_elements(self) -> List[Any]:
@@ -37,7 +40,7 @@ class WebElement(CoreElement):
 
         :return: self
         """
-        info(f'Hover over {self.name}')
+        info(f'Hover over :{self.name}"')
         self._action_chains\
             .move_to_element(self.element)\
             .move_by_offset(1, 1)\
@@ -45,7 +48,19 @@ class WebElement(CoreElement):
             .perform()
         return self
 
-    def click_outside(self, x=-1, y=-1) -> WebElement:
+    def hover_outside(self, x: int = -100, y: int = -100) -> WebElement:
+        """
+        Hover outside from current element
+
+        :return: self
+        """
+        info(f'Hover outside from "{self.name}"')
+        self._action_chains\
+            .move_by_offset(x, y)\
+            .perform()
+        return self
+
+    def click_outside(self, x: int = -1, y: int = -1) -> WebElement:
         """
         Click outside of element. By default, 1px above and 1px left of element
 

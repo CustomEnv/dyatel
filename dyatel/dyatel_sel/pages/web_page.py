@@ -11,4 +11,4 @@ class WebPage(CorePage):
         :param locator_type: specific locator type
         :param name: name of page (will be attached to logs)
         """
-        CorePage.__init__(self, locator=locator, locator_type=locator_type, name=name)
+        super().__init__(locator=locator, locator_type=locator_type, name=name)

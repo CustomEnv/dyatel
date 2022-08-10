@@ -1,4 +1,4 @@
-from dyatel.internal_utils import all_tags
+from dyatel.mixins.internal_utils import all_tags
 
 
 def get_selenium_completable_locator(locator):

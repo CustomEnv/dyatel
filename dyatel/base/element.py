@@ -4,19 +4,22 @@ import time
 from logging import info
 from typing import Any
 
-from dyatel.base.driver import Driver
-from dyatel.dyatel_play.play_driver import PlayDriver
-from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from playwright.sync_api import Page as PlaywrightDriver
+from appium.webdriver.webdriver import WebDriver as AppiumDriver
+from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
+
+from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
-from dyatel.internal_utils import WAIT_EL
+from dyatel.mixins.internal_utils import WAIT_EL
 
 
 class Element(WebElement, MobileElement, PlayElement):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
-    def __init__(self, locator: str, locator_type='', name='', parent: Any = None, wait=False):
+    def __init__(self, locator: str, locator_type: str = '', name: str = '',
+                 parent: Any = None, wait: bool = False):
         """
         Initializing of element based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group
@@ -32,28 +35,31 @@ class Element(WebElement, MobileElement, PlayElement):
         self.name = name
         self.parent = parent
         self.wait = wait
-        self._initialized = False
-        self._driver_instance = Driver
 
-        self.element_class = self.__get_element_class()
+        self._initialized = False
+        self._driver_instance = DriverWrapper
+
+        self.element_class = self.__set_base_class()
         if self.element_class:
             super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 
-    def __get_element_class(self):
+    def __set_base_class(self):
         """
         Get element class in according to current driver, and set him as base class
 
         :return: element class
         """
-        if PlayDriver.driver:
+        if isinstance(self.driver, PlaywrightDriver):
             Element.__bases__ = PlayElement,
             return PlayElement
-        elif CoreDriver.driver and CoreDriver.mobile:
+        elif isinstance(self.driver, AppiumDriver):
             Element.__bases__ = MobileElement,
             return MobileElement
-        elif CoreDriver.driver and not CoreDriver.mobile:
+        elif isinstance(self.driver, SeleniumDriver):
             Element.__bases__ = WebElement,
             return WebElement
+
+        # No exception due to delayed initialization
 
     # Following methods works same for both Selenium/Appium and Playwright APIs
 
@@ -87,10 +93,10 @@ class Element(WebElement, MobileElement, PlayElement):
             info(f'Wait until elements count will be equal to "{elements_count}"')
 
         start_time = time.time()
-        while time.time() - start_time < timeout and self.get_elements_count() != elements_count:
+        while time.time() - start_time < timeout and self.get_elements_count(silent=True) != elements_count:
             pass
 
-        actual_elements_count = self.get_elements_count()
+        actual_elements_count = self.get_elements_count(silent=True)
 
         if actual_elements_count != elements_count:
             raise Exception(f'Unexpected elements count of "{self.name}". '

@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-import time
 from logging import info
 
+from selenium.common.exceptions import ElementNotSelectableException
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 
-from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.internal_utils import WAIT_EL
+from dyatel.base.element import Element
 
 
-class CoreCheckbox(CoreElement):
+class CoreCheckbox(Element):
 
     def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False, by_attr=False):
         """
@@ -33,7 +32,7 @@ class CoreCheckbox(CoreElement):
 
         :return: selenium WebElement
         """
-        self.wait_availability()
+        self.wait_availability(silent=True)
         return self._get_element(wait=False)
 
     def is_checked(self) -> bool:
@@ -42,7 +41,11 @@ class CoreCheckbox(CoreElement):
 
         :return: bool
         """
-        is_checked_selenium = self.element.is_selected()
+        try:
+            is_checked_selenium = self.element.is_selected()
+        except ElementNotSelectableException:
+            is_checked_selenium = False
+
         return self.checked if self.by_attr else is_checked_selenium
 
     def check(self) -> CoreCheckbox:
@@ -52,6 +55,7 @@ class CoreCheckbox(CoreElement):
         :return: self
         """
         if not self.is_checked():
+            info(f'Select "{self.name}"')
             self.wait_clickable(silent=True).element.click()
             self.checked = True
 
@@ -64,6 +68,7 @@ class CoreCheckbox(CoreElement):
         :return: self
         """
         if self.is_checked():
+            info(f'Unselect "{self.name}"')
             self.wait_clickable(silent=True).element.click()
             self.checked = False
 
@@ -77,24 +82,3 @@ class CoreCheckbox(CoreElement):
         :return: checkbox text
         """
         return self.element.text if self.element.text else self.element.get_attribute('value')
-
-    def wait_clickable(self, silent=False, timeout=WAIT_EL) -> CoreCheckbox:
-        """
-        Wait until checkbox become clickable
-        Selenium `element_to_be_clickable` doesn't work for some checkboxes
-
-        :param silent: erase log
-        :param timeout: wait timeout
-        :return: self
-        """
-        if not silent:
-            info(f'Wait until "{self.name}" become clickable')
-
-        start_time = time.time()
-        while time.time() - start_time < timeout and not self.element.is_enabled():
-            pass
-
-        if not self.element.is_enabled():
-            raise Exception(f'"{self.name}" not clickable')
-
-        return self

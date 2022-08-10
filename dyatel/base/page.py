@@ -1,21 +1,26 @@
 from __future__ import annotations
 
 from logging import debug, info
+from typing import Union, Any
 
-from dyatel.base.driver import Driver
+from playwright.sync_api import Page as PlaywrightDriver
+from appium.webdriver.webdriver import WebDriver as AppiumDriver
+from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
+
+from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
-from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_page import PlayPage
-from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
-from dyatel.internal_utils import WAIT_PAGE
+from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
+from dyatel.mixins.internal_utils import WAIT_PAGE
 
 
 class Page(WebPage, MobilePage, PlayPage):
     """ Page object crossroad. Should be defined as class """
 
-    def __init__(self, locator: str, locator_type='', name='', driver_wrapper=None):
+    def __init__(self, locator: str, locator_type: str = '', name: str = '',
+                 driver_wrapper: Union[DriverWrapper, Any] = None):
         """
         Initializing of page based on current driver
 
@@ -24,15 +29,17 @@ class Page(WebPage, MobilePage, PlayPage):
         :param name: name of page (will be attached to logs)
         :param driver_wrapper: set custom driver for page and page elements
         """
-        self._driver_instance = driver_wrapper if driver_wrapper else Driver
-        self.__set_page_class()
-        super().__init__(locator=locator, locator_type=locator_type, name=name)
+        self.locator = locator
+        self.locator_type = locator_type
+        self.name = name
 
+        self._driver_instance = DriverWrapper
+        self.__set_base_class()
+        super().__init__(locator=locator, locator_type=locator_type, name=name)
+        # it's necessary to leave it after init
         if driver_wrapper:
-            if isinstance(driver_wrapper, Driver):
-                self.set_driver(driver_wrapper)
-            else:
-                self.set_driver(driver_wrapper.driver_wrapper)
+            self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
+            self.set_driver(self._driver_instance)
 
     def reload_page(self, wait_page_load=True) -> Page:
         """
@@ -41,10 +48,12 @@ class Page(WebPage, MobilePage, PlayPage):
         :param wait_page_load: wait until anchor will be element loaded
         :return: self
         """
-        info(f'Reload {self.name} page')
+        info(f'Reload "{self.name}" page')
         self.driver_wrapper.refresh()
+
         if wait_page_load:
             self.wait_page_loaded()
+
         return self
 
     def open_page(self, url='') -> Page:
@@ -100,29 +109,31 @@ class Page(WebPage, MobilePage, PlayPage):
 
         return result
 
-    def set_driver(self, driver_wrapper) -> Page:
+    def set_driver(self, driver_wrapper: DriverWrapper) -> Page:
         """
         Set driver instance for page and elements/groups
 
-        :param driver_wrapper: driver wrapper object ~ Driver/WebDriver/MobileDriver/CoreDriver/PlayDriver
+        :param driver_wrapper: driver wrapper object ~ DriverWrapper/WebDriver/MobileDriver/CoreDriver/PlayDriver
         :return: self
         """
         self._set_driver(driver_wrapper, Element)
         return self
 
-    def __set_page_class(self):
+    def __set_base_class(self):
         """
         Get page class in according to current driver, and set him as base class
 
         :return: page class
         """
-        if PlayDriver.driver:
+        driver = self.driver_wrapper.driver
+
+        if isinstance(driver, PlaywrightDriver):
             Page.__bases__ = PlayPage,
             return PlayPage
-        elif CoreDriver.driver and CoreDriver.mobile:
+        elif isinstance(driver, AppiumDriver):
             Page.__bases__ = MobilePage,
             return MobilePage
-        elif CoreDriver.driver and not CoreDriver.mobile:
+        elif isinstance(driver, SeleniumDriver):
             Page.__bases__ = WebPage,
             return WebPage
         else:

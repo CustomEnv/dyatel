@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Union
 
-from dyatel.base.driver import Driver
+from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
-from dyatel.internal_utils import get_child_elements
+from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
+from dyatel.mixins.internal_utils import get_child_elements
 
 
 class AfterInitMeta(type):
@@ -26,7 +27,8 @@ class AfterInitMeta(type):
 class Group(Element, metaclass=AfterInitMeta):
     """ Group of elements. Should be defined as class """
 
-    def __init__(self, locator: str, locator_type='', name='', parent: Any = None, wait=False, driver_wrapper=None):
+    def __init__(self, locator: str, locator_type: str = '', name: str = '',
+                 parent: Any = None, wait: bool = False, driver_wrapper: Union[DriverWrapper, Any] = None):
         """
         Initializing of group based on current driver
 
@@ -37,8 +39,11 @@ class Group(Element, metaclass=AfterInitMeta):
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         :param driver_wrapper: set custom driver for group and group elements
         """
-        self.__custom_driver_wrapper = driver_wrapper
         super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
+        # it's necessary to leave it after init
+        if driver_wrapper:
+            self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
+            self.set_driver(self._driver_instance)
 
     def set_driver(self, driver_wrapper) -> Group:
         """
@@ -57,9 +62,3 @@ class Group(Element, metaclass=AfterInitMeta):
         """
         for element in get_child_elements(self, Element):
             element.parent = self
-
-        if self.__custom_driver_wrapper:
-            if isinstance(self.__custom_driver_wrapper, Driver):
-                self.set_driver(self.__custom_driver_wrapper)
-            else:
-                self.set_driver(self.__custom_driver_wrapper.driver_wrapper)

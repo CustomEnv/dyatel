@@ -12,10 +12,13 @@ class CoreDriver:
     driver: Union[AppiumDriver, SeleniumWebDriver] = None
     driver_wrapper: CoreDriver = None
 
-    mobile = False
     desktop = False
+
+    mobile = False
     is_ios = False
     is_android = False
+    is_safari_driver = False
+    is_xcui_driver = False
 
     def __init__(self, driver: Union[AppiumDriver, SeleniumWebDriver]):
         """
@@ -26,12 +29,14 @@ class CoreDriver:
         """
         driver.implicitly_wait(0.001)  # reduce selenium wait
         self.driver = driver
+        self.driver_wrapper = self
+        self.original_tab = driver.current_window_handle
 
         if not CoreDriver.driver:
             CoreDriver.driver = driver
             CoreDriver.driver_wrapper = self
 
-    def get(self, url) -> CoreDriver:
+    def get(self, url: str) -> CoreDriver:
         """
         Navigate to given url
 
@@ -102,7 +107,7 @@ class CoreDriver:
         self.driver.back()
         return self
 
-    def quit(self, silent=True) -> CoreDriver:
+    def quit(self, silent: bool = True) -> CoreDriver:
         """
         Quit the driver instance
 
@@ -113,6 +118,10 @@ class CoreDriver:
             info('Quit driver instance')
 
         self.driver.quit()
+
+        if self.driver == CoreDriver.driver:  # Clear only if original driver closed
+            CoreDriver.driver = None
+            CoreDriver.driver_wrapper = None
         return self
 
     def set_cookie(self, cookies: List[dict]) -> CoreDriver:
@@ -123,8 +132,13 @@ class CoreDriver:
         :return: self
         """
         for cookie in cookies:
-            cookie.pop('domain')
+            cookie.pop('domain', None)
+
+            if 'path' not in cookie:
+                cookie.update({'path': '/'})
+
             self.driver.add_cookie(cookie)
+
         return self
 
     def clear_cookies(self) -> CoreDriver:
@@ -144,7 +158,7 @@ class CoreDriver:
         """
         return self.driver.get_cookies()
 
-    def execute_script(self, script, *args):
+    def execute_script(self, script: str, *args):
         """
         Synchronously Executes JavaScript in the current window/frame.
 
@@ -154,7 +168,7 @@ class CoreDriver:
         """
         return self.driver.execute_script(script, *args)
 
-    def set_page_load_timeout(self, timeout=30) -> CoreDriver:
+    def set_page_load_timeout(self, timeout: int = 30) -> CoreDriver:
         """
         Set the amount of time to wait for a page load to complete before throwing an error
 
@@ -164,7 +178,7 @@ class CoreDriver:
         self.driver.set_page_load_timeout(timeout)
         return self
 
-    def set_window_size(self, width, height) -> CoreDriver:
+    def set_window_size(self, width: int, height: int) -> CoreDriver:
         """
         Sets the width and height of the current window
 
@@ -174,3 +188,67 @@ class CoreDriver:
         """
         self.driver.set_window_size(width, height)
         return self
+
+    def get_screenshot(self) -> bytes:
+        """
+        Gets the screenshot of the current window as a binary data.
+
+        :return: screenshot binary
+        """
+        return self.driver.get_screenshot_as_png()
+
+    def get_all_tabs(self) -> List[str]:
+        """
+        Get all opened tabs
+
+        :return: list of tabs
+        """
+        return self.driver.window_handles
+
+    def create_new_tab(self) -> CoreDriver:
+        """
+        Create new tab and switch into it
+
+        :return: self
+        """
+        self.driver.switch_to.new_window('tab')
+        return self
+
+    def switch_to_original_tab(self) -> CoreDriver:
+        """
+        Switch to original tab
+
+        :return: self
+        """
+        self.driver.switch_to.window(self.original_tab)
+        return self
+
+    def switch_to_tab(self, tab=-1) -> CoreDriver:
+        """
+        Switch to specific tab
+
+        :param tab: tab index. Start from 1. Default: latest tab
+        :return: self
+        """
+        if tab == -1:
+            tab = self.get_all_tabs()[tab:]
+        else:
+            tab = self.get_all_tabs()[tab - 1]
+
+        self.driver.switch_to.window(tab)
+        return self
+
+    def close_unused_tabs(self) -> CoreDriver:
+        """
+        Close all tabs except original
+
+        :return: self
+        """
+        tabs = self.get_all_tabs()
+        tabs.remove(self.original_tab)
+
+        for tab in tabs:
+            self.driver.switch_to.window(tab)
+            self.driver.close()
+
+        return self.switch_to_original_tab()
