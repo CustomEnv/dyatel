@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import copy
-from typing import Union
+from typing import Union, Any
 
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from playwright.sync_api import Browser as PlaywrightWebDriver
@@ -12,6 +12,25 @@ from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.mixins.internal_utils import get_child_elements, get_child_elements_with_names
+
+
+def get_driver_wrapper_from_object(obj, custom_driver_wrapper_object: Union[DriverWrapper, Any]):
+    """
+    Get driver wrapper from custom object
+
+    :param obj: self object of the class
+    :param custom_driver_wrapper_object: custom object. Can be driver_wrapper or object with driver_wrapper
+    :return: driver wrapper object
+    """
+    if isinstance(custom_driver_wrapper_object, DriverWrapper):
+        new_driver_instance = custom_driver_wrapper_object
+    elif hasattr(custom_driver_wrapper_object, 'driver_wrapper'):
+        new_driver_instance = custom_driver_wrapper_object.driver_wrapper
+    else:
+        msg = f'Cant get custom driver_wrapper object for "{getattr(obj, "name")}" of "{obj.__class__}"'
+        raise Exception(msg)
+
+    return new_driver_instance
 
 
 class DriverMixin:

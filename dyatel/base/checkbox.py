@@ -14,7 +14,8 @@ from dyatel.dyatel_sel.core.core_checkbox import CoreCheckbox as SelCheckbox
 class Checkbox(SelCheckbox, PlayCheckbox):
     """ Checkbox object crossroad. Should be defined as Page/Group class variable """
 
-    def __init__(self, locator: str, locator_type='', name='', parent: Any = None, wait=False, by_attr=False):
+    def __init__(self, locator: str, locator_type: str = '', name: str = '',
+                 parent: Any = None, wait: bool = False, by_attr: bool = False):
         """
         Initializing of checkbox based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group
