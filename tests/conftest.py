@@ -161,7 +161,7 @@ def driver_func(request, driver_name, driver_engine, chrome_options, firefox_opt
     if 'appium' not in driver_engine:
         driver_wrapper.set_window_size(1024, 900)
 
-    os.environ['visual'] = 'tests/adata/visual'
+    os.environ['visual'] = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
     return driver_wrapper
 
 

@@ -47,6 +47,8 @@ class ElementMixin:
         root_path = root_path if root_path.endswith('/') else f'{root_path}/'
         reference_file = f'{root_path}reference/{filename}.png'
         get_screenshot = getattr(self, 'get_screenshot')
+        output_directory = f'{root_path}output/'
+        os.makedirs(os.path.dirname(output_directory), exist_ok=True)
 
         try:
             Image.open(reference_file)
@@ -57,7 +59,7 @@ class ElementMixin:
             raise FileNotFoundError(message) from None
 
         time.sleep(delay)
-        output_file = f'{root_path}output/{filename}.png'
+        output_file = f'{output_directory}{filename}.png'
         get_screenshot(output_file)
         assert_same_images(output_file, reference_file, filename, threshold)
         return self
