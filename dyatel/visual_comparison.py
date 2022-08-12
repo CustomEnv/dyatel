@@ -17,7 +17,9 @@ def assert_same_images(actual_file: str, reference_file: str, filename: str, thr
     # TODO: Same pixel ratio check
     if actual_threshold > threshold:
         root_path = os.environ.get('visual', '')
-        diff_file = f'{root_path}/difference/diff-{filename}.png'
+        diff_directory = f'{root_path}/difference/'
+        os.makedirs(os.path.dirname(diff_directory), exist_ok=True)
+        diff_file = f'{diff_directory}/diff-{filename}.png'
         diff.save(diff_file)
         attach_allure_diff(actual_file, reference_file, diff_file)
         raise AssertionError(f"The new screenshot '{actual_file}' did not match the"
