@@ -1,5 +1,6 @@
 import os
 
+import allure
 import pytest
 from playwright.sync_api import sync_playwright
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
@@ -87,6 +88,8 @@ def driver_wrapper(platform, driver_name, driver_engine, request, driver_init):
     if platform in str(skip_platform) or driver_engine in str(skip_platform) or driver_name in str(skip_platform):
         skip_reason = list(name for marker in skip_marks_iterator for name in marker.kwargs.values())
         pytest.skip(f"Skip test {platform} with {driver_name}. Reason={skip_reason}")
+
+    request.node.add_marker(allure.label('testType', 'screenshotDiff'))
 
     yield driver_init
     driver_init.get('data:,')

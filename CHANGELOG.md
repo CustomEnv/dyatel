@@ -1,8 +1,11 @@
 # Dyatel Changelog
 
 ---
-## v1.1.2
+## v1.2.0
 *Release date: In development*
+
+### Added
+- [Allure Screen Diff Plugin](https://github.com/allure-framework/allure2/blob/master/plugins/screen-diff-plugin/README.md) support 
 
 ---
 ## v1.1.1
