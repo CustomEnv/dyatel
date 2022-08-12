@@ -45,10 +45,12 @@ class ElementMixin:
             raise Exception('Provide visual regression path. Example: os.environ["visual"] = "tests/visual"')
 
         root_path = root_path if root_path.endswith('/') else f'{root_path}/'
-        reference_file = f'{root_path}reference/{filename}.png'
+        reference_directory = f'{root_path}reference/'
+        reference_file = f'{reference_directory}{filename}.png'
         get_screenshot = getattr(self, 'get_screenshot')
         output_directory = f'{root_path}output/'
         os.makedirs(os.path.dirname(output_directory), exist_ok=True)
+        os.makedirs(os.path.dirname(reference_directory), exist_ok=True)
 
         try:
             Image.open(reference_file)
