@@ -2,17 +2,16 @@ from __future__ import annotations
 
 import time
 from io import BytesIO
-from logging import info, debug
 from typing import Union, List, Any
 
 from PIL import Image
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException, \
-    InvalidArgumentException, InvalidSelectorException, WebDriverException
+from selenium.common.exceptions import *
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import ActionChains
 
+from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.internal_utils import get_child_elements, WAIT_EL, initialize_objects_with_args
 from dyatel.mixins.element_mixin import ElementMixin
@@ -20,7 +19,7 @@ from dyatel.mixins.driver_mixin import DriverMixin
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 
 
-class CoreElement(ElementMixin, DriverMixin):
+class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
     def __init__(self, locator: str, locator_type: str = '', name: str = '', parent: Any = None, wait: bool = False):
         """
@@ -73,7 +72,7 @@ class CoreElement(ElementMixin, DriverMixin):
 
         :return: self
         """
-        info(f'Click into "{self.name}"')
+        self.log(f'Click into "{self.name}"')
         self.wait_element(silent=True).wait_clickable(silent=True).element.click()
         return self
 
@@ -87,7 +86,7 @@ class CoreElement(ElementMixin, DriverMixin):
         """
         text = str(text)
         if not silent:
-            info(f'Type text {cut_log_data(text)} into "{self.name}"')
+            self.log(f'Type text {cut_log_data(text)} into "{self.name}"')
 
         self.wait_element(silent=True).element.send_keys(text)
         return self
@@ -104,7 +103,7 @@ class CoreElement(ElementMixin, DriverMixin):
         text = str(text)
 
         if not silent:
-            info(f'Type text "{cut_log_data(text)}" into "{self.name}"')
+            self.log(f'Type text "{cut_log_data(text)}" into "{self.name}"')
 
         self.wait_element(silent=True)
         for letter in str(text):
@@ -120,7 +119,7 @@ class CoreElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Clear text in "{self.name}"')
+            self.log(f'Clear text in "{self.name}"')
 
         self.wait_element(silent=True).element.clear()
         return self
@@ -136,7 +135,7 @@ class CoreElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Wait until presence of "{self.name}"')
+            self.log(f'Wait until presence of "{self.name}"')
 
         def safe_is_displayed():
             try:
@@ -162,13 +161,13 @@ class CoreElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Wait until presence of "{self.name}" without error exception')
+            self.log(f'Wait until presence of "{self.name}" without error exception')
 
         try:
             self.wait_element(timeout=timeout, silent=True)
         except (NoSuchElementException, TimeoutException, WebDriverException, Exception) as exception:
             if not silent:
-                info(f'Ignored exception: "{exception.msg}"')
+                self.log(f'Ignored exception: "{exception.msg}"')
         return self
 
     def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
@@ -180,7 +179,7 @@ class CoreElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Wait hidden of "{self.name}"')
+            self.log(f'Wait hidden of "{self.name}"')
 
         is_hidden = False
         start_time = time.time()
@@ -205,7 +204,7 @@ class CoreElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Wait until "{self.name}" become clickable')
+            self.log(f'Wait until "{self.name}" become clickable')
 
         start_time = time.time()
         while time.time() - start_time < timeout and not self.element.is_enabled():
@@ -225,7 +224,7 @@ class CoreElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Wait until "{self.name}" will be available in DOM')
+            self.log(f'Wait until "{self.name}" will be available in DOM')
 
         start_time = time.time()
 
@@ -249,7 +248,7 @@ class CoreElement(ElementMixin, DriverMixin):
         :param: sleep: delay after scroll
         :return: self
         """
-        info(f'Scroll element "{self.name}" into view')
+        self.log(f'Scroll element "{self.name}" into view')
 
         self.wait_element(silent=True)
 
@@ -269,7 +268,7 @@ class CoreElement(ElementMixin, DriverMixin):
         :param filename: path/filename
         :return: image binary
         """
-        info(f'Get screenshot of "{self.name}"')
+        self.log(f'Get screenshot of "{self.name}"')
         image_binary = self.get_screenshot_base
         image_binary.save(filename)
         return image_binary
@@ -339,7 +338,7 @@ class CoreElement(ElementMixin, DriverMixin):
         result = False
 
         if not silent:
-            info(f'Check displaying of "{self.name}"')
+            self.log(f'Check displaying of "{self.name}"')
 
         if self.is_available():  # Check in DOM first due to selenium exception
             result = self._get_element(wait=False).is_displayed()
@@ -354,7 +353,7 @@ class CoreElement(ElementMixin, DriverMixin):
         :return: True if element hidden
         """
         if not silent:
-            info(f'Check invisibility of "{self.name}"')
+            self.log(f'Check invisibility of "{self.name}"')
 
         return not self.is_displayed()
 
@@ -367,7 +366,7 @@ class CoreElement(ElementMixin, DriverMixin):
         :return: custom attribute value
         """
         if not silent:
-            info(f'Get "{attribute}" from "{self.name}"')
+            self.log(f'Get "{attribute}" from "{self.name}"')
 
         return self.wait_element(silent=True).element.get_attribute(attribute)
 
@@ -379,7 +378,7 @@ class CoreElement(ElementMixin, DriverMixin):
         :return: list of texts
         """
         if not silent:
-            info(f'Get all texts from "{self.name}"')
+            self.log(f'Get all texts from "{self.name}"')
 
         self.wait_element(silent=True)
         return list(element_item.get_text for element_item in getattr(self, 'all_elements'))
@@ -392,7 +391,7 @@ class CoreElement(ElementMixin, DriverMixin):
         :return: elements count
         """
         if not silent:
-            info(f'Get elements count of "{self.name}"')
+            self.log(f'Get elements count of "{self.name}"')
 
         return len(getattr(self, 'all_elements'))
 
@@ -406,7 +405,7 @@ class CoreElement(ElementMixin, DriverMixin):
         """
         base = self.driver
         if self.parent:
-            debug(f'Get element "{self.name}" from parent element "{self.parent.name}"')
+            self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')
 
             if isinstance(self.parent, CoreElement):
                 base = self.parent._get_element(wait=wait)

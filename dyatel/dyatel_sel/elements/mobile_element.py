@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from logging import info
 from typing import Union, List, BinaryIO, Any
 
 from appium.webdriver.common.touch_action import TouchAction
@@ -88,7 +87,7 @@ class MobileElement(CoreElement):
         """
         if self.is_safari_driver:
             if not silent:
-                info(f'Check displaying of "{self.name}"')
+                self.log(f'Check displaying of "{self.name}"')
 
             try:
                 return self.driver.execute_script(is_displayed_js, self._get_element(wait=False))
@@ -105,7 +104,7 @@ class MobileElement(CoreElement):
         """
         self.wait_element(silent=True)
 
-        info(f'Tap to "{self.name}"')
+        self.log(f'Tap to "{self.name}"')
 
         if self.is_ios:
             x, y = self.element.location.values()
@@ -133,7 +132,7 @@ class MobileElement(CoreElement):
         """
         self.wait_element(silent=True)
 
-        info(f'Tap outside from "{self.name}"')
+        self.log(f'Tap outside from "{self.name}"')
 
         if self.is_ios:
             el_x, el_y = self.element.location.values()

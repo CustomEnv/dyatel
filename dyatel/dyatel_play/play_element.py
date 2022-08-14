@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from logging import info, debug
 from typing import Union, List, Any
 
 # noinspection PyProtectedMember
@@ -11,18 +10,14 @@ from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
 from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
+from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
-from dyatel.mixins.internal_utils import (
-    get_child_elements,
-    WAIT_EL,
-    get_timeout_in_ms,
-    initialize_objects_with_args,
-)
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
+from dyatel.mixins.internal_utils import get_child_elements, WAIT_EL, get_timeout_in_ms, initialize_objects_with_args
 
 
-class PlayElement(ElementMixin, DriverMixin):
+class PlayElement(ElementMixin, DriverMixin, LogMixin):
 
     def __init__(self, locator: str, locator_type: str = '', name: str = '',
                  parent: Union[PlayElement, Any] = None, wait: bool = False):
@@ -98,7 +93,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :param: kwargs: https://playwright.dev/python/docs/api/class-locator#locator-click
         :return: self
         """
-        info(f'Click into "{self.name}"')
+        self.log(f'Click into "{self.name}"')
         self._first_element.click(*args, **kwargs)
         return self
 
@@ -123,7 +118,7 @@ class PlayElement(ElementMixin, DriverMixin):
         """
         text = str(text)
         if not silent:
-            info(f'Type text {cut_log_data(text)} into "{self.name}"')
+            self.log(f'Type text {cut_log_data(text)} into "{self.name}"')
 
         self._first_element.type(text=text)
         return self
@@ -138,7 +133,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Type text {cut_log_data(text)} into "{self.name}"')
+            self.log(f'Type text {cut_log_data(text)} into "{self.name}"')
 
         self._first_element.type(text=text, delay=sleep_gap)
         return self
@@ -151,7 +146,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Clear text in "{self.name}"')
+            self.log(f'Clear text in "{self.name}"')
 
         self._first_element.fill('')
         return self
@@ -162,7 +157,7 @@ class PlayElement(ElementMixin, DriverMixin):
 
         :return: self
         """
-        info(f'Hover over "{self.name}"')
+        self.log(f'Hover over "{self.name}"')
         self._first_element.hover()
         return self
 
@@ -172,7 +167,7 @@ class PlayElement(ElementMixin, DriverMixin):
 
         :return: self
         """
-        info(f'Hover outside from "{self.name}"')
+        self.log(f'Hover outside from "{self.name}"')
         self._first_element.hover(position={'x': float(x), 'y': float(y)})
         return self
 
@@ -187,7 +182,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Wait until presence of "{self.name}"')
+            self.log(f'Wait until presence of "{self.name}"')
 
         self._first_element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
         return self
@@ -201,12 +196,12 @@ class PlayElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Wait until presence of "{self.name}" without error exception')
+            self.log(f'Wait until presence of "{self.name}" without error exception')
 
         try:
             self.wait_element(timeout=timeout, silent=True)
         except PlayTimeoutError as exception:
-            info(f'Ignored exception: "{exception}"')
+            self.log(f'Ignored exception: "{exception}"')
         return self
 
     def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
@@ -218,7 +213,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Wait hidden of "{self.name}"')
+            self.log(f'Wait hidden of "{self.name}"')
 
         self._first_element.wait_for(state='hidden', timeout=get_timeout_in_ms(timeout))
         return self
@@ -233,7 +228,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Skip wait until clickable of "{self.name}". Timeout: {timeout}')
+            self.log(f'Skip wait until clickable of "{self.name}". Timeout: {timeout}')
 
         return self
 
@@ -246,7 +241,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :return: self
         """
         if not silent:
-            info(f'Wait until presence of "{self.name}"')
+            self.log(f'Wait until presence of "{self.name}"')
 
         self._first_element.wait_for(state='attached', timeout=get_timeout_in_ms(timeout))
         return self
@@ -260,7 +255,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :param sleep: delay after scroll
         :return: self
         """
-        info(f'Scroll element "{self.name}" into view')
+        self.log(f'Scroll element "{self.name}" into view')
         self._first_element.scroll_into_view_if_needed()
 
         if sleep:
@@ -275,7 +270,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :param filename: path/filename
         :return: image binary
         """
-        info(f'Get screenshot of "{self.name}"')
+        self.log(f'Get screenshot of "{self.name}"')
         return self._first_element.screenshot(path=filename)
 
     @property
@@ -294,7 +289,7 @@ class PlayElement(ElementMixin, DriverMixin):
 
         :return: element text
         """
-        info(f'Get text from "{self.name}"')
+        self.log(f'Get text from "{self.name}"')
         return self._first_element.text_content()
 
     @property
@@ -331,7 +326,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :return: True if element visible
         """
         if not silent:
-            info(f'Check visibility of "{self.name}"')
+            self.log(f'Check visibility of "{self.name}"')
 
         return self._first_element.is_visible()
 
@@ -343,7 +338,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :return: True if element hidden
         """
         if not silent:
-            info(f'Check invisibility of "{self.name}"')
+            self.log(f'Check invisibility of "{self.name}"')
 
         return self._first_element.is_hidden()
 
@@ -356,7 +351,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :return: custom attribute value
         """
         if not silent:
-            info(f'Get "{attribute}" from "{self.name}"')
+            self.log(f'Get "{attribute}" from "{self.name}"')
 
         return self._first_element.get_attribute(attribute)
 
@@ -368,7 +363,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :return: list of texts
         """
         if not silent:
-            info(f'Get all texts from "{self.name}"')
+            self.log(f'Get all texts from "{self.name}"')
 
         return self.element.all_text_contents()
 
@@ -380,7 +375,7 @@ class PlayElement(ElementMixin, DriverMixin):
         :return: elements count
         """
         if not silent:
-            info(f'Get elements count of "{self.name}"')
+            self.log(f'Get elements count of "{self.name}"')
 
         return len(self.all_elements)
 
@@ -394,7 +389,7 @@ class PlayElement(ElementMixin, DriverMixin):
         """
         base = self.driver
         if self.parent:
-            debug(f'Get element "{self.name}" from parent element "{self.parent.name}"')
+            self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')
 
             if isinstance(self.parent, PlayElement):
                 base = self.parent.element

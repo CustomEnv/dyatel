@@ -3,10 +3,11 @@ import math
 import operator
 import os
 from functools import reduce
-from logging import debug
 from typing import Union
 
 from PIL import Image, ImageChops
+
+from dyatel.mixins.log_mixin import autolog
 
 
 def assert_same_images(actual_file: str, reference_file: str, filename: str, threshold: Union[int, float]):
@@ -62,34 +63,13 @@ def attach_allure_diff(actual_path: str, expected_path: str, diff_path: str) -> 
     :param diff_path: path of diff image
     :return: None
     """
+    allure = None
+
     try:
         allure = importlib.import_module('allure')
     except ModuleNotFoundError:
-        allure = None
-        debug('Skip screenshot attaching due to allure module not found')
+        autolog('Skip screenshot attaching due to allure module not found')
 
     if allure:
-
-        with open(actual_path, 'rb') as actual:
-            image = actual.read()
-            allure.attach(
-                body=image,
-                name='actual',
-                attachment_type=allure.attachment_type.PNG
-            )
-
-        with open(expected_path, 'rb') as expected:
-            image = expected.read()
-            allure.attach(
-                body=image,
-                name='expected',
-                attachment_type=allure.attachment_type.PNG
-            )
-
-        with open(diff_path, 'rb') as diff:
-            image = diff.read()
-            allure.attach(
-                body=image,
-                name='diff',
-                attachment_type=allure.attachment_type.PNG
-            )
+        for name, path in (('actual', actual_path), ('expected', expected_path), ('diff', diff_path)):
+            allure.attach.file(name=name, source=path, attachment_type=allure.attachment_type.PNG)

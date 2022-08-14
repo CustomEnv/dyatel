@@ -1,22 +1,25 @@
 from __future__ import annotations
 
-from logging import info
 from typing import List, Union
 
 from playwright.sync_api import Page as PlaywrightPage, Locator, Page
 from playwright.sync_api import Browser
 
 from dyatel.mixins.internal_utils import get_timeout_in_ms
-from dyatel.mixins.element_mixin import ElementMixin
+from dyatel.mixins.log_mixin import LogMixin
 
 
-class PlayDriver(ElementMixin):
+class PlayDriver(LogMixin):
     instance: Browser = None
     driver: PlaywrightPage = None
+    all_drivers: List[PlaywrightPage] = []
     driver_wrapper: PlayDriver = None
 
-    mobile = False
     desktop = False
+    selenium = False
+    playwright = True
+
+    mobile = False
     is_ios = False
     is_android = False
     is_safari_driver = False
@@ -30,6 +33,7 @@ class PlayDriver(ElementMixin):
         """
         self.driver_context = driver.new_context()
         self.driver = self.driver_context.new_page()
+        self.all_drivers.append(self.driver)
         self.original_tab = self.driver
 
         PlayDriver.desktop = True
@@ -46,7 +50,7 @@ class PlayDriver(ElementMixin):
         :param url: url for navigation
         :return: self
         """
-        info(f'Navigating to url {url}')
+        self.log(f'Navigating to url {url}')
         self.driver.goto(url)
         return self
 
@@ -81,7 +85,7 @@ class PlayDriver(ElementMixin):
 
         :return: self
         """
-        info('Reload current page')
+        self.log('Reload current page')
         self.driver.reload()
         return self
 
@@ -91,7 +95,7 @@ class PlayDriver(ElementMixin):
 
         :return: self
         """
-        info('Going forward')
+        self.log('Going forward')
         self.driver.go_forward()
         return self
 
@@ -101,7 +105,7 @@ class PlayDriver(ElementMixin):
 
         :return: self
         """
-        info('Going back')
+        self.log('Going back')
         self.driver.go_back()
         return self
 
@@ -113,9 +117,10 @@ class PlayDriver(ElementMixin):
         :return: self
         """
         if silent:
-            info('Quit driver instance')
+            self.log('Quit driver instance')
 
         self.driver.close()
+        self.all_drivers.remove(self.driver)
 
         if self.driver == PlayDriver.driver:  # Clear only if original driver closed
             PlayDriver.driver = None

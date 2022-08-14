@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from logging import info
 from typing import Any
 
 from playwright.sync_api import Page as PlaywrightDriver
@@ -73,7 +72,7 @@ class Element(WebElement, MobileElement, PlayElement):
         :return: self
         """
         if not silent:
-            info(f'Set text in "{self.name}"')
+            self.log(f'Set text in "{self.name}"')
 
         self.clear_text(silent=True).type_text(text, silent=True)
         return self
@@ -90,7 +89,7 @@ class Element(WebElement, MobileElement, PlayElement):
         :return: self
         """
         if not silent:
-            info(f'Wait until elements count will be equal to "{elements_count}"')
+            self.log(f'Wait until elements count will be equal to "{elements_count}"')
 
         start_time = time.time()
         while time.time() - start_time < timeout and self.get_elements_count(silent=True) != elements_count:
@@ -113,7 +112,7 @@ class Element(WebElement, MobileElement, PlayElement):
         :return: self
         """
         if not silent:
-            info(f'Wait for any text is available in "{self.name}"')
+            self.log(f'Wait for any text is available in "{self.name}"')
 
         start_time = time.time()
         while time.time() - start_time < timeout and not self.get_text:
@@ -133,7 +132,7 @@ class Element(WebElement, MobileElement, PlayElement):
         :return: self
         """
         if not silent:
-            info(f'Wait for any value is available in "{self.name}"')
+            self.log(f'Wait for any value is available in "{self.name}"')
 
         start_time = time.time()
         while time.time() - start_time < timeout and not self.get_value:

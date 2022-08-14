@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from logging import debug, info
 from typing import Union, Any
 
 from playwright.sync_api import Page as PlaywrightDriver
@@ -48,7 +47,7 @@ class Page(WebPage, MobilePage, PlayPage):
         :param wait_page_load: wait until anchor will be element loaded
         :return: self
         """
-        info(f'Reload "{self.name}" page')
+        self.log(f'Reload "{self.name}" page')
         self.driver_wrapper.refresh()
 
         if wait_page_load:
@@ -77,7 +76,7 @@ class Page(WebPage, MobilePage, PlayPage):
         :return: self
         """
         if not silent:
-            info(f'Wait until page "{self.name}" loaded')
+            self.log(f'Wait until page "{self.name}" loaded')
 
         self.anchor.wait_element(timeout=timeout)
 
@@ -100,7 +99,7 @@ class Page(WebPage, MobilePage, PlayPage):
                 if getattr(element, 'wait'):
                     result &= element.is_displayed(silent=True)
                     if not result:
-                        debug(f'Element "{element.name}" is not displayed')
+                        self.log(f'Element "{element.name}" is not displayed', level='debug')
 
         result &= self.anchor.is_displayed()
 

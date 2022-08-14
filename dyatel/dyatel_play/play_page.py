@@ -1,16 +1,13 @@
 from __future__ import annotations
 
-
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
-from dyatel.mixins.internal_utils import (
-    get_child_elements,
-    initialize_objects_with_args,
-)
+from dyatel.mixins.internal_utils import get_child_elements, initialize_objects_with_args
 from dyatel.mixins.driver_mixin import DriverMixin
+from dyatel.mixins.log_mixin import LogMixin
 
 
-class PlayPage(DriverMixin):
+class PlayPage(DriverMixin, LogMixin):
 
     def __init__(self, locator: str, locator_type='', name=''):
         """

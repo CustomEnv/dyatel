@@ -1,24 +1,28 @@
 from __future__ import annotations
 
 from typing import Union, List
-from logging import info
 
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
+from dyatel.mixins.log_mixin import LogMixin
 
-class CoreDriver:
+
+class CoreDriver(LogMixin):
+    all_drivers: Union[List[AppiumDriver], List[SeleniumWebDriver]] = []
     driver: Union[AppiumDriver, SeleniumWebDriver] = None
     driver_wrapper: CoreDriver = None
 
     desktop = False
+    selenium = True
+    playwright = False
 
     mobile = False
     is_ios = False
     is_android = False
-    is_safari_driver = False
     is_xcui_driver = False
+    is_safari_driver = False
 
     def __init__(self, driver: Union[AppiumDriver, SeleniumWebDriver]):
         """
@@ -30,6 +34,7 @@ class CoreDriver:
         driver.implicitly_wait(0.001)  # reduce selenium wait
         self.driver = driver
         self.driver_wrapper = self
+        self.all_drivers.append(driver)
         self.original_tab = driver.current_window_handle
 
         if not CoreDriver.driver:
@@ -43,7 +48,7 @@ class CoreDriver:
         :param url: url for navigation
         :return: self
         """
-        info(f'Navigating to url {url}')
+        self.log(f'Navigating to url {url}')
 
         try:
             self.driver.get(url)
@@ -83,7 +88,7 @@ class CoreDriver:
 
         :return: self
         """
-        info('Reload current page')
+        self.log('Reload current page')
         self.driver.refresh()
         return self
 
@@ -93,7 +98,7 @@ class CoreDriver:
 
         :return: self
         """
-        info('Going forward')
+        self.log('Going forward')
         self.driver.forward()
         return self
 
@@ -103,7 +108,7 @@ class CoreDriver:
 
         :return: self
         """
-        info('Going back')
+        self.log('Going back')
         self.driver.back()
         return self
 
@@ -115,9 +120,10 @@ class CoreDriver:
         :return: self
         """
         if silent:
-            info('Quit driver instance')
+            self.log('Quit driver instance')
 
         self.driver.quit()
+        self.all_drivers.remove(self.driver)
 
         if self.driver == CoreDriver.driver:  # Clear only if original driver closed
             CoreDriver.driver = None

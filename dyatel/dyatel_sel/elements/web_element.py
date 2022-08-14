@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from logging import info
 from typing import Union, List, Any
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
@@ -40,7 +39,7 @@ class WebElement(CoreElement):
 
         :return: self
         """
-        info(f'Hover over :{self.name}"')
+        self.log(f'Hover over :{self.name}"')
         self._action_chains\
             .move_to_element(self.element)\
             .move_by_offset(1, 1)\
@@ -54,7 +53,7 @@ class WebElement(CoreElement):
 
         :return: self
         """
-        info(f'Hover outside from "{self.name}"')
+        self.log(f'Hover outside from "{self.name}"')
         self._action_chains\
             .move_by_offset(x, y)\
             .perform()
