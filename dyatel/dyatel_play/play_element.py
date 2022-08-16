@@ -161,14 +161,14 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         self._first_element.hover()
         return self
 
-    def hover_outside(self, x: int = -100, y: int = -100) -> PlayElement:
+    def hover_outside(self, x: int = 5, y: int = -5) -> PlayElement:
         """
         Hover outside from current element
 
         :return: self
         """
         self.log(f'Hover outside from "{self.name}"')
-        self._first_element.hover(position={'x': float(x), 'y': float(y)})
+        self._first_element.hover(position={'x': float(x), 'y': float(y)}, force=True)
         return self
 
     # Element waits

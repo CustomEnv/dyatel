@@ -1,4 +1,6 @@
 import importlib
+import json
+import base64
 import math
 import operator
 import os
@@ -48,16 +50,6 @@ def attach_allure_diff(actual_path: str, expected_path: str, diff_path: str) -> 
     Attach screenshots to allure screen diff plugin
     https://github.com/allure-framework/allure2/blob/master/plugins/screen-diff-plugin/README.md
 
-    Note: you should add pytest mark to your tests.
-
-    Example::
-
-        # Directly above the test
-        @allure.label('testType', 'screenshotDiff')
-
-        # Dynamically  in the fixtures/tests
-        request.node.add_marker(allure.label('testType', 'screenshotDiff'))
-
     :param actual_path: path of actual image
     :param expected_path: path of expected image
     :param diff_path: path of diff image
@@ -71,5 +63,11 @@ def attach_allure_diff(actual_path: str, expected_path: str, diff_path: str) -> 
         autolog('Skip screenshot attaching due to allure module not found')
 
     if allure:
+
+        diff_dict = {}
         for name, path in (('actual', actual_path), ('expected', expected_path), ('diff', diff_path)):
-            allure.attach.file(name=name, source=path, attachment_type=allure.attachment_type.PNG)
+            image = open(path, 'rb')
+            diff_dict.update({name: f'data:image/png;base64,{base64.b64encode(image.read()).decode("ascii")}'})
+            image.close()
+
+        allure.attach(name='diff', body=json.dumps(diff_dict), attachment_type='application/vnd.allure.image.diff')
