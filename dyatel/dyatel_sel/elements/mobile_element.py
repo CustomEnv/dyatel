@@ -43,7 +43,7 @@ class MobileElement(CoreElement):
 
         :return: list of wrapped objects
         """
-        appium_elements = self._get_driver().find_elements(self.locator_type, self.locator)
+        appium_elements = self._get_base().find_elements(self.locator_type, self.locator)
         return self._get_all_elements(appium_elements, MobileElement)
 
     def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> MobileElement:

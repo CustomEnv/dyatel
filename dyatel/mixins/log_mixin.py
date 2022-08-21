@@ -36,8 +36,6 @@ def autolog(message, level='info') -> None:
 
 
 class LogMixin:
-    driver = None
-    driver_wrapper = None
 
     def log(self, message, level='info') -> LogMixin:
         """
@@ -50,16 +48,18 @@ class LogMixin:
         :return: None
         """
         driver_log = ''
+        driver = getattr(self, 'driver')
+        driver_wrapper = getattr(self, 'driver_wrapper')
 
-        if len(self.driver_wrapper.all_drivers) > 1:
-            driver_index = str(self.driver_wrapper.all_drivers.index(self.driver) + 1)
+        if len(driver_wrapper.all_drivers) > 1 and driver_wrapper.desktop:
+            driver_index = str(driver_wrapper.all_drivers.index(driver) + 1)
             driver_log = f'[{driver_index}_driver]'
 
-            if not hasattr(self.driver, 'driver_index'):
-                self.driver.driver_index = driver_index
+            if not hasattr(driver, 'driver_index'):
+                driver.driver_index = driver_index
 
-            if self.driver_wrapper.selenium:
-                self.driver_wrapper.execute_script(add_driver_index_comment_js, driver_index)
+            if driver_wrapper.selenium:
+                driver_wrapper.execute_script(add_driver_index_comment_js, driver_index)
 
         send_log_message(level, f'{driver_log}{get_log_message(message)}')
         return self

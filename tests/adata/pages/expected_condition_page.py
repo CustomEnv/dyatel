@@ -7,7 +7,9 @@ class ExpectedConditionPage(Page):
     def __init__(self):
         self.url = 'https://testautomation-playground.herokuapp.com/expected_conditions.html'
         self.wait_value_card = WaitValueCard()
+        self.test_driver = self.driver_wrapper
         super().__init__('//*[contains(@class, "card") and contains(., "wait")]', name='Expected condition page')
+        self.test_driver = self.driver_wrapper
 
     min_wait_input = Element('min_wait', name='min wait input')
     max_wait_input = Element('max_wait', name='max wait input')

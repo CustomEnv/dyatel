@@ -18,7 +18,7 @@ def test_element_exception_without_parent_form_driver(base_playground_page):
         el._get_element(wait=False)
     except NoSuchElementException as exc:
         logs = ElementMixin().get_element_logging_data(el)
-        message = f'Cant find element "{el.name}". {logs}.'
+        message = f'Cant find element "{el.name}". {logs}'
         assert exc.msg == message
 
 
@@ -32,7 +32,7 @@ def test_element_exception_with_broken_parent_form_driver(base_playground_page):
         el._get_element(wait=False)
     except NoSuchElementException as exc:
         logs = ElementMixin().get_element_logging_data(el.parent)
-        message = f'Cant find parent element "{el.parent.name}". {logs}.'
+        message = f'Cant find parent element "{el.parent.name}". {logs}'
         assert exc.msg == message
 
 
@@ -119,7 +119,7 @@ def test_type_clear_text_get_value(pizza_order_page):
 def test_hover(mouse_event_page):
     initial_not_displayed = not mouse_event_page.dropdown.is_displayed()
     mouse_event_page.choose_language_button.scroll_into_view(sleep=0.1).hover()
-    after_hover_displayed = mouse_event_page.dropdown.wait_element_without_error().is_displayed()
+    after_hover_displayed = mouse_event_page.dropdown.wait_element().is_displayed()
     assert all((initial_not_displayed, after_hover_displayed))
 
 

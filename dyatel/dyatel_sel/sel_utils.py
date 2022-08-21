@@ -1,6 +1,9 @@
 from selenium.webdriver.common.by import By
 
-from dyatel.mixins.internal_utils import all_tags
+from dyatel.mixins.internal_utils import all_tags, get_child_elements
+
+
+selenium_locator_types = get_child_elements(By, str)
 
 
 def get_locator_type(locator: str):
@@ -16,6 +19,9 @@ def get_locator_type(locator: str):
       By.CSS_SELECTOR if locator contain dot and no brackets
       By.ID if there is no any match
     """
+    if locator in selenium_locator_types:
+        raise Exception('Locator type given instead of locator')
+
     brackets = '[' in locator and ']' in locator
     is_only_tags = True
 

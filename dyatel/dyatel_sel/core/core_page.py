@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import List
 
 from dyatel.base.element import Element
-from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.mixins.internal_utils import get_child_elements, initialize_objects_with_args
 from dyatel.mixins.driver_mixin import DriverMixin
@@ -22,7 +21,6 @@ class CorePage(DriverMixin, LogMixin):
         :param name: name of page (will be attached to logs)
         """
         self._element = None
-        self._driver_instance = CoreDriver
 
         self.locator = locator
         self.locator_type = locator_type

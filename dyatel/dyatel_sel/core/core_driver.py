@@ -12,7 +12,7 @@ from dyatel.mixins.log_mixin import LogMixin
 class CoreDriver(LogMixin):
     all_drivers: Union[List[AppiumDriver], List[SeleniumWebDriver]] = []
     driver: Union[AppiumDriver, SeleniumWebDriver] = None
-    driver_wrapper: CoreDriver = None
+    driver_wrapper = None
 
     desktop = False
     selenium = True

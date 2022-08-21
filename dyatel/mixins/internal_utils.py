@@ -49,13 +49,13 @@ def get_timeout_in_ms(timeout: int):
     return timeout * 1000 if timeout < 1000 else timeout
 
 
-def get_child_elements(self, instance) -> list:
+def get_child_elements(obj, instance) -> list:
     """
     Return page elements and page objects of this page object
 
     :returns: list of page elements and page objects
     """
-    return list(get_child_elements_with_names(self, instance).values())
+    return list(get_child_elements_with_names(obj, instance).values())
 
 
 def get_child_elements_with_names(self, instance) -> dict:
