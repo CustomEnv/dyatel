@@ -47,7 +47,7 @@ class PlayCheckbox(PlayElement):
         return self
 
     @property
-    def get_text(self) -> str:
+    def text(self) -> str:
         """
         Get text of current checkbox
 

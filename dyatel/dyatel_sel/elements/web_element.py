@@ -39,7 +39,7 @@ class WebElement(CoreElement):
 
         :return: self
         """
-        self.log(f'Hover over :{self.name}"')
+        self.log(f'Hover over "{self.name}"')
         self._action_chains\
             .move_to_element(self.element)\
             .move_by_offset(1, 1)\
@@ -47,15 +47,17 @@ class WebElement(CoreElement):
             .perform()
         return self
 
-    def hover_outside(self, x: int = -100, y: int = -100) -> WebElement:
+    def hover_outside(self, x: int = 0, y: int = -5) -> WebElement:
         """
         Hover outside from current element
 
         :return: self
         """
         self.log(f'Hover outside from "{self.name}"')
+
+        x, y = calculate_coordinate_to_click(self, x, y)
         self._action_chains\
-            .move_by_offset(x, y)\
+            .move_to_element_with_offset(self.element, x, y)\
             .perform()
         return self
 
@@ -67,10 +69,11 @@ class WebElement(CoreElement):
         :param y: y offset
         :return: self
         """
-        self.wait_element(silent=True)
-        dx, dy = calculate_coordinate_to_click(self, x, y)
+        self.log(f'Click outside from "{self.name}"')
+
+        x, y = calculate_coordinate_to_click(self, x, y)
         self._action_chains\
-            .move_to_element_with_offset(self.element, dx, dy)\
+            .move_to_element_with_offset(self.element, x, y)\
             .click()\
             .perform()
         return self

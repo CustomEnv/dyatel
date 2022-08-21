@@ -65,24 +65,26 @@ def test_click_and_wait(pizza_order_page, driver_engine):
 @pytest.mark.xfail_platform('android', 'ios', reason='Can not get value from that element. TODO: Rework test')
 def test_wait_element_value(expected_condition_page):
     expected_condition_page.wait_value_card.trigger_button.click()
-    value_without_wait = expected_condition_page.wait_value_card.wait_for_value_input.get_value
+    value_without_wait = expected_condition_page.wait_value_card.wait_for_value_input.value
     expected_condition_page.wait_value_card.wait_for_value_input.wait_element_value()
-    value_with_wait = expected_condition_page.wait_value_card.wait_for_value_input.get_value == 'Dennis Ritchie'
+    value_with_wait = expected_condition_page.wait_value_card.wait_for_value_input.value == 'Dennis Ritchie'
     assert all((not value_without_wait, value_with_wait))
 
 
 @pytest.mark.xfail(reason='Unexpected text')
 def test_wait_element_text(expected_condition_page):
     expected_condition_page.wait_value_card.trigger_button.click()
-    value_without_wait = expected_condition_page.wait_value_card.wait_for_text_button.get_text
+    value_without_wait = expected_condition_page.wait_value_card.wait_for_text_button.text
     expected_condition_page.wait_value_card.wait_for_text_button.wait_element_text()
-    value_with_wait = expected_condition_page.wait_value_card.wait_for_text_button.get_text == 'Submit'
+    value_with_wait = expected_condition_page.wait_value_card.wait_for_text_button.text == 'Submit'
     assert all((not value_without_wait, value_with_wait))
 
 
-@pytest.mark.xfail(reason='TODO: Implementation')
-def test_wait_elements_count(progressbar_page):
-    pass
+def test_wait_elements_count(forms_page):
+    forms_page.validation_form.form_mixin.input.type_text('sample')
+    forms_page.validation_form.submit_form_button.click()
+    forms_page.validation_form.any_error.wait_elements_count(4)
+    assert forms_page.validation_form.any_error.get_elements_count() == 4
 
 
 @pytest.mark.xfail(reason='TODO: Implementation')
@@ -110,17 +112,19 @@ def test_wait_without_error(pizza_order_page):
 def test_type_clear_text_get_value(pizza_order_page):
     text_to_send = str(random.randint(100, 9999))
     pizza_order_page.quantity_input.type_text(text_to_send)
-    text_added = pizza_order_page.quantity_input.get_value == text_to_send
+    text_added = pizza_order_page.quantity_input.value == text_to_send
     pizza_order_page.quantity_input.clear_text()
-    text_erased = pizza_order_page.quantity_input.get_value == ''
+    text_erased = pizza_order_page.quantity_input.value == ''
     assert all((text_added, text_erased))
 
 
 def test_hover(mouse_event_page):
     initial_not_displayed = not mouse_event_page.dropdown.is_displayed()
     mouse_event_page.choose_language_button.scroll_into_view(sleep=0.1).hover()
-    after_hover_displayed = mouse_event_page.dropdown.wait_element().is_displayed()
-    assert all((initial_not_displayed, after_hover_displayed))
+    after_hover_displayed = mouse_event_page.dropdown.wait_element_without_error().is_displayed()
+    mouse_event_page.choose_language_button.hover_outside()
+    after_outside_hover_displayed = not mouse_event_page.dropdown.wait_element_hidden().is_displayed()
+    assert all((initial_not_displayed, after_hover_displayed, after_outside_hover_displayed))
 
 
 def test_screenshot(base_playground_page, driver_engine, driver_name, platform, request):

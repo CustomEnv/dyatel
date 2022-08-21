@@ -104,9 +104,9 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         if not silent:
             self.log(f'Type text "{cut_log_data(text)}" into "{self.name}"')
 
-        self.wait_element(silent=True)
+        element = self.wait_element(silent=True)._displayed_element
         for letter in str(text):
-            self._displayed_element.send_keys(letter)
+            element.send_keys(letter)
             time.sleep(sleep_gap)
         return self
 
@@ -179,7 +179,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         start_time = time.time()
         while time.time() - start_time < timeout and not is_hidden:
             try:
-                is_hidden = not self._get_element(wait=False).is_displayed()
+                is_hidden = not self.is_displayed()
             except (NoSuchElementException, StaleElementReferenceException):
                 is_hidden = True
 
@@ -199,12 +199,12 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         if not silent:
             self.log(f'Wait until "{self.name}" become clickable')
 
-        self.wait_element(silent=True)
+        element = self.wait_element(silent=True)._displayed_element
 
         is_clickable = False
         start_time = time.time()
         while time.time() - start_time < timeout and not is_clickable:
-            is_clickable = self._displayed_element.is_enabled()
+            is_clickable = element.is_enabled()
 
         if not is_clickable:
             raise Exception(f'"{self.name}" not clickable') from None
@@ -246,11 +246,10 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         """
         self.log(f'Scroll element "{self.name}" into view')
 
-        self.wait_element(silent=True)
+        element = self.wait_element(silent=True)._displayed_element
 
         self.driver.execute_script(
-            'arguments[0].scrollIntoView({{block: "{}", behavior: "{}"}});'.format(block, behavior),
-            self._displayed_element
+            'arguments[0].scrollIntoView({{block: "{}", behavior: "{}"}});'.format(block, behavior), element
         )
 
         if sleep:
@@ -266,12 +265,12 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: image binary
         """
         self.log(f'Get screenshot of "{self.name}"')
-        image_binary = self.get_screenshot_base
+        image_binary = self.screenshot_base
         image_binary.save(filename)
         return image_binary
 
     @property
-    def get_screenshot_base(self) -> Image:
+    def screenshot_base(self) -> Image:
         """
         Get driver width scaled screenshot binary of element without saving
 
@@ -281,7 +280,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         return self._scaled_screenshot(element.screenshot_as_png, element.size['width'])
 
     @property
-    def get_text(self) -> str:
+    def text(self) -> str:
         """
         Get current element text
 
@@ -290,7 +289,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         return self.wait_element(silent=True)._displayed_element.text
 
     @property
-    def get_inner_text(self) -> str:
+    def inner_text(self) -> str:
         """
         Get current element inner text
 
@@ -299,7 +298,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         return self.get_attribute('textContent', silent=True) or self.get_attribute('innerText', silent=True)
 
     @property
-    def get_value(self) -> str:
+    def value(self) -> str:
         """
         Get value from current element
 
@@ -322,7 +321,12 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             else:
                 raise exc
 
-        return bool(len(elements))
+        is_available = bool(len(elements))
+
+        if is_available:
+            self._displayed_element = elements[0]
+
+        return is_available
 
     def is_displayed(self, silent: bool = False) -> bool:
         """
@@ -376,7 +380,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             self.log(f'Get all texts from "{self.name}"')
 
         self.wait_element(silent=True)
-        return list(element_item.get_text for element_item in getattr(self, 'all_elements'))
+        return list(element_item.text for element_item in getattr(self, 'all_elements'))
 
     def get_elements_count(self, silent: bool = False) -> int:
         """
@@ -465,6 +469,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: driver
         """
         base = self.driver
+
         if self.parent:
             self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')
 

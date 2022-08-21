@@ -161,7 +161,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         self._first_element.hover()
         return self
 
-    def hover_outside(self, x: int = 5, y: int = -5) -> PlayElement:
+    def hover_outside(self, x: int = 0, y: int = -5) -> PlayElement:
         """
         Hover outside from current element
 
@@ -274,7 +274,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         return self._first_element.screenshot(path=filename)
 
     @property
-    def get_screenshot_base(self) -> bytes:
+    def screenshot_base(self) -> bytes:
         """
         Get driver width scaled screenshot binary of element without saving
 
@@ -283,7 +283,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         return self._first_element.screenshot()
 
     @property
-    def get_text(self) -> str:
+    def text(self) -> str:
         """
         Get current element text
 
@@ -293,7 +293,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         return self._first_element.text_content()
 
     @property
-    def get_inner_text(self) -> str:
+    def inner_text(self) -> str:
         """
         Get current element inner text
 
@@ -302,7 +302,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         return self._first_element.inner_text()
 
     @property
-    def get_value(self) -> str:
+    def value(self) -> str:
         """
         Get value from current element
 

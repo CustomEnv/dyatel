@@ -17,6 +17,7 @@ class ValidationForm(Group):
     invalid_feedback_error = Element('invalid_state', name='invalid feedback error')
     invalid_zip_error = Element('invalid_zip', name='invalid zip error')
     invalid_terms_error = Element('invalid_terms', name='invalid terms error')
+    any_error = Element('[class *= invalid]', name='any error')
 
 
 class ControlsForm(Group):
@@ -26,4 +27,4 @@ class ControlsForm(Group):
     python_checkbox = Checkbox('check_python', name='python checkbox')
     selenium_radio = Checkbox('rad_selenium', name='selenium radiobutton')
     protractor_radio = Checkbox('rad_protractor', name='protractor radiobutton')
-    german_slider = Checkbox('.custom-control-label', name='german language slider', by_attr=True)
+    german_slider = Checkbox('.custom-control-label', name='german language slider')

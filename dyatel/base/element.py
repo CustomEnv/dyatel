@@ -79,7 +79,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
     # Elements waits
 
-    def wait_elements_count(self, elements_count, timeout=WAIT_EL, silent=False) -> Element:
+    def wait_elements_count(self, expected_count, timeout=WAIT_EL, silent=False) -> Element:
         """
         Wait until elements count will be equal to expected value
 
@@ -89,17 +89,17 @@ class Element(WebElement, MobileElement, PlayElement):
         :return: self
         """
         if not silent:
-            self.log(f'Wait until elements count will be equal to "{elements_count}"')
+            self.log(f'Wait until elements count will be equal to "{expected_count}"')
 
+        is_equal, actual_elements_count = False, None
         start_time = time.time()
-        while time.time() - start_time < timeout and self.get_elements_count(silent=True) != elements_count:
-            pass
+        while time.time() - start_time < timeout and not is_equal:
+            actual_elements_count = self.get_elements_count(silent=True)
+            is_equal = actual_elements_count == expected_count
 
-        actual_elements_count = self.get_elements_count(silent=True)
-
-        if actual_elements_count != elements_count:
+        if not is_equal:
             raise Exception(f'Unexpected elements count of "{self.name}". '
-                            f'Actual: {actual_elements_count}; Expected: {elements_count}')
+                            f'Actual: {actual_elements_count}; Expected: {expected_count}')
 
         return self
 
@@ -114,11 +114,12 @@ class Element(WebElement, MobileElement, PlayElement):
         if not silent:
             self.log(f'Wait for any text is available in "{self.name}"')
 
+        text = None
         start_time = time.time()
-        while time.time() - start_time < timeout and not self.get_text:
-            pass
+        while time.time() - start_time < timeout and not text:
+            text = self.text
 
-        if not self.get_text:
+        if not text:
             raise Exception(f'Text of "{self.name}" is empty')
 
         return self
@@ -134,11 +135,12 @@ class Element(WebElement, MobileElement, PlayElement):
         if not silent:
             self.log(f'Wait for any value is available in "{self.name}"')
 
+        value = None
         start_time = time.time()
-        while time.time() - start_time < timeout and not self.get_value:
-            pass
+        while time.time() - start_time < timeout and not value:
+            value = self.value
 
-        if not self.get_value:
+        if not value:
             raise Exception(f'Value of "{self.name}" is empty')
 
         return self

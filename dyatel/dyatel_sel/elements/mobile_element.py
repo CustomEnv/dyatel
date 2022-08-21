@@ -27,6 +27,7 @@ class MobileElement(CoreElement):
         """
         self.is_safari_driver = CoreDriver.is_safari_driver
         self.is_ios = CoreDriver.is_ios
+        self.is_android = CoreDriver.is_android
 
         self.top_bar_height = None
         self.bottom_bar_height = None
@@ -102,16 +103,16 @@ class MobileElement(CoreElement):
 
         :return: self
         """
+        self.log(f'Tap to "{self.name}"')
         self.wait_element(silent=True)
 
-        self.log(f'Tap to "{self.name}"')
-
         if self.is_ios:
-            x, y = self.element.location.values()
+            x, y = calculate_coordinate_to_click(self, 0, 0, self.is_android)
             y += self._get_top_bar_height()
             TouchAction(self.driver).tap(x=x, y=y).perform()
         else:
             self._action_chains.click(on_element=self.element).perform()
+
         return self
 
     def hover_outside(self, x: int = 0, y: int = -5) -> MobileElement:
@@ -130,18 +131,17 @@ class MobileElement(CoreElement):
         :param y: y offset
         :return: self
         """
+        self.log(f'Tap outside from "{self.name}"')
         self.wait_element(silent=True)
 
-        self.log(f'Tap outside from "{self.name}"')
+        x, y = calculate_coordinate_to_click(self, x, y, self.is_android)
 
         if self.is_ios:
-            el_x, el_y = self.element.location.values()
-            el_y += self._get_top_bar_height()
-            TouchAction(self.driver).tap(x=el_x + x, y=el_y + y).perform()
+            y += self._get_top_bar_height()
+            TouchAction(self.driver).tap(x=x, y=y).perform()
         else:
-            dx, dy = calculate_coordinate_to_click(self, x, y)
             self._action_chains\
-                .move_by_offset(dx, dy)\
+                .move_to_element_with_offset(self.element, x, y)\
                 .click()\
                 .perform()
         return self

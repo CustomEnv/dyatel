@@ -79,7 +79,7 @@ def get_child_elements_with_names(self, instance) -> dict:
     return elements
 
 
-def calculate_coordinate_to_click(element, x, y):
+def calculate_coordinate_to_click(element, x, y, from_current=True):
     """
     Calculate coordinates to click for element
     Examples:
@@ -91,13 +91,29 @@ def calculate_coordinate_to_click(element, x, y):
     :param element: dyatel WebElement or MobileElement
     :param x: horizontal offset relative to either left (x < 0) or right side (x > 0)
     :param y: vertical offset relative to either top (y > 0) or bottom side (y < 0)
-    :return:  coordinates
+    :param from_current: calculate from current position or from element location
+    :return: coordinates
     """
-    element_size = element.element.size
-    half_width, half_height = element_size['width'] / 2, element_size['height'] / 2
-    dx, dy = half_width, half_height
-    if x:
-        dx += x + (-half_width if x < 0 else half_width)
-    if y:
-        dy += -y + (half_height if y < 0 else -half_height)
-    return dx, dy
+    if from_current:
+        eh, ew = element.element.size.values()
+
+        if x:
+            x = x + eh / 2 if x > 0 else x - eh / 2
+        if y:
+            y = y + ew / 2 if y > 0 else y - ew / 2
+
+    else:
+        ex, ey, ew, eh = element.element.rect.values()
+        emx, emy = ex + ew / 2, ey + eh / 2  # middle of element
+
+        if x:
+            x = x + emx + ew / 2 if x > 0 else emx + x - ew / 2
+        else:
+            x = emx
+
+        if y:
+            y = y + emy + eh / 2 if y > 0 else emy + y - eh / 2
+        else:
+            y = emy
+
+    return int(x), int(y)
