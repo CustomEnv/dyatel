@@ -35,7 +35,7 @@ class CoreCheckbox(Element):
 
         :return: bool
         """
-        return self.wait_element()._displayed_element.is_selected()
+        return self.element.is_selected()
 
     def check(self) -> CoreCheckbox:
         """
@@ -43,8 +43,13 @@ class CoreCheckbox(Element):
 
         :return: self
         """
-        if not self.is_checked():
-            self.click()
+        self.element = self._get_element()
+
+        try:
+            if not self.is_checked():
+                self.click()
+        finally:
+            self.element = None
 
         return self
 
@@ -54,8 +59,13 @@ class CoreCheckbox(Element):
 
         :return: self
         """
-        if self.is_checked():
-            self.click()
+        self.element = self._get_element()
+
+        try:
+            if self.is_checked():
+                self.click()
+        finally:
+            self.element = None
 
         return self
 
@@ -66,5 +76,5 @@ class CoreCheckbox(Element):
 
         :return: checkbox text
         """
-        text = self.wait_element()._displayed_element.text
-        return text if text else self._displayed_element.get_attribute('value')
+        element = self.element
+        return element.text if element.text else element.get_attribute('value')

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import inspect
-
+from typing import Any
 
 WAIT_EL = 10
 WAIT_PAGE = 20
 
 
 all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
-            'textarea', 'svg', 'circle']
+            'textarea', 'svg', 'circle', 'iframe']
 
 
 def initialize_objects_with_args(objects: list):
@@ -23,7 +23,7 @@ def initialize_objects_with_args(objects: list):
             obj.__init__(**get_object_kwargs(obj))
 
 
-def get_object_kwargs(obj):
+def get_object_kwargs(obj: object):
     """
     Get actual args/kwargs of object __init__
 
@@ -49,7 +49,7 @@ def get_timeout_in_ms(timeout: int):
     return timeout * 1000 if timeout < 1000 else timeout
 
 
-def get_child_elements(obj, instance) -> list:
+def get_child_elements(obj: object, instance: type) -> list:
     """
     Return page elements and page objects of this page object
 
@@ -58,7 +58,7 @@ def get_child_elements(obj, instance) -> list:
     return list(get_child_elements_with_names(obj, instance).values())
 
 
-def get_child_elements_with_names(self, instance) -> dict:
+def get_child_elements_with_names(obj: object, instance: type) -> dict:
     """
     Return page elements and page objects of this page object
 
@@ -66,10 +66,10 @@ def get_child_elements_with_names(self, instance) -> dict:
     """
     elements, class_items = {}, []
 
-    for parent_class in self.__class__.__bases__:
+    for parent_class in obj.__class__.__bases__:
         class_items += list(parent_class.__dict__.items()) + list(parent_class.__class__.__dict__.items())
 
-    class_items += list(list(self.__class__.__dict__.items()) + list(self.__dict__.items()))
+    class_items += list(list(obj.__class__.__dict__.items()) + list(obj.__dict__.items()))
 
     for attribute, value in class_items:
         if isinstance(value, instance):
@@ -79,7 +79,7 @@ def get_child_elements_with_names(self, instance) -> dict:
     return elements
 
 
-def calculate_coordinate_to_click(element, x, y, from_current=True):
+def calculate_coordinate_to_click(element: Any, x: int, y: int, from_current: bool = True) -> tuple:
     """
     Calculate coordinates to click for element
     Examples:
@@ -91,8 +91,8 @@ def calculate_coordinate_to_click(element, x, y, from_current=True):
     :param element: dyatel WebElement or MobileElement
     :param x: horizontal offset relative to either left (x < 0) or right side (x > 0)
     :param y: vertical offset relative to either top (y > 0) or bottom side (y < 0)
-    :param from_current: calculate from current position or from element location
-    :return: coordinates
+    :param from_current: True - calculate from current position. False - calculate from element location
+    :return: tuple of calculated coordinates
     """
     if from_current:
         eh, ew = element.element.size.values()

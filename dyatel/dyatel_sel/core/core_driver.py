@@ -6,6 +6,7 @@ from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
+from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.log_mixin import LogMixin
 
 
@@ -53,7 +54,7 @@ class CoreDriver(LogMixin):
         try:
             self.driver.get(url)
         except WebDriverException:
-            raise Exception(f'Can\'t proceed to {url}')
+            raise DriverWrapperException(f'Can\'t proceed to {url}')
 
         return self
 

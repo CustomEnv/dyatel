@@ -11,6 +11,7 @@ from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
+from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException
 from dyatel.mixins.internal_utils import WAIT_EL
 
 
@@ -91,15 +92,15 @@ class Element(WebElement, MobileElement, PlayElement):
         if not silent:
             self.log(f'Wait until elements count will be equal to "{expected_count}"')
 
-        is_equal, actual_elements_count = False, None
+        is_equal, actual_count = False, None
         start_time = time.time()
         while time.time() - start_time < timeout and not is_equal:
-            actual_elements_count = self.get_elements_count(silent=True)
-            is_equal = actual_elements_count == expected_count
+            actual_count = self.get_elements_count(silent=True)
+            is_equal = actual_count == expected_count
 
         if not is_equal:
-            raise Exception(f'Unexpected elements count of "{self.name}". '
-                            f'Actual: {actual_elements_count}; Expected: {expected_count}')
+            msg = f'Unexpected elements count of "{self.name}". Actual: {actual_count}; Expected: {expected_count}'
+            raise UnexpectedElementsCountException(msg)
 
         return self
 
@@ -120,7 +121,7 @@ class Element(WebElement, MobileElement, PlayElement):
             text = self.text
 
         if not text:
-            raise Exception(f'Text of "{self.name}" is empty')
+            raise UnexpectedTextException(f'Text of "{self.name}" is empty')
 
         return self
 
@@ -141,6 +142,6 @@ class Element(WebElement, MobileElement, PlayElement):
             value = self.value
 
         if not value:
-            raise Exception(f'Value of "{self.name}" is empty')
+            raise UnexpectedValueException(f'Value of "{self.name}" is empty')
 
         return self

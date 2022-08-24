@@ -14,7 +14,7 @@ from dyatel.visual_comparison import assert_same_images
 class ElementMixin:
     """ Mixin for PlayElement and CoreElement """
 
-    def get_element_logging_data(self, element=None) -> str:
+    def get_element_logging_data(self, element: Any = None) -> str:
         """
         Get full loging data depends on parent element
 
@@ -37,7 +37,7 @@ class ElementMixin:
         :param filename: screenshot path/name
         :param threshold: possible threshold
         :param delay: delay before taking screenshot
-        :return: current driver instance (Web/Mobile/PlayDriver)
+        :return: self
         """
         root_path = os.environ.get('visual', '')
 
@@ -66,13 +66,13 @@ class ElementMixin:
         assert_same_images(output_file, reference_file, filename, threshold)
         return self
 
-    def _get_all_elements(self, sources, instance_class) -> List[Any]:
+    def _get_all_elements(self, sources: Union[tuple, list], instance_class: type) -> List[Any]:
         """
         Get all wrapped elements from sources
 
         :param sources: list of elements: `all_elements` from selenium or `element_handles` from playwright
         :param instance_class: attribute class to looking for
-        :return: wrapped elements
+        :return: list of wrapped elements
         """
         wrapped_elements = []
 
@@ -84,7 +84,7 @@ class ElementMixin:
 
         return wrapped_elements
 
-    def __set_parent_for_attr(self, instance_class, base_obj):
+    def __set_parent_for_attr(self, instance_class: type, base_obj: object):
         """
         Copy attributes of given object and set new parent for him
 

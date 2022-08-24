@@ -11,6 +11,7 @@ from dyatel.base.element import Element
 from dyatel.dyatel_play.play_page import PlayPage
 from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
+from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.internal_utils import WAIT_PAGE
 
@@ -134,4 +135,4 @@ class Page(WebPage, MobilePage, PlayPage):
             Page.__bases__ = WebPage,
             return WebPage
         else:
-            raise Exception('Cant specify Page')
+            raise DriverWrapperException('Cant specify Page')
