@@ -167,10 +167,10 @@ class CoreDriver(LogMixin):
 
     def execute_script(self, script: str, *args):
         """
-        Synchronously Executes JavaScript in the current window/frame.
+        Synchronously Executes JavaScript in the current window/frame
 
-        :param script: the JavaScript to execute.
-        :param args: any applicable arguments for your JavaScript.
+        :param script: the JavaScript to execute
+        :param args: any applicable arguments for your JavaScript
         :return: execution return value
         """
         return self.driver.execute_script(script, *args)

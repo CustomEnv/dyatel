@@ -6,6 +6,7 @@ from os.path import basename
 
 from dyatel.js_scripts import add_driver_index_comment_js
 
+
 logging.basicConfig(
     level=logging.INFO,
     format='[%(asctime)s.%(msecs)03d][%(levelname).1s]%(message)s',
@@ -13,16 +14,29 @@ logging.basicConfig(
 )
 
 
-def get_log_message(message) -> str:
+def get_log_message(message: str) -> str:
+    """
+    Get log message with code
+
+    :param message: custom message
+    :return: log message
+    """
     code = currentframe().f_back.f_back.f_code
     return f'[{basename(code.co_filename)}][{code.co_name}:{code.co_firstlineno}] {message}'
 
 
-def send_log_message(level, log_message) -> None:
+def send_log_message(level: str, log_message: str) -> None:
+    """
+    Send log message
+
+    :param level: log level
+    :param log_message: custom message
+    :return: None
+    """
     logging.log(getattr(logging, level.upper()), log_message)
 
 
-def autolog(message, level='info') -> None:
+def autolog(message: str, level: str = 'info') -> None:
     """
     Log message in format:
       ~ [time][level][module][function:line] <message>
@@ -37,7 +51,7 @@ def autolog(message, level='info') -> None:
 
 class LogMixin:
 
-    def log(self, message, level='info') -> LogMixin:
+    def log(self, message: str, level: str = 'info') -> LogMixin:
         """
         Log message in format:
           ~ [time][level][driver_index][module][function:line] <message>

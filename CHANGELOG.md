@@ -5,7 +5,22 @@
 *Release date: In development*
 
 ### Added
-- [Allure Screen Diff Plugin](https://github.com/allure-framework/allure2/blob/master/plugins/screen-diff-plugin/README.md) support 
+- [Allure Screen Diff Plugin](https://github.com/allure-framework/allure2/blob/master/plugins/screen-diff-plugin/README.md) support
+- Driver specific logs 
+- Custom exceptions
+- Screenshot name generation in `assert_screenshot`
+- `KeyboardKeys` class
+
+### Changed
+- `get_text` property become `text`
+- `get_value` property become `value`
+- `get_screenshot_base` property become `screenshot_base`
+- `get_inner_text` property become `inner_text`
+- `by_attr` arg of `Checkbox` removed
+- `calculate_coordinate_to_click` now can calculate coordinates from element location
+
+### Fixed
+- Reduced count of `find_element` execution 
 
 ---
 ## v1.1.1

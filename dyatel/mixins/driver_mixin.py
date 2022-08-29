@@ -4,7 +4,7 @@ from copy import copy
 from typing import Union, Any
 
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
-from playwright.sync_api import Browser as PlaywrightWebDriver
+from playwright.sync_api import Page as PlaywrightWebDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
 from dyatel.base.driver_wrapper import DriverWrapper

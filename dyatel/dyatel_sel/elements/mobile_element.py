@@ -91,7 +91,7 @@ class MobileElement(CoreElement):
                 self.log(f'Check displaying of "{self.name}"')
 
             try:
-                return self.driver.execute_script(is_displayed_js, self._get_element(wait=False))
+                return self.driver_wrapper.execute_script(is_displayed_js, self._get_element(wait=False))
             except:
                 return False
         else:
@@ -107,8 +107,7 @@ class MobileElement(CoreElement):
         self.wait_element(silent=True)
 
         if self.is_ios:
-            x, y = calculate_coordinate_to_click(self, 0, 0, self.is_android)
-            y += self._get_top_bar_height()
+            x, y = calculate_coordinate_to_click(self, 0, 0)
             TouchAction(self.driver).tap(x=x, y=y).perform()
         else:
             self._action_chains.click(on_element=self.element).perform()
@@ -134,16 +133,12 @@ class MobileElement(CoreElement):
         self.log(f'Tap outside from "{self.name}"')
         self.wait_element(silent=True)
 
-        x, y = calculate_coordinate_to_click(self, x, y, self.is_android)
+        x, y = calculate_coordinate_to_click(self, x, y)
 
         if self.is_ios:
-            y += self._get_top_bar_height()
             TouchAction(self.driver).tap(x=x, y=y).perform()
         else:
-            self._action_chains\
-                .move_to_element_with_offset(self.element, x, y)\
-                .click()\
-                .perform()
+            self._action_chains.move_to_location(x, y).click().perform()
         return self
 
     def get_screenshot(self, filename: str, legacy: bool = True) -> BinaryIO:

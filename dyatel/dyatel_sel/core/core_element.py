@@ -9,7 +9,6 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from appium.webdriver.webelement import WebElement as AppiumWebElement
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver import ActionChains
 from selenium.common.exceptions import (
     StaleElementReferenceException as SeleniumStaleElementReferenceException,
     InvalidArgumentException as SeleniumInvalidArgumentException,
@@ -17,7 +16,9 @@ from selenium.common.exceptions import (
     NoSuchElementException as SeleniumNoSuchElementException,
 )
 
+from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.exceptions import TimeoutException, InvalidSelectorException, DriverWrapperException, NoSuchElementException
+from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.internal_utils import get_child_elements, WAIT_EL, initialize_objects_with_args
@@ -89,7 +90,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         return self
 
-    def type_text(self, text: str, silent: bool = False) -> CoreElement:
+    def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> CoreElement:
         """
         Type text to current element
 
@@ -453,7 +454,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
             try:
                 element = self._find_element(base)
-            except SeleniumNoSuchElementException:
+            except NoSuchElementException:
                 element = None
 
             if not element and wait:
@@ -507,6 +508,8 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             return base.find_element(self.locator_type, self.locator)
         except (SeleniumInvalidArgumentException, SeleniumInvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
+        except SeleniumNoSuchElementException as exc:
+            raise NoSuchElementException(exc.msg) from None
 
     def _find_elements(self, base: Any) -> List[Union[SeleniumWebElement, AppiumWebElement]]:
         """
@@ -520,7 +523,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         except (SeleniumInvalidArgumentException, InvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
 
-    def _raise_invalid_selector_exception(self, exc: Exception) -> None:
+    def _raise_invalid_selector_exception(self, exc: Any) -> None:
         """
         Raises InvalidSelectorException if specific keywords in exception message
 

@@ -57,7 +57,7 @@ class WebElement(CoreElement):
 
         x, y = calculate_coordinate_to_click(self, x, y)
         self._action_chains\
-            .move_to_element_with_offset(self.element, x, y)\
+            .move_to_location(x, y)\
             .perform()
         return self
 
@@ -72,8 +72,9 @@ class WebElement(CoreElement):
         self.log(f'Click outside from "{self.name}"')
 
         x, y = calculate_coordinate_to_click(self, x, y)
+
         self._action_chains\
-            .move_to_element_with_offset(self.element, x, y)\
+            .move_to_location(x, y)\
             .click()\
             .perform()
         return self

@@ -5,7 +5,7 @@ from dyatel.dyatel_play.play_element import PlayElement
 
 class PlayCheckbox(PlayElement):
 
-    def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False, **kwargs):
+    def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False):
         """
         Initializing of checkbox with playwright driver
 
@@ -14,7 +14,6 @@ class PlayCheckbox(PlayElement):
         :param name: name of checkbox (will be attached to logs)
         :param parent: parent of checkbox. Can be Web/MobileElement, Web/MobilePage or Group objects etc.
         :param wait: add element waiting in `wait_page_loaded` function of PlayPage
-        :param by_attr: compatibility arg - does nothing
         """
         super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 

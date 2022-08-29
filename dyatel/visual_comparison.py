@@ -16,17 +16,24 @@ def assert_same_images(actual_file: str, reference_file: str, filename: str, thr
     reference_image = Image.open(reference_file).convert('RGB')
     output_image = Image.open(actual_file).convert('RGB')
     diff, actual_threshold = get_difference(reference_image, output_image)
-    # TODO: Same size check
-    # TODO: Same pixel ratio check
-    if actual_threshold > threshold:
+
+    same_size = reference_image.size == output_image.size
+    is_different = actual_threshold > threshold
+
+    if is_different or not same_size:
         root_path = os.environ.get('visual', '')
         diff_directory = f'{root_path}/difference/'
         os.makedirs(os.path.dirname(diff_directory), exist_ok=True)
         diff_file = f'{diff_directory}/diff-{filename}.png'
         diff.save(diff_file)
         attach_allure_diff(actual_file, reference_file, diff_file)
-        raise AssertionError(f"The new screenshot '{actual_file}' did not match the"
-                             f" reference '{reference_file}'. Threshold is: {actual_threshold}")
+
+    if not same_size:
+        raise AssertionError(f'Image size (width, height) is different: '
+                             f'Expected:{reference_image.size}, Actual: {output_image.size}.')
+    if is_different:
+        raise AssertionError(f"The new screenshot '{actual_file}' did not match the reference '{reference_file}'. "
+                             f"Threshold is: {actual_threshold}")
 
 
 def get_difference(im1: Image, im2: Image):

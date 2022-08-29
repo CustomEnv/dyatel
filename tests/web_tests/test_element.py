@@ -71,9 +71,9 @@ def test_hover(mouse_event_page):
     assert all((initial_not_displayed, after_hover_displayed, after_outside_hover_displayed))
 
 
-def test_screenshot(base_playground_page, driver_engine, driver_name, platform, request):
-    node_name = request.node.name.replace('_', '-')
-    filename = f'{node_name}-{driver_engine}-{driver_name}-{platform}-kube'
+@pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])
+def test_screenshot(base_playground_page, driver_engine, driver_name, platform, with_name):
+    filename = f'{driver_engine}-{driver_name}-{platform}-kube' if with_name else ''
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename, threshold=6)
 
 

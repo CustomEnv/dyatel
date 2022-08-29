@@ -3,6 +3,8 @@ from __future__ import annotations
 import inspect
 from typing import Any
 
+from dyatel.js_scripts import get_element_position_on_screen_js
+
 WAIT_EL = 10
 WAIT_PAGE = 20
 
@@ -79,7 +81,7 @@ def get_child_elements_with_names(obj: object, instance: type) -> dict:
     return elements
 
 
-def calculate_coordinate_to_click(element: Any, x: int, y: int, from_current: bool = True) -> tuple:
+def calculate_coordinate_to_click(element: Any, x: int, y: int) -> tuple:
     """
     Calculate coordinates to click for element
     Examples:
@@ -91,29 +93,21 @@ def calculate_coordinate_to_click(element: Any, x: int, y: int, from_current: bo
     :param element: dyatel WebElement or MobileElement
     :param x: horizontal offset relative to either left (x < 0) or right side (x > 0)
     :param y: vertical offset relative to either top (y > 0) or bottom side (y < 0)
-    :param from_current: True - calculate from current position. False - calculate from element location
     :return: tuple of calculated coordinates
     """
-    if from_current:
-        eh, ew = element.element.size.values()
+    selenium_element = element.element
+    ex, ey = element.driver.execute_script(get_element_position_on_screen_js, selenium_element).values()
+    ew, eh = selenium_element.size.values()
+    emx, emy = ex + ew / 2, ey + eh / 2  # middle of element
 
-        if x:
-            x = x + eh / 2 if x > 0 else x - eh / 2
-        if y:
-            y = y + ew / 2 if y > 0 else y - ew / 2
-
+    if x:
+        x = x + emx + ew / 2 if x > 0 else emx + x - ew / 2
     else:
-        ex, ey, ew, eh = element.element.rect.values()
-        emx, emy = ex + ew / 2, ey + eh / 2  # middle of element
+        x = emx
 
-        if x:
-            x = x + emx + ew / 2 if x > 0 else emx + x - ew / 2
-        else:
-            x = emx
-
-        if y:
-            y = y + emy + eh / 2 if y > 0 else emy + y - eh / 2
-        else:
-            y = emy
+    if y:
+        y = y + emy + eh / 2 if y > 0 else emy + y - eh / 2
+    else:
+        y = emy
 
     return int(x), int(y)

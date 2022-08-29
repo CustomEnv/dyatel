@@ -1,3 +1,4 @@
+from selenium.webdriver import ActionChains as SeleniumActionChains
 from selenium.webdriver.common.by import By
 
 from dyatel.mixins.internal_utils import all_tags, get_child_elements
@@ -66,3 +67,16 @@ def get_legacy_selector(locator, locator_type):
         locator_type = By.CSS_SELECTOR
         locator = f'[name="{locator}"]'
     return locator, locator_type
+
+
+class ActionChains(SeleniumActionChains):
+
+    def move_to_location(self, x, y):
+        """
+        Moving the mouse specified location
+
+        """
+        self.w3c_actions.pointer_action.move_to_location(x, y)
+        self.w3c_actions.key_action.pause()
+
+        return self

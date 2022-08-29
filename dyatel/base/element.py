@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, Union
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -12,6 +12,7 @@ from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException
+from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.internal_utils import WAIT_EL
 
 
@@ -76,6 +77,21 @@ class Element(WebElement, MobileElement, PlayElement):
             self.log(f'Set text in "{self.name}"')
 
         self.clear_text(silent=True).type_text(text, silent=True)
+        return self
+
+    def send_keyboard_action(self, action: Union[str, KeyboardKeys]) -> Element:
+        """
+        Send keyboard action to current element
+
+        :param action: keyboard action
+        :return: self
+        """
+        if self.driver_wrapper.playwright:
+            self.click()
+            self.driver.keyboard.press(action)
+        else:
+            self.type_text(action)
+
         return self
 
     # Elements waits

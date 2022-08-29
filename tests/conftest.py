@@ -19,6 +19,7 @@ from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.shared_utils import set_logging_settings
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
+from tests.adata.pages.keyboard_page import KeyboardPage
 from tests.adata.pages.progress_bar_page import ProgressBarPage
 from tests.settings import android_desired_caps, ios_desired_caps
 from tests.adata.pages.mouse_event_page import MouseEventPage
@@ -196,3 +197,8 @@ def expected_condition_page(driver_wrapper):
 @pytest.fixture
 def progressbar_page(driver_wrapper):
     return ProgressBarPage().open_page()
+
+
+@pytest.fixture
+def keyboard_page(driver_wrapper):
+    return KeyboardPage().open_page()
