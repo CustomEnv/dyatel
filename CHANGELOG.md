@@ -1,8 +1,12 @@
 # Dyatel Changelog
 
 ---
-## v1.2.0
+## v1.3.0
 *Release date: In development*
+
+---
+## v1.2.0
+*Release date: 2022-08-31*
 
 ### Added
 - [Allure Screen Diff Plugin](https://github.com/allure-framework/allure2/blob/master/plugins/screen-diff-plugin/README.md) support
@@ -10,6 +14,7 @@
 - Custom exceptions
 - Screenshot name generation in `assert_screenshot`
 - `KeyboardKeys` class
+- `element.send_keyboard_action` method
 
 ### Changed
 - `get_text` property become `text`
@@ -17,10 +22,11 @@
 - `get_screenshot_base` property become `screenshot_base`
 - `get_inner_text` property become `inner_text`
 - `by_attr` arg of `Checkbox` removed
-- `calculate_coordinate_to_click` now can calculate coordinates from element location
+- `calculate_coordinate_to_click` now calculate coordinates from element location
 
 ### Fixed
-- Reduced count of `find_element` execution 
+- Reduced count of `find_element` execution
+- Page `driver_wrapper` getter exception
 
 ---
 ## v1.1.1

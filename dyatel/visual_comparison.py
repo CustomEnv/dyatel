@@ -5,14 +5,23 @@ import math
 import operator
 import os
 from functools import reduce
-from typing import Union
+from typing import Union, Tuple
 
 from PIL import Image, ImageChops
 
 from dyatel.mixins.log_mixin import autolog
 
 
-def assert_same_images(actual_file: str, reference_file: str, filename: str, threshold: Union[int, float]):
+def assert_same_images(actual_file: str, reference_file: str, filename: str, threshold: Union[int, float]) -> None:
+    """
+    Assert that given images are equal to each other
+
+    :param actual_file: actual image path
+    :param reference_file: reference image path
+    :param filename: difference image name
+    :param threshold: possible difference in percents
+    :return: None
+    """
     reference_image = Image.open(reference_file).convert('RGB')
     output_image = Image.open(actual_file).convert('RGB')
     diff, actual_threshold = get_difference(reference_image, output_image)
@@ -28,15 +37,23 @@ def assert_same_images(actual_file: str, reference_file: str, filename: str, thr
         diff.save(diff_file)
         attach_allure_diff(actual_file, reference_file, diff_file)
 
+    base_error = f"The new screenshot '{actual_file}' did not match the reference '{reference_file}'."
+
     if not same_size:
-        raise AssertionError(f'Image size (width, height) is different: '
+        raise AssertionError(f'{base_error} Image size (width, height) is different: '
                              f'Expected:{reference_image.size}, Actual: {output_image.size}.')
     if is_different:
-        raise AssertionError(f"The new screenshot '{actual_file}' did not match the reference '{reference_file}'. "
-                             f"Threshold is: {actual_threshold}")
+        raise AssertionError(f"{base_error} Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
 
 
-def get_difference(im1: Image, im2: Image):
+def get_difference(im1: Image, im2: Image) -> Tuple[Image, float]:
+    """
+    Calculate difference between two images
+
+    :param im1: image 1
+    :param im2: image 2
+    :return: (diff image, diff float value )
+    """
     diff = ImageChops.difference(im1, im2)
     histogram = diff.histogram()
 

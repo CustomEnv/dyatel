@@ -74,7 +74,7 @@ class ElementMixin(DriverMixin):
             Image.open(reference_file)
         except FileNotFoundError:
             self.get_screenshot(reference_file)
-            message = 'Reference file not found, but its just saved. ' \
+            message = f'Reference file "{reference_file}" not found, but its just saved. ' \
                       'If it CI run, then you need to commit reference files.'
             raise FileNotFoundError(message) from None
 
