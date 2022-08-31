@@ -5,6 +5,13 @@
 *Release date: In development*
 
 ---
+## v1.2.1
+*Release date: 2022-08-31*
+
+### Fixed
+- Annotations
+
+---
 ## v1.2.0
 *Release date: 2022-08-31*
 

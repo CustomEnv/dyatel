@@ -5,7 +5,7 @@ import math
 import operator
 import os
 from functools import reduce
-from typing import Union, Tuple
+from typing import Union
 
 from PIL import Image, ImageChops
 
@@ -46,7 +46,7 @@ def assert_same_images(actual_file: str, reference_file: str, filename: str, thr
         raise AssertionError(f"{base_error} Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
 
 
-def get_difference(im1: Image, im2: Image) -> Tuple[Image, float]:
+def get_difference(im1: Image, im2: Image) -> tuple[Image, float]:
     """
     Calculate difference between two images
 
