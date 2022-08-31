@@ -46,7 +46,7 @@ def assert_same_images(actual_file: str, reference_file: str, filename: str, thr
         raise AssertionError(f"{base_error} Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
 
 
-def get_difference(im1: Image, im2: Image) -> tuple[Image, float]:
+def get_difference(im1: Image, im2: Image):
     """
     Calculate difference between two images
 

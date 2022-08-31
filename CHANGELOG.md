@@ -5,7 +5,7 @@
 *Release date: In development*
 
 ---
-## v1.2.1
+## v1.2.1 & v1.2.2
 *Release date: 2022-08-31*
 
 ### Fixed
