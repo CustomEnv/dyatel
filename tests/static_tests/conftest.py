@@ -43,7 +43,7 @@ def mocked_selenium_driver():
 @pytest.fixture
 def mocked_play_driver():
     driver_wrapper = DriverWrapper(Browser(MagicMock()))
-    DriverWrapper.driver_wrapper = MagicMock()
-    DriverWrapper.driver_wrapper.driver = PlaywrightDriver(MagicMock())
+    DriverWrapper.driver_wrapper = driver_wrapper
+    DriverWrapper.driver = PlaywrightDriver(MagicMock())
     yield driver_wrapper
     PlayDriver.driver = None

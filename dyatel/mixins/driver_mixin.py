@@ -4,7 +4,7 @@ from copy import copy
 from typing import Union, Any
 
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
-from playwright.sync_api import Browser as PlaywrightWebDriver
+from playwright.sync_api import Page as PlaywrightWebDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
 from dyatel.base.driver_wrapper import DriverWrapper
@@ -42,7 +42,8 @@ class DriverMixin:
 
         :return: SeleniumWebDriver/AppiumWebDriver/PlaywrightWebDriver
         """
-        return self._driver_instance.driver
+        driver_instance = getattr(self, '_driver_instance', DriverWrapper)
+        return driver_instance.driver
 
     @property
     def driver_wrapper(self) -> Union[WebDriver, MobileDriver, PlayDriver, DriverWrapper]:
@@ -51,7 +52,8 @@ class DriverMixin:
 
         :return: driver_wrapper
         """
-        return self._driver_instance.driver_wrapper
+        driver_instance = getattr(self, '_driver_instance', DriverWrapper)
+        return driver_instance.driver_wrapper
 
     def _set_driver(self, driver_wrapper, instance_class) -> DriverMixin:
         """

@@ -1,6 +1,12 @@
+from __future__ import annotations
+
+from selenium.webdriver import ActionChains as SeleniumActionChains
 from selenium.webdriver.common.by import By
 
-from dyatel.mixins.internal_utils import all_tags
+from dyatel.mixins.internal_utils import all_tags, get_child_elements
+
+
+selenium_locator_types = get_child_elements(By, str)
 
 
 def get_locator_type(locator: str):
@@ -16,6 +22,9 @@ def get_locator_type(locator: str):
       By.CSS_SELECTOR if locator contain dot and no brackets
       By.ID if there is no any match
     """
+    if locator in selenium_locator_types:
+        raise Exception('Locator type given instead of locator')
+
     brackets = '[' in locator and ']' in locator
     is_only_tags = True
 
@@ -60,3 +69,19 @@ def get_legacy_selector(locator, locator_type):
         locator_type = By.CSS_SELECTOR
         locator = f'[name="{locator}"]'
     return locator, locator_type
+
+
+class ActionChains(SeleniumActionChains):
+
+    def move_to_location(self, x: int, y: int) -> ActionChains:
+        """
+        Moving the mouse to specified location
+
+        :param x: x coordinate
+        :param y: y coordinate
+        :return: self
+        """
+        self.w3c_actions.pointer_action.move_to_location(x, y)
+        self.w3c_actions.key_action.pause()
+
+        return self

@@ -1,5 +1,6 @@
 import os
 
+import allure
 import pytest
 from playwright.sync_api import sync_playwright
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
@@ -18,6 +19,7 @@ from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.shared_utils import set_logging_settings
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
+from tests.adata.pages.keyboard_page import KeyboardPage
 from tests.adata.pages.progress_bar_page import ProgressBarPage
 from tests.settings import android_desired_caps, ios_desired_caps
 from tests.adata.pages.mouse_event_page import MouseEventPage
@@ -158,7 +160,7 @@ def driver_func(request, driver_name, driver_engine, chrome_options, firefox_opt
     if 'appium' not in driver_engine:
         driver_wrapper.set_window_size(1024, 900)
 
-    os.environ['visual'] = 'tests/adata/visual'
+    os.environ['visual'] = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
     return driver_wrapper
 
 
@@ -195,3 +197,8 @@ def expected_condition_page(driver_wrapper):
 @pytest.fixture
 def progressbar_page(driver_wrapper):
     return ProgressBarPage().open_page()
+
+
+@pytest.fixture
+def keyboard_page(driver_wrapper):
+    return KeyboardPage().open_page()

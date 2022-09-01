@@ -15,7 +15,7 @@ class Checkbox(SelCheckbox, PlayCheckbox):
     """ Checkbox object crossroad. Should be defined as Page/Group class variable """
 
     def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 parent: Any = None, wait: bool = False, by_attr: bool = False):
+                 parent: Any = None, wait: bool = False):
         """
         Initializing of checkbox based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group
@@ -25,22 +25,19 @@ class Checkbox(SelCheckbox, PlayCheckbox):
         :param name: name of checkbox (will be attached to logs)
         :param parent: parent of checkbox. Can be Group or Page objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
-        :param by_attr: Selenium only: get is_checked state by custom attribute
         """
         self.locator = locator
         self.locator_type = locator_type
         self.name = name
         self.parent = parent
         self.wait = wait
-        self.by_attr = by_attr
 
         self._driver_instance = DriverWrapper
         self._initialized = False
 
         self.element_class = self.__set_base_class()
         if self.element_class:
-            super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait,
-                             by_attr=by_attr)
+            super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 
     def __set_base_class(self):
         """

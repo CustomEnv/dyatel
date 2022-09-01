@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from logging import debug, info
 from typing import Union, Any
 
 from playwright.sync_api import Page as PlaywrightDriver
@@ -12,6 +11,7 @@ from dyatel.base.element import Element
 from dyatel.dyatel_play.play_page import PlayPage
 from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
+from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.internal_utils import WAIT_PAGE
 
@@ -48,7 +48,7 @@ class Page(WebPage, MobilePage, PlayPage):
         :param wait_page_load: wait until anchor will be element loaded
         :return: self
         """
-        info(f'Reload "{self.name}" page')
+        self.log(f'Reload "{self.name}" page')
         self.driver_wrapper.refresh()
 
         if wait_page_load:
@@ -77,7 +77,7 @@ class Page(WebPage, MobilePage, PlayPage):
         :return: self
         """
         if not silent:
-            info(f'Wait until page "{self.name}" loaded')
+            self.log(f'Wait until page "{self.name}" loaded')
 
         self.anchor.wait_element(timeout=timeout)
 
@@ -100,7 +100,7 @@ class Page(WebPage, MobilePage, PlayPage):
                 if getattr(element, 'wait'):
                     result &= element.is_displayed(silent=True)
                     if not result:
-                        debug(f'Element "{element.name}" is not displayed')
+                        self.log(f'Element "{element.name}" is not displayed', level='debug')
 
         result &= self.anchor.is_displayed()
 
@@ -125,16 +125,14 @@ class Page(WebPage, MobilePage, PlayPage):
 
         :return: page class
         """
-        driver = self.driver_wrapper.driver
-
-        if isinstance(driver, PlaywrightDriver):
+        if isinstance(self.driver, PlaywrightDriver):
             Page.__bases__ = PlayPage,
             return PlayPage
-        elif isinstance(driver, AppiumDriver):
+        elif isinstance(self.driver, AppiumDriver):
             Page.__bases__ = MobilePage,
             return MobilePage
-        elif isinstance(driver, SeleniumDriver):
+        elif isinstance(self.driver, SeleniumDriver):
             Page.__bases__ = WebPage,
             return WebPage
         else:
-            raise Exception('Cant specify Page')
+            raise DriverWrapperException('Cant specify Page')

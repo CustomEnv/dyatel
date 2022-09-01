@@ -3,6 +3,9 @@ from selenium.webdriver.common.by import By
 
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
+from dyatel.dyatel_sel.pages.mobile_page import MobilePage
+from dyatel.dyatel_sel.pages.web_page import WebPage
+from dyatel.dyatel_sel.sel_utils import selenium_locator_types
 from dyatel.mixins.internal_utils import all_tags
 
 
@@ -66,3 +69,14 @@ def test_name_missed(base_class):
 def test_name_specified(base_class):
     locator, name = '.sample .locator', 'sample name'
     assert base_class(locator, name=name).name == name
+
+
+@pytest.mark.parametrize('base_class', (MobileElement, WebElement, MobilePage, WebPage))
+@pytest.mark.parametrize('locator_type', selenium_locator_types)
+def test_locator_type_given_instead_of_locator(base_class, locator_type):
+    try:
+        base_class(locator_type)
+    except:
+        pass
+    else:
+        raise Exception('Unexpected behavior')

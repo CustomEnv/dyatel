@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import inspect
+from typing import Any
 
+from dyatel.js_scripts import get_element_position_on_screen_js
 
 WAIT_EL = 10
 WAIT_PAGE = 20
 
 
 all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
-            'textarea', 'svg', 'circle']
+            'textarea', 'svg', 'circle', 'iframe']
 
 
 def initialize_objects_with_args(objects: list):
@@ -23,7 +25,7 @@ def initialize_objects_with_args(objects: list):
             obj.__init__(**get_object_kwargs(obj))
 
 
-def get_object_kwargs(obj):
+def get_object_kwargs(obj: object):
     """
     Get actual args/kwargs of object __init__
 
@@ -49,16 +51,16 @@ def get_timeout_in_ms(timeout: int):
     return timeout * 1000 if timeout < 1000 else timeout
 
 
-def get_child_elements(self, instance) -> list:
+def get_child_elements(obj: object, instance: type) -> list:
     """
     Return page elements and page objects of this page object
 
     :returns: list of page elements and page objects
     """
-    return list(get_child_elements_with_names(self, instance).values())
+    return list(get_child_elements_with_names(obj, instance).values())
 
 
-def get_child_elements_with_names(self, instance) -> dict:
+def get_child_elements_with_names(obj: object, instance: type) -> dict:
     """
     Return page elements and page objects of this page object
 
@@ -66,10 +68,10 @@ def get_child_elements_with_names(self, instance) -> dict:
     """
     elements, class_items = {}, []
 
-    for parent_class in self.__class__.__bases__:
+    for parent_class in obj.__class__.__bases__:
         class_items += list(parent_class.__dict__.items()) + list(parent_class.__class__.__dict__.items())
 
-    class_items += list(list(self.__class__.__dict__.items()) + list(self.__dict__.items()))
+    class_items += list(list(obj.__class__.__dict__.items()) + list(obj.__dict__.items()))
 
     for attribute, value in class_items:
         if isinstance(value, instance):
@@ -79,7 +81,7 @@ def get_child_elements_with_names(self, instance) -> dict:
     return elements
 
 
-def calculate_coordinate_to_click(element, x, y):
+def calculate_coordinate_to_click(element: Any, x: int, y: int) -> tuple:
     """
     Calculate coordinates to click for element
     Examples:
@@ -91,13 +93,21 @@ def calculate_coordinate_to_click(element, x, y):
     :param element: dyatel WebElement or MobileElement
     :param x: horizontal offset relative to either left (x < 0) or right side (x > 0)
     :param y: vertical offset relative to either top (y > 0) or bottom side (y < 0)
-    :return:  coordinates
+    :return: tuple of calculated coordinates
     """
-    element_size = element.element.size
-    half_width, half_height = element_size['width'] / 2, element_size['height'] / 2
-    dx, dy = half_width, half_height
+    selenium_element = element.element
+    ex, ey = element.driver.execute_script(get_element_position_on_screen_js, selenium_element).values()
+    ew, eh = selenium_element.size.values()
+    emx, emy = ex + ew / 2, ey + eh / 2  # middle of element
+
     if x:
-        dx += x + (-half_width if x < 0 else half_width)
+        x = x + emx + ew / 2 if x > 0 else emx + x - ew / 2
+    else:
+        x = emx
+
     if y:
-        dy += -y + (half_height if y < 0 else -half_height)
-    return dx, dy
+        y = y + emy + eh / 2 if y > 0 else emy + y - eh / 2
+    else:
+        y = emy
+
+    return int(x), int(y)

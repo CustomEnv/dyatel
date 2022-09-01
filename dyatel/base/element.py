@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import time
-from logging import info
-from typing import Any
+from typing import Any, Union
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -12,6 +11,8 @@ from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
+from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException
+from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.internal_utils import WAIT_EL
 
 
@@ -73,14 +74,29 @@ class Element(WebElement, MobileElement, PlayElement):
         :return: self
         """
         if not silent:
-            info(f'Set text in "{self.name}"')
+            self.log(f'Set text in "{self.name}"')
 
         self.clear_text(silent=True).type_text(text, silent=True)
         return self
 
+    def send_keyboard_action(self, action: Union[str, KeyboardKeys]) -> Element:
+        """
+        Send keyboard action to current element
+
+        :param action: keyboard action
+        :return: self
+        """
+        if self.driver_wrapper.playwright:
+            self.click()
+            self.driver.keyboard.press(action)
+        else:
+            self.type_text(action)
+
+        return self
+
     # Elements waits
 
-    def wait_elements_count(self, elements_count, timeout=WAIT_EL, silent=False) -> Element:
+    def wait_elements_count(self, expected_count, timeout=WAIT_EL, silent=False) -> Element:
         """
         Wait until elements count will be equal to expected value
 
@@ -90,17 +106,17 @@ class Element(WebElement, MobileElement, PlayElement):
         :return: self
         """
         if not silent:
-            info(f'Wait until elements count will be equal to "{elements_count}"')
+            self.log(f'Wait until elements count will be equal to "{expected_count}"')
 
+        is_equal, actual_count = False, None
         start_time = time.time()
-        while time.time() - start_time < timeout and self.get_elements_count(silent=True) != elements_count:
-            pass
+        while time.time() - start_time < timeout and not is_equal:
+            actual_count = self.get_elements_count(silent=True)
+            is_equal = actual_count == expected_count
 
-        actual_elements_count = self.get_elements_count(silent=True)
-
-        if actual_elements_count != elements_count:
-            raise Exception(f'Unexpected elements count of "{self.name}". '
-                            f'Actual: {actual_elements_count}; Expected: {elements_count}')
+        if not is_equal:
+            msg = f'Unexpected elements count of "{self.name}". Actual: {actual_count}; Expected: {expected_count}'
+            raise UnexpectedElementsCountException(msg)
 
         return self
 
@@ -113,14 +129,15 @@ class Element(WebElement, MobileElement, PlayElement):
         :return: self
         """
         if not silent:
-            info(f'Wait for any text is available in "{self.name}"')
+            self.log(f'Wait for any text is available in "{self.name}"')
 
+        text = None
         start_time = time.time()
-        while time.time() - start_time < timeout and not self.get_text:
-            pass
+        while time.time() - start_time < timeout and not text:
+            text = self.text
 
-        if not self.get_text:
-            raise Exception(f'Text of "{self.name}" is empty')
+        if not text:
+            raise UnexpectedTextException(f'Text of "{self.name}" is empty')
 
         return self
 
@@ -133,13 +150,14 @@ class Element(WebElement, MobileElement, PlayElement):
         :return: self
         """
         if not silent:
-            info(f'Wait for any value is available in "{self.name}"')
+            self.log(f'Wait for any value is available in "{self.name}"')
 
+        value = None
         start_time = time.time()
-        while time.time() - start_time < timeout and not self.get_value:
-            pass
+        while time.time() - start_time < timeout and not value:
+            value = self.value
 
-        if not self.get_value:
-            raise Exception(f'Value of "{self.name}" is empty')
+        if not value:
+            raise UnexpectedValueException(f'Value of "{self.name}" is empty')
 
         return self

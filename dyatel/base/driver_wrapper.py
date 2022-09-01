@@ -7,6 +7,7 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
+from dyatel.exceptions import DriverWrapperException
 
 
 class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
@@ -38,4 +39,4 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
             DriverWrapper.__bases__ = WebDriver,
             return WebDriver
         else:
-            raise Exception('Cant specify Driver')
+            raise DriverWrapperException('Cant specify Driver')

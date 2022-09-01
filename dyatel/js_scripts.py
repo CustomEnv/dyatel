@@ -20,6 +20,15 @@ is_element_checked_js = 'return arguments[0].checked'
 click_js = 'arguments[0].click();'
 is_displayed_js = 'return arguments[0].style.display == false;'
 
+add_driver_index_comment_js = """
+function addComment(driver_index) {
+  comment = document.createComment(" " + driver_index + "_driver ");
+  document.body.appendChild(comment);
+} 
+
+addComment(arguments[0])
+"""
+
 trigger_react = """
 function reactTriggerChange(node) {
   var supportedInputTypes = {

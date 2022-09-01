@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from logging import info
 from typing import Union, List, BinaryIO, Any
 
 from appium.webdriver.common.touch_action import TouchAction
@@ -28,6 +27,7 @@ class MobileElement(CoreElement):
         """
         self.is_safari_driver = CoreDriver.is_safari_driver
         self.is_ios = CoreDriver.is_ios
+        self.is_android = CoreDriver.is_android
 
         self.top_bar_height = None
         self.bottom_bar_height = None
@@ -44,7 +44,7 @@ class MobileElement(CoreElement):
 
         :return: list of wrapped objects
         """
-        appium_elements = self._get_driver().find_elements(self.locator_type, self.locator)
+        appium_elements = self._find_elements(self._get_base())
         return self._get_all_elements(appium_elements, MobileElement)
 
     def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> MobileElement:
@@ -88,10 +88,10 @@ class MobileElement(CoreElement):
         """
         if self.is_safari_driver:
             if not silent:
-                info(f'Check displaying of "{self.name}"')
+                self.log(f'Check displaying of "{self.name}"')
 
             try:
-                return self.driver.execute_script(is_displayed_js, self._get_element(wait=False))
+                return self.driver_wrapper.execute_script(is_displayed_js, self._get_element(wait=False))
             except:
                 return False
         else:
@@ -103,16 +103,15 @@ class MobileElement(CoreElement):
 
         :return: self
         """
+        self.log(f'Tap to "{self.name}"')
         self.wait_element(silent=True)
 
-        info(f'Tap to "{self.name}"')
-
         if self.is_ios:
-            x, y = self.element.location.values()
-            y += self._get_top_bar_height()
+            x, y = calculate_coordinate_to_click(self, 0, 0)
             TouchAction(self.driver).tap(x=x, y=y).perform()
         else:
             self._action_chains.click(on_element=self.element).perform()
+
         return self
 
     def hover_outside(self, x: int = 0, y: int = -5) -> MobileElement:
@@ -131,20 +130,15 @@ class MobileElement(CoreElement):
         :param y: y offset
         :return: self
         """
+        self.log(f'Tap outside from "{self.name}"')
         self.wait_element(silent=True)
 
-        info(f'Tap outside from "{self.name}"')
+        x, y = calculate_coordinate_to_click(self, x, y)
 
         if self.is_ios:
-            el_x, el_y = self.element.location.values()
-            el_y += self._get_top_bar_height()
-            TouchAction(self.driver).tap(x=el_x + x, y=el_y + y).perform()
+            TouchAction(self.driver).tap(x=x, y=y).perform()
         else:
-            dx, dy = calculate_coordinate_to_click(self, x, y)
-            self._action_chains\
-                .move_by_offset(dx, dy)\
-                .click()\
-                .perform()
+            self._action_chains.move_to_location(x, y).click().perform()
         return self
 
     def get_screenshot(self, filename: str, legacy: bool = True) -> BinaryIO:

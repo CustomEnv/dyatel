@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from logging import info
 from typing import Union, List, Any
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
@@ -31,7 +30,7 @@ class WebElement(CoreElement):
 
         :return: list of wrapped objects
         """
-        selenium_elements = self._get_driver().find_elements(self.locator_type, self.locator)
+        selenium_elements = self._find_elements(self._get_base())
         return self._get_all_elements(selenium_elements, WebElement)
 
     def hover(self) -> WebElement:
@@ -40,7 +39,7 @@ class WebElement(CoreElement):
 
         :return: self
         """
-        info(f'Hover over :{self.name}"')
+        self.log(f'Hover over "{self.name}"')
         self._action_chains\
             .move_to_element(self.element)\
             .move_by_offset(1, 1)\
@@ -48,15 +47,17 @@ class WebElement(CoreElement):
             .perform()
         return self
 
-    def hover_outside(self, x: int = -100, y: int = -100) -> WebElement:
+    def hover_outside(self, x: int = 0, y: int = -5) -> WebElement:
         """
         Hover outside from current element
 
         :return: self
         """
-        info(f'Hover outside from "{self.name}"')
+        self.log(f'Hover outside from "{self.name}"')
+
+        x, y = calculate_coordinate_to_click(self, x, y)
         self._action_chains\
-            .move_by_offset(x, y)\
+            .move_to_location(x, y)\
             .perform()
         return self
 
@@ -68,10 +69,12 @@ class WebElement(CoreElement):
         :param y: y offset
         :return: self
         """
-        self.wait_element(silent=True)
-        dx, dy = calculate_coordinate_to_click(self, x, y)
+        self.log(f'Click outside from "{self.name}"')
+
+        x, y = calculate_coordinate_to_click(self, x, y)
+
         self._action_chains\
-            .move_to_element_with_offset(self.element, dx, dy)\
+            .move_to_location(x, y)\
             .click()\
             .perform()
         return self

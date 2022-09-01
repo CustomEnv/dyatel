@@ -1,7 +1,7 @@
 import pytest
-from selenium.common import TimeoutException as SeleniumTimeoutException
 from playwright._impl._api_types import TimeoutError as PlaywrightTimeoutException
 
+from dyatel.exceptions import TimeoutException
 from tests.adata.pages.mouse_event_page import MouseEventPageWithUnexpectedWait
 
 
@@ -16,7 +16,7 @@ def test_page_loaded_negative(mouse_event_page, with_elements_case):
     page = MouseEventPageWithUnexpectedWait()
     try:
         page.wait_page_loaded(timeout=0.1)
-    except (SeleniumTimeoutException, PlaywrightTimeoutException):
+    except (TimeoutException, PlaywrightTimeoutException):
         if with_elements_case:
             assert not page.is_page_opened(with_elements=with_elements_case)
         else:
