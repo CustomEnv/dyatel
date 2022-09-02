@@ -5,7 +5,14 @@
 *Release date: In development*
 
 ---
-## v1.2.1 & v1.2.2
+## v1.2.3
+*Release date: 2022-09-02*
+
+### Fixed
+- `element.is_displayed()` exception handler
+
+---
+## v1.2.2
 *Release date: 2022-08-31*
 
 ### Fixed
