@@ -78,3 +78,11 @@ class WebElement(CoreElement):
             .click()\
             .perform()
         return self
+
+    def get_rect(self) -> dict:
+        """
+        A dictionary with the size and location of the element.
+
+        :return: dict
+        """
+        return self.element.rect

@@ -151,10 +151,10 @@ class MobileElement(CoreElement):
         """
         if self.driver_wrapper.is_ios and legacy:
             element_box = self._element_box()
-            window_width = self.driver.get_window_size()['width']  # FIXME
+            window_width, window_height = self.driver.get_window_size().values()  # FIXME
             img_binary = self.driver_wrapper.get_screenshot()
             image_binary = self._scaled_screenshot(img_binary, window_width)
-            if any(element_box) < 0:
+            if any(element_box) < 0 or window_height > self.element.size['height']:
                 image_binary = image_binary.crop(element_box)
             image_binary.save(filename)
         else:
@@ -162,7 +162,12 @@ class MobileElement(CoreElement):
 
         return image_binary
 
-    def get_rect(self):
+    def get_rect(self) -> dict:
+        """
+        A dictionary with the size and location of the element.
+
+        :return: dict
+        """
         size = self.element.size
         location = self.driver.execute_script(get_element_position_on_screen_js, self.element)
         size.update(location)

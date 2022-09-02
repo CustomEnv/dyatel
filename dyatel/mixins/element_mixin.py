@@ -38,13 +38,15 @@ class ElementMixin(DriverMixin):
             current_data = f'{current_data}. {parent_data}'
         return current_data
 
-    def remove_elements(self, parent, children, path):
+    def remove_elements(self, parent, children, path) -> None:
         """
         Remove elements from image
 
         :param parent: parent element
         :param children: list of children elements
         :param path: path to output file
+
+        :return: None
         """
         parent_abs = {x: max(y, 0) for x, y in parent.get_rect().items()}
         for element in children:
@@ -67,7 +69,7 @@ class ElementMixin(DriverMixin):
         :param threshold: possible threshold
         :param delay: delay before taking screenshot
         :param scroll: scroll to element before taking the screenshot
-        :param remove: remove elements from screenshot
+        :param remove: remove element from screenshot
         :return: self
         """
         filename = filename if filename else self._get_screenshot_name(test_name)
