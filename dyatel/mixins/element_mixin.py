@@ -48,12 +48,17 @@ class ElementMixin(DriverMixin):
 
         :return: None
         """
+        # TODO remove iOS browser bottom
         parent_abs = {x: max(y, 0) for x, y in parent.get_rect().items()}
+        is_ios = self.driver_wrapper.is_ios
+        offset = abs(self.driver_wrapper.get_top_bar_height()) if is_ios else 0
         for element in children:
-            elem_abs = {x: max(y, 0) for x, y in element.get_rect().items()}
-            zone = {item: int(elem_abs[item] - (parent_abs[item] if item in ['x', 'y'] else 0)) for item in elem_abs}
-            if self.driver_wrapper.is_ios and zone['y'] != 0:
-                zone['y'] += 52
+            elem_rect = element.get_rect()
+            if is_ios:
+                elem_rect = {x: max(y, 0) for x, y in elem_rect.items()}
+                if elem_rect['y'] != 0:
+                    elem_rect['y'] += offset
+            zone = {item: int(elem_rect[item] - (parent_abs[item] if item in ['x', 'y'] else 0)) for item in elem_rect}
             remove_coordinates = (zone['x'], zone['y'], zone['x'] + zone['width'], zone['y'] + zone['height'])
             image = Image.open(path).convert('RGB')
             image.paste("#000000", remove_coordinates)

@@ -13,6 +13,21 @@ function getPositionOnScreen(elem) {
 return getPositionOnScreen(arguments[0])
 """
 
+get_element_size_js = """
+function getSize(elem) {
+  let box = elem.getBoundingClientRect();
+  var width;
+  var height;
+  width = Math.floor(box.width)
+  height = Math.floor(box.height)
+  return {
+    width: width,
+    height: height
+  };
+};
+return getSize(arguments[0])
+"""
+
 check_element_js = 'arguments[0].checked = true'
 uncheck_element_js = 'arguments[0].checked = false'
 is_element_checked_js = 'return arguments[0].checked'

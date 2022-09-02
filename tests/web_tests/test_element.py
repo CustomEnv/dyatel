@@ -77,11 +77,9 @@ def test_screenshot(base_playground_page, driver_engine, driver_name, platform, 
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename, threshold=6)
 
 
-def test_screenshot_remove(base_playground_page, driver_engine, driver_name, platform, request):
-    node_name = request.node.name.replace('_', '-')
-    filename = f'{node_name}-{driver_engine}-{driver_name}-{platform}-container'
+def test_screenshot_remove(base_playground_page):
     base_playground_page.text_container.scroll_into_view().assert_screenshot(
-        filename, threshold=6, remove=[base_playground_page.inner_text_1, base_playground_page.inner_text_2])
+        remove=[base_playground_page.inner_text_1, base_playground_page.inner_text_2])
 
 # Test waits
 

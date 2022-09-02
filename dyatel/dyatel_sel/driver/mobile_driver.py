@@ -5,6 +5,7 @@ from typing import Union, List
 
 from appium.webdriver.applicationstate import ApplicationState
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
+from selenium.webdriver.common.by import By
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 
@@ -35,6 +36,9 @@ class MobileDriver(CoreDriver):
 
         self.native_context = 'NATIVE_APP'
         self.web_context = self.get_web_view_context() if self.is_xcui_driver else 'CHROMIUM'
+
+        self.top_bar_height = None
+        self.bottom_bar_height = None
 
         if self.is_app:
             if self.is_ios:
@@ -146,3 +150,44 @@ class MobileDriver(CoreDriver):
         :return: list of available contexts
         """
         return self.driver.contexts
+
+    def get_top_bar_height(self) -> int:
+        """
+        iOS only: Get top bar height
+
+        :return: self
+        """
+        if not self.top_bar_height:
+            self.switch_to_native()
+
+            top_bar = self.driver.find_element(
+                By.XPATH,
+                '//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther'
+            )
+            top_bar_height = top_bar.size['height']
+
+            self.switch_to_web()
+            return top_bar_height
+        else:
+            return self.top_bar_height
+
+    def get_bottom_bar_height(self, force: bool = False) -> int:
+        """
+        iOS only: Get bottom bar height
+
+        :param force: get the new value forcly
+        :return: self
+        """
+        if force or not self.top_bar_height:
+            self.switch_to_native()
+
+            bottom_bar = self.driver.find_element(
+                By.XPATH,
+                '//*[@name="CapsuleViewController"]/XCUIElementTypeOther[1]'
+            )
+            bottom_bar_height = bottom_bar.size['height']
+
+            self.switch_to_web()
+            return bottom_bar_height
+        else:
+            return self.top_bar_height

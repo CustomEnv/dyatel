@@ -3,13 +3,12 @@ from __future__ import annotations
 from typing import Union, List, BinaryIO, Any
 
 from appium.webdriver.common.touch_action import TouchAction
-from selenium.webdriver.common.by import By
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.sel_utils import get_legacy_selector, get_locator_type
 from dyatel.mixins.internal_utils import calculate_coordinate_to_click, WAIT_EL
-from dyatel.js_scripts import get_element_position_on_screen_js, click_js, is_displayed_js
+from dyatel.js_scripts import get_element_position_on_screen_js, get_element_size_js, click_js, is_displayed_js
 
 
 class MobileElement(CoreElement):
@@ -28,9 +27,6 @@ class MobileElement(CoreElement):
         self.is_safari_driver = CoreDriver.is_safari_driver
         self.is_ios = CoreDriver.is_ios
         self.is_android = CoreDriver.is_android
-
-        self.top_bar_height = None
-        self.bottom_bar_height = None
 
         self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.locator, self.locator_type = get_legacy_selector(locator, self.locator_type)
@@ -168,11 +164,10 @@ class MobileElement(CoreElement):
 
         :return: dict
         """
-        size = self.element.size
+        size = self.driver.execute_script(get_element_size_js, self.element)
         location = self.driver.execute_script(get_element_position_on_screen_js, self.element)
-        size.update(location)
 
-        return size
+        return {**size, **location}
 
     def _element_box(self) -> tuple:
         """
@@ -180,8 +175,9 @@ class MobileElement(CoreElement):
 
         :return: element coordinates on screen (start_x, start_y, end_x, end_y)
         """
-        self.scroll_into_view(sleep=0.1)
+        # self.scroll_into_view(sleep=0.1)
 
+        # breakpoint()
         el_location = self.driver.execute_script(get_element_position_on_screen_js, self.element)
         start_x, start_y = el_location.values()
         h, w = self.element.size.values()
@@ -196,50 +192,9 @@ class MobileElement(CoreElement):
             else:
                 bar_size = bars_size / 2  # top bar shown, bottom hidden
         else:
-            bar_size = self._get_top_bar_height()
+            bar_size = self.driver_wrapper.get_top_bar_height()
 
         if bar_size:
             start_y += bar_size
 
         return start_x, start_y, start_x+w, start_y+h
-
-    def _get_top_bar_height(self) -> int:
-        """
-        iOS only: Get top bar height
-
-        :return: self
-        """
-        if not self.top_bar_height:
-            self.driver_wrapper.switch_to_native()
-
-            top_bar = self.driver.find_element(
-                By.XPATH,
-                '//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther'
-            )
-            top_bar_height = top_bar.size['height']
-
-            self.driver_wrapper.switch_to_web()
-            return top_bar_height
-        else:
-            return self.top_bar_height
-
-    def _get_bottom_bar_height(self, force: bool = False) -> int:
-        """
-        iOS only: Get bottom bar height
-
-        :param force: get the new value forcly
-        :return: self
-        """
-        if force or not self.top_bar_height:
-            self.driver_wrapper.switch_to_native()
-
-            bottom_bar = self.driver.find_element(
-                By.XPATH,
-                '//*[@name="CapsuleViewController"]/XCUIElementTypeOther[1]'
-            )
-            bottom_bar_height = bottom_bar.size['height']
-
-            self.driver_wrapper.switch_to_web()
-            return bottom_bar_height
-        else:
-            return self.top_bar_height
