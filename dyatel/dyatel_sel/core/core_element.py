@@ -401,6 +401,9 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         return len(getattr(self, 'all_elements'))
 
+    def get_rect(self):
+        return self.element.rect
+
     # Mixin
 
     def _get_wait(self, timeout: int = WAIT_EL) -> WebDriverWait:

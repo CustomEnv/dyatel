@@ -27,6 +27,9 @@ class PlaygroundMainPage(Page):
     kube_parent = Element('.img-fluid', name='kube with parent', parent=description_section)
     kube_wrong_parent = Element('.img-fluid', name='kube with wrong parent', parent=overview_section)
     kube_broken_parent = Element('.img-fluid', name='kube with broken parent', parent=overview_section_broken)
+    inner_text_1 = Element('//*[@class="row"][2]//*[@class="col-sm"][2]', name='text block 1 for removal')
+    inner_text_2 = Element('//*[@class="row"][3]//*[@class="col-sm"][3]', name='text block 2 for removal')
+    text_container = Element('#overview .container', name='container of text')
     
 
 class SecondPlaygroundMainPage(Page):

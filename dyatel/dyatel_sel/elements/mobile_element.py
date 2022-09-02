@@ -153,13 +153,21 @@ class MobileElement(CoreElement):
             element_box = self._element_box()
             window_width = self.driver.get_window_size()['width']  # FIXME
             img_binary = self.driver_wrapper.get_screenshot()
-            scaled_image = self._scaled_screenshot(img_binary, window_width)
-            image_binary = scaled_image.crop(element_box)
+            image_binary = self._scaled_screenshot(img_binary, window_width)
+            if any(element_box) < 0:
+                image_binary = image_binary.crop(element_box)
             image_binary.save(filename)
         else:
             image_binary = super().get_screenshot(filename)
 
         return image_binary
+
+    def get_rect(self):
+        size = self.element.size
+        location = self.driver.execute_script(get_element_position_on_screen_js, self.element)
+        size.update(location)
+
+        return size
 
     def _element_box(self) -> tuple:
         """

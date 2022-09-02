@@ -379,6 +379,9 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
 
         return len(self.all_elements)
 
+    def get_rect(self):
+        return self.element.bounding_box()
+
     # Mixin
 
     def _get_driver(self) -> Union[PlaywrightPage, Locator, ElementHandle]:
