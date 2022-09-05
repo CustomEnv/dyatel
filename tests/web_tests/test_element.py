@@ -78,8 +78,8 @@ def test_screenshot(base_playground_page, driver_engine, driver_name, platform, 
 
 
 def test_screenshot_remove(base_playground_page):
-    base_playground_page.text_container.scroll_into_view().assert_screenshot(
-        remove=[base_playground_page.inner_text_1, base_playground_page.inner_text_2])
+    base_playground_page.text_container.scroll_into_view(sleep=0.5).assert_screenshot(
+            remove=[base_playground_page.inner_text_1, base_playground_page.inner_text_2])
 
 # Test waits
 
