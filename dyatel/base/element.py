@@ -13,7 +13,7 @@ from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.mixins.internal_utils import WAIT_EL
+from dyatel.mixins.internal_utils import WAIT_EL, get_frame
 
 
 class Element(WebElement, MobileElement, PlayElement):
@@ -50,6 +50,19 @@ class Element(WebElement, MobileElement, PlayElement):
 
         :return: element class
         """
+        if len(self.driver_wrapper.all_drivers) > 1:
+
+            if self.driver:
+                frame = get_frame(3)
+                prev_object = frame.f_locals['self']
+                self.driver_wrapper = prev_object.driver_wrapper
+
+                if not self.parent:
+                    from dyatel.base.group import Group
+
+                    if isinstance(prev_object, Group):
+                        self.parent = prev_object
+
         if isinstance(self.driver, PlaywrightDriver):
             Element.__bases__ = PlayElement,
             return PlayElement

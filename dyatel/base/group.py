@@ -5,7 +5,7 @@ from typing import Any, Union
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.internal_utils import get_child_elements
+from dyatel.mixins.internal_utils import get_child_elements, get_frame, get_driver_wrapper_from_prev_object
 
 
 class AfterInitMeta(type):
@@ -44,6 +44,8 @@ class Group(Element, metaclass=AfterInitMeta):
         if driver_wrapper:
             self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
             self.set_driver(self._driver_instance)
+        elif len(self.driver_wrapper.all_drivers) > 1:
+            self.set_driver(get_driver_wrapper_from_prev_object(frame_index=5))
 
     def set_driver(self, driver_wrapper) -> Group:
         """
@@ -52,6 +54,9 @@ class Group(Element, metaclass=AfterInitMeta):
         :param driver_wrapper: driver wrapper object ~ Driver/WebDriver/MobileDriver/CoreDriver/PlayDriver
         :return: self
         """
+        if not driver_wrapper:
+            return self
+
         self._set_driver(driver_wrapper, Element)
         return self
 

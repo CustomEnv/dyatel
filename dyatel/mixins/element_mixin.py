@@ -5,13 +5,12 @@ import time
 import platform
 from copy import copy
 from typing import List, Any, Union
-from inspect import currentframe
 
 from PIL import Image
 
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.internal_utils import get_child_elements_with_names
+from dyatel.mixins.internal_utils import get_child_elements_with_names, get_frame
 from dyatel.visual_comparison import assert_same_images
 
 
@@ -97,7 +96,7 @@ class ElementMixin(DriverMixin):
           :::
         """
         if not test_function_name:
-            back_frame = currentframe().f_back
+            back_frame = get_frame().f_back
 
             try:
                 for _ in range(50):

@@ -55,6 +55,11 @@ class DriverMixin:
         driver_instance = getattr(self, '_driver_instance', DriverWrapper)
         return driver_instance.driver_wrapper
 
+    @driver_wrapper.setter
+    def driver_wrapper(self, driver_wrapper: Union[WebDriver, MobileDriver, PlayDriver, DriverWrapper]):
+        """ Set source driver wrapper instance """
+        setattr(self, '_driver_instance', driver_wrapper)
+
     def _set_driver(self, driver_wrapper, instance_class) -> DriverMixin:
         """
         Set driver_wrapper/driver instances for class
