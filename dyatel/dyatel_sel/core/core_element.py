@@ -193,10 +193,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         is_hidden = False
         start_time = time.time()
         while time.time() - start_time < timeout and not is_hidden:
-            try:
-                is_hidden = not self.is_displayed(silent=True)
-            except (SeleniumNoSuchElementException, SeleniumStaleElementReferenceException):
-                is_hidden = True
+            is_hidden = self.is_hidden(silent=True)
 
         if not is_hidden:
             msg = f'"{self.name}" not visible after {timeout} seconds. {self.get_element_logging_data()}'
@@ -348,7 +345,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         try:
             self.__element = self._get_element(wait=False)
             return self.__element.is_displayed()
-        except (NoSuchElementException, DriverWrapperException):
+        except (NoSuchElementException, DriverWrapperException, SeleniumStaleElementReferenceException):
             return False
 
     def is_hidden(self, silent: bool = False) -> bool:
@@ -361,7 +358,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         if not silent:
             self.log(f'Check invisibility of "{self.name}"')
 
-        return not self.is_displayed()
+        return not self.is_displayed(silent=True)
 
     def get_attribute(self, attribute: str, silent: bool = False) -> str:
         """
