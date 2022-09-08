@@ -22,6 +22,7 @@ class ElementMixin(DriverMixin):
         self.name = None
         self.get_screenshot = None
         self.scroll_into_view = None
+        self.get_rect = None
 
     def get_element_logging_data(self, element: Any = None) -> str:
         """
@@ -48,16 +49,17 @@ class ElementMixin(DriverMixin):
 
         :return: None
         """
-        # TODO remove iOS browser bottom
         parent_abs = {x: max(y, 0) for x, y in parent.get_rect().items()}
         is_ios = self.driver_wrapper.is_ios
-        offset = abs(self.driver_wrapper.get_top_bar_height()) if is_ios else 0
         for element in children:
             elem_rect = element.get_rect()
+
             if is_ios:
                 elem_rect = {x: max(y, 0) for x, y in elem_rect.items()}
+
                 if elem_rect['y'] != 0:
-                    elem_rect['y'] += offset
+                    elem_rect['y'] += abs(self.driver_wrapper.get_top_bar_height())
+
             zone = {item: int(elem_rect[item] - (parent_abs[item] if item in ['x', 'y'] else 0)) for item in elem_rect}
             remove_coordinates = (zone['x'], zone['y'], zone['x'] + zone['width'], zone['y'] + zone['height'])
             image = Image.open(path).convert('RGB')
@@ -108,11 +110,14 @@ class ElementMixin(DriverMixin):
             raise FileNotFoundError(message) from None
 
         output_file = f'{output_directory}{filename}.png'
+
         self.get_screenshot(output_file)
+
         if remove:
             self.remove_elements(self, remove, output_file)
 
         assert_same_images(output_file, reference_file, filename, threshold)
+
         return self
 
     def _get_screenshot_name(self, test_function_name: str = '') -> str:

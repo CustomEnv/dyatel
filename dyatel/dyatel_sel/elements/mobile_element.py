@@ -147,11 +147,13 @@ class MobileElement(CoreElement):
         """
         if self.driver_wrapper.is_ios and legacy:
             element_box = self._element_box()
-            window_width, window_height = self.driver.get_window_size().values()  # FIXME
+            window_width, window_height = self.driver.get_window_size().values()
             img_binary = self.driver_wrapper.get_screenshot()
             image_binary = self._scaled_screenshot(img_binary, window_width)
+
             if any(element_box) < 0 or window_height > self.element.size['height']:
                 image_binary = image_binary.crop(element_box)
+
             image_binary.save(filename)
         else:
             image_binary = super().get_screenshot(filename)
@@ -164,8 +166,9 @@ class MobileElement(CoreElement):
 
         :return: dict
         """
-        size = self.driver.execute_script(get_element_size_js, self.element)
-        location = self.driver.execute_script(get_element_position_on_screen_js, self.element)
+        element = self.element
+        size = self.driver.execute_script(get_element_size_js, element)
+        location = self.driver.execute_script(get_element_position_on_screen_js, element)
 
         return {**size, **location}
 
@@ -175,12 +178,10 @@ class MobileElement(CoreElement):
 
         :return: element coordinates on screen (start_x, start_y, end_x, end_y)
         """
-        # self.scroll_into_view(sleep=0.1)
-
-        # breakpoint()
-        el_location = self.driver.execute_script(get_element_position_on_screen_js, self.element)
+        element = self.element
+        el_location = self.driver.execute_script(get_element_position_on_screen_js, element)
         start_x, start_y = el_location.values()
-        h, w = self.element.size.values()
+        h, w = element.size.values()
 
         if self.is_safari_driver:
             inner_height = self.driver.execute_script('return window.innerHeight')
