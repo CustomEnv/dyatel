@@ -117,9 +117,14 @@ def driver_func(request, driver_name, driver_engine, chrome_options, firefox_opt
             appium_ip = request.config.getoption('--appium-ip')
             appium_port = request.config.getoption('--appium-port')
             command_exc = f'http://{appium_ip}:{appium_port}/wd/hub'
+            is_android = platform == 'android'
+            caps = android_desired_caps if is_android else ios_desired_caps
 
-            caps = android_desired_caps if platform == 'android' else ios_desired_caps
             caps.update({'browserName': driver_name.title()})
+
+            if is_android:
+                caps.update({'chromedriverArgs': ['--hide-scrollbars']})
+
             driver = AppiumDriver(command_executor=command_exc, desired_capabilities=caps)
         else:
             driver = ChromeWebDriver(executable_path=ChromeDriverManager().install(), options=chrome_options)

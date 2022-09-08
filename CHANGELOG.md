@@ -5,6 +5,13 @@
 *Release date: In development*
 
 ---
+## v1.2.4
+*Release date: 2022-09-08*
+
+### Added
+- `assert_screenshot()` elements removal
+
+---
 ## v1.2.3
 *Release date: 2022-09-02*
 

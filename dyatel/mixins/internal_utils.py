@@ -81,7 +81,7 @@ def get_child_elements_with_names(obj: object, instance: type) -> dict:
     return elements
 
 
-def calculate_coordinate_to_click(element: Any, x: int, y: int) -> tuple:
+def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple:
     """
     Calculate coordinates to click for element
     Examples:

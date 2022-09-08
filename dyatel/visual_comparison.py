@@ -57,7 +57,7 @@ def get_difference(im1: Image, im2: Image):
     diff = ImageChops.difference(im1, im2)
     histogram = diff.histogram()
 
-    red = reduce(
+    rms = reduce(
             operator.add,
             map(
                 lambda h, i: h * (i ** 2),
@@ -66,7 +66,7 @@ def get_difference(im1: Image, im2: Image):
             )
         )
 
-    return diff, math.sqrt(red / (float(im1.size[0]) * im1.size[1]))
+    return diff, math.sqrt(rms / (float(im1.size[0]) * im1.size[1]))
 
 
 def attach_allure_diff(actual_path: str, expected_path: str, diff_path: str) -> None:

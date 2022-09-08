@@ -379,6 +379,14 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
 
         return len(self.all_elements)
 
+    def get_rect(self) -> dict:
+        """
+        A dictionary with the size and location of the element.
+
+        :return: dict
+        """
+        return self.element.bounding_box()
+
     # Mixin
 
     def _get_driver(self) -> Union[PlaywrightPage, Locator, ElementHandle]:
