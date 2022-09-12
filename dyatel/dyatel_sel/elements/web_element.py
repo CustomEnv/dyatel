@@ -51,6 +51,8 @@ class WebElement(CoreElement):
         """
         Hover outside from current element
 
+        :param x: x-offset of element to hover
+        :param y: y-offset of element to hover
         :return: self
         """
         self.log(f'Hover outside from "{self.name}"')
@@ -65,18 +67,15 @@ class WebElement(CoreElement):
         """
         Click outside of element. By default, 1px above and 1px left of element
 
-        :param x: x offset
-        :param y: y offset
+        :param x: x offset of element to click
+        :param y: y offset of element to click
         :return: self
         """
         self.log(f'Click outside from "{self.name}"')
 
         x, y = calculate_coordinate_to_click(self, x, y)
 
-        self._action_chains\
-            .move_to_location(x, y)\
-            .click()\
-            .perform()
+        self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
         return self
 
     def get_rect(self) -> dict:

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dyatel.base.element import Element
 from dyatel.base.group import Group
 from dyatel.base.page import Page
@@ -5,7 +7,7 @@ from dyatel.base.page import Page
 
 class MouseEventPage(Page):
     def __init__(self, driver_wrapper=None):
-        self.url = 'https://testautomation-playground.herokuapp.com/mouse_events.html'
+        self.url = 'https://dineshvelhal.github.io/testautomation-playground/mouse_events.html'
         super().__init__('//h2[.="Mouse Click Actions"]', name='Mouse events page', driver_wrapper=driver_wrapper)
 
     choose_language_button = Element('button.dropbtn', name='"Choose language" button', wait=True)
@@ -25,7 +27,25 @@ class MouseClickCard(Group):
         super().__init__('//*[contains(@class, "card") and .//.="Mouse Click Actions"]', name='mouse click card')
 
     click_area = Element('click_area', name='click area')
+    click_area_parent = Element('//*[@id="click_area"]/..', name='click area')
+    x_result = Element('click_x', name='x result')
+    y_result = Element('click_y', name='y result')
+
     drag_source = Element('drag_source', name='drag source button')  # Wrong one
+
+    def get_result_coordinates(self):
+        x = self.x_result.text.split(' ')[1]
+        y = self.y_result.text.split(' ')[1]
+        return int(x), int(y)
+
+    def get_click_area_middle(self):
+        el_rect = self.click_area.get_rect()
+        h, w = el_rect['height'], el_rect['width']
+        h, w = int(h / 2), int(w / 2)
+        return range(w - 1, w + 1), range(h - 1, h + 1)
+
+    def is_click_proceeded(self):
+        return self.x_result.is_displayed() or self.y_result.is_displayed()
 
     def click_area_func(self):
         return self.click_area

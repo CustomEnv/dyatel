@@ -5,6 +5,19 @@
 *Release date: In development*
 
 ---
+## v1.2.5
+*Release date: 2022-09-13*
+
+### Added
+- `element.click_into_center` method
+- `driver_wrapper.click_by_coordinates` method
+
+### Fixed
+- `calculate_coordinate_to_click` calculation
+- Shared object of groups become unique for each class 
+
+
+---
 ## v1.2.4
 *Release date: 2022-09-08*
 

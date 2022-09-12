@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import time
 from typing import Union, List
 
 from appium.webdriver.applicationstate import ApplicationState
+from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.common.by import By
 
@@ -159,17 +159,14 @@ class MobileDriver(CoreDriver):
         """
         if not self.top_bar_height:
             self.switch_to_native()
-
             top_bar = self.driver.find_element(
                 By.XPATH,
                 '//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther'
             )
-            top_bar_height = top_bar.size['height']
-
+            self.top_bar_height = top_bar.size['height']
             self.switch_to_web()
-            return top_bar_height
-        else:
-            return self.top_bar_height
+
+        return self.top_bar_height
 
     def get_bottom_bar_height(self, force: bool = False) -> int:
         """
@@ -185,9 +182,26 @@ class MobileDriver(CoreDriver):
                 By.XPATH,
                 '//*[@name="CapsuleViewController"]/XCUIElementTypeOther[1]'
             )
-            bottom_bar_height = bottom_bar.size['height']
-
+            self.bottom_bar_height = bottom_bar.size['height']
             self.switch_to_web()
-            return bottom_bar_height
-        else:
-            return self.top_bar_height
+
+        return self.top_bar_height
+
+    def click_by_coordinates(self, x: int, y: int, silent: bool = False) -> MobileDriver:
+        """
+        Click by given coordinates
+
+        :param x: tap by given x-axis
+        :param y: tap by given y-axis
+        :param silent: erase log
+        :return: self
+        """
+        if not silent:
+            self.log(f'Tap by given coordinates (x: {x}, y: {y})')
+
+        if self.is_ios:
+            TouchAction(self.driver).tap(x=x, y=y).perform()
+        elif self.is_android:
+            super().click_by_coordinates(x=x, y=y, silent=True)
+
+        return self

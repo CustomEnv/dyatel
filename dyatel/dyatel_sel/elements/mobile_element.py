@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Union, List, BinaryIO, Any
 
-from appium.webdriver.common.touch_action import TouchAction
-
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.sel_utils import get_legacy_selector, get_locator_type
@@ -43,6 +41,81 @@ class MobileElement(CoreElement):
         appium_elements = self._find_elements(self._get_base())
         return self._get_all_elements(appium_elements, MobileElement)
 
+    def click(self) -> MobileElement:
+        """
+        Click to current element
+        SafariDriver: Click to current element by JS
+
+        :return: self
+        """
+        if self.is_safari_driver:
+            self.wait_element(silent=True).wait_clickable(silent=True)
+            self.driver.execute_script(click_js, self.element)
+        else:
+            super().click()
+
+        return self
+
+    def click_outside(self, x: int = 0, y: int = -5, calculate_top_bar=True) -> MobileElement:
+        """
+        Click outside of element. By default, 5px above  of element
+
+        :param x: x offset of element to tap
+        :param y: y offset of element to tap
+        :param calculate_top_bar: iOS only - attach top bar height to calculation
+        :return: self
+        """
+        x, y = calculate_coordinate_to_click(self, x, y)
+
+        if calculate_top_bar and self.is_ios:
+            y += self.driver_wrapper.get_top_bar_height()
+
+        self.log(f'Tap outside from "{self.name}" with coordinates (x: {x}, y: {y})')
+
+        self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
+        return self
+
+    def click_into_center(self, calculate_top_bar: bool = True, silent: bool = True) -> MobileElement:
+        """
+        Click into the center of element
+
+        :param calculate_top_bar: iOS only - attach top bar height to calculation
+        :param silent: erase log message
+        :return: self
+        """
+        x, y = calculate_coordinate_to_click(self, 0, 0)
+
+        if calculate_top_bar and self.is_ios:
+            y += self.driver_wrapper.get_top_bar_height()
+
+        if not silent:
+            self.log(f'Tap into the center by coordinates (x: {x}, y: {y}) for "{self.name}"')
+
+        self.driver_wrapper.click_by_coordinates(x, y, silent=True)
+
+        return self
+
+    def hover(self, calculate_top_bar=True) -> MobileElement:
+        """
+        Hover over current element
+
+        :param calculate_top_bar: iOS only - attach top bar height to calculation
+        :return: self
+        """
+        self.click_into_center(calculate_top_bar=calculate_top_bar)
+        return self
+
+    def hover_outside(self, x: int = 0, y: int = -5, calculate_top_bar=True) -> MobileElement:
+        """
+        Hover outside from current element. By default, 5px above  of element
+
+        :param x: x-offset of element to hover(tap)
+        :param y: y-offset of element to hover(tap)
+        :param calculate_top_bar: iOS only - attach top bar height to calculation
+        :return: self
+        """
+        return self.click_outside(x=x, y=y, calculate_top_bar=calculate_top_bar)
+
     def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> MobileElement:
         """
         Wait for current element available in page
@@ -56,21 +129,6 @@ class MobileElement(CoreElement):
             self.wait_availability(timeout=timeout, silent=True)
         else:
             super().wait_element(timeout=timeout, silent=silent)
-
-        return self
-
-    def click(self) -> MobileElement:
-        """
-        Click to current element
-        SafariDriver: Click to current element by JS
-
-        :return: self
-        """
-        if self.is_safari_driver:
-            self.wait_element(silent=True).wait_clickable(silent=True)
-            self.driver.execute_script(click_js, self.element)
-        else:
-            super().click()
 
         return self
 
@@ -92,50 +150,6 @@ class MobileElement(CoreElement):
                 return False
         else:
             return super().is_displayed(silent=silent)
-
-    def hover(self) -> MobileElement:
-        """
-        Hover over current element
-
-        :return: self
-        """
-        self.log(f'Tap to "{self.name}"')
-        self.wait_element(silent=True)
-
-        if self.is_ios:
-            x, y = calculate_coordinate_to_click(self, 0, 0)
-            TouchAction(self.driver).tap(x=x, y=y).perform()
-        else:
-            self._action_chains.click(on_element=self.element).perform()
-
-        return self
-
-    def hover_outside(self, x: int = 0, y: int = -5) -> MobileElement:
-        """
-        Hover outside from current element
-
-        :return: self
-        """
-        return self.click_outside(x, y)
-
-    def click_outside(self, x: int = 0, y: int = -5) -> MobileElement:
-        """
-        Click outside of element. By default, 5px above  of element
-
-        :param x: x offset
-        :param y: y offset
-        :return: self
-        """
-        self.log(f'Tap outside from "{self.name}"')
-        self.wait_element(silent=True)
-
-        x, y = calculate_coordinate_to_click(self, x, y)
-
-        if self.is_ios:
-            TouchAction(self.driver).tap(x=x, y=y).perform()
-        else:
-            self._action_chains.move_to_location(x, y).click().perform()
-        return self
 
     def get_screenshot(self, filename: str, legacy: bool = True) -> BinaryIO:
         """
