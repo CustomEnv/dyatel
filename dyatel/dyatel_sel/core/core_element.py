@@ -21,7 +21,8 @@ from dyatel.exceptions import TimeoutException, InvalidSelectorException, Driver
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
-from dyatel.mixins.internal_utils import get_child_elements, WAIT_EL, initialize_objects_with_args
+from dyatel.mixins.internal_utils import get_child_elements, WAIT_EL, initialize_objects_with_args, \
+    calculate_coordinate_to_click
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
 
@@ -90,6 +91,21 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         return self
 
+    def click_into_center(self, silent: bool = False) -> CoreElement:
+        """
+        Click into the center of element
+
+        :param silent: erase log message
+        :return: self
+        """
+        x, y = calculate_coordinate_to_click(self, 0, 0)
+
+        if not silent:
+            self.log(f'Click into the center (x: {x}, y: {y}) for "{self.name}"')
+
+        self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
+        return self
+
     def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> CoreElement:
         """
         Type text to current element
@@ -99,6 +115,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: self
         """
         text = str(text)
+
         if not silent:
             self.log(f'Type text {cut_log_data(text)} into "{self.name}"')
 

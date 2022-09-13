@@ -34,7 +34,7 @@ class PlaygroundMainPage(Page):
 
 class SecondPlaygroundMainPage(Page):
     def __init__(self):
-        self.url = 'https://testautomation-playground.herokuapp.com/index.html'
+        self.url = 'https://dineshvelhal.github.io/testautomation-playground/index.html'
         super(SecondPlaygroundMainPage, self).__init__('//h1[.="The Playground"]', name='Second playground main page')
 
     def get_all_cards(self) -> List[Card]:
