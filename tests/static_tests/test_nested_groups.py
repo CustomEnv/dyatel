@@ -1,3 +1,5 @@
+import pytest
+
 from dyatel.base.element import Element
 from dyatel.base.group import Group
 from dyatel.base.page import Page
@@ -22,7 +24,13 @@ class Page1(Page):
         super().__init__('page1')
 
 
-def test_object_in_nested_groups(mocked_selenium_driver):
+@pytest.mark.parametrize(
+    'driver',
+    ('mocked_selenium_driver', 'mocked_mobile_driver', 'mocked_play_driver'),
+    ids=['selenium', 'appium', 'playwright']
+)
+def test_object_in_nested_groups(mocked_mobile_driver, driver, request):
+    request.getfixturevalue(driver)
     page = Page1()
     assert page.group1.shared_element != page.group2.shared_element
     assert page.group1.shared_element.parent != page.group2.shared_element.parent
