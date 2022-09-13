@@ -34,15 +34,12 @@ class MouseClickCard(Group):
     drag_source = Element('drag_source', name='drag source button')  # Wrong one
 
     def get_result_coordinates(self):
-        x = self.x_result.text.split(' ')[1]
-        y = self.y_result.text.split(' ')[1]
-        return int(x), int(y)
+        return [int(element.text.split(' ')[1]) for element in (self.x_result, self.y_result)]
 
     def get_click_area_middle(self):
         el_rect = self.click_area.get_rect()
-        h, w = el_rect['height'], el_rect['width']
-        h, w = int(h / 2), int(w / 2)
-        return range(w - 1, w + 1), range(h - 1, h + 1)
+        height, width = int(el_rect['height'] / 2), int(el_rect['width'] / 2)
+        return [range(side - 1, side + 1) for side in [width, height]]
 
     def is_click_proceeded(self):
         return self.x_result.is_displayed() or self.y_result.is_displayed()
