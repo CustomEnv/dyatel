@@ -135,20 +135,17 @@ class ElementMixin(DriverMixin):
         """
         if not test_function_name:
             back_frame = currentframe().f_back
+            test_function_name = ''
 
             try:
                 for _ in range(50):
-                    if 'test' not in test_function_name and 'test' not in back_frame.f_code.co_filename:
+                    if 'test' not in test_function_name or 'test' not in back_frame.f_code.co_filename:
                         back_frame = back_frame.f_back
                         test_function_name = back_frame.f_code.co_name
                     else:
                         break
             except AttributeError:
                 raise Exception("Can't find test name. Please pass the test_name as parameter to assert_screenshot")
-        else:
-            test_function_name = test_function_name.replace('[', '').replace(']', '')
-
-        element_name = self.name.replace('"', '').replace("'", '_')
 
         current_os = platform.system()
         if 'darwin' in current_os.lower():
@@ -177,9 +174,15 @@ class ElementMixin(DriverMixin):
         else:
             raise DriverWrapperException('Cant find current platform')
 
-        screenshot_name = f'{test_function_name}_{element_name}_{screenshot_name}'
-        screenshot_name = screenshot_name.replace(' ', '_').replace('.', '_').lower()
-        return screenshot_name
+        screenshot_name = f'{test_function_name}_{self.name}_{screenshot_name}'
+
+        for item in (' ', '.', '-', ':'):
+            screenshot_name = screenshot_name.replace(item, '_')
+
+        for item in ('[', ']', '"', "'"):
+            screenshot_name = screenshot_name.replace(item, '')
+
+        return screenshot_name.lower()
 
     def _get_all_elements(self, sources: Union[tuple, list], instance_class: type) -> List[Any]:
         """

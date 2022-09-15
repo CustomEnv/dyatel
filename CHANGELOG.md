@@ -5,11 +5,11 @@
 *Release date: In development*
 
 ---
-## v1.2.6
+## v1.2.6/7
 *Release date: 2022-09-15*
 
 ### Fixed
-- `element.assert_screenshot` screenshot name generation for real device on android
+- screenshot name generation
 
 ---
 ## v1.2.5
@@ -38,7 +38,7 @@
 - `element.is_displayed()` exception handler
 
 ---
-## v1.2.2
+## v1.2.1/2
 *Release date: 2022-08-31*
 
 ### Fixed
