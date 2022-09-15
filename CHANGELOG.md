@@ -5,6 +5,13 @@
 *Release date: In development*
 
 ---
+## v1.2.6
+*Release date: 2022-09-15*
+
+### Fixed
+- `element.assert_screenshot` screenshot name generation for real device on android
+
+---
 ## v1.2.5
 *Release date: 2022-09-13*
 
@@ -14,8 +21,7 @@
 
 ### Fixed
 - `calculate_coordinate_to_click` calculation
-- Shared object of groups become unique for each class 
-
+- Shared object of groups become unique for each class
 
 ---
 ## v1.2.4

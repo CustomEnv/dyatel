@@ -156,7 +156,14 @@ class ElementMixin(DriverMixin):
 
         if self.driver_wrapper.mobile:
             caps = self.driver.caps
-            device_name = caps['deviceName'] if self.driver_wrapper.is_ios else caps['avd']
+
+            device_name = caps.get('customDeviceName', '')
+
+            if self.driver_wrapper.is_android and not device_name:
+                device_name = caps.get('avd', f'{caps.get("deviceManufacturer")}_{caps.get("deviceModel", "none")}')
+            elif self.driver_wrapper.is_ios and not device_name:
+                device_name = caps['deviceName']
+
             browser_name = caps['browserName']
             platform_version = caps['platformVersion']
             screenshot_name = f'{device_name}_v_{platform_version}_appium_{browser_name}'
