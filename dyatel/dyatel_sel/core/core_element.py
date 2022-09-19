@@ -15,6 +15,7 @@ from selenium.common.exceptions import (
     InvalidSelectorException as SeleniumInvalidSelectorException,
     NoSuchElementException as SeleniumNoSuchElementException,
     ElementNotInteractableException as SeleniumElementNotInteractableException,
+    ElementClickInterceptedException as SeleniumElementClickInterceptedException,
 )
 
 from dyatel.dyatel_sel.sel_utils import ActionChains
@@ -94,12 +95,14 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         self.log(f'Click into "{self.name}"')
 
         self.element = self._get_element()
+        exception_msg = f'Element "{self.name}" not interactable {self.get_element_logging_data()}'
 
         try:
             self.wait_clickable(silent=True).element.click()
         except SeleniumElementNotInteractableException:
-            exception_msg = f'Element "{self.name}" not interactable {self.get_element_logging_data()}'
             raise ElementNotInteractableException(exception_msg) from None
+        except SeleniumElementClickInterceptedException as exc:
+            raise ElementNotInteractableException(f'{exception_msg}. Original error: {exc.msg}') from None
         finally:
             self.element = None
 
