@@ -151,8 +151,9 @@ class MobileDriver(CoreDriver):
     @property
     def is_native_context(self) -> bool:
         """
+        Check is current context is native or not
 
-        :return:
+        :return: bool
         """
         if not self.__is_native_context:
             self.__is_native_context = self.get_current_context() == self.native_context_name
@@ -162,8 +163,9 @@ class MobileDriver(CoreDriver):
     @property
     def is_web_context(self) -> bool:
         """
+        Check is current context is web or not
 
-        :return:
+        :return: bool
         """
         if not self.__is_web_context:
             self.__is_web_context = self.get_current_context() == self.web_context_name

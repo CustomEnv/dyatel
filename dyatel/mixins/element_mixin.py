@@ -154,6 +154,8 @@ class ElementMixin(DriverMixin):
                         break
             except AttributeError:
                 raise Exception("Can't find test name. Please pass the test_name as parameter to assert_screenshot")
+        else:
+            test_function_name = test_function_name.replace('[', '_')
 
         current_os = platform.system()
         if 'darwin' in current_os.lower():
@@ -184,7 +186,7 @@ class ElementMixin(DriverMixin):
 
         screenshot_name = f'{test_function_name}_{self.name}_{screenshot_name}'
 
-        for item in ('[', ']', '"', "'"):
+        for item in (']', '"', "'"):
             screenshot_name = screenshot_name.replace(item, '')
 
         for item in punctuation + ' ':
