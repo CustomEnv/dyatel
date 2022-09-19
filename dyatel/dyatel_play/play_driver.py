@@ -242,7 +242,7 @@ class PlayDriver(LogMixin):
         :return: self
         """
         if tab == -1:
-            tab = self.get_all_tabs()[tab:]
+            tab = self.get_all_tabs()[tab]
         else:
             tab = self.get_all_tabs()[tab - 1]
 
