@@ -82,6 +82,7 @@ class WebElement(CoreElement):
         """
         A dictionary with the size and location of the element.
 
-        :return: dict
+        :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
         """
-        return self.element.rect
+        sorted_items: list = sorted(self.element.rect.items(), reverse=True)
+        return dict(sorted_items)

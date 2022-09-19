@@ -174,7 +174,8 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             is_displayed = self.is_displayed(silent=True)
 
         if not is_displayed:
-            raise TimeoutException(f'Can\'t wait element "{self.name}". {self.get_element_logging_data()}') from None
+            base_exception_msg = f'Element "{self.name}" not visible after {timeout} seconds'
+            raise TimeoutException(f'{base_exception_msg} {self.get_element_logging_data()}') from None
 
         return self
 
@@ -493,6 +494,10 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if not base:
             raise DriverWrapperException("Can't find driver") from None
+
+        if self.driver_wrapper.mobile:
+            if self.driver_wrapper.is_native_context:
+                return base
 
         if self.parent:
             self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')

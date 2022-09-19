@@ -16,16 +16,6 @@ class CoreDriver(LogMixin):
     driver: Union[AppiumDriver, SeleniumWebDriver] = None
     driver_wrapper = None
 
-    desktop = False
-    selenium = True
-    playwright = False
-
-    mobile = False
-    is_ios = False
-    is_android = False
-    is_xcui_driver = False
-    is_safari_driver = False
-
     def __init__(self, driver: Union[AppiumDriver, SeleniumWebDriver]):
         """
         Initializing of core driver

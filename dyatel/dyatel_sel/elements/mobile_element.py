@@ -178,13 +178,13 @@ class MobileElement(CoreElement):
         """
         A dictionary with the size and location of the element.
 
-        :return: dict
+        :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
         """
         element = self.element
         size = self.driver.execute_script(get_element_size_js, element)
         location = self.driver.execute_script(get_element_position_on_screen_js, element)
-
-        return {**size, **location}
+        sorted_items: list = sorted({**size, **location}.items(), reverse=True)
+        return dict(sorted_items)
 
     def _element_box(self) -> tuple:
         """

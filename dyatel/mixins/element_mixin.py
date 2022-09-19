@@ -4,6 +4,7 @@ import os
 import time
 import platform
 from copy import copy
+from string import punctuation
 from typing import List, Any, Union
 from inspect import currentframe
 
@@ -50,11 +51,11 @@ class ElementMixin(DriverMixin):
         :return: None
         """
         parent_abs = {x: max(y, 0) for x, y in parent.get_rect().items()}
-        is_ios = self.driver_wrapper.is_ios
+
         for element in children:
             elem_rect = element.get_rect()
 
-            if is_ios:
+            if self.driver_wrapper.is_ios:
                 elem_rect = {x: max(y, 0) for x, y in elem_rect.items()}
 
                 if elem_rect['y'] != 0:
@@ -80,43 +81,50 @@ class ElementMixin(DriverMixin):
         :return: self
         """
         filename = filename if filename else self._get_screenshot_name(test_name)
-        root_path = os.environ.get('visual', '')
+
+        root_path = self.driver_wrapper.visual_regression_path
 
         if not root_path:
-            raise Exception('Provide visual regression path to environment. Example: os.environ["visual"] = "tests"')
+            raise Exception('Provide visual regression path to environment. '
+                            'Example: DriverWrapper.visual_regression_path = "src"')
 
         root_path = root_path if root_path.endswith('/') else f'{root_path}/'
         reference_directory = f'{root_path}reference/'
         output_directory = f'{root_path}output/'
+        diff_directory = f'{root_path}difference/'
 
         reference_file = f'{reference_directory}{filename}.png'
+        output_file = f'{output_directory}{filename}.png'
+        diff_file = f'{diff_directory}/diff_{filename}.png'
 
-        os.makedirs(os.path.dirname(output_directory), exist_ok=True)
         os.makedirs(os.path.dirname(reference_directory), exist_ok=True)
+        os.makedirs(os.path.dirname(output_directory), exist_ok=True)
+        os.makedirs(os.path.dirname(diff_directory), exist_ok=True)
 
         if scroll:
             self.scroll_into_view()
 
         time.sleep(delay)
 
+        def save_screenshot(screenshot_name):
+            self.get_screenshot(screenshot_name)
+            if remove:
+                self.remove_elements(self, remove, screenshot_name)
+
         try:
             Image.open(reference_file)
         except FileNotFoundError:
-            self.get_screenshot(reference_file)
-            if remove:
-                self.remove_elements(self, remove, reference_file)
-            message = f'Reference file "{reference_file}" not found, but its just saved. ' \
-                      'If it CI run, then you need to commit reference files.'
-            raise FileNotFoundError(message) from None
+            save_screenshot(reference_file)
 
-        output_file = f'{output_directory}{filename}.png'
+            if self.driver_wrapper.visual_reference_generation:
+                return self
 
-        self.get_screenshot(output_file)
+            raise FileNotFoundError(f'Reference file "{reference_file}" not found, but its just saved. '
+                                    f'If it CI run, then you need to commit reference files.') from None
 
-        if remove:
-            self.remove_elements(self, remove, output_file)
+        save_screenshot(output_file)
 
-        assert_same_images(output_file, reference_file, filename, threshold)
+        assert_same_images(output_file, reference_file, diff_file, threshold)
 
         return self
 
@@ -127,10 +135,10 @@ class ElementMixin(DriverMixin):
         :param test_function_name: execution test name. Will try to find it automatically if empty string given
         :return: custom screenshot filename:
           :::
-          - playwright: test_screenshot_rubik_s_cube_darwin_v_12_3_1_playwright_chromium
-          - selenium: test_screenshot_rubik_s_cube_darwin_v_12_3_1_selenium_chrome
-          - appium ios: test_screenshot_rubik_s_cube_iphone_13_v_15_4_appium_safari
-          - appium android: test_screenshot_rubik_s_cube_pixel5_v_12_appium_chrome
+          - playwright: test_screenshot_rubiks_cube_darwin_v_12_3_1_playwright_chromium
+          - selenium: test_screenshot_rubiks_cube_darwin_v_12_3_1_selenium_chrome
+          - appium ios: test_screenshot_rubiks_cube_iphone_13_v_15_4_appium_safari
+          - appium android: test_screenshot_rubiks_cube_pixel5_v_12_appium_chrome
           :::
         """
         if not test_function_name:
@@ -176,11 +184,11 @@ class ElementMixin(DriverMixin):
 
         screenshot_name = f'{test_function_name}_{self.name}_{screenshot_name}'
 
-        for item in (' ', '.', '-', ':'):
-            screenshot_name = screenshot_name.replace(item, '_')
-
         for item in ('[', ']', '"', "'"):
             screenshot_name = screenshot_name.replace(item, '')
+
+        for item in punctuation + ' ':
+            screenshot_name = screenshot_name.replace(item, '_')
 
         return screenshot_name.lower()
 

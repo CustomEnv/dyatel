@@ -18,37 +18,38 @@ class MobileDriver(CoreDriver):
 
         :param driver: appium driver to initialize
         """
-        self.capabilities = driver.capabilities
+        self.caps = driver.capabilities
 
-        self.is_web = self.capabilities.get('browserName', False)
-        self.is_app = self.capabilities.get('app', False)
-        self.is_android = self.capabilities.get('platformName').lower() == 'android'
+        self.is_web = self.caps.get('browserName', False)
+        self.is_app = self.caps.get('app', False)
+        self.is_android = self.caps.get('platformName').lower() == 'android'
 
-        self.is_ios = self.capabilities.get('platformName').lower() == 'ios'
-        self.is_safari_driver = self.capabilities.get('automationName').lower() == 'safari'
-        self.is_xcui_driver = self.capabilities.get('automationName').lower() == 'xcuitest'
+        self.is_ios = self.caps.get('platformName').lower() == 'ios'
+        self.is_safari_driver = self.caps.get('automationName').lower() == 'safari'
+        self.is_xcui_driver = self.caps.get('automationName').lower() == 'xcuitest'
 
-        CoreDriver.mobile = True
         CoreDriver.is_ios = self.is_ios
         CoreDriver.is_android = self.is_android
         CoreDriver.is_safari_driver = self.is_safari_driver
         CoreDriver.is_xcui_driver = self.is_xcui_driver
 
-        self.native_context = 'NATIVE_APP'
-        self.web_context = self.get_web_view_context() if self.is_xcui_driver else 'CHROMIUM'
+        self.native_context_name = 'NATIVE_APP'
+        self.web_context_name = self.get_web_view_context() if self.is_xcui_driver else 'CHROMIUM'
+        self.__is_native_context = None
+        self.__is_web_context = None
 
         self.top_bar_height = None
         self.bottom_bar_height = None
 
         if self.is_app:
             if self.is_ios:
-                self.bundle_id = self.capabilities['bundleId']
+                self.bundle_id = self.caps.get('bundleId', 'undefined: bundleId')
             elif self.is_android:
-                self.bundle_id = self.capabilities['appPackage']
+                self.bundle_id = self.caps.get('appPackage', 'undefined: appPackage')
             else:
                 raise Exception('Make sure that correct "platformName" capability specified')
 
-        CoreDriver.__init__(self, driver=driver)
+        super().__init__(driver=driver)
 
     def is_app_installed(self) -> bool:
         """
@@ -113,7 +114,9 @@ class MobileDriver(CoreDriver):
 
         :return: self
         """
-        self.driver.switch_to.context(self.native_context)
+        self.driver.switch_to.context(self.native_context_name)
+        self.__is_native_context = True
+        self.__is_web_context = False
         return self
 
     def switch_to_web(self) -> MobileDriver:
@@ -122,7 +125,9 @@ class MobileDriver(CoreDriver):
 
         :return: self
         """
-        self.driver.switch_to.context(self.web_context)
+        self.driver.switch_to.context(self.web_context_name)
+        self.__is_native_context = False
+        self.__is_web_context = True
         return self
 
     def get_web_view_context(self) -> Union[None, str]:
@@ -142,6 +147,28 @@ class MobileDriver(CoreDriver):
         :return: current context name
         """
         return self.driver.context
+
+    @property
+    def is_native_context(self) -> bool:
+        """
+
+        :return:
+        """
+        if not self.__is_native_context:
+            self.__is_native_context = self.get_current_context() == self.native_context_name
+
+        return self.__is_native_context
+
+    @property
+    def is_web_context(self) -> bool:
+        """
+
+        :return:
+        """
+        if not self.__is_web_context:
+            self.__is_web_context = self.get_current_context() == self.web_context_name
+
+        return self.__is_web_context
 
     def get_all_contexts(self) -> List[str]:
         """

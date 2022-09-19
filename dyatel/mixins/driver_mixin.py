@@ -22,7 +22,7 @@ def get_driver_wrapper_from_object(obj, custom_driver_wrapper_object: Union[Driv
     :param custom_driver_wrapper_object: custom object. Can be driver_wrapper or object with driver_wrapper
     :return: driver wrapper object
     """
-    if isinstance(custom_driver_wrapper_object, DriverWrapper):
+    if isinstance(custom_driver_wrapper_object, (DriverWrapper, PlayDriver, WebDriver, MobileDriver)):
         new_driver_instance = custom_driver_wrapper_object
     elif hasattr(custom_driver_wrapper_object, 'driver_wrapper'):
         new_driver_instance = custom_driver_wrapper_object.driver_wrapper
