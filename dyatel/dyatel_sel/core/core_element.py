@@ -14,17 +14,28 @@ from selenium.common.exceptions import (
     InvalidArgumentException as SeleniumInvalidArgumentException,
     InvalidSelectorException as SeleniumInvalidSelectorException,
     NoSuchElementException as SeleniumNoSuchElementException,
+    ElementNotInteractableException as SeleniumElementNotInteractableException,
 )
 
 from dyatel.dyatel_sel.sel_utils import ActionChains
-from dyatel.exceptions import TimeoutException, InvalidSelectorException, DriverWrapperException, NoSuchElementException
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
-from dyatel.mixins.internal_utils import get_child_elements, WAIT_EL, initialize_objects_with_args, \
-    calculate_coordinate_to_click
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
+from dyatel.exceptions import (
+    TimeoutException,
+    InvalidSelectorException,
+    DriverWrapperException,
+    NoSuchElementException,
+    ElementNotInteractableException,
+)
+from dyatel.mixins.internal_utils import (
+    WAIT_EL,
+    get_child_elements,
+    initialize_objects_with_args,
+    calculate_coordinate_to_click,
+)
 
 
 class CoreElement(ElementMixin, DriverMixin, LogMixin):
@@ -86,6 +97,9 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         try:
             self.wait_clickable(silent=True).element.click()
+        except SeleniumElementNotInteractableException:
+            exception_msg = f'Element "{self.name}" not interactable {self.get_element_logging_data()}'
+            raise ElementNotInteractableException(exception_msg) from None
         finally:
             self.element = None
 
