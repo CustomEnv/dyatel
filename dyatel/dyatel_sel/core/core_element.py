@@ -513,8 +513,9 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             raise DriverWrapperException("Can't find driver") from None
 
         if self.driver_wrapper.mobile:
-            if self.driver_wrapper.is_native_context:
-                return base
+            if not self.driver_wrapper.is_safari_driver:
+                if self.driver_wrapper.is_native_context:
+                    return base
 
         if self.parent:
             self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')
