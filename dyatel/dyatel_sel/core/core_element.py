@@ -14,17 +14,29 @@ from selenium.common.exceptions import (
     InvalidArgumentException as SeleniumInvalidArgumentException,
     InvalidSelectorException as SeleniumInvalidSelectorException,
     NoSuchElementException as SeleniumNoSuchElementException,
+    ElementNotInteractableException as SeleniumElementNotInteractableException,
+    ElementClickInterceptedException as SeleniumElementClickInterceptedException,
 )
 
 from dyatel.dyatel_sel.sel_utils import ActionChains
-from dyatel.exceptions import TimeoutException, InvalidSelectorException, DriverWrapperException, NoSuchElementException
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
-from dyatel.mixins.internal_utils import get_child_elements, WAIT_EL, initialize_objects_with_args, \
-    calculate_coordinate_to_click
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
+from dyatel.exceptions import (
+    TimeoutException,
+    InvalidSelectorException,
+    DriverWrapperException,
+    NoSuchElementException,
+    ElementNotInteractableException,
+)
+from dyatel.mixins.internal_utils import (
+    WAIT_EL,
+    get_child_elements,
+    initialize_objects_with_args,
+    calculate_coordinate_to_click,
+)
 
 
 class CoreElement(ElementMixin, DriverMixin, LogMixin):
@@ -83,9 +95,14 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         self.log(f'Click into "{self.name}"')
 
         self.element = self._get_element()
+        exception_msg = f'Element "{self.name}" not interactable {self.get_element_logging_data()}'
 
         try:
             self.wait_clickable(silent=True).element.click()
+        except SeleniumElementNotInteractableException:
+            raise ElementNotInteractableException(exception_msg) from None
+        except SeleniumElementClickInterceptedException as exc:
+            raise ElementNotInteractableException(f'{exception_msg}. Original error: {exc.msg}') from None
         finally:
             self.element = None
 
@@ -174,7 +191,8 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             is_displayed = self.is_displayed(silent=True)
 
         if not is_displayed:
-            raise TimeoutException(f'Can\'t wait element "{self.name}". {self.get_element_logging_data()}') from None
+            base_exception_msg = f'Element "{self.name}" not visible after {timeout} seconds'
+            raise TimeoutException(f'{base_exception_msg} {self.get_element_logging_data()}') from None
 
         return self
 
@@ -493,6 +511,11 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if not base:
             raise DriverWrapperException("Can't find driver") from None
+
+        if self.driver_wrapper.mobile:
+            if not self.driver_wrapper.is_safari_driver:
+                if self.driver_wrapper.is_native_context:
+                    return base
 
         if self.parent:
             self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')

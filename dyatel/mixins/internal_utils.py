@@ -95,8 +95,7 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
     :param y: vertical offset relative to either top (y > 0) or bottom side (y < 0)
     :return: tuple of calculated coordinates
     """
-    el_rect = element.get_rect()
-    ex, ey, ew, eh = el_rect['x'], el_rect['y'], el_rect['width'], el_rect['height']
+    ey, ex, ew, eh = element.get_rect().values()
     emx, emy = ex + ew / 2, ey + eh / 2  # middle of element
 
     if x:

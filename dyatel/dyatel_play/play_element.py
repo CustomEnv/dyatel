@@ -399,9 +399,10 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         """
         A dictionary with the size and location of the element.
 
-        :return: dict
+        :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
         """
-        return self.element.bounding_box()
+        sorted_items: list = sorted(self.element.bounding_box().items(), reverse=True)
+        return dict(sorted_items)
 
     # Mixin
 

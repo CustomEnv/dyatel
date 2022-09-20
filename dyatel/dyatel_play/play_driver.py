@@ -15,16 +15,6 @@ class PlayDriver(LogMixin):
     all_drivers: List[PlaywrightPage] = []
     driver_wrapper: PlayDriver = None
 
-    desktop = False
-    selenium = False
-    playwright = True
-
-    mobile = False
-    is_ios = False
-    is_android = False
-    is_safari_driver = False
-    is_xcui_driver = False
-
     def __init__(self, driver: Browser):
         """
         Initializing of desktop web driver with playwright
@@ -35,8 +25,6 @@ class PlayDriver(LogMixin):
         self.driver = self.driver_context.new_page()
         self.all_drivers.append(self.driver)
         self.original_tab = self.driver
-
-        PlayDriver.desktop = True
 
         if not PlayDriver.driver:
             PlayDriver.instance = driver
@@ -254,7 +242,7 @@ class PlayDriver(LogMixin):
         :return: self
         """
         if tab == -1:
-            tab = self.get_all_tabs()[tab:]
+            tab = self.get_all_tabs()[tab]
         else:
             tab = self.get_all_tabs()[tab - 1]
 

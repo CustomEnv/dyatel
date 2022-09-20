@@ -3,7 +3,6 @@ import json
 import base64
 import math
 import operator
-import os
 from functools import reduce
 from typing import Union
 
@@ -30,12 +29,8 @@ def assert_same_images(actual_file: str, reference_file: str, filename: str, thr
     is_different = actual_threshold > threshold
 
     if is_different or not same_size:
-        root_path = os.environ.get('visual', '')
-        diff_directory = f'{root_path}/difference/'
-        os.makedirs(os.path.dirname(diff_directory), exist_ok=True)
-        diff_file = f'{diff_directory}/diff-{filename}.png'
-        diff.save(diff_file)
-        attach_allure_diff(actual_file, reference_file, diff_file)
+        diff.save(filename)
+        attach_allure_diff(actual_file, reference_file, filename)
 
     base_error = f"The new screenshot '{actual_file}' did not match the reference '{reference_file}'."
 
