@@ -3,7 +3,7 @@ from __future__ import annotations
 import inspect
 from typing import Any
 
-from dyatel.js_scripts import get_element_position_on_screen_js
+from dyatel.exceptions import UnsuitableArgumentsException
 
 WAIT_EL = 10
 WAIT_PAGE = 20
@@ -21,11 +21,17 @@ def initialize_objects_with_args(objects: list):
     :return: None
     """
     for obj in objects:
-        if not getattr(obj, '_initialized'):
-            obj.__init__(**get_object_kwargs(obj))
+        if not getattr(obj, '__initialized', False):
+            obj_args = get_object_kwargs(obj)
+            obj.__init__(**obj_args)
+
+            obj.__initialized = True
+            for arg_name, arg_value in obj_args.items():
+                if arg_value:
+                    setattr(obj, arg_name, arg_value)
 
 
-def get_object_kwargs(obj: object):
+def get_object_kwargs(obj: Any) -> dict:
     """
     Get actual args/kwargs of object __init__
 
@@ -33,12 +39,37 @@ def get_object_kwargs(obj: object):
     :return: object kwargs
     """
     init_args = inspect.getfullargspec(obj.__init__).args
-
     for index, key in enumerate(init_args):
         if key == 'self':
             init_args.pop(index)
 
-    return {item: getattr(obj, item) for item in init_args}
+    obj_locals = getattr(obj, '_init_locals')
+    obj_locals.pop('self', None)
+    kwargs = obj_locals.get('kwargs', {})
+    kwargs.update({item: obj_locals.get(item, getattr(obj, item)) for item in init_args})
+
+    return kwargs
+
+
+def get_platform_locator(obj):
+    locator, data = obj.locator, getattr(obj, '_init_locals').get('kwargs', {})
+
+    if not data:
+        return locator
+
+    if obj.driver_wrapper.desktop:
+        locator = data.get('desktop', locator)
+
+    elif obj.driver_wrapper.mobile:
+        locator = data.get('mobile', locator)
+        if data.get('mobile', False) and (data.get('android', False) or data.get('ios', False)):
+            raise UnsuitableArgumentsException('Dont use mobile and android/ios locators together')
+        elif obj.driver_wrapper.is_ios:
+            locator = data.get('ios', locator)
+        elif obj.driver_wrapper.is_android:
+            locator = data.get('android', locator)
+
+    return locator
 
 
 def get_timeout_in_ms(timeout: int):

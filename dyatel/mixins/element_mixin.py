@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import time
-import platform
 from copy import copy
 from string import punctuation
 from typing import List, Any, Union
@@ -135,8 +134,8 @@ class ElementMixin(DriverMixin):
         :param test_function_name: execution test name. Will try to find it automatically if empty string given
         :return: custom screenshot filename:
           :::
-          - playwright: test_screenshot_rubiks_cube_darwin_v_12_3_1_playwright_chromium
-          - selenium: test_screenshot_rubiks_cube_darwin_v_12_3_1_selenium_chrome
+          - playwright: test_screenshot_rubiks_cube_playwright_chromium
+          - selenium: test_screenshot_rubiks_cube_mac_os_x_selenium_chrome
           - appium ios: test_screenshot_rubiks_cube_iphone_13_v_15_4_appium_safari
           - appium android: test_screenshot_rubiks_cube_pixel5_v_12_appium_chrome
           :::
@@ -157,10 +156,6 @@ class ElementMixin(DriverMixin):
         else:
             test_function_name = test_function_name.replace('[', '_')
 
-        current_os = platform.system()
-        if 'darwin' in current_os.lower():
-            current_os += f'_v_{platform.mac_ver()[0]}'
-
         if self.driver_wrapper.mobile:
             caps = self.driver.caps
 
@@ -176,11 +171,11 @@ class ElementMixin(DriverMixin):
             screenshot_name = f'{device_name}_v_{platform_version}_appium_{browser_name}'
         elif self.driver_wrapper.selenium:
             caps = self.driver.caps
-            browser_name = caps['browserName']
-            screenshot_name = f'{current_os}_selenium_{browser_name}'
+            platform_name, browser_name = caps["platformName"], caps['browserName']
+            screenshot_name = f'{platform_name}_selenium_{browser_name}'
         elif self.driver_wrapper.playwright:
             caps = self.driver_wrapper.instance
-            screenshot_name = f'{current_os}_playwright_{caps.browser_type.name}'
+            screenshot_name = f'playwright_{caps.browser_type.name}'
         else:
             raise DriverWrapperException('Cant find current platform')
 

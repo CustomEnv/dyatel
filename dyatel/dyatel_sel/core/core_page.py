@@ -4,6 +4,7 @@ from typing import List
 
 from dyatel.base.element import Element
 from dyatel.dyatel_sel.core.core_element import CoreElement
+from dyatel.dyatel_sel.sel_utils import get_locator_type
 from dyatel.mixins.internal_utils import get_child_elements, initialize_objects_with_args
 from dyatel.mixins.driver_mixin import DriverMixin
 from dyatel.mixins.log_mixin import LogMixin
@@ -23,7 +24,7 @@ class CorePage(DriverMixin, LogMixin):
         self._element = None
 
         self.locator = locator
-        self.locator_type = locator_type
+        self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.name = name if name else locator
 
         self.name = name if name else self.locator

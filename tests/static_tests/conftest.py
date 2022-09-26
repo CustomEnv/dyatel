@@ -8,22 +8,45 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
-from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 
 
 @pytest.fixture
-def mocked_mobile_driver():
+def mocked_shared_mobile_driver():
     appium_driver = AppiumDriver
     appium_driver.__init__ = lambda *args, **kwargs: None
     appium_driver.session_id = None
     appium_driver.command_executor = MagicMock()
     appium_driver.error_handler = MagicMock()
+    return appium_driver
 
-    appium_driver.capabilities = MagicMock(return_value={
-        'platformName': 'ios', 'browserName': 'safari', 'automationName': 'safari'
-    })()
-    driver_wrapper = MobileDriver(appium_driver())
+
+@pytest.fixture
+def mocked_ios_driver(mocked_shared_mobile_driver):
+    mocked_shared_mobile_driver.capabilities = MagicMock(
+        return_value={
+            'platformName': 'ios',
+            'browserName': 'safari',
+            'automationName': 'safari'
+        }
+    )()
+    driver_wrapper = DriverWrapper(mocked_shared_mobile_driver())
     yield driver_wrapper
+    DriverWrapper._DriverWrapper__init_count = 0
+    CoreDriver.driver = None
+
+
+@pytest.fixture
+def mocked_android_driver(mocked_shared_mobile_driver):
+    mocked_shared_mobile_driver.capabilities = MagicMock(
+        return_value={
+            'platformName': 'Android',
+            'browserName': 'chrome',
+            'automationName': 'UiAutomator2'
+        }
+    )()
+    driver_wrapper = DriverWrapper(mocked_shared_mobile_driver())
+    yield driver_wrapper
+    DriverWrapper._DriverWrapper__init_count = 0
     CoreDriver.driver = None
 
 
@@ -37,13 +60,14 @@ def mocked_selenium_driver():
 
     driver_wrapper = DriverWrapper(selenium_driver())
     yield driver_wrapper
+    DriverWrapper._DriverWrapper__init_count = 0
     CoreDriver.driver = None
 
 
 @pytest.fixture
 def mocked_play_driver():
     driver_wrapper = DriverWrapper(Browser(MagicMock()))
-    DriverWrapper.driver_wrapper = driver_wrapper
     DriverWrapper.driver = PlaywrightDriver(MagicMock())
     yield driver_wrapper
+    DriverWrapper._DriverWrapper__init_count = 0
     PlayDriver.driver = None

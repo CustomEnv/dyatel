@@ -13,7 +13,7 @@ from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.internal_utils import WAIT_PAGE
+from dyatel.mixins.internal_utils import WAIT_PAGE, get_platform_locator
 
 
 class Page(WebPage, MobilePage, PlayPage):
@@ -32,6 +32,7 @@ class Page(WebPage, MobilePage, PlayPage):
         self.locator = locator
         self.locator_type = locator_type
         self.name = name
+        self._init_locals = locals()
 
         self._driver_instance = DriverWrapper
         self.__set_base_class()
@@ -40,6 +41,18 @@ class Page(WebPage, MobilePage, PlayPage):
         if driver_wrapper:
             self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
             self.set_driver(self._driver_instance)
+
+    def __repr__(self):
+        cls = self.__class__
+        class_name = cls.__name__
+        base_class_name = cls.__base__.__base__.__name__
+        locator = f'locator="{get_platform_locator(self)}"'
+        driver_index = self._driver_index(self.driver_wrapper, self.driver)
+        driver = driver_index if driver_index else 'driver'
+        return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}") at {hex(id(self))}'\
+               f', base={base_class_name}, {driver}={self.driver}'
+
+    # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 
     def reload_page(self, wait_page_load=True) -> Page:
         """

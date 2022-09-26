@@ -33,7 +33,7 @@ class Checkbox(SelCheckbox, PlayCheckbox):
         self.wait = wait
 
         self._driver_instance = DriverWrapper
-        self._initialized = False
+        self._init_locals = locals()
 
         self.element_class = self.__set_base_class()
         if self.element_class:
