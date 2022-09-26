@@ -12,8 +12,8 @@ from dyatel.dyatel_play.play_page import PlayPage
 from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
-from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.internal_utils import WAIT_PAGE, get_driver_wrapper_from_prev_object
+from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, PreviousObjectDriver
+from dyatel.mixins.internal_utils import WAIT_PAGE
 
 
 class Page(WebPage, MobilePage, PlayPage):
@@ -41,7 +41,7 @@ class Page(WebPage, MobilePage, PlayPage):
             self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
             self.set_driver(self._driver_instance)
         elif len(self.driver_wrapper.all_drivers) > 1:
-            self.set_driver(get_driver_wrapper_from_prev_object(frame_index=4))
+            self.set_driver(PreviousObjectDriver().get_driver_from_previous_object_for_page_or_group(self, 5))
 
     def reload_page(self, wait_page_load=True) -> Page:
         """

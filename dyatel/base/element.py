@@ -13,7 +13,8 @@ from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.mixins.internal_utils import WAIT_EL, get_frame
+from dyatel.mixins.driver_mixin import PreviousObjectDriver
+from dyatel.mixins.internal_utils import WAIT_EL
 
 
 class Element(WebElement, MobileElement, PlayElement):
@@ -50,30 +51,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
         :return: element class
         """
-        if self.driver_wrapper:
-            if len(self.driver_wrapper.all_drivers) > 1:
-                if self.driver:
-                    from dyatel.base.group import Group
-                    if not isinstance(self, Group):
-                        start = 3
-                        frame = get_frame(start)
-                        prev_object = frame.f_locals.get('self', None)
-
-                        def is_prev_element_func():
-                            is_element = isinstance(prev_object, Element)
-                            is_group = isinstance(prev_object, Group)
-                            return (is_element and not is_group) and prev_object is not None
-
-                        is_prev_element = is_prev_element_func()
-
-                        while is_prev_element and start < 40:
-                            start += 1
-                            frame = get_frame(start)
-                            prev_object = frame.f_locals.get('self', None)
-                            is_prev_element = is_prev_element_func()
-
-                        if prev_object:
-                            self.driver_wrapper = prev_object.driver_wrapper
+        PreviousObjectDriver().set_driver_from_previous_object_for_element(self)
 
         if isinstance(self.driver, PlaywrightDriver):
             Element.__bases__ = PlayElement,

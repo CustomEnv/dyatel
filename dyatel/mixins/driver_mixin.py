@@ -11,7 +11,8 @@ from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
-from dyatel.mixins.internal_utils import get_child_elements, get_child_elements_with_names
+from dyatel.exceptions import DriverWrapperException
+from dyatel.mixins.internal_utils import get_child_elements, get_child_elements_with_names, get_frame
 
 
 def get_driver_wrapper_from_object(obj, custom_driver_wrapper_object: Union[DriverWrapper, Any]):
@@ -108,3 +109,48 @@ class DriverMixin:
             self.__set_driver_for_attr(wrapped_child, instance_class, driver_wrapper)
 
         return self
+
+
+class PreviousObjectDriver:
+
+    def get_driver_from_previous_object_for_page_or_group(self, current_obj, frame_index):
+        if current_obj.driver_wrapper:
+            if len(current_obj.driver_wrapper.all_drivers) > 1:
+                if current_obj.driver == DriverWrapper.driver:
+                    try:
+                        return self._get_correct_previous_object(frame_index).driver_wrapper
+                    except AttributeError:
+                        raise DriverWrapperException(f'Cant get driver_wrapper for {current_obj}') from None
+
+    def set_driver_from_previous_object_for_element(self, current_obj):
+        if current_obj.driver_wrapper:
+            if len(current_obj.driver_wrapper.all_drivers) > 1:
+                from dyatel.base.group import Group
+                if not isinstance(current_obj, Group):
+                    if current_obj.driver == DriverWrapper.driver:
+                        previous_object = self._get_correct_previous_object(4)
+                        if previous_object:
+                            try:
+                                current_obj.driver_wrapper = previous_object.driver_wrapper
+                            except AttributeError:
+                                raise DriverWrapperException(f'Cant get driver_wrapper for {current_obj}') from None
+
+    def previous_object_is_not_group_or_page(self, obj):
+        from dyatel.base.group import Group
+        from dyatel.base.page import Page
+        is_group = isinstance(obj, Group)
+        is_page = isinstance(obj, Page)
+        return not (is_page or is_group) and obj is not None
+
+    def _get_correct_previous_object(self, index):
+        frame = get_frame(index)
+        prev_object = frame.f_locals.get('self', None)
+        unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)
+
+        while unexpected_previous_obj and index < 20:
+            index += 1
+            frame = get_frame(index)
+            prev_object = frame.f_locals.get('self', None)
+            unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)
+
+        return prev_object

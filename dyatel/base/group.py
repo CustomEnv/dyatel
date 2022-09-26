@@ -5,8 +5,8 @@ from typing import Any, Union
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
-from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.internal_utils import get_driver_wrapper_from_prev_object, get_child_elements_with_names
+from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, PreviousObjectDriver
+from dyatel.mixins.internal_utils import get_child_elements_with_names
 
 
 class AfterInitMeta(type):
@@ -47,7 +47,7 @@ class Group(Element, metaclass=AfterInitMeta):
             self.set_driver(self._driver_instance)
         elif self.driver_wrapper:
             if len(self.driver_wrapper.all_drivers) > 1:
-                self.set_driver(get_driver_wrapper_from_prev_object(frame_index=5))
+                self.set_driver(PreviousObjectDriver().get_driver_from_previous_object_for_page_or_group(self, 6))
 
     def set_driver(self, driver_wrapper) -> Group:
         """

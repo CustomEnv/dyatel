@@ -4,11 +4,9 @@ import sys
 import inspect
 from typing import Any
 
-from dyatel.js_scripts import get_element_position_on_screen_js
 
 WAIT_EL = 10
 WAIT_PAGE = 20
-
 
 all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
             'textarea', 'svg', 'circle', 'iframe']
@@ -20,14 +18,6 @@ def get_frame(frame=1):
     :return:
     """
     return sys._getframe(frame)
-
-
-def get_driver_wrapper_from_prev_object(frame_index):
-    frame = get_frame(frame_index)
-    try:
-        return frame.f_locals['self'].driver_wrapper
-    except KeyError:
-        return None
 
 
 def initialize_objects_with_args(objects: list):
