@@ -55,8 +55,22 @@ class Element(WebElement, MobileElement, PlayElement):
                 if self.driver:
                     from dyatel.base.group import Group
                     if not isinstance(self, Group):
-                        frame = get_frame(3)
+                        start = 3
+                        frame = get_frame(start)
                         prev_object = frame.f_locals.get('self', None)
+                        is_not_previous = False
+
+                        def is_prev_element():
+                            is_element = isinstance(prev_object, Element)
+                            is_group = isinstance(prev_object, Group)
+                            return (is_element and not is_group) and prev_object
+
+                        while is_not_previous and start < 40:
+                            start += 1
+                            frame = get_frame(start)
+                            prev_object = frame.f_locals.get('self', None)
+                            is_not_previous = is_prev_element()
+
                         if prev_object:
                             self.driver_wrapper = prev_object.driver_wrapper
 
