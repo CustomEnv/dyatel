@@ -9,6 +9,7 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_checkbox import PlayCheckbox
 from dyatel.dyatel_sel.core.core_checkbox import CoreCheckbox as SelCheckbox
+from dyatel.mixins.internal_utils import get_frame
 
 
 class Checkbox(SelCheckbox, PlayCheckbox):
@@ -45,10 +46,21 @@ class Checkbox(SelCheckbox, PlayCheckbox):
 
         :return: element class
         """
+        if self.driver_wrapper:
+            if len(self.driver_wrapper.all_drivers) > 1:
+                if self.driver:
+                    from dyatel.base.group import Group
+                    if not isinstance(self, Group):
+                        frame = get_frame(3)
+                        prev_object = frame.f_locals.get('self', None)
+                        if prev_object:
+                            self.driver_wrapper = prev_object.driver_wrapper
+
         if isinstance(self.driver, PlaywrightDriver):
             Checkbox.__bases__ = PlayCheckbox,
             return PlayCheckbox
         elif isinstance(self.driver, (SeleniumDriver, AppiumDriver)):
+            Checkbox.__bases__ = SelCheckbox,
             return SelCheckbox
 
         # No exception due to delayed initialization

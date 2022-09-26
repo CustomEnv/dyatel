@@ -36,7 +36,7 @@ class PlaygroundMainPage(Page):
 
 class SecondPlaygroundMainPage(Page):
     def __init__(self, driver_wrapper=None):
-        self.url = 'https://testautomation-playground.herokuapp.com/index.html'
+        self.url = 'https://dineshvelhal.github.io/testautomation-playground/index.html'
         self.dw = driver_wrapper
         super().__init__('//h1[.="The Playground"]', name='Second playground main page', driver_wrapper=driver_wrapper)
 

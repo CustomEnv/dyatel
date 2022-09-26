@@ -50,18 +50,15 @@ class Element(WebElement, MobileElement, PlayElement):
 
         :return: element class
         """
-        if len(self.driver_wrapper.all_drivers) > 1:
-
-            if self.driver:
-                frame = get_frame(3)
-                prev_object = frame.f_locals['self']
-                self.driver_wrapper = prev_object.driver_wrapper
-
-                if not self.parent:
+        if self.driver_wrapper:
+            if len(self.driver_wrapper.all_drivers) > 1:
+                if self.driver:
                     from dyatel.base.group import Group
-
-                    if isinstance(prev_object, Group):
-                        self.parent = prev_object
+                    if not isinstance(self, Group):
+                        frame = get_frame(3)
+                        prev_object = frame.f_locals.get('self', None)
+                        if prev_object:
+                            self.driver_wrapper = prev_object.driver_wrapper
 
         if isinstance(self.driver, PlaywrightDriver):
             Element.__bases__ = PlayElement,
