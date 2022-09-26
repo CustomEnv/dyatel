@@ -59,18 +59,18 @@ class Element(WebElement, MobileElement, PlayElement):
                         frame = get_frame(start)
                         prev_object = frame.f_locals.get('self', None)
 
-                        def is_prev_element():
+                        def is_prev_element_func():
                             is_element = isinstance(prev_object, Element)
                             is_group = isinstance(prev_object, Group)
                             return (is_element and not is_group) and prev_object is not None
 
-                        is_prev_element = is_prev_element()
+                        is_prev_element = is_prev_element_func()
 
                         while is_prev_element and start < 40:
                             start += 1
                             frame = get_frame(start)
                             prev_object = frame.f_locals.get('self', None)
-                            is_prev_element = is_prev_element()
+                            is_prev_element = is_prev_element_func()
 
                         if prev_object:
                             self.driver_wrapper = prev_object.driver_wrapper
