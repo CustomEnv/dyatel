@@ -45,8 +45,9 @@ class Group(Element, metaclass=AfterInitMeta):
         if driver_wrapper:
             self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
             self.set_driver(self._driver_instance)
-        elif len(self.driver_wrapper.all_drivers) > 1:
-            self.set_driver(get_driver_wrapper_from_prev_object(frame_index=5))
+        elif self.driver_wrapper:
+            if len(self.driver_wrapper.all_drivers) > 1:
+                self.set_driver(get_driver_wrapper_from_prev_object(frame_index=5))
 
     def set_driver(self, driver_wrapper) -> Group:
         """
