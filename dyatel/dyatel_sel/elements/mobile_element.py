@@ -2,14 +2,11 @@ from __future__ import annotations
 
 from typing import Union, List, BinaryIO, Any
 
-from appium.webdriver.common.touch_action import TouchAction
-from selenium.webdriver.common.by import By
-
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.sel_utils import get_legacy_selector, get_locator_type
 from dyatel.mixins.internal_utils import calculate_coordinate_to_click, WAIT_EL
-from dyatel.js_scripts import get_element_position_on_screen_js, click_js, is_displayed_js
+from dyatel.js_scripts import get_element_position_on_screen_js, get_element_size_js, click_js, is_displayed_js
 
 
 class MobileElement(CoreElement):
@@ -29,9 +26,6 @@ class MobileElement(CoreElement):
         self.is_ios = CoreDriver.is_ios
         self.is_android = CoreDriver.is_android
 
-        self.top_bar_height = None
-        self.bottom_bar_height = None
-
         self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.locator, self.locator_type = get_legacy_selector(locator, self.locator_type)
 
@@ -47,6 +41,81 @@ class MobileElement(CoreElement):
         appium_elements = self._find_elements(self._get_base())
         return self._get_all_elements(appium_elements, MobileElement)
 
+    def click(self) -> MobileElement:
+        """
+        Click to current element
+        SafariDriver: Click to current element by JS
+
+        :return: self
+        """
+        if self.is_safari_driver:
+            self.wait_element(silent=True).wait_clickable(silent=True)
+            self.driver.execute_script(click_js, self.element)
+        else:
+            super().click()
+
+        return self
+
+    def click_outside(self, x: int = 0, y: int = -5, calculate_top_bar=True) -> MobileElement:
+        """
+        Click outside of element. By default, 5px above  of element
+
+        :param x: x offset of element to tap
+        :param y: y offset of element to tap
+        :param calculate_top_bar: iOS only - attach top bar height to calculation
+        :return: self
+        """
+        x, y = calculate_coordinate_to_click(self, x, y)
+
+        if calculate_top_bar and self.is_ios:
+            y += self.driver_wrapper.get_top_bar_height()
+
+        self.log(f'Tap outside from "{self.name}" with coordinates (x: {x}, y: {y})')
+
+        self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
+        return self
+
+    def click_into_center(self, calculate_top_bar: bool = True, silent: bool = True) -> MobileElement:
+        """
+        Click into the center of element
+
+        :param calculate_top_bar: iOS only - attach top bar height to calculation
+        :param silent: erase log message
+        :return: self
+        """
+        x, y = calculate_coordinate_to_click(self, 0, 0)
+
+        if calculate_top_bar and self.is_ios:
+            y += self.driver_wrapper.get_top_bar_height()
+
+        if not silent:
+            self.log(f'Tap into the center by coordinates (x: {x}, y: {y}) for "{self.name}"')
+
+        self.driver_wrapper.click_by_coordinates(x, y, silent=True)
+
+        return self
+
+    def hover(self, calculate_top_bar=True) -> MobileElement:
+        """
+        Hover over current element
+
+        :param calculate_top_bar: iOS only - attach top bar height to calculation
+        :return: self
+        """
+        self.click_into_center(calculate_top_bar=calculate_top_bar)
+        return self
+
+    def hover_outside(self, x: int = 0, y: int = -5, calculate_top_bar=True) -> MobileElement:
+        """
+        Hover outside from current element. By default, 5px above  of element
+
+        :param x: x-offset of element to hover(tap)
+        :param y: y-offset of element to hover(tap)
+        :param calculate_top_bar: iOS only - attach top bar height to calculation
+        :return: self
+        """
+        return self.click_outside(x=x, y=y, calculate_top_bar=calculate_top_bar)
+
     def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> MobileElement:
         """
         Wait for current element available in page
@@ -60,21 +129,6 @@ class MobileElement(CoreElement):
             self.wait_availability(timeout=timeout, silent=True)
         else:
             super().wait_element(timeout=timeout, silent=silent)
-
-        return self
-
-    def click(self) -> MobileElement:
-        """
-        Click to current element
-        SafariDriver: Click to current element by JS
-
-        :return: self
-        """
-        if self.is_safari_driver:
-            self.wait_element(silent=True).wait_clickable(silent=True)
-            self.driver.execute_script(click_js, self.element)
-        else:
-            super().click()
 
         return self
 
@@ -97,50 +151,6 @@ class MobileElement(CoreElement):
         else:
             return super().is_displayed(silent=silent)
 
-    def hover(self) -> MobileElement:
-        """
-        Hover over current element
-
-        :return: self
-        """
-        self.log(f'Tap to "{self.name}"')
-        self.wait_element(silent=True)
-
-        if self.is_ios:
-            x, y = calculate_coordinate_to_click(self, 0, 0)
-            TouchAction(self.driver).tap(x=x, y=y).perform()
-        else:
-            self._action_chains.click(on_element=self.element).perform()
-
-        return self
-
-    def hover_outside(self, x: int = 0, y: int = -5) -> MobileElement:
-        """
-        Hover outside from current element
-
-        :return: self
-        """
-        return self.click_outside(x, y)
-
-    def click_outside(self, x: int = 0, y: int = -5) -> MobileElement:
-        """
-        Click outside of element. By default, 5px above  of element
-
-        :param x: x offset
-        :param y: y offset
-        :return: self
-        """
-        self.log(f'Tap outside from "{self.name}"')
-        self.wait_element(silent=True)
-
-        x, y = calculate_coordinate_to_click(self, x, y)
-
-        if self.is_ios:
-            TouchAction(self.driver).tap(x=x, y=y).perform()
-        else:
-            self._action_chains.move_to_location(x, y).click().perform()
-        return self
-
     def get_screenshot(self, filename: str, legacy: bool = True) -> BinaryIO:
         """
         Taking element screenshot and saving with given path/filename
@@ -151,15 +161,30 @@ class MobileElement(CoreElement):
         """
         if self.driver_wrapper.is_ios and legacy:
             element_box = self._element_box()
-            window_width = self.driver.get_window_size()['width']  # FIXME
+            window_width, window_height = self.driver.get_window_size().values()
             img_binary = self.driver_wrapper.get_screenshot()
-            scaled_image = self._scaled_screenshot(img_binary, window_width)
-            image_binary = scaled_image.crop(element_box)
+            image_binary = self._scaled_screenshot(img_binary, window_width)
+
+            if any(element_box) < 0 or window_height > self.element.size['height']:
+                image_binary = image_binary.crop(element_box)
+
             image_binary.save(filename)
         else:
             image_binary = super().get_screenshot(filename)
 
         return image_binary
+
+    def get_rect(self) -> dict:
+        """
+        A dictionary with the size and location of the element.
+
+        :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
+        """
+        element = self.element
+        size = self.driver.execute_script(get_element_size_js, element)
+        location = self.driver.execute_script(get_element_position_on_screen_js, element)
+        sorted_items: list = sorted({**size, **location}.items(), reverse=True)
+        return dict(sorted_items)
 
     def _element_box(self) -> tuple:
         """
@@ -167,11 +192,10 @@ class MobileElement(CoreElement):
 
         :return: element coordinates on screen (start_x, start_y, end_x, end_y)
         """
-        self.scroll_into_view(sleep=0.1)
-
-        el_location = self.driver.execute_script(get_element_position_on_screen_js, self.element)
+        element = self.element
+        el_location = self.driver.execute_script(get_element_position_on_screen_js, element)
         start_x, start_y = el_location.values()
-        h, w = self.element.size.values()
+        h, w = element.size.values()
 
         if self.is_safari_driver:
             inner_height = self.driver.execute_script('return window.innerHeight')
@@ -183,50 +207,9 @@ class MobileElement(CoreElement):
             else:
                 bar_size = bars_size / 2  # top bar shown, bottom hidden
         else:
-            bar_size = self._get_top_bar_height()
+            bar_size = self.driver_wrapper.get_top_bar_height()
 
         if bar_size:
             start_y += bar_size
 
         return start_x, start_y, start_x+w, start_y+h
-
-    def _get_top_bar_height(self) -> int:
-        """
-        iOS only: Get top bar height
-
-        :return: self
-        """
-        if not self.top_bar_height:
-            self.driver_wrapper.switch_to_native()
-
-            top_bar = self.driver.find_element(
-                By.XPATH,
-                '//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther'
-            )
-            top_bar_height = top_bar.size['height']
-
-            self.driver_wrapper.switch_to_web()
-            return top_bar_height
-        else:
-            return self.top_bar_height
-
-    def _get_bottom_bar_height(self, force: bool = False) -> int:
-        """
-        iOS only: Get bottom bar height
-
-        :param force: get the new value forcly
-        :return: self
-        """
-        if force or not self.top_bar_height:
-            self.driver_wrapper.switch_to_native()
-
-            bottom_bar = self.driver.find_element(
-                By.XPATH,
-                '//*[@name="CapsuleViewController"]/XCUIElementTypeOther[1]'
-            )
-            bottom_bar_height = bottom_bar.size['height']
-
-            self.driver_wrapper.switch_to_web()
-            return bottom_bar_height
-        else:
-            return self.top_bar_height

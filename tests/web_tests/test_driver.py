@@ -1,5 +1,6 @@
 import pytest
 
+from dyatel.base.driver_wrapper import DriverWrapper
 from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import SecondPlaygroundMainPage
@@ -32,14 +33,15 @@ def test_driver_execute_script_with_args(driver_wrapper, mouse_event_page):
 def test_second_driver_different_page(driver_wrapper, second_driver_wrapper):
     mouse_page = MouseEventPage().set_driver(second_driver_wrapper)
     pizza_page = PizzaOrderPage().set_driver(driver_wrapper)
-
-    assert pizza_page.driver != mouse_page.driver
-    assert pizza_page.driver_wrapper != mouse_page.driver_wrapper
-    assert mouse_page.header_logo.driver != pizza_page.quantity_input.driver
-    assert mouse_page.header_logo.driver_wrapper != pizza_page.quantity_input.driver_wrapper
+    assert len(DriverWrapper.all_drivers) == 2
 
     mouse_page.open_page()
     pizza_page.open_page()
+
+    assert pizza_page.driver is not mouse_page.driver
+    assert pizza_page.driver_wrapper is not mouse_page.driver_wrapper
+    assert mouse_page.header_logo.driver is not pizza_page.quantity_input.driver
+    assert mouse_page.header_logo.driver_wrapper is not pizza_page.quantity_input.driver_wrapper
 
     assert mouse_page.is_page_opened()
     assert mouse_page.header_logo.is_displayed()
@@ -51,30 +53,32 @@ def test_second_driver_different_page(driver_wrapper, second_driver_wrapper):
 def test_second_driver_same_page(driver_wrapper, second_driver_wrapper):
     mouse_page1 = MouseEventPage().set_driver(second_driver_wrapper)
     mouse_page2 = MouseEventPage().set_driver(driver_wrapper)
-
-    assert mouse_page1.driver != mouse_page2.driver
-    assert mouse_page1.driver_wrapper != mouse_page2.driver_wrapper
-    assert mouse_page1.header_logo.driver != mouse_page2.header_logo.driver
-    assert mouse_page1.header_logo.driver_wrapper != mouse_page2.header_logo.driver_wrapper
+    assert len(DriverWrapper.all_drivers) == 2
 
     mouse_page1.open_page()
     mouse_page2.open_page()
+
+    assert mouse_page1.driver is not mouse_page2.driver
+    assert mouse_page1.driver_wrapper is not mouse_page2.driver_wrapper
+    assert mouse_page1.header_logo.driver is not mouse_page2.header_logo.driver
+    assert mouse_page1.header_logo.driver_wrapper is not mouse_page2.header_logo.driver_wrapper
 
     assert mouse_page1.is_page_opened()
     assert mouse_page2.is_page_opened()
 
 
 def test_second_driver_by_arg(driver_wrapper, second_driver_wrapper):
-    pizza_page = PizzaOrderPage(driver_wrapper)
     mouse_page = MouseEventPage(second_driver_wrapper)
-
-    assert pizza_page.driver != mouse_page.driver
-    assert pizza_page.driver_wrapper != mouse_page.driver_wrapper
-    assert mouse_page.header_logo.driver != pizza_page.quantity_input.driver
-    assert mouse_page.header_logo.driver_wrapper != pizza_page.quantity_input.driver_wrapper
+    pizza_page = PizzaOrderPage(driver_wrapper)
+    assert len(DriverWrapper.all_drivers) == 2
 
     mouse_page.open_page()
     pizza_page.open_page()
+
+    assert pizza_page.driver_wrapper is not mouse_page.driver_wrapper
+    assert pizza_page.driver is not mouse_page.driver
+    assert mouse_page.header_logo.driver is not pizza_page.quantity_input.driver
+    assert mouse_page.header_logo.driver_wrapper is not pizza_page.quantity_input.driver_wrapper
 
     assert mouse_page.is_page_opened()
     assert mouse_page.header_logo.is_displayed()
@@ -87,7 +91,8 @@ def test_second_driver_by_arg(driver_wrapper, second_driver_wrapper):
 def test_driver_tabs(driver_wrapper, second_playground_page):
     driver_wrapper.create_new_tab()
     driver_wrapper.switch_to_original_tab()
-    driver_wrapper.switch_to_tab(2)
+    driver_wrapper.switch_to_tab()
+    driver_wrapper.switch_to_tab(1)
     driver_wrapper.create_new_tab()
     driver_wrapper.close_unused_tabs()
 

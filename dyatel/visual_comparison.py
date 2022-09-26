@@ -3,7 +3,6 @@ import json
 import base64
 import math
 import operator
-import os
 from functools import reduce
 from typing import Union
 
@@ -30,12 +29,8 @@ def assert_same_images(actual_file: str, reference_file: str, filename: str, thr
     is_different = actual_threshold > threshold
 
     if is_different or not same_size:
-        root_path = os.environ.get('visual', '')
-        diff_directory = f'{root_path}/difference/'
-        os.makedirs(os.path.dirname(diff_directory), exist_ok=True)
-        diff_file = f'{diff_directory}/diff-{filename}.png'
-        diff.save(diff_file)
-        attach_allure_diff(actual_file, reference_file, diff_file)
+        diff.save(filename)
+        attach_allure_diff(actual_file, reference_file, filename)
 
     base_error = f"The new screenshot '{actual_file}' did not match the reference '{reference_file}'."
 
@@ -57,7 +52,7 @@ def get_difference(im1: Image, im2: Image):
     diff = ImageChops.difference(im1, im2)
     histogram = diff.histogram()
 
-    red = reduce(
+    rms = reduce(
             operator.add,
             map(
                 lambda h, i: h * (i ** 2),
@@ -66,7 +61,7 @@ def get_difference(im1: Image, im2: Image):
             )
         )
 
-    return diff, math.sqrt(red / (float(im1.size[0]) * im1.size[1]))
+    return diff, math.sqrt(rms / (float(im1.size[0]) * im1.size[1]))
 
 
 def attach_allure_diff(actual_path: str, expected_path: str, diff_path: str) -> None:

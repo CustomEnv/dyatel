@@ -14,7 +14,8 @@ from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.internal_utils import get_child_elements, WAIT_EL, get_timeout_in_ms, initialize_objects_with_args
+from dyatel.mixins.internal_utils import get_child_elements, WAIT_EL, get_timeout_in_ms, initialize_objects_with_args, \
+    calculate_coordinate_to_click
 
 
 class PlayElement(ElementMixin, DriverMixin, LogMixin):
@@ -106,6 +107,21 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         :return: self
         """
         self._first_element.click(position={'x': x, 'y': y}, force=True)
+        return self
+
+    def click_into_center(self, silent: bool = False) -> PlayElement:
+        """
+        Click into the center of element
+
+        :param silent: erase log message
+        :return: self
+        """
+        x, y = calculate_coordinate_to_click(self, 0, 0)
+
+        if not silent:
+            self.log(f'Click into the center (x: {x}, y: {y}) for "{self.name}"')
+
+        self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
         return self
 
     def type_text(self, text: str, silent: bool = False) -> PlayElement:
@@ -378,6 +394,15 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
             self.log(f'Get elements count of "{self.name}"')
 
         return len(self.all_elements)
+
+    def get_rect(self) -> dict:
+        """
+        A dictionary with the size and location of the element.
+
+        :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
+        """
+        sorted_items: list = sorted(self.element.bounding_box().items(), reverse=True)
+        return dict(sorted_items)
 
     # Mixin
 

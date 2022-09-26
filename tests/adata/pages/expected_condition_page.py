@@ -5,7 +5,7 @@ from dyatel.base.page import Page
 
 class ExpectedConditionPage(Page):
     def __init__(self):
-        self.url = 'https://testautomation-playground.herokuapp.com/expected_conditions.html'
+        self.url = 'https://dineshvelhal.github.io/testautomation-playground/expected_conditions.html'
         self.value_card = WaitValueCard()
         self.element_card = WaitElementCard()
         self.frame_card = WaitFrameCard()

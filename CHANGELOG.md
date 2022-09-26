@@ -5,7 +5,61 @@
 *Release date: In development*
 
 ---
-## v1.2.1 & v1.2.2
+## v1.2.8
+*Release date: 2022-xx-xx*
+
+### Added 
+- `driver_wrapper.is_native_context` property on mobile
+- `driver_wrapper.is_web_context` property on mobile
+- `driver_wrapper.visual_reference_generation` that disable AssertionError exception in `element.assert_screenshot`
+- `ElementNotInteractableException` handler in `element.click`
+
+### Changed
+- `element.get_rect` output value sorting
+- `PlayDriver`/`CoreDriver` class variables moved to `DriverWrapper`
+- `os.environ['visual']` changed to `driver_wrapper.visual_regression_path`
+- `element.wait_element` exception message
+- Mobile: Finding elements in native context now skips parent
+
+### Fixed
+- `autolog` params
+- `driver_wrapper.switch_to_tab` with default params
+
+---
+## v1.2.6/7
+*Release date: 2022-09-15*
+
+### Fixed
+- screenshot name generation
+
+---
+## v1.2.5
+*Release date: 2022-09-13*
+
+### Added
+- `element.click_into_center` method
+- `driver_wrapper.click_by_coordinates` method
+
+### Fixed
+- `calculate_coordinate_to_click` calculation
+- Shared object of groups become unique for each class
+
+---
+## v1.2.4
+*Release date: 2022-09-08*
+
+### Added
+- `assert_screenshot()` elements removal
+
+---
+## v1.2.3
+*Release date: 2022-09-02*
+
+### Fixed
+- `element.is_displayed()` exception handler
+
+---
+## v1.2.1/2
 *Release date: 2022-08-31*
 
 ### Fixed

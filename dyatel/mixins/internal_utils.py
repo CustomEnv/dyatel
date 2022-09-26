@@ -98,7 +98,7 @@ def get_child_elements_with_names(obj: object, instance: type) -> dict:
     return elements
 
 
-def calculate_coordinate_to_click(element: Any, x: int, y: int) -> tuple:
+def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple:
     """
     Calculate coordinates to click for element
     Examples:
@@ -112,9 +112,7 @@ def calculate_coordinate_to_click(element: Any, x: int, y: int) -> tuple:
     :param y: vertical offset relative to either top (y > 0) or bottom side (y < 0)
     :return: tuple of calculated coordinates
     """
-    selenium_element = element.element
-    ex, ey = element.driver.execute_script(get_element_position_on_screen_js, selenium_element).values()
-    ew, eh = selenium_element.size.values()
+    ey, ex, ew, eh = element.get_rect().values()
     emx, emy = ex + ew / 2, ey + eh / 2  # middle of element
 
     if x:

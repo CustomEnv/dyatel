@@ -1,6 +1,5 @@
 import os
 
-import allure
 import pytest
 from playwright.sync_api import sync_playwright
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
@@ -14,8 +13,6 @@ from webdriver_manager.firefox import GeckoDriverManager
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_driver import PlayDriver
-from dyatel.dyatel_sel.core.core_driver import CoreDriver
-from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.shared_utils import set_logging_settings
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
@@ -117,9 +114,14 @@ def driver_func(request, driver_name, driver_engine, chrome_options, firefox_opt
             appium_ip = request.config.getoption('--appium-ip')
             appium_port = request.config.getoption('--appium-port')
             command_exc = f'http://{appium_ip}:{appium_port}/wd/hub'
+            is_android = platform == 'android'
+            caps = android_desired_caps if is_android else ios_desired_caps
 
-            caps = android_desired_caps if platform == 'android' else ios_desired_caps
             caps.update({'browserName': driver_name.title()})
+
+            if is_android:
+                caps.update({'chromedriverArgs': ['--hide-scrollbars']})
+
             driver = AppiumDriver(command_executor=command_exc, desired_capabilities=caps)
         else:
             driver = ChromeWebDriver(executable_path=ChromeDriverManager().install(), options=chrome_options)
@@ -152,15 +154,13 @@ def driver_func(request, driver_name, driver_engine, chrome_options, firefox_opt
 
             driver = browser.launch(headless=is_headless)
 
-    if not CoreDriver.driver:
-        driver_wrapper = DriverWrapper(driver)
-    else:
-        driver_wrapper = WebDriver(driver)
+    driver_wrapper = DriverWrapper(driver)
+
+    driver_wrapper.visual_regression_path = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
 
     if 'appium' not in driver_engine:
         driver_wrapper.set_window_size(1024, 900)
 
-    os.environ['visual'] = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
     return driver_wrapper
 
 

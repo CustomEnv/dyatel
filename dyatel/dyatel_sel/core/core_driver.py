@@ -6,6 +6,7 @@ from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
+from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.log_mixin import LogMixin
 
@@ -14,16 +15,6 @@ class CoreDriver(LogMixin):
     all_drivers: Union[List[AppiumDriver], List[SeleniumWebDriver]] = []
     driver: Union[AppiumDriver, SeleniumWebDriver] = None
     driver_wrapper = None
-
-    desktop = False
-    selenium = True
-    playwright = False
-
-    mobile = False
-    is_ios = False
-    is_android = False
-    is_xcui_driver = False
-    is_safari_driver = False
 
     def __init__(self, driver: Union[AppiumDriver, SeleniumWebDriver]):
         """
@@ -238,7 +229,7 @@ class CoreDriver(LogMixin):
         :return: self
         """
         if tab == -1:
-            tab = self.get_all_tabs()[tab:]
+            tab = self.get_all_tabs()[tab]
         else:
             tab = self.get_all_tabs()[tab - 1]
 
@@ -259,3 +250,18 @@ class CoreDriver(LogMixin):
             self.driver.close()
 
         return self.switch_to_original_tab()
+
+    def click_by_coordinates(self, x: int, y: int, silent: bool = False) -> CoreDriver:
+        """
+        Click by given coordinates
+
+        :param x: click by given x-axis
+        :param y: click by given y-axis
+        :param silent: erase log message
+        :return: self
+        """
+        if not silent:
+            self.log(f'Click by given coordinates (x: {x}, y: {y})')
+
+        ActionChains(self.driver).move_to_location(x, y).click().perform()
+        return self

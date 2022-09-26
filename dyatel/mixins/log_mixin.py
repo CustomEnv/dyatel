@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from os.path import basename
+from typing import Any
 
 from dyatel.js_scripts import add_driver_index_comment_js
 from dyatel.mixins.internal_utils import get_frame
@@ -24,7 +25,7 @@ def get_log_message(message: str) -> str:
     return f'[{basename(code.co_filename)}][{code.co_name}:{code.co_firstlineno}] {message}'
 
 
-def send_log_message(level: str, log_message: str) -> None:
+def send_log_message(log_message: str, level: str, ) -> None:
     """
     Send log message
 
@@ -35,7 +36,7 @@ def send_log_message(level: str, log_message: str) -> None:
     logging.log(getattr(logging, level.upper()), log_message)
 
 
-def autolog(message: str, level: str = 'info') -> None:
+def autolog(message: Any, level: str = 'info') -> Any:
     """
     Log message in format:
       ~ [time][level][module][function:line] <message>
@@ -43,9 +44,10 @@ def autolog(message: str, level: str = 'info') -> None:
 
     :param message: info message
     :param level: log level
-    :return: None
+    :return: message
     """
-    send_log_message(message, level)
+    send_log_message(str(message), level)
+    return message
 
 
 class LogMixin:
@@ -74,5 +76,5 @@ class LogMixin:
             if driver_wrapper.selenium:
                 driver_wrapper.execute_script(add_driver_index_comment_js, driver_index)
 
-        send_log_message(level, f'{driver_log}{get_log_message(message)}')
+        send_log_message(f'{driver_log}{get_log_message(message)}', level)
         return self

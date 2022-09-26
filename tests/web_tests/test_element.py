@@ -77,6 +77,10 @@ def test_screenshot(base_playground_page, driver_engine, driver_name, platform, 
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename, threshold=6)
 
 
+def test_screenshot_remove(base_playground_page):
+    base_playground_page.text_container.scroll_into_view(sleep=0.5).assert_screenshot(
+            remove=[base_playground_page.inner_text_1, base_playground_page.inner_text_2])
+
 # Test waits
 
 
@@ -95,6 +99,20 @@ def test_click_and_wait(pizza_order_page, driver_engine):
     assert all((after_click_displayed, after_click_outside_not_displayed))
 
 
+def test_click_into_center(mouse_event_page, platform):
+    mouse_event_page.mouse_click_card().click_area.click_into_center()
+    result_x, result_y = mouse_event_page.mouse_click_card().get_result_coordinates()
+    expected_x_range, expected_y_range = mouse_event_page.mouse_click_card().get_click_area_middle()
+    assert result_x in expected_x_range, f'result_x: {result_x}; expected_x: {expected_x_range}'
+    assert result_y in expected_y_range, f'result_y: {result_y}; expected_y: {expected_y_range}'
+
+
+@pytest.mark.parametrize('coordinates', [(-2, -2), (2, 2), (2, -2), (-2, 2), (2, 0), (0, 2)])
+def test_click_outside(mouse_event_page, platform, coordinates):
+    mouse_event_page.mouse_click_card().click_area_parent.click_outside(*coordinates)
+    assert not mouse_event_page.mouse_click_card().is_click_proceeded()
+
+
 @pytest.mark.xfail_platform('android', 'ios', reason='Can not get value from that element. TODO: Rework test')
 def test_wait_element_value(expected_condition_page):
     expected_condition_page.value_card.trigger_button.click()
@@ -104,7 +122,7 @@ def test_wait_element_value(expected_condition_page):
     assert all((not value_without_wait, value_with_wait))
 
 
-@pytest.mark.xfail(reason='Unexpected text')
+@pytest.mark.xfail_platform('playwright', 'safari', reason='Unexpected text')
 def test_wait_element_text(expected_condition_page):
     expected_condition_page.value_card.trigger_button.click()
     value_without_wait = expected_condition_page.value_card.wait_for_text_button.text

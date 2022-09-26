@@ -14,16 +14,29 @@ from selenium.common.exceptions import (
     InvalidArgumentException as SeleniumInvalidArgumentException,
     InvalidSelectorException as SeleniumInvalidSelectorException,
     NoSuchElementException as SeleniumNoSuchElementException,
+    ElementNotInteractableException as SeleniumElementNotInteractableException,
+    ElementClickInterceptedException as SeleniumElementClickInterceptedException,
 )
 
 from dyatel.dyatel_sel.sel_utils import ActionChains
-from dyatel.exceptions import TimeoutException, InvalidSelectorException, DriverWrapperException, NoSuchElementException
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
-from dyatel.mixins.internal_utils import get_child_elements, WAIT_EL, initialize_objects_with_args
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
+from dyatel.exceptions import (
+    TimeoutException,
+    InvalidSelectorException,
+    DriverWrapperException,
+    NoSuchElementException,
+    ElementNotInteractableException,
+)
+from dyatel.mixins.internal_utils import (
+    WAIT_EL,
+    get_child_elements,
+    initialize_objects_with_args,
+    calculate_coordinate_to_click,
+)
 
 
 class CoreElement(ElementMixin, DriverMixin, LogMixin):
@@ -82,12 +95,32 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         self.log(f'Click into "{self.name}"')
 
         self.element = self._get_element()
+        exception_msg = f'Element "{self.name}" not interactable {self.get_element_logging_data()}'
 
         try:
             self.wait_clickable(silent=True).element.click()
+        except SeleniumElementNotInteractableException:
+            raise ElementNotInteractableException(exception_msg) from None
+        except SeleniumElementClickInterceptedException as exc:
+            raise ElementNotInteractableException(f'{exception_msg}. Original error: {exc.msg}') from None
         finally:
             self.element = None
 
+        return self
+
+    def click_into_center(self, silent: bool = False) -> CoreElement:
+        """
+        Click into the center of element
+
+        :param silent: erase log message
+        :return: self
+        """
+        x, y = calculate_coordinate_to_click(self, 0, 0)
+
+        if not silent:
+            self.log(f'Click into the center (x: {x}, y: {y}) for "{self.name}"')
+
+        self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
         return self
 
     def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> CoreElement:
@@ -99,6 +132,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: self
         """
         text = str(text)
+
         if not silent:
             self.log(f'Type text {cut_log_data(text)} into "{self.name}"')
 
@@ -157,7 +191,8 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             is_displayed = self.is_displayed(silent=True)
 
         if not is_displayed:
-            raise TimeoutException(f'Can\'t wait element "{self.name}". {self.get_element_logging_data()}') from None
+            base_exception_msg = f'Element "{self.name}" not visible after {timeout} seconds'
+            raise TimeoutException(f'{base_exception_msg} {self.get_element_logging_data()}') from None
 
         return self
 
@@ -193,10 +228,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         is_hidden = False
         start_time = time.time()
         while time.time() - start_time < timeout and not is_hidden:
-            try:
-                is_hidden = not self.is_displayed(silent=True)
-            except (SeleniumNoSuchElementException, SeleniumStaleElementReferenceException):
-                is_hidden = True
+            is_hidden = self.is_hidden(silent=True)
 
         if not is_hidden:
             msg = f'"{self.name}" not visible after {timeout} seconds. {self.get_element_logging_data()}'
@@ -348,7 +380,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         try:
             self.__element = self._get_element(wait=False)
             return self.__element.is_displayed()
-        except (NoSuchElementException, DriverWrapperException):
+        except (NoSuchElementException, DriverWrapperException, SeleniumStaleElementReferenceException):
             return False
 
     def is_hidden(self, silent: bool = False) -> bool:
@@ -361,7 +393,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         if not silent:
             self.log(f'Check invisibility of "{self.name}"')
 
-        return not self.is_displayed()
+        return not self.is_displayed(silent=True)
 
     def get_attribute(self, attribute: str, silent: bool = False) -> str:
         """
@@ -479,6 +511,11 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if not base:
             raise DriverWrapperException("Can't find driver") from None
+
+        if self.driver_wrapper.mobile:
+            if not self.driver_wrapper.is_safari_driver:
+                if self.driver_wrapper.is_native_context:
+                    return base
 
         if self.parent:
             self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')
