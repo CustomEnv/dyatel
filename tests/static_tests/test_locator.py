@@ -1,6 +1,6 @@
 import pytest
 
-from dyatel.base.driver_wrapper import DriverWrapper
+from dyatel.base.checkbox import Checkbox
 from dyatel.base.element import Element
 from dyatel.base.group import Group
 from dyatel.exceptions import UnsuitableArgumentsException
@@ -18,6 +18,7 @@ class SomeGroup(Group):
 
     link_to_class = ExtendedClass('some locator', name='nested element')  # all elements initialised two times
 
+    multiple_checkbox_partial = Checkbox(desktop='desktop_checkbox', mobile='mobile_checkbox', name='multiple checkbox all')
     multiple_element_partial = Element(desktop='desktop_locator', mobile='mobile_locator', name='multiple element all')
     multiple_element_all = Element(
         desktop='desktop_locator',

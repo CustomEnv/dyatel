@@ -6,7 +6,7 @@ from typing import Any, Union
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.internal_utils import get_child_elements_with_names, get_platform_locator
+from dyatel.mixins.internal_utils import get_child_elements_with_names
 
 
 class AfterInitMeta(type):
@@ -29,7 +29,7 @@ class Group(Element, metaclass=AfterInitMeta):
     """ Group of elements. Should be defined as class """
 
     def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 parent: Any = None, wait: bool = False, driver_wrapper: Union[DriverWrapper, Any] = None):
+                 parent: Any = None, wait: bool = False, driver_wrapper: Union[DriverWrapper, Any] = None, **kwargs):
         """
         Initializing of group based on current driver
 

@@ -26,9 +26,14 @@ def initialize_objects_with_args(objects: list):
             obj.__init__(**obj_args)
 
             obj.__initialized = True
-            for arg_name, arg_value in obj_args.items():
-                if arg_value:
-                    setattr(obj, arg_name, arg_value)
+
+            from dyatel.base.group import Group
+            from dyatel.base.page import Page
+
+            if isinstance(obj, (Group, Page)):
+                for arg_name, arg_value in obj_args.items():
+                    if arg_value:
+                        setattr(obj, arg_name, arg_value)
 
 
 def get_object_kwargs(obj: Any) -> dict:

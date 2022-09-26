@@ -9,13 +9,14 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_checkbox import PlayCheckbox
 from dyatel.dyatel_sel.core.core_checkbox import CoreCheckbox as SelCheckbox
+from dyatel.mixins.internal_utils import get_platform_locator
 
 
 class Checkbox(SelCheckbox, PlayCheckbox):
     """ Checkbox object crossroad. Should be defined as Page/Group class variable """
 
-    def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 parent: Any = None, wait: bool = False):
+    def __init__(self, locator: str = '', locator_type: str = '', name: str = '',
+                 parent: Any = None, wait: bool = False, **kwargs):
         """
         Initializing of checkbox based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group
@@ -38,6 +39,17 @@ class Checkbox(SelCheckbox, PlayCheckbox):
         self.element_class = self.__set_base_class()
         if self.element_class:
             super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
+
+    def __repr__(self, base_class=None):
+        cls = self.__class__
+        class_name = cls.__name__
+        base_class_name = base_class if base_class else cls.__base__.__name__
+        locator = f'locator="{get_platform_locator(self)}"'
+        driver_index = self._driver_index(self.driver_wrapper, self.driver)
+        driver = driver_index if driver_index else 'driver'
+        parent = self.parent.__class__.__name__ if self.parent else None
+        return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}", parent={parent}) '\
+               f'at {hex(id(self))}, base={base_class_name}, {driver}={self.driver}'
 
     def __set_base_class(self):
         """

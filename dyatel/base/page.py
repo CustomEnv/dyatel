@@ -20,7 +20,7 @@ class Page(WebPage, MobilePage, PlayPage):
     """ Page object crossroad. Should be defined as class """
 
     def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 driver_wrapper: Union[DriverWrapper, Any] = None):
+                 driver_wrapper: Union[DriverWrapper, Any] = None, **kwargs):
         """
         Initializing of page based on current driver
 

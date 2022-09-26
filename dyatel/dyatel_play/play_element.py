@@ -14,8 +14,14 @@ from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.internal_utils import get_child_elements, WAIT_EL, get_timeout_in_ms, initialize_objects_with_args, \
-    calculate_coordinate_to_click, get_platform_locator
+from dyatel.mixins.internal_utils import (
+    WAIT_EL,
+    get_child_elements,
+    get_timeout_in_ms,
+    initialize_objects_with_args,
+    calculate_coordinate_to_click,
+    get_platform_locator,
+)
 
 
 class PlayElement(ElementMixin, DriverMixin, LogMixin):
@@ -35,7 +41,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         self._driver_instance = PlayDriver
 
         self.locator = get_selenium_completable_locator(locator)
-        self.locator_type = f'{locator_type}: locator_type does not supported for playwright'
+        self.locator_type = f'{locator_type} - locator_type does not supported for playwright'
         self.name = name if name else self.locator
         self.wait = wait
         self.parent: Union[PlayElement, Any] = parent if parent else None

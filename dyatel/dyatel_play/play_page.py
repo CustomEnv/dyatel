@@ -22,7 +22,7 @@ class PlayPage(DriverMixin, LogMixin):
 
         self.locator = get_selenium_completable_locator(locator)
         self.name = name if name else self.locator
-        self.locator_type = locator_type  # locator_type is not supported for playwright
+        self.locator_type = f'{locator_type} - locator_type does not supported for playwright'
 
         self.url = getattr(self, 'url', '')
         self.page_elements = get_child_elements(self, PlayElement)

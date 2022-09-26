@@ -36,9 +36,10 @@ class Element(WebElement, MobileElement, PlayElement):
         self.name = name
         self.parent = parent
         self.wait = wait
-        self._init_locals = locals() if not hasattr(self, '_init_locals') else getattr(self, '_init_locals')
 
+        self._init_locals = locals() if not hasattr(self, '_init_locals') else getattr(self, '_init_locals')
         self._driver_instance = DriverWrapper
+
         self.element_class = self.__set_base_class()
         if self.element_class:
             super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
