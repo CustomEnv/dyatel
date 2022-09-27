@@ -140,14 +140,14 @@ class PreviousObjectDriver:
         from dyatel.base.page import Page
         is_group = isinstance(obj, Group)
         is_page = isinstance(obj, Page)
-        return not (is_page or is_group) and obj is not None
+        return not (is_page or is_group) or obj is None
 
     def _get_correct_previous_object(self, index):
         frame = get_frame(index)
         prev_object = frame.f_locals.get('self', None)
         unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)
 
-        while unexpected_previous_obj and index < 20:
+        while unexpected_previous_obj and index < 40:
             index += 1
             frame = get_frame(index)
             prev_object = frame.f_locals.get('self', None)
