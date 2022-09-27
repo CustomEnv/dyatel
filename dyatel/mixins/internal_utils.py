@@ -56,7 +56,13 @@ def get_object_kwargs(obj: Any) -> dict:
     return kwargs
 
 
-def get_platform_locator(obj):
+def get_platform_locator(obj: Any):
+    """
+    Get locator for current platform from object
+
+    :param obj: Page/Group/Checkbox/Element
+    :return: current platform locator
+    """
     locator, data = obj.locator, getattr(obj, '_init_locals').get('kwargs', {})
 
     if not data:

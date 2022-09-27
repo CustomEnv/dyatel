@@ -26,6 +26,11 @@ class Checkbox(SelCheckbox, PlayCheckbox):
         :param name: name of checkbox (will be attached to logs)
         :param parent: parent of checkbox. Can be Group or Page objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
+        :param kwargs:
+          - desktop: str = locator that will be used for desktop platform
+          - mobile: str = locator that will be used for all mobile platforms
+          - ios: str = locator that will be used for ios platform
+          - android: str = locator that will be used for android platform
         """
         self.locator = locator
         self.locator_type = locator_type
