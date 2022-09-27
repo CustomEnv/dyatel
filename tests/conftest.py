@@ -158,7 +158,7 @@ def driver_func(request, driver_name, driver_engine, chrome_options, firefox_opt
     driver_wrapper = DriverWrapper(driver)
 
     driver_wrapper.visual_regression_path = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
-    driver_wrapper.visual_reference_generation = request.config.getoption('generate-reference')
+    driver_wrapper.visual_reference_generation = request.config.getoption('--generate-reference')
 
     if 'appium' not in driver_engine:
         driver_wrapper.set_window_size(1024, 900)
