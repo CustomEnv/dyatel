@@ -120,7 +120,7 @@ class PreviousObjectDriver:
                     try:
                         return self._get_correct_previous_object(frame_index).driver_wrapper
                     except AttributeError:
-                        raise DriverWrapperException(f'Cant get driver_wrapper for {current_obj}') from None
+                        return None
 
     def set_driver_from_previous_object_for_element(self, current_obj):
         if current_obj.driver_wrapper:
@@ -147,7 +147,7 @@ class PreviousObjectDriver:
         prev_object = frame.f_locals.get('self', None)
         unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)
 
-        while unexpected_previous_obj and index < 40:
+        while unexpected_previous_obj and index < 10:
             index += 1
             frame = get_frame(index)
             prev_object = frame.f_locals.get('self', None)
