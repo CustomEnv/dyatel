@@ -128,12 +128,12 @@ class PreviousObjectDriver:
                 from dyatel.base.group import Group
                 if not isinstance(current_obj, Group):
                     if current_obj.driver == DriverWrapper.driver:
-                        previous_object = self._get_correct_previous_object(4)
+                        previous_object = self._get_correct_previous_object(5)
                         if previous_object:
                             try:
                                 current_obj.driver_wrapper = previous_object.driver_wrapper
                             except AttributeError:
-                                raise DriverWrapperException(f'Cant get driver_wrapper for {current_obj}') from None
+                                pass
 
     def previous_object_is_not_group_or_page(self, obj):
         from dyatel.base.group import Group
@@ -148,9 +148,15 @@ class PreviousObjectDriver:
         unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)
 
         while unexpected_previous_obj and index < 10:
+            if frame.f_code.co_name == '__init__':
+                return None
+
             index += 1
             frame = get_frame(index)
             prev_object = frame.f_locals.get('self', None)
             unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)
+
+        if frame.f_code.co_name == '__init__':
+            return None
 
         return prev_object
