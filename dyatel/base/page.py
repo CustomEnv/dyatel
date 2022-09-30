@@ -12,7 +12,7 @@ from dyatel.dyatel_play.play_page import PlayPage
 from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
-from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
+from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, PreviousObjectDriver
 from dyatel.mixins.internal_utils import WAIT_PAGE, get_platform_locator
 
 
@@ -46,6 +46,8 @@ class Page(WebPage, MobilePage, PlayPage):
         if driver_wrapper:
             self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
             self.set_driver(self._driver_instance)
+        elif len(self.driver_wrapper.all_drivers) > 1:
+            self.set_driver(PreviousObjectDriver().get_driver_from_previous_object_for_page_or_group(self, 5))
 
     def __repr__(self):
         cls = self.__class__
@@ -134,6 +136,9 @@ class Page(WebPage, MobilePage, PlayPage):
         :param driver_wrapper: driver wrapper object ~ DriverWrapper/WebDriver/MobileDriver/CoreDriver/PlayDriver
         :return: self
         """
+        if not driver_wrapper:
+            return self
+
         self._set_driver(driver_wrapper, Element)
         return self
 

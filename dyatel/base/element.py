@@ -13,6 +13,7 @@ from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException
 from dyatel.keyboard_keys import KeyboardKeys
+from dyatel.mixins.driver_mixin import PreviousObjectDriver
 from dyatel.mixins.internal_utils import WAIT_EL, get_platform_locator
 
 
@@ -166,6 +167,8 @@ class Element(WebElement, MobileElement, PlayElement):
 
         :return: element class
         """
+        PreviousObjectDriver().set_driver_from_previous_object_for_element(self)
+
         if isinstance(self.driver, PlaywrightDriver):
             Element.__bases__ = PlayElement,
             return PlayElement

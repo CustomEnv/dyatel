@@ -1,16 +1,25 @@
 from __future__ import annotations
 
+import sys
 import inspect
 from typing import Any
 
 from dyatel.exceptions import UnsuitableArgumentsException
 
+
 WAIT_EL = 10
 WAIT_PAGE = 20
 
-
 all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
             'textarea', 'svg', 'circle', 'iframe']
+
+
+def get_frame(frame=1):
+    """
+
+    :return:
+    """
+    return sys._getframe(frame)
 
 
 def initialize_objects_with_args(objects: list):

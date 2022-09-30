@@ -7,6 +7,8 @@ from selenium.webdriver.common.by import By
 from dyatel.base.element import Element
 from dyatel.base.group import Group
 from dyatel.base.page import Page
+from tests.adata.pages.expected_condition_page import ExpectedConditionPage
+from tests.adata.pages.keyboard_page import KeyboardPage
 
 
 class PlaygroundMainPage(Page):
@@ -33,16 +35,25 @@ class PlaygroundMainPage(Page):
     
 
 class SecondPlaygroundMainPage(Page):
-    def __init__(self):
+    def __init__(self, driver_wrapper=None):
         self.url = 'https://dineshvelhal.github.io/testautomation-playground/index.html'
-        super(SecondPlaygroundMainPage, self).__init__('//h1[.="The Playground"]', name='Second playground main page')
+        self.dw = driver_wrapper
+        super().__init__('//h1[.="The Playground"]', name='Second playground main page', driver_wrapper=driver_wrapper)
 
     def get_all_cards(self) -> List[Card]:
-        return Card().all_elements
+        return Card(self.dw).all_elements
+
+    def navigate_to_expected_condition_page(self):
+        self.get_all_cards()[0].button.click()
+        return ExpectedConditionPage()
+
+    def navigate_to_keyboard_page(self):
+        self.get_all_cards()[1].button.click()
+        return KeyboardPage()
 
 
 class Card(Group):
-    def __init__(self):
-        super(Card, self).__init__('.card', name='action cards')
+    def __init__(self, driver_wrapper=None):
+        super().__init__('.card', name='action cards', driver_wrapper=driver_wrapper)
 
     button = Element('a', name='proceed card button')

@@ -14,6 +14,9 @@ class MouseEventPage(Page):
     dropdown = Element('div.dropdown-content', name='dropdown with languages')
     header_logo = Element('[class = "navbar-brand abs"]', name='header logo', wait=True)
 
+    def button_with_text(self, text):
+        return Element(f'//button[contains(.,"{text}")]', name=f'button with text: {text}')
+
     def mouse_click_card(self):
         return MouseClickCard()
 

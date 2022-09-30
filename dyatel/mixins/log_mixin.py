@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import logging
-from inspect import currentframe
 from os.path import basename
 from typing import Any
 
 from dyatel.js_scripts import add_driver_index_comment_js
-
+from dyatel.mixins.internal_utils import get_frame
 
 logging.basicConfig(
     level=logging.INFO,
@@ -22,7 +21,7 @@ def get_log_message(message: str) -> str:
     :param message: custom message
     :return: log message
     """
-    code = currentframe().f_back.f_back.f_code
+    code = get_frame().f_back.f_back.f_code
     return f'[{basename(code.co_filename)}][{code.co_name}:{code.co_firstlineno}] {message}'
 
 
