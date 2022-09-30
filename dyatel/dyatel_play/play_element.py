@@ -14,8 +14,14 @@ from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.internal_utils import get_child_elements, WAIT_EL, get_timeout_in_ms, initialize_objects_with_args, \
-    calculate_coordinate_to_click
+from dyatel.mixins.internal_utils import (
+    WAIT_EL,
+    get_child_elements,
+    get_timeout_in_ms,
+    initialize_objects_with_args,
+    calculate_coordinate_to_click,
+    get_platform_locator,
+)
 
 
 class PlayElement(ElementMixin, DriverMixin, LogMixin):
@@ -32,11 +38,10 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
         self._element = None
-        self._initialized = True
         self._driver_instance = PlayDriver
 
         self.locator = get_selenium_completable_locator(locator)
-        self.locator_type = f'{locator_type}: locator_type does not supported for playwright'
+        self.locator_type = f'{locator_type} - locator_type does not supported for playwright'
         self.name = name if name else self.locator
         self.wait = wait
         self.parent: Union[PlayElement, Any] = parent if parent else None
@@ -57,12 +62,11 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         """
         element = self._element
         if not element:
-
-            driver = self._get_driver()
+            driver, locator = self._get_driver(), get_platform_locator(self)
             if isinstance(driver, ElementHandle):
-                element = driver.query_selector(self.locator)
+                element = driver.query_selector(locator)
             else:
-                element = driver.locator(self.locator)
+                element = driver.locator(locator)
 
         return element
 

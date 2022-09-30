@@ -62,13 +62,12 @@ class LogMixin:
         :param level: log level
         :return: None
         """
-        driver_log = ''
         driver = getattr(self, 'driver')
         driver_wrapper = getattr(self, 'driver_wrapper')
+        driver_log, driver_index = '', self._driver_index(driver_wrapper, driver)
 
-        if len(driver_wrapper.all_drivers) > 1 and driver_wrapper.desktop:
-            driver_index = str(driver_wrapper.all_drivers.index(driver) + 1)
-            driver_log = f'[{driver_index}_driver]'
+        if driver_index:
+            driver_log = f'[{driver_index}]'
 
             if not hasattr(driver, 'driver_index'):
                 driver.driver_index = driver_index
@@ -78,3 +77,17 @@ class LogMixin:
 
         send_log_message(f'{driver_log}{get_log_message(message)}', level)
         return self
+
+    def _driver_index(self, driver_wrapper, driver) -> str:
+        """
+        Get driver index for logging
+
+        :param driver_wrapper: driver wrapper object
+        :param driver: driver object
+        :return: 'index_driver' data
+        """
+        if len(driver_wrapper.all_drivers) > 1 and driver_wrapper.desktop:
+            driver_index = str(driver_wrapper.all_drivers.index(driver) + 1)
+            return f'{driver_index}_driver'
+
+        return ''

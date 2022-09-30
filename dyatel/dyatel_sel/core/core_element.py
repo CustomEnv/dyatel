@@ -35,7 +35,7 @@ from dyatel.mixins.internal_utils import (
     WAIT_EL,
     get_child_elements,
     initialize_objects_with_args,
-    calculate_coordinate_to_click,
+    calculate_coordinate_to_click, get_platform_locator,
 )
 
 
@@ -53,7 +53,6 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         """
         self._element: Union[SeleniumWebElement, None] = None
         self.__element: Union[SeleniumWebElement, None] = None
-        self._initialized = True
 
         self.locator = locator
         self.locator_type = locator_type
@@ -542,7 +541,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: SeleniumWebElement or AppiumWebElement
         """
         try:
-            return base.find_element(self.locator_type, self.locator)
+            return base.find_element(self.locator_type, get_platform_locator(self))
         except (SeleniumInvalidArgumentException, SeleniumInvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
         except SeleniumNoSuchElementException as exc:
@@ -556,7 +555,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: list of SeleniumWebElement or AppiumWebElement
         """
         try:
-            return base.find_elements(self.locator_type, self.locator)
+            return base.find_elements(self.locator_type, get_platform_locator(self))
         except (SeleniumInvalidArgumentException, InvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
 

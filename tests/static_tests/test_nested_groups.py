@@ -26,10 +26,10 @@ class Page1(Page):
 
 @pytest.mark.parametrize(
     'driver',
-    ('mocked_selenium_driver', 'mocked_mobile_driver', 'mocked_play_driver'),
+    ('mocked_selenium_driver', 'mocked_ios_driver', 'mocked_play_driver'),
     ids=['selenium', 'appium', 'playwright']
 )
-def test_object_in_nested_groups(mocked_mobile_driver, driver, request):
+def test_object_in_nested_groups(driver, request):
     request.getfixturevalue(driver)
     page = Page1()
     assert page.group1.shared_element != page.group2.shared_element

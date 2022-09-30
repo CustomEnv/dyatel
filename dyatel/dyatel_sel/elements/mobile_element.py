@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Union, List, BinaryIO, Any
 
-from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.sel_utils import get_legacy_selector, get_locator_type
 from dyatel.mixins.internal_utils import calculate_coordinate_to_click, WAIT_EL
@@ -22,9 +22,9 @@ class MobileElement(CoreElement):
         :param parent: parent of element. Can be MobileElement, MobilePage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self.is_safari_driver = CoreDriver.is_safari_driver
-        self.is_ios = CoreDriver.is_ios
-        self.is_android = CoreDriver.is_android
+        self.is_safari_driver = DriverWrapper.is_safari_driver
+        self.is_ios = DriverWrapper.is_ios
+        self.is_android = DriverWrapper.is_android
 
         self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.locator, self.locator_type = get_legacy_selector(locator, self.locator_type)

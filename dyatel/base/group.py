@@ -29,7 +29,7 @@ class Group(Element, metaclass=AfterInitMeta):
     """ Group of elements. Should be defined as class """
 
     def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 parent: Any = None, wait: bool = False, driver_wrapper: Union[DriverWrapper, Any] = None):
+                 parent: Any = None, wait: bool = False, driver_wrapper: Union[DriverWrapper, Any] = None, **kwargs):
         """
         Initializing of group based on current driver
 
@@ -39,7 +39,13 @@ class Group(Element, metaclass=AfterInitMeta):
         :param parent: parent of element. Can be Group or Page objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         :param driver_wrapper: set custom driver for group and group elements
+        :param kwargs:
+          - desktop: str = locator that will be used for desktop platform
+          - mobile: str = locator that will be used for all mobile platforms
+          - ios: str = locator that will be used for ios platform
+          - android: str = locator that will be used for android platform
         """
+        self._init_locals = locals()
         super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
         # it's necessary to leave it after init
         if driver_wrapper:
@@ -48,6 +54,9 @@ class Group(Element, metaclass=AfterInitMeta):
         elif self.driver_wrapper:
             if len(self.driver_wrapper.all_drivers) > 1:
                 self.set_driver(PreviousObjectDriver().get_driver_from_previous_object_for_page_or_group(self, 6))
+
+    def __repr__(self, base_class=None):
+        return super().__repr__(self.__class__.__base__.__base__.__base__.__name__)
 
     def set_driver(self, driver_wrapper) -> Group:
         """

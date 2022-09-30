@@ -6,7 +6,7 @@
 
 ---
 ## v1.2.8
-*Release date: 2022-xx-xx*
+*Release date: 2022-09-20*
 
 ### Added 
 - `driver_wrapper.is_native_context` property on mobile

@@ -14,14 +14,14 @@ from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.driver_mixin import PreviousObjectDriver
-from dyatel.mixins.internal_utils import WAIT_EL
+from dyatel.mixins.internal_utils import WAIT_EL, get_platform_locator
 
 
 class Element(WebElement, MobileElement, PlayElement):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
-    def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 parent: Any = None, wait: bool = False):
+    def __init__(self, locator: str = '', locator_type: str = '', name: str = '',
+                 parent: Any = None, wait: bool = False, **kwargs):
         """
         Initializing of element based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group
@@ -31,6 +31,11 @@ class Element(WebElement, MobileElement, PlayElement):
         :param name: name of element (will be attached to logs)
         :param parent: parent of element. Can be Group or Page objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
+        :param kwargs:
+          - desktop: str = locator that will be used for desktop platform
+          - mobile: str = locator that will be used for all mobile platforms
+          - ios: str = locator that will be used for ios platform
+          - android: str = locator that will be used for android platform
         """
         self.locator = locator
         self.locator_type = locator_type
@@ -38,34 +43,25 @@ class Element(WebElement, MobileElement, PlayElement):
         self.parent = parent
         self.wait = wait
 
-        self._initialized = False
+        self._init_locals = locals() if not hasattr(self, '_init_locals') else getattr(self, '_init_locals')
         self._driver_instance = DriverWrapper
 
         self.element_class = self.__set_base_class()
         if self.element_class:
             super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 
-    def __set_base_class(self):
-        """
-        Get element class in according to current driver, and set him as base class
+    def __repr__(self, base_class=None):
+        cls = self.__class__
+        class_name = cls.__name__
+        base_class_name = base_class if base_class else cls.__base__.__name__
+        locator = f'locator="{get_platform_locator(self)}"'
+        driver_index = self._driver_index(self.driver_wrapper, self.driver)
+        driver = driver_index if driver_index else 'driver'
+        parent = self.parent.__class__.__name__ if self.parent else None
+        return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}", parent={parent}) '\
+               f'at {hex(id(self))}, base={base_class_name}, {driver}={self.driver}'
 
-        :return: element class
-        """
-        PreviousObjectDriver().set_driver_from_previous_object_for_element(self)
-
-        if isinstance(self.driver, PlaywrightDriver):
-            Element.__bases__ = PlayElement,
-            return PlayElement
-        elif isinstance(self.driver, AppiumDriver):
-            Element.__bases__ = MobileElement,
-            return MobileElement
-        elif isinstance(self.driver, SeleniumDriver):
-            Element.__bases__ = WebElement,
-            return WebElement
-
-        # No exception due to delayed initialization
-
-    # Following methods works same for both Selenium/Appium and Playwright APIs
+    # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 
     # Elements interaction
 
@@ -164,3 +160,23 @@ class Element(WebElement, MobileElement, PlayElement):
             raise UnexpectedValueException(f'Value of "{self.name}" is empty')
 
         return self
+
+    def __set_base_class(self):
+        """
+        Get element class in according to current driver, and set him as base class
+
+        :return: element class
+        """
+        PreviousObjectDriver().set_driver_from_previous_object_for_element(self)
+
+        if isinstance(self.driver, PlaywrightDriver):
+            Element.__bases__ = PlayElement,
+            return PlayElement
+        elif isinstance(self.driver, AppiumDriver):
+            Element.__bases__ = MobileElement,
+            return MobileElement
+        elif isinstance(self.driver, SeleniumDriver):
+            Element.__bases__ = WebElement,
+            return WebElement
+
+        # No exception due to delayed initialization

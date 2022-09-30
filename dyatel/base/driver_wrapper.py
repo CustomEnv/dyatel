@@ -45,6 +45,15 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         self.__set_base_class()
         super(self.__class__, self).__init__(driver=driver)
 
+    def __repr__(self):
+        cls = self.__class__
+        class_name = cls.__name__
+        base_class_name = cls.__base__.__name__
+        mobile_data = f'mobile=(android={cls.is_android}, ios={cls.is_ios})' if cls.mobile else f'mobile={cls.mobile}'
+        driver = self.instance if cls.playwright else self.driver
+        return f'{class_name}(driver={driver}) at {hex(id(self))}, ' \
+               f'base={base_class_name}, desktop={cls.desktop}, {mobile_data}'
+
     def __set_base_class(self):
         """
         Get driver wrapper class in according to given driver source, and set him as base class
@@ -53,15 +62,18 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         DriverWrapper.__init_count += 1
         if isinstance(self.driver, PlaywrightDriver):
             self.__class__.__bases__ = PlayDriver,
+            self.__class__.mobile = False
             self.__class__.playwright = True
             self.__class__.desktop = True
             return PlayDriver
         if isinstance(self.driver, AppiumDriver):
             self.__class__.__bases__ = MobileDriver,
             self.__class__.mobile = True
+            self.__class__.desktop = False
             return MobileDriver
         if isinstance(self.driver, SeleniumDriver):
             self.__class__.__bases__ = WebDriver,
+            self.__class__.mobile = False
             self.__class__.desktop = True
             self.__class__.selenium = True
             return WebDriver
