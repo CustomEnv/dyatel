@@ -51,7 +51,7 @@ def get_object_kwargs(obj: Any) -> dict:
     obj_locals = getattr(obj, '_init_locals')
     obj_locals.pop('self', None)
     kwargs = obj_locals.get('kwargs', {})
-    kwargs.update({item: obj_locals.get(item, getattr(obj, item)) for item in init_args})
+    kwargs.update({item: obj_locals.get(item, getattr(obj, item, None)) for item in init_args})
 
     return kwargs
 
