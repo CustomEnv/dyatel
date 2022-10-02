@@ -48,7 +48,8 @@ class Element(WebElement, MobileElement, PlayElement):
 
         self.element_class = self.__set_base_class()
         if self.element_class:
-            super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
+            super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name, parent=self.parent,
+                             wait=self.wait)
 
     def __repr__(self, base_class=None):
         cls = self.__class__

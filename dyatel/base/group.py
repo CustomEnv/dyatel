@@ -45,8 +45,15 @@ class Group(Element, metaclass=AfterInitMeta):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
+        self.locator = locator
+        self.locator_type = locator_type
+        self.name = name
+        self.parent = parent
+        self.wait = wait
         self._init_locals = locals()
-        super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
+
+        super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name, parent=self.parent,
+                         wait=self.wait)
         # it's necessary to leave it after init
         if driver_wrapper:
             self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)

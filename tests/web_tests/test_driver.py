@@ -101,7 +101,7 @@ def test_driver_in_hidden_element(driver_wrapper, second_driver_wrapper):
     pizza_page = PizzaOrderPage(driver_wrapper)
     mouse_page = MouseEventPage(second_driver_wrapper)
 
-    # card = mouse_page.mouse_click_card()
+    card = mouse_page.mouse_click_card()
 
     mouse_page.open_page()
     pizza_page.open_page()
@@ -109,7 +109,7 @@ def test_driver_in_hidden_element(driver_wrapper, second_driver_wrapper):
     assert mouse_page.is_page_opened()
     assert mouse_page.button_with_text('Drop me').wait_element(2).is_displayed()  # button without specified driver
 
-    # assert card.any_button.parent == card
+    assert card.any_button.parent == card
 
     assert pizza_page.is_page_opened()
     assert pizza_page.input_with_value('SMALL').wait_element(2).is_displayed()  # button without specified driver

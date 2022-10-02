@@ -45,7 +45,7 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         self.visual_reference_generation = False
 
         self.__set_base_class()
-        super(self.__class__, self).__init__(driver=driver)
+        super(self.__class__, self).__init__(driver=self.driver)
 
     def __repr__(self):
         cls = self.__class__

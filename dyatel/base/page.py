@@ -41,7 +41,7 @@ class Page(WebPage, MobilePage, PlayPage):
 
         self._driver_instance = DriverWrapper
         self.__set_base_class()
-        super().__init__(locator=locator, locator_type=locator_type, name=name)
+        super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name)
         # it's necessary to leave it after init
         if driver_wrapper:
             self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)

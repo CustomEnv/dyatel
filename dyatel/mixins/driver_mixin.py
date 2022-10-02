@@ -153,9 +153,6 @@ class PreviousObjectDriver:
                             except AttributeError:
                                 pass
 
-                            # if current_obj.name == 'any button':
-                            #     breakpoint()
-
     def previous_object_is_not_group_or_page(self, obj: Any) -> bool:
         """
         Check is previous object is npt group or page
