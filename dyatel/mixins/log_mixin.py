@@ -4,8 +4,8 @@ import logging
 from os.path import basename
 from typing import Any
 
-from dyatel.js_scripts import add_driver_index_comment_js
-from dyatel.mixins.internal_utils import get_frame
+from dyatel.js_scripts import add_driver_index_comment_js, find_comments_js
+from dyatel.mixins.internal_utils import get_frame, driver_index
 
 logging.basicConfig(
     level=logging.INFO,
@@ -64,30 +64,17 @@ class LogMixin:
         """
         driver = getattr(self, 'driver')
         driver_wrapper = getattr(self, 'driver_wrapper')
-        driver_log, driver_index = '', self._driver_index(driver_wrapper, driver)
+        driver_log, index = '', driver_index(driver_wrapper, driver)
 
-        if driver_index:
-            driver_log = f'[{driver_index}]'
+        if index:
+            driver_log = f'[{index}]'
 
             if not hasattr(driver, 'driver_index'):
-                driver.driver_index = driver_index
+                driver.driver_index = index
 
             if driver_wrapper.selenium:
-                driver_wrapper.execute_script(add_driver_index_comment_js, driver_index)
+                if '_driver' not in str(driver_wrapper.execute_script(find_comments_js)):
+                    driver_wrapper.execute_script(add_driver_index_comment_js, index)
 
         send_log_message(f'{driver_log}{get_log_message(message)}', level)
         return self
-
-    def _driver_index(self, driver_wrapper, driver) -> str:
-        """
-        Get driver index for logging
-
-        :param driver_wrapper: driver wrapper object
-        :param driver: driver object
-        :return: 'index_driver' data
-        """
-        if len(driver_wrapper.all_drivers) > 1 and driver_wrapper.desktop:
-            driver_index = str(driver_wrapper.all_drivers.index(driver) + 1)
-            return f'{driver_index}_driver'
-
-        return ''

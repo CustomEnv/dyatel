@@ -10,7 +10,7 @@ from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_checkbox import PlayCheckbox
 from dyatel.dyatel_sel.core.core_checkbox import CoreCheckbox as SelCheckbox
 from dyatel.mixins.driver_mixin import PreviousObjectDriver
-from dyatel.mixins.internal_utils import get_platform_locator
+from dyatel.mixins.internal_utils import get_platform_locator, driver_index
 
 
 class Checkbox(SelCheckbox, PlayCheckbox):
@@ -51,8 +51,8 @@ class Checkbox(SelCheckbox, PlayCheckbox):
         class_name = cls.__name__
         base_class_name = base_class if base_class else cls.__base__.__name__
         locator = f'locator="{get_platform_locator(self)}"'
-        driver_index = self._driver_index(self.driver_wrapper, self.driver)
-        driver = driver_index if driver_index else 'driver'
+        index = driver_index(self.driver_wrapper, self.driver)
+        driver = index if index else 'driver'
         parent = self.parent.__class__.__name__ if self.parent else None
         return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}", parent={parent}) '\
                f'at {hex(id(self))}, base={base_class_name}, {driver}={self.driver}'

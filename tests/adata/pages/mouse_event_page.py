@@ -3,11 +3,12 @@ from __future__ import annotations
 from dyatel.base.element import Element
 from dyatel.base.group import Group
 from dyatel.base.page import Page
+from tests.settings import domain_name, repo_name
 
 
 class MouseEventPage(Page):
     def __init__(self, driver_wrapper=None):
-        self.url = 'https://dineshvelhal.github.io/testautomation-playground/mouse_events.html'
+        self.url = f'{domain_name}/{repo_name}/mouse_events_v2.html'
         super().__init__('//h2[.="Mouse Click Actions"]', name='Mouse events page', driver_wrapper=driver_wrapper)
 
     choose_language_button = Element('button.dropbtn', name='"Choose language" button', wait=True)
@@ -35,6 +36,10 @@ class MouseClickCard(Group):
     y_result = Element('click_y', name='y result')
 
     drag_source = Element('drag_source', name='drag source button')  # Wrong one
+
+    @property
+    def any_button(self):
+        return Element('button', name='any button')
 
     def get_result_coordinates(self):
         return [int(element.text.split(' ')[1]) for element in (self.x_result, self.y_result)]

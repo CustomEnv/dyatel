@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, List
+from typing import Union, List, Any
 
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.common.exceptions import WebDriverException
@@ -25,7 +25,7 @@ class CoreDriver(LogMixin):
         """
         driver.implicitly_wait(0.001)  # reduce selenium wait
         self.driver = driver
-        self.driver_wrapper = self
+        self.driver_wrapper: Any = self
         self.all_drivers.append(driver)
         self.original_tab = driver.current_window_handle
 

@@ -1,3 +1,6 @@
+domain_name = 'https://envinc.github.io/'
+repo_name = 'dyatel-playground'
+
 appium_logs_path = '.tox/.tmp/logs/android_appium.txt'
 android_device_start_timeout = 60
 android_desired_caps = {

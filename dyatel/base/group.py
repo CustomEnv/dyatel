@@ -53,7 +53,7 @@ class Group(Element, metaclass=AfterInitMeta):
             self.set_driver(self._driver_instance)
         elif self.driver_wrapper:
             if len(self.driver_wrapper.all_drivers) > 1:
-                self.set_driver(PreviousObjectDriver().get_driver_from_previous_object_for_page_or_group(self, 6))
+                PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)
 
     def __repr__(self, base_class=None):
         return super().__repr__(self.__class__.__base__.__base__.__base__.__name__)
@@ -77,7 +77,7 @@ class Group(Element, metaclass=AfterInitMeta):
         Will be called automatically after __init__ by metaclass `AfterInitMeta`
         """
         for name, value in get_child_elements_with_names(self, Element).items():
-            if not value.parent:
-                setattr(self, name, copy.copy(value))
-                value = getattr(self, name)
+            setattr(self, name, copy.copy(value))
+            value = getattr(self, name)
+            if value.parent is None:
                 value.parent = self

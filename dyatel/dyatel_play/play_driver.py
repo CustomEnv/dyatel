@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Union
+from typing import List, Union, Any
 
 from playwright.sync_api import Page as PlaywrightPage, Locator, Page
 from playwright.sync_api import Browser
@@ -23,6 +23,7 @@ class PlayDriver(LogMixin):
         """
         self.driver_context = driver.new_context()
         self.driver = self.driver_context.new_page()
+        self.driver_wrapper: Any = self
         self.all_drivers.append(self.driver)
         self.original_tab = self.driver
 

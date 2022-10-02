@@ -113,16 +113,29 @@ class DriverMixin:
 
 class PreviousObjectDriver:
 
-    def get_driver_from_previous_object_for_page_or_group(self, current_obj, frame_index):
+    def set_driver_from_previous_object_for_page_or_group(self, current_obj: Any, frame_index: int) -> None:
+        """
+        Set driver for group/page from previous object
+
+        :param current_obj: group or page object
+        :param frame_index: frame start index
+        :return: None
+        """
         if current_obj.driver_wrapper:
             if len(current_obj.driver_wrapper.all_drivers) > 1:
                 if current_obj.driver == DriverWrapper.driver:
                     try:
-                        return self._get_correct_previous_object(frame_index).driver_wrapper
+                        current_obj.set_driver(self._get_correct_previous_object(frame_index).driver_wrapper)
                     except AttributeError:
                         return None
 
-    def set_driver_from_previous_object_for_element(self, current_obj):
+    def set_driver_from_previous_object_for_element(self, current_obj: Any) -> None:
+        """
+        Set driver for element from previous object
+
+        :param current_obj: element object
+        :return: None
+        """
         if current_obj.driver_wrapper:
             if len(current_obj.driver_wrapper.all_drivers) > 1:
                 from dyatel.base.group import Group
@@ -130,19 +143,39 @@ class PreviousObjectDriver:
                     if current_obj.driver == DriverWrapper.driver:
                         previous_object = self._get_correct_previous_object(5)
                         if previous_object:
+
+                            if current_obj.parent is None:
+                                if isinstance(previous_object, Group):
+                                    current_obj.parent = previous_object
+
                             try:
                                 current_obj.driver_wrapper = previous_object.driver_wrapper
                             except AttributeError:
                                 pass
 
-    def previous_object_is_not_group_or_page(self, obj):
+                            # if current_obj.name == 'any button':
+                            #     breakpoint()
+
+    def previous_object_is_not_group_or_page(self, obj: Any) -> bool:
+        """
+        Check is previous object is npt group or page
+
+        :param obj: obj to be checked
+        :return: bool
+        """
         from dyatel.base.group import Group
         from dyatel.base.page import Page
         is_group = isinstance(obj, Group)
         is_page = isinstance(obj, Page)
         return not (is_page or is_group) or obj is None
 
-    def _get_correct_previous_object(self, index):
+    def _get_correct_previous_object(self, index: int) -> Union[None, Any]:
+        """
+        Finds previous object with nested element/group/page
+
+        :param index: frame index to start
+        :return: None or object with driver_wrapper
+        """
         frame = get_frame(index)
         prev_object = frame.f_locals.get('self', None)
         unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)

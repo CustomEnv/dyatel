@@ -19,6 +19,7 @@ from selenium.common.exceptions import (
 )
 
 from dyatel.dyatel_sel.sel_utils import ActionChains
+from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
@@ -35,7 +36,7 @@ from dyatel.mixins.internal_utils import (
     WAIT_EL,
     get_child_elements,
     initialize_objects_with_args,
-    calculate_coordinate_to_click, get_platform_locator,
+    get_platform_locator,
 )
 
 
@@ -105,21 +106,6 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         finally:
             self.element = None
 
-        return self
-
-    def click_into_center(self, silent: bool = False) -> CoreElement:
-        """
-        Click into the center of element
-
-        :param silent: erase log message
-        :return: self
-        """
-        x, y = calculate_coordinate_to_click(self, 0, 0)
-
-        if not silent:
-            self.log(f'Click into the center (x: {x}, y: {y}) for "{self.name}"')
-
-        self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
         return self
 
     def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> CoreElement:
@@ -431,6 +417,18 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             self.log(f'Get elements count of "{self.name}"')
 
         return len(getattr(self, 'all_elements'))
+
+    def get_rect(self) -> dict:
+        """
+        A dictionary with the size and location of the element.
+
+        :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
+        """
+        element = self.element
+        size = self.driver.execute_script(get_element_size_js, element)
+        location = self.driver.execute_script(get_element_position_on_screen_js, element)
+        sorted_items: list = sorted({**size, **location}.items(), reverse=True)
+        return dict(sorted_items)
 
     # Mixin
 

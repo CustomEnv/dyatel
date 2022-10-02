@@ -16,8 +16,10 @@ all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'b
 
 def get_frame(frame=1):
     """
+    Get frame by given id
 
-    :return:
+    :param frame: frame id, "current" by default
+    :return: frame
     """
     return sys._getframe(frame)
 
@@ -132,6 +134,20 @@ def get_child_elements_with_names(obj: object, instance: type) -> dict:
     return elements
 
 
+def is_target_on_screen(x: int, y: int, possible_range: dict):
+    """
+    Check is given coordinates fit into given range
+
+    :param x: x coordinate
+    :param y: y coordinate
+    :param possible_range: possible range
+    :return: bool
+    """
+    is_x_on_screen = x in range(possible_range['width'])
+    is_y_on_screen = y in range(possible_range['height'])
+    return is_x_on_screen and is_y_on_screen
+
+
 def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple:
     """
     Calculate coordinates to click for element
@@ -160,3 +176,18 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
         y = emy
 
     return int(x), int(y)
+
+
+def driver_index(driver_wrapper, driver) -> str:
+    """
+    Get driver index for logging
+
+    :param driver_wrapper: driver wrapper object
+    :param driver: driver object
+    :return: 'index_driver' data
+    """
+    if len(driver_wrapper.all_drivers) > 1 and driver_wrapper.desktop:
+        index = str(driver_wrapper.all_drivers.index(driver) + 1)
+        return f'{index}_driver'
+
+    return ''

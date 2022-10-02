@@ -6,7 +6,6 @@ from typing import Union, List, Any
 # noinspection PyProtectedMember
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError
 
-from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
 from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
@@ -38,7 +37,6 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
         self._element = None
-        self._driver_instance = PlayDriver
 
         self.locator = get_selenium_completable_locator(locator)
         self.locator_type = f'{locator_type} - locator_type does not supported for playwright'
@@ -110,6 +108,8 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         :param: y: y offset
         :return: self
         """
+        self.log(f'Click outside from "{self.name}"')
+
         self._first_element.click(position={'x': x, 'y': y}, force=True)
         return self
 
@@ -120,6 +120,9 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         :param silent: erase log message
         :return: self
         """
+        if not self.is_fully_visible(silent=True):
+            self.scroll_into_view()
+
         x, y = calculate_coordinate_to_click(self, 0, 0)
 
         if not silent:
@@ -137,6 +140,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         :return: self
         """
         text = str(text)
+
         if not silent:
             self.log(f'Type text {cut_log_data(text)} into "{self.name}"')
 

@@ -8,7 +8,8 @@ from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.exceptions import DriverWrapperException
-from dyatel.mixins.internal_utils import get_child_elements_with_names
+from dyatel.js_scripts import get_inner_height_js, get_inner_width_js
+from dyatel.mixins.internal_utils import get_child_elements_with_names, driver_index
 
 
 class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
@@ -31,6 +32,7 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
             return super().__new__(cls)
 
         objects = {name: False for name in get_child_elements_with_names(cls, bool).keys()}
+        objects.update({'__repr__': cls.__repr__})
         return super().__new__(type("DifferentDriverWrapper", (DriverWrapper, ), objects))
 
     def __init__(self, driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver]):
@@ -51,8 +53,18 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         base_class_name = cls.__base__.__name__
         mobile_data = f'mobile=(android={cls.is_android}, ios={cls.is_ios})' if cls.mobile else f'mobile={cls.mobile}'
         driver = self.instance if cls.playwright else self.driver
-        return f'{class_name}(driver={driver}) at {hex(id(self))}, ' \
+        index = driver_index(self.driver_wrapper, self.driver)
+        driver_with_index = index if index else 'driver'
+        return f'{class_name}({driver_with_index}={driver}) at {hex(id(self))}, ' \
                f'base={base_class_name}, desktop={cls.desktop}, {mobile_data}'
+
+    def get_inner_window_size(self) -> dict:
+        """
+        Get inner size of driver window
+
+        :return: {'height': value, 'width': value}
+        """
+        return {'height': self.execute_script(get_inner_height_js), 'width': self.execute_script(get_inner_width_js)}
 
     def __set_base_class(self):
         """

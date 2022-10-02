@@ -14,7 +14,7 @@ from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.driver_mixin import PreviousObjectDriver
-from dyatel.mixins.internal_utils import WAIT_EL, get_platform_locator
+from dyatel.mixins.internal_utils import WAIT_EL, get_platform_locator, is_target_on_screen, driver_index
 
 
 class Element(WebElement, MobileElement, PlayElement):
@@ -55,8 +55,8 @@ class Element(WebElement, MobileElement, PlayElement):
         class_name = cls.__name__
         base_class_name = base_class if base_class else cls.__base__.__name__
         locator = f'locator="{get_platform_locator(self)}"'
-        driver_index = self._driver_index(self.driver_wrapper, self.driver)
-        driver = driver_index if driver_index else 'driver'
+        index = driver_index(self.driver_wrapper, self.driver)
+        driver = index if index else 'driver'
         parent = self.parent.__class__.__name__ if self.parent else None
         return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}", parent={parent}) '\
                f'at {hex(id(self))}, base={base_class_name}, {driver}={self.driver}'
@@ -160,6 +160,45 @@ class Element(WebElement, MobileElement, PlayElement):
             raise UnexpectedValueException(f'Value of "{self.name}" is empty')
 
         return self
+
+    def is_visible(self, silent: bool = False) -> bool:
+        """
+        Check is current element visible on current screen
+
+        :param silent: erase log
+        :return: bool
+        """
+        if not silent:
+            self.log(f'Check visibility of "{self.name}"')
+
+        is_visible = self.is_displayed()
+
+        if is_visible:
+            rect, window_size = self.get_rect(), self.driver_wrapper.get_inner_window_size()
+            is_visible = is_target_on_screen(x=rect['x'], y=rect['y'], possible_range=window_size)
+
+        return is_visible
+
+    def is_fully_visible(self, silent: bool = False) -> bool:
+        """
+        Check is current element fully visible on current screen
+
+        :param silent: erase log
+        :return: bool
+        """
+        if not silent:
+            self.log(f'Check fully visibility of "{self.name}"')
+
+        is_visible = self.is_displayed()
+
+        if is_visible:
+            rect, window_size = self.get_rect(), self.driver_wrapper.get_inner_window_size()
+            x_end, y_end = rect['x'] + rect['width'], rect['y'] + rect['height']
+            is_start_visible = is_target_on_screen(x=rect['x'], y=rect['y'], possible_range=window_size)
+            is_end_visible = is_target_on_screen(x=x_end, y=y_end, possible_range=window_size)
+            is_visible = is_start_visible and is_end_visible
+
+        return is_visible
 
     def __set_base_class(self):
         """

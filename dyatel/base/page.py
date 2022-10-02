@@ -13,7 +13,7 @@ from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, PreviousObjectDriver
-from dyatel.mixins.internal_utils import WAIT_PAGE, get_platform_locator
+from dyatel.mixins.internal_utils import WAIT_PAGE, get_platform_locator, driver_index
 
 
 class Page(WebPage, MobilePage, PlayPage):
@@ -47,15 +47,15 @@ class Page(WebPage, MobilePage, PlayPage):
             self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
             self.set_driver(self._driver_instance)
         elif len(self.driver_wrapper.all_drivers) > 1:
-            self.set_driver(PreviousObjectDriver().get_driver_from_previous_object_for_page_or_group(self, 5))
+            PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)
 
     def __repr__(self):
         cls = self.__class__
         class_name = cls.__name__
         base_class_name = cls.__base__.__base__.__name__
         locator = f'locator="{get_platform_locator(self)}"'
-        driver_index = self._driver_index(self.driver_wrapper, self.driver)
-        driver = driver_index if driver_index else 'driver'
+        index = driver_index(self.driver_wrapper, self.driver)
+        driver = index if index else 'driver'
         return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}") at {hex(id(self))}'\
                f', base={base_class_name}, {driver}={self.driver}'
 
