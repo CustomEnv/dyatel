@@ -164,7 +164,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
     def is_visible(self, silent: bool = False) -> bool:
         """
-        Check is current element visible on current screen
+        Check is current element top left corner or bottom right corner visible on current screen
 
         :param silent: erase log
         :return: bool
@@ -176,13 +176,16 @@ class Element(WebElement, MobileElement, PlayElement):
 
         if is_visible:
             rect, window_size = self.get_rect(), self.driver_wrapper.get_inner_window_size()
-            is_visible = is_target_on_screen(x=rect['x'], y=rect['y'], possible_range=window_size)
+            x_end, y_end = rect['x'] + rect['width'], rect['y'] + rect['height']
+            is_start_visible = is_target_on_screen(x=rect['x'], y=rect['y'], possible_range=window_size)
+            is_end_visible = is_target_on_screen(x=x_end, y=y_end, possible_range=window_size)
+            is_visible = is_start_visible or is_end_visible
 
         return is_visible
 
     def is_fully_visible(self, silent: bool = False) -> bool:
         """
-        Check is current element fully visible on current screen
+        Check is current element top left corner and bottom right corner visible on current screen
 
         :param silent: erase log
         :return: bool
@@ -207,7 +210,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
         :return: element class
         """
-        PreviousObjectDriver().set_driver_from_previous_object_for_element(self)
+        PreviousObjectDriver().set_driver_from_previous_object_for_element(self, 5)
 
         if isinstance(self.driver, PlaywrightDriver):
             Element.__bases__ = PlayElement,

@@ -11,7 +11,6 @@ from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
-from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.internal_utils import get_child_elements, get_child_elements_with_names, get_frame
 
 
@@ -113,7 +112,7 @@ class DriverMixin:
 
 class PreviousObjectDriver:
 
-    def set_driver_from_previous_object_for_page_or_group(self, current_obj: Any, frame_index: int) -> None:
+    def set_driver_from_previous_object_for_page(self, current_obj: Any, frame_index: int) -> None:
         """
         Set driver for group/page from previous object
 
@@ -124,34 +123,36 @@ class PreviousObjectDriver:
         if current_obj.driver_wrapper:
             if len(current_obj.driver_wrapper.all_drivers) > 1:
                 if current_obj.driver == DriverWrapper.driver:
-                    try:
-                        current_obj.set_driver(self._get_correct_previous_object(frame_index).driver_wrapper)
-                    except AttributeError:
-                        return None
+                    previous_object = self._get_correct_previous_object(frame_index)
+                    if previous_object:
+                        try:
+                            current_obj.set_driver(previous_object.driver_wrapper)
+                        except AttributeError:
+                            return None
 
-    def set_driver_from_previous_object_for_element(self, current_obj: Any) -> None:
+    def set_driver_from_previous_object_for_element(self, current_obj: Any, frame_index: int) -> None:
         """
         Set driver for element from previous object
 
         :param current_obj: element object
+        :param frame_index: frame start index
         :return: None
         """
         if current_obj.driver_wrapper:
             if len(current_obj.driver_wrapper.all_drivers) > 1:
-                from dyatel.base.group import Group
-                if not isinstance(current_obj, Group):
-                    if current_obj.driver == DriverWrapper.driver:
-                        previous_object = self._get_correct_previous_object(5)
-                        if previous_object:
+                if current_obj.driver == DriverWrapper.driver:
+                    previous_object = self._get_correct_previous_object(frame_index)
+                    if previous_object:
 
-                            if current_obj.parent is None:
-                                if isinstance(previous_object, Group):
-                                    current_obj.parent = previous_object
+                        if current_obj.parent is None:
+                            from dyatel.base.group import Group
+                            if isinstance(previous_object, Group):
+                                current_obj.parent = previous_object
 
-                            try:
-                                current_obj.driver_wrapper = previous_object.driver_wrapper
-                            except AttributeError:
-                                pass
+                        try:
+                            current_obj.driver_wrapper = previous_object.driver_wrapper
+                        except AttributeError:
+                            pass
 
     def previous_object_is_not_group_or_page(self, obj: Any) -> bool:
         """

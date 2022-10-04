@@ -2,7 +2,23 @@
 
 ---
 ## v1.3.0
-*Release date: In development*
+### Added 
+- `driver_wrapper.get_inner_window_size` method
+- `element.is_visible` method 
+- `element.is_fully_visible` method
+- `element.__repr__`, `checkbox.__repr__`, `group.__repr__`, `page.__repr__` 
+- `scroll_into_view` before `element.click_into_center/hover/etc.` if element isn't visible
+- auto implemented `driver` in hidden object (function/property etc.) 
+- auto implemented `parent` in hidden object (function/property etc.) 
+- platform specific locator by object kwargs: ios/android/mobile/desktop
+
+### Changed
+- `element.get_rect` for selenium desktop
+- logging
+
+### Fixed
+- `get_object_kwargs` function
+- `initialize_objects_with_args` function
 
 ---
 ## v1.2.8

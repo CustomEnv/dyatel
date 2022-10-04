@@ -64,7 +64,7 @@ class Checkbox(SelCheckbox, PlayCheckbox):
 
         :return: element class
         """
-        PreviousObjectDriver().set_driver_from_previous_object_for_element(self)
+        PreviousObjectDriver().set_driver_from_previous_object_for_element(self, 5)
 
         if isinstance(self.driver, PlaywrightDriver):
             Checkbox.__bases__ = PlayCheckbox,
