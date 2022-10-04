@@ -47,7 +47,7 @@ class MouseClickCard(Group):
     def get_click_area_middle(self):
         el_rect = self.click_area.get_rect()
         height, width = int(el_rect['height'] / 2), int(el_rect['width'] / 2)
-        return [range(side - 1, side + 1) for side in [width, height]]
+        return [range(side - 2, side + 2) for side in [width, height]]
 
     def is_click_proceeded(self):
         return self.x_result.is_displayed() or self.y_result.is_displayed()

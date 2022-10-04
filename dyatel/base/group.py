@@ -60,7 +60,7 @@ class Group(Element, metaclass=AfterInitMeta):
             self.set_driver(self._driver_instance)
         elif self.driver_wrapper:
             if len(self.driver_wrapper.all_drivers) > 1:
-                PreviousObjectDriver().set_driver_from_previous_object_for_element(self, 6)
+                PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)
 
     def __repr__(self, base_class=None):
         return super().__repr__(self.__class__.__base__.__base__.__base__.__name__)

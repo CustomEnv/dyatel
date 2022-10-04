@@ -8,8 +8,8 @@
 - `element.is_fully_visible` method
 - `element.__repr__`, `checkbox.__repr__`, `group.__repr__`, `page.__repr__` 
 - `scroll_into_view` before `element.click_into_center/hover/etc.` if element isn't visible
-- auto implemented `driver` in hidden object (function/property etc.) 
-- auto implemented `parent` in hidden object (function/property etc.) 
+- auto implemented `driver` in hidden object (function/property etc.) for `element/checkbox/group/page`
+- auto implemented `parent` in hidden object (function/property etc.) for `element`
 - platform specific locator by object kwargs: ios/android/mobile/desktop
 
 ### Changed
