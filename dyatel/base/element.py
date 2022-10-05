@@ -44,23 +44,24 @@ class Element(WebElement, MobileElement, PlayElement):
         self.wait = wait
 
         self._init_locals = locals() if not hasattr(self, '_init_locals') else getattr(self, '_init_locals')
+        self._initialized = False
         self._driver_instance = DriverWrapper
 
         self.element_class = self.__set_base_class()
         if self.element_class:
+            self._initialized = True
             super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name, parent=self.parent,
                              wait=self.wait)
 
-    def __repr__(self, base_class=None):
+    def __repr__(self):
         cls = self.__class__
         class_name = cls.__name__
-        base_class_name = base_class if base_class else cls.__base__.__name__
         locator = f'locator="{get_platform_locator(self)}"'
         index = driver_index(self.driver_wrapper, self.driver)
         driver = index if index else 'driver'
         parent = self.parent.__class__.__name__ if self.parent else None
         return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}", parent={parent}) '\
-               f'at {hex(id(self))}, base={base_class_name}, {driver}={self.driver}'
+               f'at {hex(id(self))}, {driver}={self.driver}'
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 

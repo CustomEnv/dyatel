@@ -52,12 +52,11 @@ class Page(WebPage, MobilePage, PlayPage):
     def __repr__(self):
         cls = self.__class__
         class_name = cls.__name__
-        base_class_name = cls.__base__.__base__.__name__
         locator = f'locator="{get_platform_locator(self)}"'
         index = driver_index(self.driver_wrapper, self.driver)
         driver = index if index else 'driver'
-        return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}") at {hex(id(self))}'\
-               f', base={base_class_name}, {driver}={self.driver}'
+        return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}") at {hex(id(self))}, '\
+               f'{driver}={self.driver}'
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 
