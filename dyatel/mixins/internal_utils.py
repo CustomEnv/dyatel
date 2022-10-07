@@ -33,10 +33,9 @@ def initialize_objects_with_args(objects: list):
     """
     for obj in objects:
         if not getattr(obj, '_initialized', False):
+            obj._initialized = True
             obj_args = get_object_kwargs(obj)
             obj.__init__(**obj_args)
-
-            obj._initialized = True
 
             from dyatel.base.group import Group
             from dyatel.base.page import Page

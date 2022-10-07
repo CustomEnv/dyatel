@@ -3,6 +3,7 @@ from __future__ import annotations
 from selenium.webdriver import ActionChains as SeleniumActionChains
 from selenium.webdriver.common.by import By
 
+from dyatel.exceptions import InvalidSelectorException
 from dyatel.mixins.internal_utils import all_tags, get_child_elements
 
 
@@ -23,7 +24,7 @@ def get_locator_type(locator: str):
       By.ID if there is no any match
     """
     if locator in selenium_locator_types:
-        raise Exception('Locator type given instead of locator')
+        raise InvalidSelectorException('Locator type given instead of locator')
 
     brackets = '[' in locator and ']' in locator
     is_only_tags = True
@@ -37,6 +38,8 @@ def get_locator_type(locator: str):
     elif '/' not in locator and brackets:
         return By.CSS_SELECTOR
     elif '.' in locator and not brackets:
+        return By.CSS_SELECTOR
+    elif '#' in locator:
         return By.CSS_SELECTOR
 
     for tag in locator.split(' '):

@@ -41,8 +41,8 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         self.locator = get_selenium_completable_locator(locator)
         self.locator_type = f'{locator_type} - locator_type does not supported for playwright'
         self.name = name if name else self.locator
+        self.parent = parent
         self.wait = wait
-        self.parent: Union[PlayElement, Any] = parent if parent else None
 
         self.child_elements: List[PlayElement] = get_child_elements(self, PlayElement)
         initialize_objects_with_args(self.child_elements)

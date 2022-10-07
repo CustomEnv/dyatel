@@ -9,8 +9,8 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_checkbox import PlayCheckbox
 from dyatel.dyatel_sel.core.core_checkbox import CoreCheckbox as SelCheckbox
-from dyatel.mixins.driver_mixin import PreviousObjectDriver
 from dyatel.mixins.internal_utils import get_platform_locator, driver_index
+from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
 
 class Checkbox(SelCheckbox, PlayCheckbox):

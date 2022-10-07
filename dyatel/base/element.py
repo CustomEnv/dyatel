@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Union
+from typing import Any, Union, List
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -13,8 +13,9 @@ from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.mixins.driver_mixin import PreviousObjectDriver
+from dyatel.mixins import previous_object_mixin
 from dyatel.mixins.internal_utils import WAIT_EL, get_platform_locator, is_target_on_screen, driver_index
+from dyatel.visual_comparison import VisualComparison
 
 
 class Element(WebElement, MobileElement, PlayElement):
@@ -44,7 +45,6 @@ class Element(WebElement, MobileElement, PlayElement):
         self.wait = wait
 
         self._init_locals = locals() if not hasattr(self, '_init_locals') else getattr(self, '_init_locals')
-        self._initialized = False
         self._driver_instance = DriverWrapper
 
         self.element_class = self.__set_base_class()
@@ -205,13 +205,43 @@ class Element(WebElement, MobileElement, PlayElement):
 
         return is_visible
 
+    def assert_screenshot(self, filename: str = '', test_name: str = '', name_suffix: str = '',
+                          threshold: Union[int, float] = 0, delay: Union[int, float] = 0.5, scroll: bool = False,
+                          remove: List[Element] = None) -> None:
+        """
+        Assert given (by name) and taken screenshot equals
+
+        :param filename: full screenshot name. Custom filename will be used if empty string given
+        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
+        :param name_suffix: filename suffix. Good to use for same element with positive/netagative case
+        :param threshold: possible threshold
+        :param delay: delay before taking screenshot
+        :param scroll: scroll to element before taking the screenshot
+        :param remove: remove elements from screenshot
+        :return: None
+        """
+        VisualComparison(self.driver_wrapper, self).assert_screenshot(
+            filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
+            scroll=scroll, remove=remove,
+        )
+
     def __set_base_class(self):
         """
         Get element class in according to current driver, and set him as base class
 
         :return: element class
         """
-        PreviousObjectDriver().set_driver_from_previous_object_for_element(self, 5)
+        if self.driver_wrapper:
+
+            prev_obj_driver_class = previous_object_mixin.PreviousObjectDriver()
+
+            if len(self.driver_wrapper.all_drivers) > 1:
+                if self.driver == DriverWrapper.driver:
+                    prev_obj_driver_class.set_driver_from_previous_object_for_element(self, 5)
+
+            if not getattr(self, '_initialized', False):
+                if self.parent is None:
+                    prev_obj_driver_class.set_parent_from_previous_object_for_element(self, 5)
 
         if isinstance(self.driver, PlaywrightDriver):
             Element.__bases__ = PlayElement,

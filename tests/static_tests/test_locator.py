@@ -14,7 +14,7 @@ class ExtendedClass(Group):
 
 class SomeGroup(Group):
     def __init__(self):
-        super().__init__('SomeGroup')
+        super().__init__('default_group', mobile='mobile_group')
 
     link_to_class = ExtendedClass('some locator', name='nested element')  # all elements initialised two times
 
@@ -48,18 +48,22 @@ def test_link_to_class_locator(driver):
 
 def test_multiple_locator_ios(mocked_ios_driver):
     assert 'ios_locator' in get_platform_locator(SomeGroup().multiple_element_all)
+    assert 'mobile_group' in get_platform_locator(SomeGroup())
 
 
 def test_multiple_locator_android(mocked_android_driver):
     assert 'android_locator' in get_platform_locator(SomeGroup().multiple_element_all)
+    assert 'mobile_group' in get_platform_locator(SomeGroup())
 
 
 def test_multiple_locator_selenium(mocked_selenium_driver):
     assert 'desktop_locator' in get_platform_locator(SomeGroup().multiple_element_all)
+    assert 'default_group' in get_platform_locator(SomeGroup())
 
 
 def test_multiple_locator_playwright(mocked_play_driver):
     assert 'desktop_locator' in get_platform_locator(SomeGroup().multiple_element_all)
+    assert 'default_group' in get_platform_locator(SomeGroup())
 
 
 @pytest.mark.parametrize(

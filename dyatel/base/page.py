@@ -12,8 +12,9 @@ from dyatel.dyatel_play.play_page import PlayPage
 from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
-from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, PreviousObjectDriver
+from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.internal_utils import WAIT_PAGE, get_platform_locator, driver_index
+from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
 
 class Page(WebPage, MobilePage, PlayPage):

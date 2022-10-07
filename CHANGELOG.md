@@ -8,17 +8,22 @@
 - `element.is_fully_visible` method
 - `element.__repr__`, `checkbox.__repr__`, `group.__repr__`, `page.__repr__` 
 - `scroll_into_view` before `element.click_into_center/hover/etc.` if element isn't visible
-- auto implemented `driver` in hidden object (function/property etc.) for `element/checkbox/group/page`
-- auto implemented `parent` in hidden object (function/property etc.) for `element`
-- platform specific locator by object kwargs: ios/android/mobile/desktop
+- `name_suffix` arg for `element.assert_screenshot` 
+- Auto implemented `driver` in hidden object (function/property etc.) for `element/checkbox/group/page`
+- Auto implemented `parent` in hidden object (function/property etc.) for `element`
+- Platform specific locator by object kwargs: ios/android/mobile/desktop
 
 ### Changed
 - `element.get_rect` for selenium desktop
-- logging
+- All visual comparisons staff moved to `VisualComparison` class 
+- Logging
 
 ### Fixed
 - `get_object_kwargs` function
 - `initialize_objects_with_args` function
+- `element.assert_screenshot` driver name for remote
+- Click by location after scroll
+- Parent for nested element
 
 ---
 ## v1.2.8

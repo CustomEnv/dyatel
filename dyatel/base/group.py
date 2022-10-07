@@ -5,8 +5,9 @@ from typing import Any, Union
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
-from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, PreviousObjectDriver
+from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.internal_utils import get_child_elements_with_names
+from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
 
 class AfterInitMeta(type):

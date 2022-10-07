@@ -110,6 +110,8 @@ def test_driver_in_hidden_element(driver_wrapper, second_driver_wrapper):
     assert mouse_page.button_with_text('Drop me').wait_element(2).is_displayed()  # button without specified driver
 
     assert card.any_button.parent == card
+    assert card.any_button_without_parent.parent is False
+    assert card.any_button_with_custom_parent.parent == card.y_result
 
     assert pizza_page.is_page_opened()
     assert pizza_page.input_with_value('SMALL').wait_element(2).is_displayed()  # button without specified driver
