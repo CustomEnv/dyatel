@@ -47,7 +47,7 @@ class Page(WebPage, MobilePage, PlayPage):
         if driver_wrapper:
             self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
             self.set_driver(self._driver_instance)
-        elif len(self.driver_wrapper.all_drivers) > 1:
+        elif self.driver_wrapper:
             PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)
 
     def __repr__(self):

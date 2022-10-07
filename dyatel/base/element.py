@@ -12,10 +12,10 @@ from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException
-from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.mixins import previous_object_mixin
 from dyatel.mixins.internal_utils import WAIT_EL, get_platform_locator, is_target_on_screen, driver_index
+from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
+from dyatel.keyboard_keys import KeyboardKeys
 
 
 class Element(WebElement, MobileElement, PlayElement):
@@ -233,15 +233,11 @@ class Element(WebElement, MobileElement, PlayElement):
         """
         if self.driver_wrapper:
 
-            prev_obj_driver_class = previous_object_mixin.PreviousObjectDriver()
-
-            if len(self.driver_wrapper.all_drivers) > 1:
-                if self.driver == DriverWrapper.driver:
-                    prev_obj_driver_class.set_driver_from_previous_object_for_element(self, 5)
+            PreviousObjectDriver().set_driver_from_previous_object_for_element(self, 5)
 
             if not getattr(self, '_initialized', False):
                 if self.parent is None:
-                    prev_obj_driver_class.set_parent_from_previous_object_for_element(self, 5)
+                    PreviousObjectDriver().set_parent_from_previous_object_for_element(self, 5)
 
         if isinstance(self.driver, PlaywrightDriver):
             Element.__bases__ = PlayElement,

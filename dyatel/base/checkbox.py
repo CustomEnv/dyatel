@@ -65,7 +65,12 @@ class Checkbox(SelCheckbox, PlayCheckbox):
 
         :return: element class
         """
-        PreviousObjectDriver().set_driver_from_previous_object_for_element(self, 5)
+        if self.driver_wrapper:
+            PreviousObjectDriver().set_driver_from_previous_object_for_element(self, 5)
+
+            if not getattr(self, '_initialized', False):
+                if self.parent is None:
+                    PreviousObjectDriver().set_parent_from_previous_object_for_element(self, 5)
 
         if isinstance(self.driver, PlaywrightDriver):
             Checkbox.__bases__ = PlayCheckbox,

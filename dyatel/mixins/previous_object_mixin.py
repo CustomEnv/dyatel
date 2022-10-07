@@ -16,15 +16,14 @@ class PreviousObjectDriver:
         :param frame_index: frame start index
         :return: None
         """
-        if current_obj.driver_wrapper:
-            if len(current_obj.driver_wrapper.all_drivers) > 1:
-                if current_obj.driver == DriverWrapper.driver:
-                    previous_object = self._get_correct_previous_object(frame_index)
-                    if previous_object:
-                        try:
-                            current_obj.set_driver(previous_object.driver_wrapper)
-                        except AttributeError:
-                            return None
+        if len(current_obj.driver_wrapper.all_drivers) > 1:
+            if current_obj.driver == DriverWrapper.driver:
+                previous_object = self._get_correct_previous_object(frame_index)
+                if previous_object:
+                    try:
+                        current_obj.set_driver(previous_object.driver_wrapper)
+                    except AttributeError:
+                        return None
 
     def set_driver_from_previous_object_for_element(self, current_obj: Any, frame_index: int) -> None:
         """
@@ -35,13 +34,16 @@ class PreviousObjectDriver:
         :return: None
         """
         from dyatel.base.group import Group
-        if not isinstance(current_obj, Group):
-            previous_object = self._get_correct_previous_object(frame_index)
-            if previous_object:
-                try:
-                    current_obj.driver_wrapper = previous_object.driver_wrapper
-                except AttributeError:
-                    pass
+
+        if len(current_obj.driver_wrapper.all_drivers) > 1:
+            if current_obj.driver == DriverWrapper.driver:
+                if not isinstance(current_obj, Group):
+                    previous_object = self._get_correct_previous_object(frame_index)
+                    if previous_object:
+                        try:
+                            current_obj.driver_wrapper = previous_object.driver_wrapper
+                        except AttributeError:
+                            pass
 
     def set_parent_from_previous_object_for_element(self, current_obj: Any, frame_index: int) -> None:
         """
