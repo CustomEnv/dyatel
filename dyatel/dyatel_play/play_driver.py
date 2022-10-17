@@ -146,6 +146,16 @@ class PlayDriver(LogMixin):
         self.driver_context.clear_cookies()
         return self
 
+    def delete_cookie(self, name) -> PlayDriver:
+        """
+        Delete cookie by name
+
+        :return: self
+        """
+        # Todo: workaround can be implemented https://stackoverflow.com/questions/2144386/how-to-delete-a-cookie
+        raise NotImplementedError('Playwright does not supported specific cookie removal: '
+                                  'https://github.com/microsoft/playwright/issues/10143')
+
     def get_cookies(self) -> List[dict]:
         """
         Get a list of cookie dictionaries, corresponding to cookies visible in the current session
@@ -153,6 +163,31 @@ class PlayDriver(LogMixin):
         :return: cookies dictionaries list
         """
         return self.driver_context.cookies()
+
+    def switch_to_frame(self, frame: Any) -> PlayDriver:
+        """
+        Switch to frame
+
+        :param frame: frame Element
+        :return: self
+        """
+        raise NotImplementedError()
+
+    def switch_to_parent_frame(self) -> PlayDriver:
+        """
+        Switch to parent frame from child frame
+
+        :return: self
+        """
+        raise NotImplementedError()
+
+    def switch_to_default_content(self) -> PlayDriver:
+        """
+        Switch to default content from frame
+
+        :return: self
+        """
+        raise NotImplementedError()
 
     def execute_script(self, script: str, *args) -> Union[None, str]:
         """

@@ -17,6 +17,7 @@ from dyatel.shared_utils import set_logging_settings
 from dyatel.visual_comparison import VisualComparison
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
+from tests.adata.pages.frames_page import FramesPage
 from tests.adata.pages.keyboard_page import KeyboardPage
 from tests.adata.pages.progress_bar_page import ProgressBarPage
 from tests.settings import android_desired_caps, ios_desired_caps
@@ -205,3 +206,8 @@ def progressbar_page(driver_wrapper):
 @pytest.fixture
 def keyboard_page(driver_wrapper):
     return KeyboardPage().open_page()
+
+
+@pytest.fixture
+def frames_page(driver_wrapper):
+    return FramesPage().open_page()

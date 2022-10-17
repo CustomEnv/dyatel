@@ -148,6 +148,15 @@ class CoreDriver(LogMixin):
         self.driver.delete_all_cookies()
         return self
 
+    def delete_cookie(self, name: str) -> CoreDriver:
+        """
+        Delete cooke by name
+
+        :return: self
+        """
+        self.driver.delete_cookie(name)
+        return self
+
     def get_cookies(self) -> List[dict]:
         """
         Get a list of cookie dictionaries, corresponding to cookies visible in the current session
@@ -155,6 +164,34 @@ class CoreDriver(LogMixin):
         :return: cookies dictionaries list
         """
         return self.driver.get_cookies()
+
+    def switch_to_frame(self, frame: Any) -> CoreDriver:
+        """
+        Switch to frame
+
+        :param frame: frame Element
+        :return: self
+        """
+        self.driver.switch_to.frame(frame.element)
+        return self
+
+    def switch_to_parent_frame(self) -> CoreDriver:
+        """
+        Switch to parent frame from child frame
+
+        :return: self
+        """
+        self.driver.switch_to.parent_frame()
+        return self
+
+    def switch_to_default_content(self) -> CoreDriver:
+        """
+        Switch to default content from frame
+
+        :return: self
+        """
+        self.driver.switch_to.default_content()
+        return self
 
     def execute_script(self, script: str, *args):
         """
