@@ -2,11 +2,17 @@ from __future__ import annotations
 
 from typing import Union, List, BinaryIO, Any
 
-from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.sel_utils import get_legacy_selector, get_locator_type
 from dyatel.mixins.internal_utils import calculate_coordinate_to_click, WAIT_EL
-from dyatel.js_scripts import get_element_position_on_screen_js, get_element_size_js, click_js, is_displayed_js
+from dyatel.js_scripts import (
+    get_element_position_on_screen_js,
+    click_js,
+    is_displayed_js,
+    get_inner_height_js,
+    get_outer_height_js
+)
 
 
 class MobileElement(CoreElement):
@@ -22,9 +28,9 @@ class MobileElement(CoreElement):
         :param parent: parent of element. Can be MobileElement, MobilePage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self.is_safari_driver = CoreDriver.is_safari_driver
-        self.is_ios = CoreDriver.is_ios
-        self.is_android = CoreDriver.is_android
+        self.is_safari_driver = DriverWrapper.is_safari_driver
+        self.is_ios = DriverWrapper.is_ios
+        self.is_android = DriverWrapper.is_android
 
         self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.locator, self.locator_type = get_legacy_selector(locator, self.locator_type)
@@ -65,6 +71,10 @@ class MobileElement(CoreElement):
         :param calculate_top_bar: iOS only - attach top bar height to calculation
         :return: self
         """
+        if self.driver_wrapper.is_web_context:
+            if not self.is_fully_visible(silent=True):
+                self.scroll_into_view()
+
         x, y = calculate_coordinate_to_click(self, x, y)
 
         if calculate_top_bar and self.is_ios:
@@ -83,6 +93,10 @@ class MobileElement(CoreElement):
         :param silent: erase log message
         :return: self
         """
+        if self.driver_wrapper.is_web_context:
+            if not self.is_fully_visible(silent=True):
+                self.scroll_into_view()
+
         x, y = calculate_coordinate_to_click(self, 0, 0)
 
         if calculate_top_bar and self.is_ios:
@@ -174,18 +188,6 @@ class MobileElement(CoreElement):
 
         return image_binary
 
-    def get_rect(self) -> dict:
-        """
-        A dictionary with the size and location of the element.
-
-        :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
-        """
-        element = self.element
-        size = self.driver.execute_script(get_element_size_js, element)
-        location = self.driver.execute_script(get_element_position_on_screen_js, element)
-        sorted_items: list = sorted({**size, **location}.items(), reverse=True)
-        return dict(sorted_items)
-
     def _element_box(self) -> tuple:
         """
         Get element coordinates on screen for ios safari
@@ -198,8 +200,8 @@ class MobileElement(CoreElement):
         h, w = element.size.values()
 
         if self.is_safari_driver:
-            inner_height = self.driver.execute_script('return window.innerHeight')
-            outer_height = self.driver.execute_script('return window.outerHeight')
+            inner_height = self.driver.execute_script(get_inner_height_js)
+            outer_height = self.driver.execute_script(get_outer_height_js)
             bars_size = outer_height - inner_height
 
             if bars_size > 110:  # There is no way to get top/bottom bars of safari with SafariDriver

@@ -14,7 +14,7 @@ def test_base_group_sel_framework_variables_access(mocked_selenium_driver):
     assert hasattr(group.child_element_class_var, 'parent')
 
 
-def test_base_group_appium_framework_variables_access(mocked_mobile_driver):
+def test_base_group_appium_framework_variables_access(mocked_ios_driver):
     group = GroupChild()
     assert hasattr(group, 'driver')
     assert hasattr(group, 'driver_wrapper')
@@ -45,7 +45,7 @@ def test_base_group_selenium_set_parent_for_class_variable(mocked_selenium_drive
     assert GroupParent().parent_element_class_var.parent
 
 
-def test_base_group_appium_set_parent_for_class_variable(mocked_mobile_driver):
+def test_base_group_appium_set_parent_for_class_variable(mocked_ios_driver):
     assert GroupChild().child_element_class_var.parent
     assert GroupChild().parent_element_class_var.parent
     assert GroupParent().parent_element_class_var.parent
@@ -65,7 +65,7 @@ def test_base_group_selenium_set_parent_before_init_variable(mocked_selenium_dri
     assert GroupChild().parent_element_before_init_var.parent
 
 
-def test_base_group_appium_set_parent_before_init_variable(mocked_mobile_driver):
+def test_base_group_appium_set_parent_before_init_variable(mocked_ios_driver):
     assert GroupChild().child_element_before_init_var.parent
     assert GroupChild().parent_element_before_init_var.parent
 
@@ -80,7 +80,7 @@ def test_base_group_selenium_set_parent_after_init_variable(mocked_selenium_driv
     assert GroupChild().parent_element_after_init_var.parent
 
 
-def test_base_group_appium_set_parent_after_init_variable(mocked_mobile_driver):
+def test_base_group_appium_set_parent_after_init_variable(mocked_ios_driver):
     assert GroupChild().child_element_after_init_var.parent
     assert GroupChild().parent_element_after_init_var.parent
 

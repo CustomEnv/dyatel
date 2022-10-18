@@ -2,11 +2,35 @@
 
 ---
 ## v1.3.0
-*Release date: In development*
+### Added 
+- `driver_wrapper.get_inner_window_size` method
+- `driver_wrapper.switch_to_frame` method for selenium based driver
+- `driver_wrapper.switch_to_parent_frame` method for selenium based driver
+- `driver_wrapper.switch_to_default_content` method for selenium based driver
+- `driver_wrapper.delete_cookie` method for selenium/appium based driver
+- `element.is_visible` method 
+- `element.is_fully_visible` method
+- `element.__repr__`, `checkbox.__repr__`, `group.__repr__`, `page.__repr__` 
+- `scroll_into_view` before `element.click_into_center/hover/etc.` if element isn't visible
+- `name_suffix` arg for `element.assert_screenshot` 
+- Auto implemented `driver` in hidden object (function/property etc.) for `element/checkbox/group/page`
+- Auto implemented `parent` in hidden object (function/property etc.) for `element/checkbox`
+- Platform specific locator by object kwargs: ios/android/mobile/desktop
+
+### Changed
+- `element.get_rect` for selenium desktop
+- All visual comparisons staff moved to `VisualComparison` class 
+- Logging
+
+### Fixed
+- `get_object_kwargs` function
+- `initialize_objects_with_args` function
+- `element.assert_screenshot` driver name for remote
+- Click by location after scroll
 
 ---
 ## v1.2.8
-*Release date: 2022-xx-xx*
+*Release date: 2022-09-20*
 
 ### Added 
 - `driver_wrapper.is_native_context` property on mobile

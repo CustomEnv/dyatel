@@ -14,8 +14,10 @@ from webdriver_manager.firefox import GeckoDriverManager
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.shared_utils import set_logging_settings
+from dyatel.visual_comparison import VisualComparison
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
+from tests.adata.pages.frames_page import FramesPage
 from tests.adata.pages.keyboard_page import KeyboardPage
 from tests.adata.pages.progress_bar_page import ProgressBarPage
 from tests.settings import android_desired_caps, ios_desired_caps
@@ -32,6 +34,7 @@ def pytest_addoption(parser):
     parser.addoption('--headless', action='store_true', help='Run in headless mode')
     parser.addoption('--driver', default='chrome', help='Browser name')
     parser.addoption('--platform', default='desktop', help='Platform name')
+    parser.addoption('--generate-reference', action='store_true', help='Generate reference images in visual tests')
     parser.addoption('--appium-port', default='1000')
     parser.addoption('--appium-ip', default='0.0.0.0')
 
@@ -156,7 +159,8 @@ def driver_func(request, driver_name, driver_engine, chrome_options, firefox_opt
 
     driver_wrapper = DriverWrapper(driver)
 
-    driver_wrapper.visual_regression_path = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
+    VisualComparison.visual_regression_path = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
+    VisualComparison.visual_reference_generation = request.config.getoption('--generate-reference')
 
     if 'appium' not in driver_engine:
         driver_wrapper.set_window_size(1024, 900)
@@ -202,3 +206,8 @@ def progressbar_page(driver_wrapper):
 @pytest.fixture
 def keyboard_page(driver_wrapper):
     return KeyboardPage().open_page()
+
+
+@pytest.fixture
+def frames_page(driver_wrapper):
+    return FramesPage().open_page()

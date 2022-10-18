@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import logging
-from inspect import currentframe
 from os.path import basename
 from typing import Any
 
-from dyatel.js_scripts import add_driver_index_comment_js
-
+from dyatel.js_scripts import add_driver_index_comment_js, find_comments_js
+from dyatel.mixins.internal_utils import get_frame, driver_index
 
 logging.basicConfig(
     level=logging.INFO,
@@ -22,7 +21,7 @@ def get_log_message(message: str) -> str:
     :param message: custom message
     :return: log message
     """
-    code = currentframe().f_back.f_back.f_code
+    code = get_frame().f_back.f_back.f_code
     return f'[{basename(code.co_filename)}][{code.co_name}:{code.co_firstlineno}] {message}'
 
 
@@ -63,19 +62,19 @@ class LogMixin:
         :param level: log level
         :return: None
         """
-        driver_log = ''
         driver = getattr(self, 'driver')
         driver_wrapper = getattr(self, 'driver_wrapper')
+        driver_log, index = '', driver_index(driver_wrapper, driver)
 
-        if len(driver_wrapper.all_drivers) > 1 and driver_wrapper.desktop:
-            driver_index = str(driver_wrapper.all_drivers.index(driver) + 1)
-            driver_log = f'[{driver_index}_driver]'
+        if index:
+            driver_log = f'[{index}]'
 
             if not hasattr(driver, 'driver_index'):
-                driver.driver_index = driver_index
+                driver.driver_index = index
 
             if driver_wrapper.selenium:
-                driver_wrapper.execute_script(add_driver_index_comment_js, driver_index)
+                if '_driver' not in str(driver_wrapper.execute_script(find_comments_js)):
+                    driver_wrapper.execute_script(add_driver_index_comment_js, index)
 
         send_log_message(f'{driver_log}{get_log_message(message)}', level)
         return self

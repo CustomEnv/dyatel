@@ -15,5 +15,7 @@ def get_selenium_completable_locator(locator):
         return locator
     elif '.' in locator and not brackets:
         return locator
+    elif '#' in locator:
+        return locator
     else:
         return f'id={locator}'

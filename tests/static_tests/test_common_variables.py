@@ -6,13 +6,14 @@ from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.dyatel_sel.sel_utils import selenium_locator_types
+from dyatel.exceptions import InvalidSelectorException
 from dyatel.mixins.internal_utils import all_tags
 
 
 tags = all_tags + ['header h4']
 
 
-@pytest.mark.parametrize('locator', ('.element', '[id *= element]'))
+@pytest.mark.parametrize('locator', ('.element', '[id *= element]', 'div#some_id'))
 @pytest.mark.parametrize('base_class', (MobileElement, WebElement))
 def test_base_class_auto_css_locator(locator, base_class):
     assert base_class(locator).locator_type == By.CSS_SELECTOR
@@ -76,7 +77,7 @@ def test_name_specified(base_class):
 def test_locator_type_given_instead_of_locator(base_class, locator_type):
     try:
         base_class(locator_type)
-    except:
+    except InvalidSelectorException:
         pass
     else:
         raise Exception('Unexpected behavior')

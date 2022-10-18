@@ -1,16 +1,27 @@
 from __future__ import annotations
 
+import sys
 import inspect
 from typing import Any
 
-from dyatel.js_scripts import get_element_position_on_screen_js
+from dyatel.exceptions import UnsuitableArgumentsException
+
 
 WAIT_EL = 10
 WAIT_PAGE = 20
 
-
 all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
             'textarea', 'svg', 'circle', 'iframe']
+
+
+def get_frame(frame=1):
+    """
+    Get frame by given id
+
+    :param frame: frame id, "current" by default
+    :return: frame
+    """
+    return sys._getframe(frame)
 
 
 def initialize_objects_with_args(objects: list):
@@ -21,11 +32,21 @@ def initialize_objects_with_args(objects: list):
     :return: None
     """
     for obj in objects:
-        if not getattr(obj, '_initialized'):
-            obj.__init__(**get_object_kwargs(obj))
+        if not getattr(obj, '_initialized', False):
+            obj._initialized = True
+            obj_args = get_object_kwargs(obj)
+            obj.__init__(**obj_args)
+
+            from dyatel.base.group import Group
+            from dyatel.base.page import Page
+
+            if isinstance(obj, (Group, Page)):
+                for arg_name, arg_value in obj_args.items():
+                    if arg_value:
+                        setattr(obj, arg_name, arg_value)
 
 
-def get_object_kwargs(obj: object):
+def get_object_kwargs(obj: Any) -> dict:
     """
     Get actual args/kwargs of object __init__
 
@@ -33,12 +54,43 @@ def get_object_kwargs(obj: object):
     :return: object kwargs
     """
     init_args = inspect.getfullargspec(obj.__init__).args
-
     for index, key in enumerate(init_args):
         if key == 'self':
             init_args.pop(index)
 
-    return {item: getattr(obj, item) for item in init_args}
+    obj_locals = getattr(obj, '_init_locals')
+    obj_locals.pop('self', None)
+    kwargs = obj_locals.get('kwargs', {})
+    kwargs.update({item: obj_locals.get(item, getattr(obj, item, None)) for item in init_args})
+
+    return kwargs
+
+
+def get_platform_locator(obj: Any):
+    """
+    Get locator for current platform from object
+
+    :param obj: Page/Group/Checkbox/Element
+    :return: current platform locator
+    """
+    locator, data = obj.locator, getattr(obj, '_init_locals').get('kwargs', {})
+
+    if not data:
+        return locator
+
+    if obj.driver_wrapper.desktop:
+        locator = data.get('desktop', locator)
+
+    elif obj.driver_wrapper.mobile:
+        locator = data.get('mobile', locator)
+        if data.get('mobile', False) and (data.get('android', False) or data.get('ios', False)):
+            raise UnsuitableArgumentsException('Dont use mobile and android/ios locators together')
+        elif obj.driver_wrapper.is_ios:
+            locator = data.get('ios', locator)
+        elif obj.driver_wrapper.is_android:
+            locator = data.get('android', locator)
+
+    return locator
 
 
 def get_timeout_in_ms(timeout: int):
@@ -81,6 +133,20 @@ def get_child_elements_with_names(obj: object, instance: type) -> dict:
     return elements
 
 
+def is_target_on_screen(x: int, y: int, possible_range: dict):
+    """
+    Check is given coordinates fit into given range
+
+    :param x: x coordinate
+    :param y: y coordinate
+    :param possible_range: possible range
+    :return: bool
+    """
+    is_x_on_screen = x in range(possible_range['width'])
+    is_y_on_screen = y in range(possible_range['height'])
+    return is_x_on_screen and is_y_on_screen
+
+
 def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple:
     """
     Calculate coordinates to click for element
@@ -109,3 +175,18 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
         y = emy
 
     return int(x), int(y)
+
+
+def driver_index(driver_wrapper, driver) -> str:
+    """
+    Get driver index for logging
+
+    :param driver_wrapper: driver wrapper object
+    :param driver: driver object
+    :return: 'index_driver' data
+    """
+    if len(driver_wrapper.all_drivers) > 1 and driver_wrapper.desktop:
+        index = str(driver_wrapper.all_drivers.index(driver) + 1)
+        return f'{index}_driver'
+
+    return ''

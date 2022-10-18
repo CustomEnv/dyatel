@@ -69,3 +69,10 @@ class ElementNotInteractableException(DriverWrapperException):
     Thrown when element found and enabled but not interactable
     """
     pass
+
+
+class UnsuitableArgumentsException(DriverWrapperException):
+    """
+    Thrown when object initialised with unsuitable arguments
+    """
+    pass

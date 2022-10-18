@@ -22,7 +22,7 @@ def test_driver_execute_script_set_and_get(driver_wrapper, mouse_event_page):
 
 
 def test_driver_execute_script_return_value(driver_wrapper, mouse_event_page):
-    assert driver_wrapper.execute_script('return document.title;') == 'Mouse Actions'
+    assert driver_wrapper.execute_script('return document.title;') == 'Mouse Actions v2'
 
 
 def test_driver_execute_script_with_args(driver_wrapper, mouse_event_page):
@@ -95,3 +95,48 @@ def test_driver_tabs(driver_wrapper, second_playground_page):
     driver_wrapper.switch_to_tab(1)
     driver_wrapper.create_new_tab()
     driver_wrapper.close_unused_tabs()
+
+
+def test_driver_in_hidden_element(driver_wrapper, second_driver_wrapper):
+    pizza_page = PizzaOrderPage(driver_wrapper)
+    mouse_page = MouseEventPage(second_driver_wrapper)
+
+    card = mouse_page.mouse_click_card()
+
+    mouse_page.open_page()
+    pizza_page.open_page()
+
+    assert mouse_page.is_page_opened()
+    assert mouse_page.button_with_text('Drop me').wait_element(2).is_displayed()  # button without specified driver
+
+    assert card.any_button.parent == card
+    assert card.any_button_without_parent.parent is False
+    assert card.any_button_with_custom_parent.parent == card.y_result
+
+    assert pizza_page.is_page_opened()
+    assert pizza_page.input_with_value('SMALL').wait_element(2).is_displayed()  # button without specified driver
+
+
+def test_driver_in_hidden_group(driver_wrapper, second_driver_wrapper):
+    pizza_page = PizzaOrderPage(driver_wrapper)
+    mouse_page = MouseEventPage(second_driver_wrapper)
+
+    mouse_page.open_page()
+    pizza_page.open_page()
+
+    assert mouse_page.is_page_opened()
+    assert mouse_page.mouse_click_card().click_area.is_displayed()  # mouse_click_card without specified driver
+
+    assert pizza_page.is_page_opened()
+    assert pizza_page.quantity_input.is_displayed()
+
+
+def test_driver_in_hidden_page(driver_wrapper, second_driver_wrapper):
+    base_page1 = SecondPlaygroundMainPage(driver_wrapper).open_page()
+    base_page2 = SecondPlaygroundMainPage(second_driver_wrapper).open_page()
+
+    exp_cond_page = base_page1.navigate_to_expected_condition_page()  # page class without specified driver
+    keyboard_page = base_page2.navigate_to_keyboard_page()  # page class without specified driver
+
+    assert exp_cond_page.max_wait_input.wait_element(2).is_displayed()
+    assert keyboard_page.input_area.wait_element(2).is_displayed()

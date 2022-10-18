@@ -57,6 +57,9 @@ class WebElement(CoreElement):
         """
         self.log(f'Hover outside from "{self.name}"')
 
+        if not self.is_fully_visible(silent=True):
+            self.scroll_into_view()
+
         x, y = calculate_coordinate_to_click(self, x, y)
         self._action_chains\
             .move_to_location(x, y)\
@@ -73,16 +76,28 @@ class WebElement(CoreElement):
         """
         self.log(f'Click outside from "{self.name}"')
 
+        if not self.is_fully_visible(silent=True):
+            self.scroll_into_view()
+
         x, y = calculate_coordinate_to_click(self, x, y)
 
         self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
         return self
 
-    def get_rect(self) -> dict:
+    def click_into_center(self, silent: bool = False) -> WebElement:
         """
-        A dictionary with the size and location of the element.
+        Click into the center of element
 
-        :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
+        :param silent: erase log message
+        :return: self
         """
-        sorted_items: list = sorted(self.element.rect.items(), reverse=True)
-        return dict(sorted_items)
+        if not self.is_fully_visible(silent=True):
+            self.scroll_into_view()
+
+        x, y = calculate_coordinate_to_click(self, 0, 0)
+
+        if not silent:
+            self.log(f'Click into the center (x: {x}, y: {y}) for "{self.name}"')
+
+        self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
+        return self

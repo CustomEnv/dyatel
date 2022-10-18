@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Union
+from typing import Any, Union, List
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -12,15 +12,17 @@ from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException
+from dyatel.mixins.internal_utils import WAIT_EL, get_platform_locator, is_target_on_screen, driver_index
+from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
+from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.mixins.internal_utils import WAIT_EL
 
 
 class Element(WebElement, MobileElement, PlayElement):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
-    def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 parent: Any = None, wait: bool = False):
+    def __init__(self, locator: str = '', locator_type: str = '', name: str = '',
+                 parent: Any = None, wait: bool = False, **kwargs):
         """
         Initializing of element based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group
@@ -30,6 +32,11 @@ class Element(WebElement, MobileElement, PlayElement):
         :param name: name of element (will be attached to logs)
         :param parent: parent of element. Can be Group or Page objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
+        :param kwargs:
+          - desktop: str = locator that will be used for desktop platform
+          - mobile: str = locator that will be used for all mobile platforms
+          - ios: str = locator that will be used for ios platform
+          - android: str = locator that will be used for android platform
         """
         self.locator = locator
         self.locator_type = locator_type
@@ -37,32 +44,26 @@ class Element(WebElement, MobileElement, PlayElement):
         self.parent = parent
         self.wait = wait
 
-        self._initialized = False
+        self._init_locals = locals() if not hasattr(self, '_init_locals') else getattr(self, '_init_locals')
         self._driver_instance = DriverWrapper
 
         self.element_class = self.__set_base_class()
         if self.element_class:
-            super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
+            self._initialized = True
+            super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name, parent=self.parent,
+                             wait=self.wait)
 
-    def __set_base_class(self):
-        """
-        Get element class in according to current driver, and set him as base class
+    def __repr__(self):
+        cls = self.__class__
+        class_name = cls.__name__
+        locator = f'locator="{get_platform_locator(self)}"'
+        index = driver_index(self.driver_wrapper, self.driver)
+        driver = index if index else 'driver'
+        parent = self.parent.__class__.__name__ if self.parent else None
+        return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}", parent={parent}) '\
+               f'at {hex(id(self))}, {driver}={self.driver}'
 
-        :return: element class
-        """
-        if isinstance(self.driver, PlaywrightDriver):
-            Element.__bases__ = PlayElement,
-            return PlayElement
-        elif isinstance(self.driver, AppiumDriver):
-            Element.__bases__ = MobileElement,
-            return MobileElement
-        elif isinstance(self.driver, SeleniumDriver):
-            Element.__bases__ = WebElement,
-            return WebElement
-
-        # No exception due to delayed initialization
-
-    # Following methods works same for both Selenium/Appium and Playwright APIs
+    # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 
     # Elements interaction
 
@@ -161,3 +162,91 @@ class Element(WebElement, MobileElement, PlayElement):
             raise UnexpectedValueException(f'Value of "{self.name}" is empty')
 
         return self
+
+    def is_visible(self, silent: bool = False) -> bool:
+        """
+        Check is current element top left corner or bottom right corner visible on current screen
+
+        :param silent: erase log
+        :return: bool
+        """
+        if not silent:
+            self.log(f'Check visibility of "{self.name}"')
+
+        is_visible = self.is_displayed()
+
+        if is_visible:
+            rect, window_size = self.get_rect(), self.driver_wrapper.get_inner_window_size()
+            x_end, y_end = rect['x'] + rect['width'], rect['y'] + rect['height']
+            is_start_visible = is_target_on_screen(x=rect['x'], y=rect['y'], possible_range=window_size)
+            is_end_visible = is_target_on_screen(x=x_end, y=y_end, possible_range=window_size)
+            is_visible = is_start_visible or is_end_visible
+
+        return is_visible
+
+    def is_fully_visible(self, silent: bool = False) -> bool:
+        """
+        Check is current element top left corner and bottom right corner visible on current screen
+
+        :param silent: erase log
+        :return: bool
+        """
+        if not silent:
+            self.log(f'Check fully visibility of "{self.name}"')
+
+        is_visible = self.is_displayed()
+
+        if is_visible:
+            rect, window_size = self.get_rect(), self.driver_wrapper.get_inner_window_size()
+            x_end, y_end = rect['x'] + rect['width'], rect['y'] + rect['height']
+            is_start_visible = is_target_on_screen(x=rect['x'], y=rect['y'], possible_range=window_size)
+            is_end_visible = is_target_on_screen(x=x_end, y=y_end, possible_range=window_size)
+            is_visible = is_start_visible and is_end_visible
+
+        return is_visible
+
+    def assert_screenshot(self, filename: str = '', test_name: str = '', name_suffix: str = '',
+                          threshold: Union[int, float] = 0, delay: Union[int, float] = 0.5, scroll: bool = False,
+                          remove: List[Element] = None) -> None:
+        """
+        Assert given (by name) and taken screenshot equals
+
+        :param filename: full screenshot name. Custom filename will be used if empty string given
+        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
+        :param name_suffix: filename suffix. Good to use for same element with positive/netagative case
+        :param threshold: possible threshold
+        :param delay: delay before taking screenshot
+        :param scroll: scroll to element before taking the screenshot
+        :param remove: remove elements from screenshot
+        :return: None
+        """
+        VisualComparison(self.driver_wrapper, self).assert_screenshot(
+            filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
+            scroll=scroll, remove=remove,
+        )
+
+    def __set_base_class(self):
+        """
+        Get element class in according to current driver, and set him as base class
+
+        :return: element class
+        """
+        if self.driver_wrapper:
+
+            PreviousObjectDriver().set_driver_from_previous_object_for_element(self, 5)
+
+            if not getattr(self, '_initialized', False):
+                if self.parent is None:
+                    PreviousObjectDriver().set_parent_from_previous_object_for_element(self, 5)
+
+        if isinstance(self.driver, PlaywrightDriver):
+            Element.__bases__ = PlayElement,
+            return PlayElement
+        elif isinstance(self.driver, AppiumDriver):
+            Element.__bases__ = MobileElement,
+            return MobileElement
+        elif isinstance(self.driver, SeleniumDriver):
+            Element.__bases__ = WebElement,
+            return WebElement
+
+        # No exception due to delayed initialization

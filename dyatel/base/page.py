@@ -13,14 +13,15 @@ from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.internal_utils import WAIT_PAGE
+from dyatel.mixins.internal_utils import WAIT_PAGE, get_platform_locator, driver_index
+from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
 
 class Page(WebPage, MobilePage, PlayPage):
     """ Page object crossroad. Should be defined as class """
 
     def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 driver_wrapper: Union[DriverWrapper, Any] = None):
+                 driver_wrapper: Union[DriverWrapper, Any] = None, **kwargs):
         """
         Initializing of page based on current driver
 
@@ -28,18 +29,37 @@ class Page(WebPage, MobilePage, PlayPage):
         :param locator_type: Selenium only: specific locator type
         :param name: name of page (will be attached to logs)
         :param driver_wrapper: set custom driver for page and page elements
+        :param kwargs:
+          - desktop: str = locator that will be used for desktop platform
+          - mobile: str = locator that will be used for all mobile platforms
+          - ios: str = locator that will be used for ios platform
+          - android: str = locator that will be used for android platform
         """
         self.locator = locator
         self.locator_type = locator_type
         self.name = name
+        self._init_locals = locals()
 
         self._driver_instance = DriverWrapper
         self.__set_base_class()
-        super().__init__(locator=locator, locator_type=locator_type, name=name)
+        super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name)
         # it's necessary to leave it after init
         if driver_wrapper:
             self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
             self.set_driver(self._driver_instance)
+        elif self.driver_wrapper:
+            PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)
+
+    def __repr__(self):
+        cls = self.__class__
+        class_name = cls.__name__
+        locator = f'locator="{get_platform_locator(self)}"'
+        index = driver_index(self.driver_wrapper, self.driver)
+        driver = index if index else 'driver'
+        return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}") at {hex(id(self))}, '\
+               f'{driver}={self.driver}'
+
+    # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 
     def reload_page(self, wait_page_load=True) -> Page:
         """
@@ -116,6 +136,9 @@ class Page(WebPage, MobilePage, PlayPage):
         :param driver_wrapper: driver wrapper object ~ DriverWrapper/WebDriver/MobileDriver/CoreDriver/PlayDriver
         :return: self
         """
+        if not driver_wrapper:
+            return self
+
         self._set_driver(driver_wrapper, Element)
         return self
 

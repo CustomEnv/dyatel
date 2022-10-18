@@ -1,3 +1,8 @@
+get_inner_height_js = 'return window.innerHeight'
+get_inner_width_js = 'return window.innerWidth'
+
+get_outer_height_js = 'return window.outerHeight'
+
 get_element_position_on_screen_js = """
 function getPositionOnScreen(elem) {
   let box = elem.getBoundingClientRect();
@@ -37,11 +42,30 @@ is_displayed_js = 'return arguments[0].style.display == false;'
 
 add_driver_index_comment_js = """
 function addComment(driver_index) {
-  comment = document.createComment(" " + driver_index + "_driver ");
+  comment = document.createComment(" " + driver_index + " ");
   document.body.appendChild(comment);
 } 
 
 addComment(arguments[0])
+"""
+
+find_comments_js = """
+function filterNone() {
+    return NodeFilter.FILTER_ACCEPT;
+}
+
+function getAllComments(rootElem) {
+    var comments = [];
+    // Fourth argument, which is actually obsolete according to the DOM4 standard, is required in IE 11
+    var iterator = document.createNodeIterator(rootElem, NodeFilter.SHOW_COMMENT, filterNone, false);
+    var curNode;
+    while (curNode = iterator.nextNode()) {
+        comments.push(curNode.nodeValue);
+    }
+    return comments;
+}
+
+return getAllComments(document.body);
 """
 
 trigger_react = """

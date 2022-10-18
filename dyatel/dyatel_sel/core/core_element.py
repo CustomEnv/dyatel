@@ -19,6 +19,7 @@ from selenium.common.exceptions import (
 )
 
 from dyatel.dyatel_sel.sel_utils import ActionChains
+from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
@@ -35,7 +36,7 @@ from dyatel.mixins.internal_utils import (
     WAIT_EL,
     get_child_elements,
     initialize_objects_with_args,
-    calculate_coordinate_to_click,
+    get_platform_locator,
 )
 
 
@@ -53,7 +54,6 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         """
         self._element: Union[SeleniumWebElement, None] = None
         self.__element: Union[SeleniumWebElement, None] = None
-        self._initialized = True
 
         self.locator = locator
         self.locator_type = locator_type
@@ -106,21 +106,6 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         finally:
             self.element = None
 
-        return self
-
-    def click_into_center(self, silent: bool = False) -> CoreElement:
-        """
-        Click into the center of element
-
-        :param silent: erase log message
-        :return: self
-        """
-        x, y = calculate_coordinate_to_click(self, 0, 0)
-
-        if not silent:
-            self.log(f'Click into the center (x: {x}, y: {y}) for "{self.name}"')
-
-        self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
         return self
 
     def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> CoreElement:
@@ -433,6 +418,18 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         return len(getattr(self, 'all_elements'))
 
+    def get_rect(self) -> dict:
+        """
+        A dictionary with the size and location of the element.
+
+        :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
+        """
+        element = self.element
+        size = self.driver.execute_script(get_element_size_js, element)
+        location = self.driver.execute_script(get_element_position_on_screen_js, element)
+        sorted_items: list = sorted({**size, **location}.items(), reverse=True)
+        return dict(sorted_items)
+
     # Mixin
 
     def _get_wait(self, timeout: int = WAIT_EL) -> WebDriverWait:
@@ -542,7 +539,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: SeleniumWebElement or AppiumWebElement
         """
         try:
-            return base.find_element(self.locator_type, self.locator)
+            return base.find_element(self.locator_type, get_platform_locator(self))
         except (SeleniumInvalidArgumentException, SeleniumInvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
         except SeleniumNoSuchElementException as exc:
@@ -556,7 +553,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: list of SeleniumWebElement or AppiumWebElement
         """
         try:
-            return base.find_elements(self.locator_type, self.locator)
+            return base.find_elements(self.locator_type, get_platform_locator(self))
         except (SeleniumInvalidArgumentException, InvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
 

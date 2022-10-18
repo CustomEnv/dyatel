@@ -28,10 +28,10 @@ class MobileDriver(CoreDriver):
         self.is_safari_driver = self.caps.get('automationName').lower() == 'safari'
         self.is_xcui_driver = self.caps.get('automationName').lower() == 'xcuitest'
 
-        CoreDriver.is_ios = self.is_ios
-        CoreDriver.is_android = self.is_android
-        CoreDriver.is_safari_driver = self.is_safari_driver
-        CoreDriver.is_xcui_driver = self.is_xcui_driver
+        self.__class__.is_ios = self.is_ios
+        self.__class__.is_android = self.is_android
+        self.__class__.is_safari_driver = self.is_safari_driver
+        self.__class__.is_xcui_driver = self.is_xcui_driver
 
         self.native_context_name = 'NATIVE_APP'
         self.web_context_name = self.get_web_view_context() if self.is_xcui_driver else 'CHROMIUM'

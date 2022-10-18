@@ -1,11 +1,12 @@
 from dyatel.base.element import Element
 from dyatel.base.group import Group
 from dyatel.base.page import Page
+from tests.settings import domain_name, repo_name
 
 
 class ExpectedConditionPage(Page):
     def __init__(self):
-        self.url = 'https://dineshvelhal.github.io/testautomation-playground/expected_conditions.html'
+        self.url = f'{domain_name}/{repo_name}/expected_conditions.html'
         self.value_card = WaitValueCard()
         self.element_card = WaitElementCard()
         self.frame_card = WaitFrameCard()
