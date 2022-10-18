@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.xfail_platform('playwright', reason='Implementation required')
+@pytest.mark.xfail_platform('playwright', 'appium', reason='Implementation required')
 def test_switch_to_frame(driver_wrapper, frames_page):
     assert frames_page.anchor.is_displayed()
 
