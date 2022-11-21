@@ -10,8 +10,9 @@ from dyatel.exceptions import UnsuitableArgumentsException
 WAIT_EL = 10
 WAIT_PAGE = 20
 
-all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
-            'textarea', 'svg', 'circle', 'iframe']
+all_tags = {'h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
+            'textarea', 'svg', 'circle', 'iframe', 'label', 'tr', 'th', 'table', 'tbody', 'td', 'select', 'nav', 'li',
+            'form', 'footer', 'frame', 'area', 'span'}
 
 
 def get_frame(frame=1):
@@ -118,11 +119,29 @@ def get_child_elements_with_names(obj: object, instance: type) -> dict:
 
     :returns: list of page elements and page objects
     """
-    elements, class_items = {}, []
+    elements = {}
 
-    for parent_class in obj.__class__.__bases__:
-        class_items += list(parent_class.__dict__.items()) + list(parent_class.__class__.__dict__.items())
+    def get_items(reference_obj, obj_items):
 
+        if not inspect.isclass(reference_obj):
+            reference_obj = reference_obj.__class__
+
+        for parent_class in reference_obj.__bases__:
+
+            if "'object'" in str(parent_class) or "'type'" in str(parent_class):
+                break
+
+            # if hasattr(obj, 'name'):
+            #     if obj.name == 'main group':
+            #         breakpoint()
+
+            obj_items += list(parent_class.__dict__.items()) + list(parent_class.__class__.__dict__.items())
+
+            get_items(parent_class, obj_items)
+
+        return obj_items
+
+    class_items = get_items(obj, [])
     class_items += list(list(obj.__class__.__dict__.items()) + list(obj.__dict__.items()))
 
     for attribute, value in class_items:

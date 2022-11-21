@@ -22,7 +22,7 @@ class Element(WebElement, MobileElement, PlayElement):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
     def __init__(self, locator: str = '', locator_type: str = '', name: str = '',
-                 parent: Any = None, wait: bool = False, **kwargs):
+                 parent: Any = None, wait: bool = None, **kwargs):
         """
         Initializing of element based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group
@@ -30,7 +30,7 @@ class Element(WebElement, MobileElement, PlayElement):
         :param locator: locator of element. Can be defined without locator_type
         :param locator_type: Selenium only: specific locator type
         :param name: name of element (will be attached to logs)
-        :param parent: parent of element. Can be Group or Page objects
+        :param parent: parent of element. Can be Group or other Element objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         :param kwargs:
           - desktop: str = locator that will be used for desktop platform
@@ -43,6 +43,9 @@ class Element(WebElement, MobileElement, PlayElement):
         self.name = name
         self.parent = parent
         self.wait = wait
+
+        if self.parent:
+            assert isinstance(self.parent, Element), 'The "parent" argument should take an Element/Group object'
 
         self._init_locals = locals() if not hasattr(self, '_init_locals') else getattr(self, '_init_locals')
         self._driver_instance = DriverWrapper
@@ -57,11 +60,18 @@ class Element(WebElement, MobileElement, PlayElement):
         cls = self.__class__
         class_name = cls.__name__
         locator = f'locator="{get_platform_locator(self)}"'
-        index = driver_index(self.driver_wrapper, self.driver)
-        driver = index if index else 'driver'
         parent = self.parent.__class__.__name__ if self.parent else None
-        return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}", parent={parent}) '\
-               f'at {hex(id(self))}, {driver}={self.driver}'
+
+        try:
+            index = driver_index(self.driver_wrapper, self.driver)
+            driver = index if index else 'driver'
+        except AttributeError:
+            index, driver = None, None
+
+        base = f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}", parent={parent}) ' \
+               f'at {hex(id(self))}'
+
+        return f'{base}, {driver}={self.driver}' if driver else base
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 

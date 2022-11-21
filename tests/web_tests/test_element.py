@@ -203,12 +203,12 @@ def test_parent_element_wait_hidden_negative(base_playground_page):
 
 
 def test_all_elements_with_parent(base_playground_page):
-    """ all_elements when parent of Element is Page """
+    """ all_elements when parent of Element is other element """
     all_elements = base_playground_page.any_div_with_parent.all_elements
     assert all_elements, 'did not find elements on page'
 
     for element in all_elements:
-        assert element.parent == base_playground_page
+        assert element.parent == base_playground_page.any_section
 
 
 def test_element_group_all_elements_child(second_playground_page):

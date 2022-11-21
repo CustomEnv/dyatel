@@ -104,12 +104,12 @@ class CoreDriver(LogMixin):
         self.driver.back()
         return self
 
-    def quit(self, silent: bool = True) -> CoreDriver:
+    def quit(self, silent: bool = True) -> None:
         """
         Quit the driver instance
 
         :param: silent:
-        :return: self
+        :return: None
         """
         if silent:
             self.log('Quit driver instance')
@@ -120,7 +120,6 @@ class CoreDriver(LogMixin):
         if self.driver == CoreDriver.driver:  # Clear only if original driver closed
             CoreDriver.driver = None
             CoreDriver.driver_wrapper = None
-        return self
 
     def set_cookie(self, cookies: List[dict]) -> CoreDriver:
         """

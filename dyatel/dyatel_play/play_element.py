@@ -25,8 +25,7 @@ from dyatel.mixins.internal_utils import (
 
 class PlayElement(ElementMixin, DriverMixin, LogMixin):
 
-    def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 parent: Union[PlayElement, Any] = None, wait: bool = False):
+    def __init__(self, locator: str, locator_type: str, name: str, parent: Union[PlayElement, Any], wait: bool):
         """
         Initializing of web element with playwright driver
 
@@ -175,13 +174,16 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         self._first_element.fill('')
         return self
 
-    def hover(self) -> PlayElement:
+    def hover(self, silent: bool = False) -> PlayElement:
         """
         Hover over current element
 
+        :param: silent: erase log
         :return: self
         """
-        self.log(f'Hover over "{self.name}"')
+        if not silent:
+            self.log(f'Hover over "{self.name}"')
+
         self._first_element.hover()
         return self
 

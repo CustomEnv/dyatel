@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Callable
 
 from playwright.sync_api import Browser as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -15,7 +15,7 @@ from dyatel.mixins.internal_utils import get_child_elements_with_names, driver_i
 class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
     """ Driver object crossroad """
 
-    __init_count = 0
+    _init_count = 0
 
     desktop = False
     selenium = False
@@ -28,12 +28,16 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
     is_safari_driver = False
 
     def __new__(cls, *args, **kwargs):
-        if DriverWrapper.__init_count == 0:
+        if DriverWrapper._init_count == 0:
             return super().__new__(cls)
 
-        objects = {name: False for name in get_child_elements_with_names(cls, bool).keys()}
-        objects.update({'__repr__': cls.__repr__})
-        return super().__new__(type("DifferentDriverWrapper", (DriverWrapper, ), objects))
+        class_objects = {}
+        for name, value in get_child_elements_with_names(cls, Callable).items():
+            if not name.endswith('__'):
+                class_objects.update({name: value})
+        class_objects.update({name: False for name in get_child_elements_with_names(cls, bool).keys()})
+        class_objects.update({'__repr__': cls.__repr__})
+        return super().__new__(type("DifferentDriverWrapper", (DriverWrapper, ), class_objects))
 
     def __init__(self, driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver]):
         """
@@ -64,12 +68,17 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         """
         return {'height': self.execute_script(get_inner_height_js), 'width': self.execute_script(get_inner_width_js)}
 
+    def __getattribute__(self, item):
+        if item == 'quit':
+            DriverWrapper._init_count = 0
+        return super().__getattribute__(item)
+
     def __set_base_class(self):
         """
         Get driver wrapper class in according to given driver source, and set him as base class
         :return: driver wrapper class
         """
-        DriverWrapper.__init_count += 1
+        DriverWrapper._init_count += 1
         if isinstance(self.driver, PlaywrightDriver):
             self.__class__.__bases__ = PlayDriver,
             self.__class__.mobile = False

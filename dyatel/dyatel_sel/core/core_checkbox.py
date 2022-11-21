@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from typing import Any
+
 from dyatel.base.element import Element
 from dyatel.mixins.internal_utils import WAIT_EL
 
 
 class CoreCheckbox(Element):
 
-    def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False):
+    def __init__(self, locator: str, locator_type: str, name: str, parent: Any, wait: bool):
         """
         Initializing of core checkbox with appium/selenium driver
 

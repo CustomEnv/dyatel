@@ -42,7 +42,7 @@ from dyatel.mixins.internal_utils import (
 
 class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
-    def __init__(self, locator: str, locator_type: str = '', name: str = '', parent: Any = None, wait: bool = False):
+    def __init__(self, locator: str, locator_type: str, name: str, parent: Any, wait: bool):
         """
         Initializing of core element with appium/selenium driver
         Contain same methods/data for both WebElement and MobileElement classes
@@ -216,7 +216,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             is_hidden = self.is_hidden(silent=True)
 
         if not is_hidden:
-            msg = f'"{self.name}" not visible after {timeout} seconds. {self.get_element_logging_data()}'
+            msg = f'"{self.name}" still visible after {timeout} seconds. {self.get_element_logging_data()}'
             raise TimeoutException(msg) from None
 
         return self
@@ -565,7 +565,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: None
         """
         if 'invalid locator' in exc.msg or 'is not a valid' in exc.msg:
-            msg = f'"{self.name}" selector invalid. {self.get_element_logging_data(self)}'
+            msg = f'"{self.name}" selector is invalid. {self.get_element_logging_data(self)}'
             raise InvalidSelectorException(msg) from None
         else:
             raise exc from None

@@ -17,8 +17,7 @@ from dyatel.js_scripts import (
 
 class MobileElement(CoreElement):
 
-    def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 parent: Union[MobileElement, Any] = None, wait: bool = False):
+    def __init__(self, locator: str, locator_type: str, name: str, parent: Union[MobileElement, Any], wait: bool):
         """
         Initializing of mobile element with appium driver
 
@@ -109,13 +108,17 @@ class MobileElement(CoreElement):
 
         return self
 
-    def hover(self, calculate_top_bar=True) -> MobileElement:
+    def hover(self, calculate_top_bar: bool = True, silent: bool = False) -> MobileElement:
         """
         Hover over current element
 
         :param calculate_top_bar: iOS only - attach top bar height to calculation
+        :param silent: erase log
         :return: self
         """
+        if not silent:
+            self.log(f'Hover over "{self.name}"')
+
         self.click_into_center(calculate_top_bar=calculate_top_bar)
         return self
 

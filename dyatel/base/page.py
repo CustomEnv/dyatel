@@ -102,15 +102,18 @@ class Page(WebPage, MobilePage, PlayPage):
         self.anchor.wait_element(timeout=timeout)
 
         for element in self.page_elements:
-            if getattr(element, 'wait'):
+            if getattr(element, 'wait') is False:
+                element.wait_element_hidden(timeout=timeout, silent=True)
+            elif getattr(element, 'wait') is True:
                 element.wait_element(timeout=timeout, silent=True)
         return self
 
-    def is_page_opened(self, with_elements=False) -> bool:
+    def is_page_opened(self, with_elements: bool = False, with_url: bool = False) -> bool:
         """
         Check is current page opened or not
 
         :param with_elements: is page opened with signed elements
+        :param with_url: is page opened check with url
         :return: self
         """
         result = True
@@ -124,7 +127,7 @@ class Page(WebPage, MobilePage, PlayPage):
 
         result &= self.anchor.is_displayed()
 
-        if self.url:
+        if self.url and with_url:
             result &= self.driver_wrapper.current_url == self.url
 
         return result

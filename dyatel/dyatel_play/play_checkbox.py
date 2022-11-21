@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from typing import Any
+
 from dyatel.dyatel_play.play_element import PlayElement
 
 
 class PlayCheckbox(PlayElement):
 
-    def __init__(self, locator: str, locator_type='', name='', parent=None, wait=False):
+    def __init__(self, locator: str, locator_type: str, name: str, parent: Any, wait: bool):
         """
         Initializing of checkbox with playwright driver
 
