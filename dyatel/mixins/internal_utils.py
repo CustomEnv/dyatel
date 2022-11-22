@@ -181,17 +181,12 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
     :return: tuple of calculated coordinates
     """
     ey, ex, ew, eh = element.get_rect().values()
-    emx, emy = ex + ew / 2, ey + eh / 2  # middle of element
+    mew, meh = ew / 2, eh / 2
+    emx, emy = ex + mew, ey + meh  # middle of element
 
-    if x:
-        x = x + emx + ew / 2 if x > 0 else emx + x - ew / 2
-    else:
-        x = emx
-
-    if y:
-        y = y + emy + eh / 2 if y > 0 else emy + y - eh / 2
-    else:
-        y = emy
+    sx, sy = ([-1, 1][s > 0] for s in [x, y])
+    x = emx + bool(x) * (x + mew * sx)
+    y = emy + bool(y) * (y + meh * sy)
 
     return int(x), int(y)
 
