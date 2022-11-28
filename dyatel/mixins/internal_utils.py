@@ -131,10 +131,6 @@ def get_child_elements_with_names(obj: object, instance: type) -> dict:
             if "'object'" in str(parent_class) or "'type'" in str(parent_class):
                 break
 
-            # if hasattr(obj, 'name'):
-            #     if obj.name == 'main group':
-            #         breakpoint()
-
             obj_items += list(parent_class.__dict__.items()) + list(parent_class.__class__.__dict__.items())
 
             get_items(parent_class, obj_items)

@@ -83,14 +83,10 @@ class Group(Element, metaclass=AfterInitMeta):
         Set parent and custom driver for Group class variables, if their instance is Element class
         Will be called automatically after __init__ by metaclass `AfterInitMeta`
         """
-        def update_parent(obj):
-            if hasattr(obj, 'parent') and getattr(obj, 'parent') != self and obj != self:
-                if obj.parent is None:
-                    obj.parent = self
-                else:
-                    update_parent(obj.parent)
-
         for name, value in get_child_elements_with_names(self, Element).items():
             setattr(self, name, copy.copy(value))
             value = getattr(self, name)
-            update_parent(value)
+            if value.parent is None:
+                value.parent = self
+            else:
+                setattr(value, 'parent', copy.copy(value.parent))

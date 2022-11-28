@@ -21,6 +21,7 @@ from dyatel.mixins.internal_utils import get_frame
 class VisualComparison:
 
     visual_regression_path = ''
+    skip_screenshot_comparison = False
     visual_reference_generation = False
     hard_visual_reference_generation = False
 
@@ -43,6 +44,9 @@ class VisualComparison:
         :param remove: remove element from screenshot
         :return: self
         """
+        if self.skip_screenshot_comparison:
+            return self
+
         if filename:
             if name_suffix:
                 filename = f'{filename}_{name_suffix}'
