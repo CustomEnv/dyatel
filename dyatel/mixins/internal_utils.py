@@ -196,7 +196,10 @@ def driver_index(driver_wrapper, driver) -> str:
     :return: 'index_driver' data
     """
     if len(driver_wrapper.all_drivers) > 1 and driver_wrapper.desktop:
-        index = str(driver_wrapper.all_drivers.index(driver) + 1)
+        try:
+            index = str(driver_wrapper.all_drivers.index(driver) + 1)
+        except ValueError:
+            index = '?'
         return f'{index}_driver'
 
     return ''
