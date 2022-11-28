@@ -17,7 +17,7 @@ class Checkbox(SelCheckbox, PlayCheckbox):
     """ Checkbox object crossroad. Should be defined as Page/Group class variable """
 
     def __init__(self, locator: str = '', locator_type: str = '', name: str = '',
-                 parent: Any = None, wait: bool = False, **kwargs):
+                 parent: Any = None, wait: bool = None, **kwargs):
         """
         Initializing of checkbox based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group
