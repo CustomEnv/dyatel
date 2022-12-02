@@ -1,7 +1,26 @@
 # Dyatel Changelog
 
 ---
+## v1.3.2
+*Release date: in development*
+
+--- 
+
+## v1.3.1
+*Release date: 2022-12-02*
+- `element.wait_element_hidden_without_error` method
+- `element.assert_screenshot` hard reference generation support
+- `element.assert_screenshot` soft reference generation fix
+- `element.hover` silent argument
+- Reworked wait argument for `element`: False - wait element hidden; True - wait element visible
+- `page.is_page_opened` without url support
+- selenium - tags (locator type) updated
+- DifferentDriverWrapper and elements initialization fixes
+
+
 ## v1.3.0
+*Release date: 2022-10-18*
+
 ### Added 
 - `driver_wrapper.get_inner_window_size` method
 - `driver_wrapper.switch_to_frame` method for selenium based driver

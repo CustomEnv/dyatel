@@ -11,7 +11,8 @@ from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
-from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException
+from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException, \
+    TimeoutException
 from dyatel.mixins.internal_utils import WAIT_EL, get_platform_locator, is_target_on_screen, driver_index
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
@@ -171,6 +172,42 @@ class Element(WebElement, MobileElement, PlayElement):
         if not value:
             raise UnexpectedValueException(f'Value of "{self.name}" is empty')
 
+        return self
+
+    def wait_element_without_error(self, timeout: int = WAIT_EL, silent: bool = False) -> Element:
+        """
+        Wait until element visibility without error
+
+        :param: timeout: time to stop waiting
+        :param: silent: erase log
+        :return: self
+        """
+        if not silent:
+            self.log(f'Wait until presence of "{self.name}" without error exception')
+
+        try:
+            self.wait_element(timeout=timeout, silent=True)
+        except TimeoutException as exception:
+            if not silent:
+                self.log(f'Ignored exception: "{exception.msg}"')
+        return self
+
+    def wait_element_hidden_without_error(self, timeout: int = WAIT_EL, silent: bool = False) -> Element:
+        """
+        Wait until element hidden without error
+
+        :param: timeout: time to stop waiting
+        :param: silent: erase log
+        :return: self
+        """
+        if not silent:
+            self.log(f'Wait until invisibility of "{self.name}" without error exception')
+
+        try:
+            self.wait_element_hidden(timeout=timeout, silent=True)
+        except TimeoutException as exception:
+            if not silent:
+                self.log(f'Ignored exception: "{exception.msg}"')
         return self
 
     def is_visible(self, silent: bool = False) -> bool:

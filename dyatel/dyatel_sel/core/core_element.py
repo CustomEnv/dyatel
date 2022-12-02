@@ -181,24 +181,6 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         return self
 
-    def wait_element_without_error(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
-        """
-        Wait until element hidden
-
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait until presence of "{self.name}" without error exception')
-
-        try:
-            self.wait_element(timeout=timeout, silent=True)
-        except TimeoutException as exception:
-            if not silent:
-                self.log(f'Ignored exception: "{exception.msg}"')
-        return self
-
     def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
         """
         Wait until element hidden

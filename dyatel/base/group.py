@@ -29,7 +29,7 @@ class AfterInitMeta(type):
 class Group(Element, metaclass=AfterInitMeta):
     """ Group of elements. Should be defined as class """
 
-    def __init__(self, locator: str, locator_type: str = '', name: str = '',
+    def __init__(self, locator: str = '', locator_type: str = '', name: str = '',
                  parent: Any = None, wait: bool = None, driver_wrapper: Union[DriverWrapper, Any] = None, **kwargs):
         """
         Initializing of group based on current driver
