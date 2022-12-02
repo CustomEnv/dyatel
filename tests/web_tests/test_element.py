@@ -91,9 +91,24 @@ def test_screenshot_remove(base_playground_page):
 # Test waits
 
 
+def test_wait_element(pizza_order_page):
+    pizza_order_page.submit_button.wait_element()
+    assert pizza_order_page.submit_button.is_displayed()
+
+
 def test_wait_without_error(pizza_order_page):
-    pizza_order_page.error_modal.wait_element_without_error(timeout=0.01)
+    pizza_order_page.error_modal.wait_element_without_error(timeout=0.5)
     assert not pizza_order_page.error_modal.is_displayed()
+
+
+def test_wait_hidden(pizza_order_page):
+    pizza_order_page.error_modal.wait_element_without_error()
+    assert not pizza_order_page.error_modal.is_displayed()
+
+
+def test_wait_hidden_without_error(pizza_order_page):
+    pizza_order_page.submit_button.wait_element_without_error(timeout=0.5)
+    assert pizza_order_page.submit_button.is_displayed()
 
 
 def test_click_and_wait(pizza_order_page, driver_engine):
@@ -203,12 +218,12 @@ def test_parent_element_wait_hidden_negative(base_playground_page):
 
 
 def test_all_elements_with_parent(base_playground_page):
-    """ all_elements when parent of Element is Page """
+    """ all_elements when parent of Element is other element """
     all_elements = base_playground_page.any_div_with_parent.all_elements
     assert all_elements, 'did not find elements on page'
 
     for element in all_elements:
-        assert element.parent == base_playground_page
+        assert element.parent == base_playground_page.any_section
 
 
 def test_element_group_all_elements_child(second_playground_page):

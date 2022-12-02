@@ -98,12 +98,12 @@ class PlayDriver(LogMixin):
         self.driver.go_back()
         return self
 
-    def quit(self, silent: bool = True) -> PlayDriver:
+    def quit(self, silent: bool = True) -> None:
         """
         Quit the driver instance
 
         :param: silent:
-        :return: self
+        :return: None
         """
         if silent:
             self.log('Quit driver instance')
@@ -115,7 +115,6 @@ class PlayDriver(LogMixin):
             PlayDriver.driver = None
             PlayDriver.instance = None
             PlayDriver.driver_wrapper = None
-        return self
 
     def set_cookie(self, cookies: List[dict]) -> PlayDriver:
         """

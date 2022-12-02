@@ -12,7 +12,7 @@ from dyatel.mixins.log_mixin import LogMixin
 
 class CorePage(DriverMixin, LogMixin):
 
-    def __init__(self, locator: str, locator_type='', name=''):
+    def __init__(self, locator: str, locator_type: str, name: str):
         """
         Initializing of core page with appium/selenium driver
         Contain same methods/data for both WebPage and MobilePage classes

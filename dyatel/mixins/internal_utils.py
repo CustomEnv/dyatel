@@ -10,8 +10,9 @@ from dyatel.exceptions import UnsuitableArgumentsException
 WAIT_EL = 10
 WAIT_PAGE = 20
 
-all_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
-            'textarea', 'svg', 'circle', 'iframe']
+all_tags = {'h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
+            'textarea', 'svg', 'circle', 'iframe', 'label', 'tr', 'th', 'table', 'tbody', 'td', 'select', 'nav', 'li',
+            'form', 'footer', 'frame', 'area', 'span'}
 
 
 def get_frame(frame=1):
@@ -118,11 +119,25 @@ def get_child_elements_with_names(obj: object, instance: type) -> dict:
 
     :returns: list of page elements and page objects
     """
-    elements, class_items = {}, []
+    elements = {}
 
-    for parent_class in obj.__class__.__bases__:
-        class_items += list(parent_class.__dict__.items()) + list(parent_class.__class__.__dict__.items())
+    def get_items(reference_obj, obj_items):
 
+        if not inspect.isclass(reference_obj):
+            reference_obj = reference_obj.__class__
+
+        for parent_class in reference_obj.__bases__:
+
+            if "'object'" in str(parent_class) or "'type'" in str(parent_class):
+                break
+
+            obj_items += list(parent_class.__dict__.items()) + list(parent_class.__class__.__dict__.items())
+
+            get_items(parent_class, obj_items)
+
+        return obj_items
+
+    class_items = get_items(obj, [])
     class_items += list(list(obj.__class__.__dict__.items()) + list(obj.__dict__.items()))
 
     for attribute, value in class_items:
@@ -162,17 +177,12 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
     :return: tuple of calculated coordinates
     """
     ey, ex, ew, eh = element.get_rect().values()
-    emx, emy = ex + ew / 2, ey + eh / 2  # middle of element
+    mew, meh = ew / 2, eh / 2
+    emx, emy = ex + mew, ey + meh  # middle of element
 
-    if x:
-        x = x + emx + ew / 2 if x > 0 else emx + x - ew / 2
-    else:
-        x = emx
-
-    if y:
-        y = y + emy + eh / 2 if y > 0 else emy + y - eh / 2
-    else:
-        y = emy
+    sx, sy = ([-1, 1][s > 0] for s in [x, y])
+    x = emx + bool(x) * (x + mew * sx)
+    y = emy + bool(y) * (y + meh * sy)
 
     return int(x), int(y)
 
@@ -186,7 +196,10 @@ def driver_index(driver_wrapper, driver) -> str:
     :return: 'index_driver' data
     """
     if len(driver_wrapper.all_drivers) > 1 and driver_wrapper.desktop:
-        index = str(driver_wrapper.all_drivers.index(driver) + 1)
+        try:
+            index = str(driver_wrapper.all_drivers.index(driver) + 1)
+        except ValueError:
+            index = '?'
         return f'{index}_driver'
 
     return ''

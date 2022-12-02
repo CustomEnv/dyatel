@@ -3,7 +3,7 @@ from dyatel.dyatel_sel.core.core_page import CorePage
 
 class WebPage(CorePage):
 
-    def __init__(self, locator: str, locator_type='', name=''):
+    def __init__(self, locator: str, locator_type: str, name: str):
         """
         Initializing of web page with selenium driver
 

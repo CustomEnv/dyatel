@@ -87,6 +87,11 @@ def test_second_driver_by_arg(driver_wrapper, second_driver_wrapper):
     assert pizza_page.quantity_input.is_displayed()
 
 
+def test_second_driver_compatibility(driver_wrapper, second_driver_wrapper):
+    assert driver_wrapper.get_inner_window_size()
+    assert second_driver_wrapper.get_inner_window_size()
+
+
 @pytest.mark.skip_platform('appium', reason='Appium doesnt support tabs creating')
 def test_driver_tabs(driver_wrapper, second_playground_page):
     driver_wrapper.create_new_tab()

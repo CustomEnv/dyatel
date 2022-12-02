@@ -29,8 +29,8 @@ class AfterInitMeta(type):
 class Group(Element, metaclass=AfterInitMeta):
     """ Group of elements. Should be defined as class """
 
-    def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 parent: Any = None, wait: bool = False, driver_wrapper: Union[DriverWrapper, Any] = None, **kwargs):
+    def __init__(self, locator: str = '', locator_type: str = '', name: str = '',
+                 parent: Any = None, wait: bool = None, driver_wrapper: Union[DriverWrapper, Any] = None, **kwargs):
         """
         Initializing of group based on current driver
 
@@ -88,3 +88,5 @@ class Group(Element, metaclass=AfterInitMeta):
             value = getattr(self, name)
             if value.parent is None:
                 value.parent = self
+            else:
+                setattr(value, 'parent', copy.copy(value.parent))

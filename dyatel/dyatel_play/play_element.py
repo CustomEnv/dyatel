@@ -9,6 +9,8 @@ from playwright._impl._api_types import TimeoutError as PlayTimeoutError
 from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
 from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
+
+from dyatel.exceptions import TimeoutException
 from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
@@ -25,8 +27,7 @@ from dyatel.mixins.internal_utils import (
 
 class PlayElement(ElementMixin, DriverMixin, LogMixin):
 
-    def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 parent: Union[PlayElement, Any] = None, wait: bool = False):
+    def __init__(self, locator: str, locator_type: str, name: str, parent: Union[PlayElement, Any], wait: bool):
         """
         Initializing of web element with playwright driver
 
@@ -175,13 +176,16 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         self._first_element.fill('')
         return self
 
-    def hover(self) -> PlayElement:
+    def hover(self, silent: bool = False) -> PlayElement:
         """
         Hover over current element
 
+        :param: silent: erase log
         :return: self
         """
-        self.log(f'Hover over "{self.name}"')
+        if not silent:
+            self.log(f'Hover over "{self.name}"')
+
         self._first_element.hover()
         return self
 
@@ -208,24 +212,10 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         if not silent:
             self.log(f'Wait until presence of "{self.name}"')
 
-        self._first_element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
-        return self
-
-    def wait_element_without_error(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
-        """
-        Wait for current element available in page without raising error
-
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait until presence of "{self.name}" without error exception')
-
         try:
-            self.wait_element(timeout=timeout, silent=True)
-        except PlayTimeoutError as exception:
-            self.log(f'Ignored exception: "{exception}"')
+            self._first_element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
+        except PlayTimeoutError:
+            raise TimeoutException(f'Element "{self.name}" not visible after {timeout} seconds') from None
         return self
 
     def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
@@ -239,7 +229,10 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         if not silent:
             self.log(f'Wait hidden of "{self.name}"')
 
-        self._first_element.wait_for(state='hidden', timeout=get_timeout_in_ms(timeout))
+        try:
+            self._first_element.wait_for(state='hidden', timeout=get_timeout_in_ms(timeout))
+        except PlayTimeoutError:
+            raise TimeoutException(f'Element "{self.name}" still visible after {timeout} seconds') from None
         return self
 
     def wait_clickable(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:

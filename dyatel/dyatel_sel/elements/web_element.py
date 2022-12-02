@@ -8,8 +8,7 @@ from dyatel.mixins.internal_utils import calculate_coordinate_to_click
 
 
 class WebElement(CoreElement):
-    def __init__(self, locator: str, locator_type: str = '', name: str = '',
-                 parent: Union[WebElement, Any] = None, wait: bool = False):
+    def __init__(self, locator: str, locator_type: str, name: str, parent: Union[WebElement, Any], wait: bool):
         """
         Initializing of web element with selenium driver
 
@@ -33,13 +32,16 @@ class WebElement(CoreElement):
         selenium_elements = self._find_elements(self._get_base())
         return self._get_all_elements(selenium_elements, WebElement)
 
-    def hover(self) -> WebElement:
+    def hover(self, silent: bool = False) -> WebElement:
         """
         Hover over current element
 
+        :param silent: erase log
         :return: self
         """
-        self.log(f'Hover over "{self.name}"')
+        if not silent:
+            self.log(f'Hover over "{self.name}"')
+
         self._action_chains\
             .move_to_element(self.element)\
             .move_by_offset(1, 1)\

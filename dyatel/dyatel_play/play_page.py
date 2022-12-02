@@ -10,7 +10,7 @@ from dyatel.mixins.log_mixin import LogMixin
 
 class PlayPage(DriverMixin, LogMixin):
 
-    def __init__(self, locator: str, locator_type='', name=''):
+    def __init__(self, locator: str, locator_type: str, name: str):
         """
         Initializing of web page with playwright driver
 

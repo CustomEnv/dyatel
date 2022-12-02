@@ -21,7 +21,9 @@ from dyatel.mixins.internal_utils import get_frame
 class VisualComparison:
 
     visual_regression_path = ''
+    skip_screenshot_comparison = False
     visual_reference_generation = False
+    hard_visual_reference_generation = False
 
     def __init__(self, driver_wrapper, element):
         self.driver_wrapper = driver_wrapper
@@ -42,6 +44,9 @@ class VisualComparison:
         :param remove: remove element from screenshot
         :return: self
         """
+        if self.skip_screenshot_comparison:
+            return self
+
         if filename:
             if name_suffix:
                 filename = f'{filename}_{name_suffix}'
@@ -77,6 +82,10 @@ class VisualComparison:
             if remove:
                 self._remove_elements(self.element, remove, screenshot_name)
 
+        if self.hard_visual_reference_generation:
+            save_screenshot(reference_file)
+            return self
+
         try:
             Image.open(reference_file)
         except FileNotFoundError:
@@ -87,6 +96,9 @@ class VisualComparison:
 
             raise FileNotFoundError(f'Reference file "{reference_file}" not found, but its just saved. '
                                     f'If it CI run, then you need to commit reference files.') from None
+
+        if self.visual_reference_generation:
+            return self
 
         save_screenshot(output_file)
         self._assert_same_images(output_file, reference_file, diff_file, threshold)
