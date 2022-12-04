@@ -38,7 +38,7 @@ class PreviousObjectDriver:
         if len(current_obj.driver_wrapper.all_drivers) > 1:
             if current_obj.driver == DriverWrapper.driver:
                 if not isinstance(current_obj, Group):
-                    previous_object = self._get_correct_previous_object(frame_index, is_element=True)
+                    previous_object = self._get_correct_previous_object(frame_index, current_obj=current_obj)
                     if previous_object:
                         try:
                             current_obj.driver_wrapper = previous_object.driver_wrapper
@@ -57,8 +57,8 @@ class PreviousObjectDriver:
         from dyatel.base.element import Element
         from dyatel.base.checkbox import Checkbox
 
-        if isinstance(current_obj, (Element, Checkbox)):
-            previous_object = self._get_correct_previous_object(frame_index, is_element=True)
+        if isinstance(current_obj, (Element, Checkbox)) and not isinstance(current_obj, Group):
+            previous_object = self._get_correct_previous_object(frame_index, current_obj=current_obj)
             if previous_object:
                 if isinstance(previous_object, Group):
                     current_obj.parent = previous_object
@@ -77,7 +77,7 @@ class PreviousObjectDriver:
         is_page = isinstance(obj, Page)
         return not (is_page or is_group) or obj is None
 
-    def _get_correct_previous_object(self, index: int, is_element: bool = False) -> Union[None, Any]:
+    def _get_correct_previous_object(self, index: int, current_obj: Any = False) -> Union[None, Any]:
         """
         Finds previous object with nested element/group/page
 
@@ -93,8 +93,10 @@ class PreviousObjectDriver:
 
         while (unexpected_previous_obj or get_driver(prev_object) == DriverWrapper.driver) and index < 15:
 
-            if is_element:
-                return None
+            if current_obj:
+                if prev_object:
+                    if str(current_obj) in str(vars(prev_object)):
+                        return None
 
             index += 1
             frame = internal_utils.get_frame(index)
