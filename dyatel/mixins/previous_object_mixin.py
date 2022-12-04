@@ -95,7 +95,7 @@ class PreviousObjectDriver:
 
             if current_obj:
                 if prev_object:
-                    if str(current_obj) in str(vars(prev_object)):
+                    if str(current_obj) in str(vars(prev_object)) and current_obj != prev_object:
                         return None
 
             index += 1
