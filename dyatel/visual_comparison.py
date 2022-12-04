@@ -21,6 +21,7 @@ from dyatel.mixins.internal_utils import get_frame
 class VisualComparison:
 
     visual_regression_path = ''
+    test_item = None
     skip_screenshot_comparison = False
     visual_reference_generation = False
     hard_visual_reference_generation = False
@@ -93,6 +94,8 @@ class VisualComparison:
 
             if self.visual_reference_generation:
                 return self
+
+            self._disable_reruns()
 
             raise FileNotFoundError(f'Reference file "{reference_file}" not found, but its just saved. '
                                     f'If it CI run, then you need to commit reference files.') from None
@@ -278,3 +281,17 @@ class VisualComparison:
                 image.close()
 
             allure.attach(name='diff', body=json.dumps(diff_dict), attachment_type='application/vnd.allure.image.diff')
+
+    def _disable_reruns(self) -> None:
+        """
+        Disable reruns for pytest
+
+        :return: None
+        """
+        try:
+            pytest_rerun = importlib.import_module('pytest_rerunfailures')
+        except ModuleNotFoundError:
+            return None
+
+        if hasattr(self.test_item, 'execution_count'):
+            self.test_item.execution_count = pytest_rerun.get_reruns_count(self.test_item) + 1

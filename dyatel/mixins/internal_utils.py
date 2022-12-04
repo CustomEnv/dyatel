@@ -106,7 +106,7 @@ def get_timeout_in_ms(timeout: int):
 
 def get_child_elements(obj: object, instance: type) -> list:
     """
-    Return page elements and page objects of this page object
+    Return objects of this object by instance
 
     :returns: list of page elements and page objects
     """
@@ -115,7 +115,7 @@ def get_child_elements(obj: object, instance: type) -> list:
 
 def get_child_elements_with_names(obj: object, instance: type) -> dict:
     """
-    Return page elements and page objects of this page object
+    Return objects of this object by instance
 
     :returns: list of page elements and page objects
     """

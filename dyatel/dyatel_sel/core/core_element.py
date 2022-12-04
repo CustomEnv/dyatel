@@ -547,7 +547,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: None
         """
         if 'invalid locator' in exc.msg or 'is not a valid' in exc.msg:
-            msg = f'"{self.name}" selector is invalid. {self.get_element_logging_data(self)}'
+            msg = f'Selector for "{self.name}" is invalid. {self.get_element_logging_data(self)}'
             raise InvalidSelectorException(msg) from None
         else:
             raise exc from None

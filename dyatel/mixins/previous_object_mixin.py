@@ -38,7 +38,7 @@ class PreviousObjectDriver:
         if len(current_obj.driver_wrapper.all_drivers) > 1:
             if current_obj.driver == DriverWrapper.driver:
                 if not isinstance(current_obj, Group):
-                    previous_object = self._get_correct_previous_object(frame_index)
+                    previous_object = self._get_correct_previous_object(frame_index, is_element=True)
                     if previous_object:
                         try:
                             current_obj.driver_wrapper = previous_object.driver_wrapper
@@ -58,7 +58,7 @@ class PreviousObjectDriver:
         from dyatel.base.checkbox import Checkbox
 
         if isinstance(current_obj, (Element, Checkbox)):
-            previous_object = self._get_correct_previous_object(frame_index)
+            previous_object = self._get_correct_previous_object(frame_index, is_element=True)
             if previous_object:
                 if isinstance(previous_object, Group):
                     current_obj.parent = previous_object
@@ -77,7 +77,7 @@ class PreviousObjectDriver:
         is_page = isinstance(obj, Page)
         return not (is_page or is_group) or obj is None
 
-    def _get_correct_previous_object(self, index: int) -> Union[None, Any]:
+    def _get_correct_previous_object(self, index: int, is_element: bool = False) -> Union[None, Any]:
         """
         Finds previous object with nested element/group/page
 
@@ -88,7 +88,14 @@ class PreviousObjectDriver:
         prev_object = frame.f_locals.get('self', None)
         unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)
 
-        while unexpected_previous_obj and index < 10:
+        def get_driver(obj):
+            return getattr(obj, 'driver', False)
+
+        while (unexpected_previous_obj or get_driver(prev_object) == DriverWrapper.driver) and index < 15:
+
+            if is_element:
+                return None
+
             index += 1
             frame = internal_utils.get_frame(index)
             prev_object = frame.f_locals.get('self', None)
