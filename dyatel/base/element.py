@@ -51,7 +51,7 @@ class Element(WebElement, MobileElement, PlayElement):
         self._init_locals = locals() if not hasattr(self, '_init_locals') else getattr(self, '_init_locals')
         self._driver_instance = DriverWrapper
 
-        self.element_class = self.__set_base_class()
+        self.element_class = self._set_base_class()
         if self.element_class:
             self._initialized = True
             super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name, parent=self.parent,
@@ -272,7 +272,7 @@ class Element(WebElement, MobileElement, PlayElement):
             scroll=scroll, remove=remove,
         )
 
-    def __set_base_class(self):
+    def _set_base_class(self):
         """
         Get element class in according to current driver, and set him as base class
 
