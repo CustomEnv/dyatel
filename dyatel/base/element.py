@@ -254,7 +254,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
     def assert_screenshot(self, filename: str = '', test_name: str = '', name_suffix: str = '',
                           threshold: Union[int, float] = 0, delay: Union[int, float] = 0.5, scroll: bool = False,
-                          remove: List[Element] = None) -> None:
+                          remove: List[Element] = None, fill_background: Union[str, bool] = False) -> None:
         """
         Assert given (by name) and taken screenshot equals
 
@@ -265,11 +265,12 @@ class Element(WebElement, MobileElement, PlayElement):
         :param delay: delay before taking screenshot
         :param scroll: scroll to element before taking the screenshot
         :param remove: remove elements from screenshot
+        :param fill_background: fill background with given color or black color by default
         :return: None
         """
         VisualComparison(self.driver_wrapper, self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
-            scroll=scroll, remove=remove,
+            scroll=scroll, remove=remove, fill_background=fill_background,
         )
 
     def _set_base_class(self):

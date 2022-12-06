@@ -23,7 +23,7 @@ setup(
         'selenium>=4.1.0',
         'playwright>=1.22.0',
         'webdriver-manager>=3.7.0',
-        'Pillow>=9.1.1'
+        'Pillow>=9.3.0'
     ],
     keywords='selenium appium playwright web_automation mobile_automation',
     description='Wrapper of Selenium, Appium and Playwright with single API',

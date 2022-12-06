@@ -24,8 +24,8 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
     mobile = False
     is_ios = False
     is_android = False
-    is_xcui_driver = False
-    is_safari_driver = False
+    is_simulator = False
+    is_real_device = False
 
     def __new__(cls, *args, **kwargs):
         if DriverWrapper._init_count == 0:

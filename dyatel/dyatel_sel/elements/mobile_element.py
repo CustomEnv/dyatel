@@ -5,14 +5,8 @@ from typing import Union, List, BinaryIO, Any
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.sel_utils import get_legacy_selector, get_locator_type
-from dyatel.mixins.internal_utils import calculate_coordinate_to_click, WAIT_EL
-from dyatel.js_scripts import (
-    get_element_position_on_screen_js,
-    click_js,
-    is_displayed_js,
-    get_inner_height_js,
-    get_outer_height_js
-)
+from dyatel.mixins.internal_utils import calculate_coordinate_to_click
+from dyatel.js_scripts import get_element_position_on_screen_js
 
 
 class MobileElement(CoreElement):
@@ -27,7 +21,6 @@ class MobileElement(CoreElement):
         :param parent: parent of element. Can be MobileElement, MobilePage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self.is_safari_driver = DriverWrapper.is_safari_driver
         self.is_ios = DriverWrapper.is_ios
         self.is_android = DriverWrapper.is_android
 
@@ -45,21 +38,6 @@ class MobileElement(CoreElement):
         """
         appium_elements = self._find_elements(self._get_base())
         return self._get_all_elements(appium_elements, MobileElement)
-
-    def click(self) -> MobileElement:
-        """
-        Click to current element
-        SafariDriver: Click to current element by JS
-
-        :return: self
-        """
-        if self.is_safari_driver:
-            self.wait_element(silent=True).wait_clickable(silent=True)
-            self.driver.execute_script(click_js, self.element)
-        else:
-            super().click()
-
-        return self
 
     def click_outside(self, x: int = 0, y: int = -5, calculate_top_bar=True) -> MobileElement:
         """
@@ -133,41 +111,6 @@ class MobileElement(CoreElement):
         """
         return self.click_outside(x=x, y=y, calculate_top_bar=calculate_top_bar)
 
-    def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> MobileElement:
-        """
-        Wait for current element available in page
-        SafariDriver: Wait for current element available in DOM
-
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
-        :return: self
-        """
-        if self.is_safari_driver:
-            self.wait_availability(timeout=timeout, silent=True)
-        else:
-            super().wait_element(timeout=timeout, silent=silent)
-
-        return self
-
-    def is_displayed(self, silent: bool = False) -> bool:
-        """
-        Check visibility of element
-        SafariDriver: Check visibility by JS
-
-        :param: silent: erase log
-        :return: True if element visible
-        """
-        if self.is_safari_driver:
-            if not silent:
-                self.log(f'Check displaying of "{self.name}"')
-
-            try:
-                return self.driver_wrapper.execute_script(is_displayed_js, self._get_element(wait=False))
-            except:
-                return False
-        else:
-            return super().is_displayed(silent=silent)
-
     def get_screenshot(self, filename: str, legacy: bool = True) -> BinaryIO:
         """
         Taking element screenshot and saving with given path/filename
@@ -202,17 +145,7 @@ class MobileElement(CoreElement):
         start_x, start_y = el_location.values()
         h, w = element.size.values()
 
-        if self.is_safari_driver:
-            inner_height = self.driver.execute_script(get_inner_height_js)
-            outer_height = self.driver.execute_script(get_outer_height_js)
-            bars_size = outer_height - inner_height
-
-            if bars_size > 110:  # There is no way to get top/bottom bars of safari with SafariDriver
-                bar_size = bars_size / 4  # top and bottom bar shown
-            else:
-                bar_size = bars_size / 2  # top bar shown, bottom hidden
-        else:
-            bar_size = self.driver_wrapper.get_top_bar_height()
+        bar_size = self.driver_wrapper.get_top_bar_height()
 
         if bar_size:
             start_y += bar_size

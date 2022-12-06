@@ -32,17 +32,18 @@ class VisualComparison:
 
     def assert_screenshot(self, filename: str = '', test_name: str = '', name_suffix: str = '',
                           threshold: Union[int, float] = 0, delay: Union[int, float] = 0.5, scroll: bool = False,
-                          remove: List[Any] = None) -> VisualComparison:
+                          remove: List[Any] = None, fill_background: Union[str, bool] = False) -> VisualComparison:
         """
         Assert given (by name) and taken screenshot equals
 
         :param filename: full screenshot name. Custom filename will be used if empty string given
         :param test_name: test name for custom filename. Will try to find it automatically if empty string given
-        :param name_suffix: filename suffix. Good to use for same element with positive/netagative case
+        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
         :param threshold: possible threshold
         :param delay: delay before taking screenshot
         :param scroll: scroll to element before taking the screenshot
         :param remove: remove element from screenshot
+        :param fill_background: fill background with given color or black color by default
         :return: self
         """
         if self.skip_screenshot_comparison:
@@ -79,6 +80,12 @@ class VisualComparison:
         time.sleep(delay)
 
         def save_screenshot(screenshot_name):
+            element = self.element.element
+            if fill_background is True:
+                self.driver_wrapper.execute_script('arguments[0].style.background = "#000";', element)
+            if fill_background and type(fill_background) is str:
+                self.driver_wrapper.execute_script(f'arguments[0].style.background = "{fill_background}";', element)
+
             self.element.get_screenshot(screenshot_name)
             if remove:
                 self._remove_elements(self.element, remove, screenshot_name)

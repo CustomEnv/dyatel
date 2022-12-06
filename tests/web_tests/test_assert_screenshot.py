@@ -39,3 +39,11 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
         pass
     else:
         raise Exception('Unexpected behavior')
+
+
+def test_screenshot_fill_background_default(base_playground_page):
+    base_playground_page.kube.scroll_into_view().assert_screenshot(threshold=6, fill_background=True)
+
+
+def test_screenshot_fill_background_blue(base_playground_page):
+    base_playground_page.kube.scroll_into_view().assert_screenshot(threshold=6, fill_background='blue')
