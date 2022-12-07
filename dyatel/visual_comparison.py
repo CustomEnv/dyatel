@@ -188,6 +188,7 @@ class VisualComparison:
           - appium android: test_screenshot_rubiks_cube_pixel5_v_12_appium_chrome
           :::
         """
+        test_function_name = test_function_name if test_function_name else getattr(self.test_item, 'nodeid', '')
         if not test_function_name:
             back_frame = get_frame().f_back
             test_function_name = ''
@@ -201,7 +202,7 @@ class VisualComparison:
             except AttributeError:
                 raise Exception("Can't find test name. Please pass the test_name as parameter to assert_screenshot")
         else:
-            test_function_name = test_function_name.replace('[', '_')
+            test_function_name = test_function_name.replace('[', '_')  # required here for better separation
 
         if self.driver_wrapper.mobile:
             caps = self.driver_wrapper.driver.caps
