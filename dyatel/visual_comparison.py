@@ -188,7 +188,7 @@ class VisualComparison:
           - appium android: test_screenshot_rubiks_cube_pixel5_v_12_appium_chrome
           :::
         """
-        test_function_name = test_function_name if test_function_name else getattr(self.test_item, 'nodeid', '')
+        test_function_name = test_function_name if test_function_name else getattr(self.test_item, 'name', '')
         if not test_function_name:
             back_frame = get_frame().f_back
             test_function_name = ''
