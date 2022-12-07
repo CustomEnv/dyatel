@@ -5,7 +5,6 @@ from typing import Union, List
 from appium.webdriver.applicationstate import ApplicationState
 from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
-from selenium.webdriver.common.by import By
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 
@@ -189,6 +188,17 @@ class MobileDriver(CoreDriver):
         """
         if self.is_real_device:
             self.driver.hide_keyboard(**kwargs)
+        elif self.is_ios and self.is_simulator:
+
+            from dyatel.base.element import Element
+
+            try:
+                self.driver_wrapper.switch_to_native()
+                done_button = Element("//XCUIElementTypeButton[@name='Done']", name='Keyboard Done button')
+                if done_button.is_displayed():
+                    done_button.click()
+            finally:
+                self.driver_wrapper.switch_to_web()
 
         return self
 
@@ -199,13 +209,15 @@ class MobileDriver(CoreDriver):
         :return: self
         """
         if not self.top_bar_height:
-            self.switch_to_native()
-            top_bar = self.driver.find_element(
-                By.XPATH,
-                '//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther'
-            )
-            self.top_bar_height = top_bar.size['height']
-            self.switch_to_web()
+
+            from dyatel.base.element import Element
+
+            try:
+                self.switch_to_native()
+                top_bar = Element('//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther')
+                self.top_bar_height = top_bar.element.size['height']
+            finally:
+                self.switch_to_web()
 
         return self.top_bar_height
 
@@ -217,14 +229,15 @@ class MobileDriver(CoreDriver):
         :return: self
         """
         if force or not self.top_bar_height:
-            self.switch_to_native()
 
-            bottom_bar = self.driver.find_element(
-                By.XPATH,
-                '//*[@name="CapsuleViewController"]/XCUIElementTypeOther[1]'
-            )
-            self.bottom_bar_height = bottom_bar.size['height']
-            self.switch_to_web()
+            from dyatel.base.element import Element
+
+            try:
+                self.switch_to_native()
+                bottom_bar = Element('//*[@name="CapsuleViewController"]/XCUIElementTypeOther[1]')
+                self.bottom_bar_height = bottom_bar.element.size['height']
+            finally:
+                self.switch_to_web()
 
         return self.top_bar_height
 
