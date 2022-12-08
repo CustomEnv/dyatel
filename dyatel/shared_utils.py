@@ -15,7 +15,7 @@ def set_logging_settings(level=logging.INFO):
 
 def resize_image(screenshot_binary, scale=3, img_format='JPEG'):
     img = Image.open(io.BytesIO(screenshot_binary))
-    img = img.resize((img.width // scale, img.height // scale), Image.ANTIALIAS)
+    img = img.resize((img.width // scale, img.height // scale), Image.Resampling.LANCZOS)
 
     result_img_binary = io.BytesIO()
     img.convert('RGB').save(result_img_binary, format=img_format, optimize=True)

@@ -4,7 +4,7 @@ from copy import copy
 from typing import List, Any, Union
 
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.internal_utils import get_child_elements_with_names
+from dyatel.mixins.internal_utils import get_child_elements_with_names, get_platform_locator
 
 
 class ElementMixin(DriverMixin):
@@ -19,9 +19,9 @@ class ElementMixin(DriverMixin):
         """
         element = element if element else self
         parent = element.parent
-        current_data = f'Selector: ["{element.locator_type}": "{element.locator}"]'
+        current_data = f'Selector: ["{element.locator_type}": "{get_platform_locator(element)}"]'
         if parent:
-            parent_data = f'Parent selector: ["{parent.locator_type}": "{parent.locator}"]'
+            parent_data = f'Parent selector: ["{parent.locator_type}": "{get_platform_locator(element)}"]'
             current_data = f'{current_data}. {parent_data}'
         return current_data
 

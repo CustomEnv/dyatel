@@ -21,6 +21,7 @@ from dyatel.mixins.internal_utils import get_frame
 class VisualComparison:
 
     visual_regression_path = ''
+    test_item = None
     skip_screenshot_comparison = False
     visual_reference_generation = False
     hard_visual_reference_generation = False
@@ -31,17 +32,18 @@ class VisualComparison:
 
     def assert_screenshot(self, filename: str = '', test_name: str = '', name_suffix: str = '',
                           threshold: Union[int, float] = 0, delay: Union[int, float] = 0.5, scroll: bool = False,
-                          remove: List[Any] = None) -> VisualComparison:
+                          remove: List[Any] = None, fill_background: Union[str, bool] = False) -> VisualComparison:
         """
         Assert given (by name) and taken screenshot equals
 
         :param filename: full screenshot name. Custom filename will be used if empty string given
         :param test_name: test name for custom filename. Will try to find it automatically if empty string given
-        :param name_suffix: filename suffix. Good to use for same element with positive/netagative case
+        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
         :param threshold: possible threshold
         :param delay: delay before taking screenshot
         :param scroll: scroll to element before taking the screenshot
         :param remove: remove element from screenshot
+        :param fill_background: fill background with given color or black color by default
         :return: self
         """
         if self.skip_screenshot_comparison:
@@ -78,6 +80,12 @@ class VisualComparison:
         time.sleep(delay)
 
         def save_screenshot(screenshot_name):
+            element = self.element.element
+            if fill_background is True:
+                self.driver_wrapper.execute_script('arguments[0].style.background = "#000";', element)
+            if fill_background and type(fill_background) is str:
+                self.driver_wrapper.execute_script(f'arguments[0].style.background = "{fill_background}";', element)
+
             self.element.get_screenshot(screenshot_name)
             if remove:
                 self._remove_elements(self.element, remove, screenshot_name)
@@ -93,6 +101,8 @@ class VisualComparison:
 
             if self.visual_reference_generation:
                 return self
+
+            self._disable_reruns()
 
             raise FileNotFoundError(f'Reference file "{reference_file}" not found, but its just saved. '
                                     f'If it CI run, then you need to commit reference files.') from None
@@ -178,6 +188,7 @@ class VisualComparison:
           - appium android: test_screenshot_rubiks_cube_pixel5_v_12_appium_chrome
           :::
         """
+        test_function_name = test_function_name if test_function_name else getattr(self.test_item, 'name', '')
         if not test_function_name:
             back_frame = get_frame().f_back
             test_function_name = ''
@@ -191,7 +202,7 @@ class VisualComparison:
             except AttributeError:
                 raise Exception("Can't find test name. Please pass the test_name as parameter to assert_screenshot")
         else:
-            test_function_name = test_function_name.replace('[', '_')
+            test_function_name = test_function_name.replace('[', '_')  # required here for better separation
 
         if self.driver_wrapper.mobile:
             caps = self.driver_wrapper.driver.caps
@@ -278,3 +289,17 @@ class VisualComparison:
                 image.close()
 
             allure.attach(name='diff', body=json.dumps(diff_dict), attachment_type='application/vnd.allure.image.diff')
+
+    def _disable_reruns(self) -> None:
+        """
+        Disable reruns for pytest
+
+        :return: None
+        """
+        try:
+            pytest_rerun = importlib.import_module('pytest_rerunfailures')
+        except ModuleNotFoundError:
+            return None
+
+        if hasattr(self.test_item, 'execution_count'):
+            self.test_item.execution_count = pytest_rerun.get_reruns_count(self.test_item) + 1

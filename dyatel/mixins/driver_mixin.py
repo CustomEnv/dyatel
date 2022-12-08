@@ -100,6 +100,7 @@ class DriverMixin:
         for name, child in child_elements:
             wrapped_child = copy(child)
             wrapped_child._driver_instance = driver_wrapper
+            wrapped_child._set_base_class()
             setattr(base_obj, name, wrapped_child)
 
             if getattr(wrapped_child, 'parent', None):

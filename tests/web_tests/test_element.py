@@ -1,9 +1,8 @@
 import random
-import time
 
 import pytest
 
-from dyatel.exceptions import UnexpectedElementsCountException, NoSuchElementException
+from dyatel.exceptions import NoSuchElementException
 from dyatel.mixins.element_mixin import ElementMixin
 from tests.adata.pages.keyboard_page import KeyboardPage
 
@@ -69,130 +68,6 @@ def test_hover(mouse_event_page):
     mouse_event_page.choose_language_button.hover_outside()
     after_outside_hover_displayed = not mouse_event_page.dropdown.wait_element_hidden().is_displayed()
     assert all((initial_not_displayed, after_hover_displayed, after_outside_hover_displayed))
-
-
-@pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])
-def test_screenshot(base_playground_page, driver_engine, driver_name, platform, with_name):
-    filename = f'{driver_engine}-{driver_name}-{platform}-kube' if with_name else ''
-    base_playground_page.kube.scroll_into_view().assert_screenshot(filename, threshold=6)
-
-
-@pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])
-def test_screenshot_name_with_suffix(base_playground_page, driver_engine, driver_name, platform, with_name):
-    filename = f'{driver_engine}-{driver_name}-{platform}-kube' if with_name else ''
-    base_playground_page.kube.scroll_into_view().assert_screenshot(filename, name_suffix='first', threshold=6)
-    base_playground_page.kube.scroll_into_view().assert_screenshot(filename, name_suffix='second', threshold=6)
-
-
-def test_screenshot_remove(base_playground_page):
-    base_playground_page.text_container.scroll_into_view(sleep=0.5).assert_screenshot(
-            remove=[base_playground_page.inner_text_1, base_playground_page.inner_text_2])
-
-# Test waits
-
-
-def test_wait_element(pizza_order_page):
-    pizza_order_page.submit_button.wait_element()
-    assert pizza_order_page.submit_button.is_displayed()
-
-
-def test_wait_without_error(pizza_order_page):
-    pizza_order_page.error_modal.wait_element_without_error(timeout=0.5)
-    assert not pizza_order_page.error_modal.is_displayed()
-
-
-def test_wait_hidden(pizza_order_page):
-    pizza_order_page.error_modal.wait_element_without_error()
-    assert not pizza_order_page.error_modal.is_displayed()
-
-
-def test_wait_hidden_without_error(pizza_order_page):
-    pizza_order_page.submit_button.wait_element_without_error(timeout=0.5)
-    assert pizza_order_page.submit_button.is_displayed()
-
-
-def test_click_and_wait(pizza_order_page, driver_engine):
-    pizza_order_page.submit_button.click()
-    after_click_displayed = pizza_order_page.error_modal.wait_element().is_displayed()
-    if 'play' in driver_engine:
-        time.sleep(1)
-    pizza_order_page.error_modal.click_outside()
-    after_click_outside_not_displayed = not pizza_order_page.error_modal.wait_element_hidden().is_displayed()
-    assert all((after_click_displayed, after_click_outside_not_displayed))
-
-
-def test_click_into_center(mouse_event_page, platform):
-    mouse_event_page.mouse_click_card().click_area.click_into_center()
-    result_x, result_y = mouse_event_page.mouse_click_card().get_result_coordinates()
-    expected_x_range, expected_y_range = mouse_event_page.mouse_click_card().get_click_area_middle()
-    assert result_x in expected_x_range, f'result_x: {result_x}; expected_x: {expected_x_range}'
-    assert result_y in expected_y_range, f'result_y: {result_y}; expected_y: {expected_y_range}'
-
-
-@pytest.mark.parametrize('coordinates', [(-2, -2), (2, 2), (2, -2), (-2, 2), (2, 0), (0, 2)])
-def test_click_outside(mouse_event_page, platform, coordinates):
-    mouse_event_page.mouse_click_card().click_area_parent.click_outside(*coordinates)
-    assert not mouse_event_page.mouse_click_card().is_click_proceeded()
-
-
-@pytest.mark.xfail_platform('android', 'ios', reason='Can not get value from that element. TODO: Rework test')
-def test_wait_element_value(expected_condition_page):
-    expected_condition_page.value_card.trigger_button.click()
-    value_without_wait = expected_condition_page.value_card.wait_for_value_input.value
-    expected_condition_page.value_card.wait_for_value_input.wait_element_value()
-    value_with_wait = expected_condition_page.value_card.wait_for_value_input.value == 'Dennis Ritchie'
-    assert all((not value_without_wait, value_with_wait))
-
-
-@pytest.mark.xfail_platform('playwright', 'safari', reason='Unexpected text')
-def test_wait_element_text(expected_condition_page):
-    expected_condition_page.value_card.trigger_button.click()
-    value_without_wait = expected_condition_page.value_card.wait_for_text_button.text
-    expected_condition_page.value_card.wait_for_text_button.wait_element_text()
-    value_with_wait = expected_condition_page.value_card.wait_for_text_button.text == 'Submit'
-    assert all((not value_without_wait, value_with_wait))
-
-
-def test_wait_elements_count(forms_page):
-    forms_page.validation_form.form_mixin.input.type_text('sample')
-    forms_page.validation_form.submit_form_button.click()
-    forms_page.validation_form.any_error.wait_elements_count(4)
-    assert forms_page.validation_form.any_error.get_elements_count() == 4
-
-
-def test_wait_elements_count_v2(expected_condition_page):
-    initial_count = expected_condition_page.frame_card.frame.get_elements_count()
-    expected_condition_page.frame_card.trigger_button.click()
-    target_count = expected_condition_page.frame_card.frame.wait_elements_count(1).get_elements_count()
-    assert all((initial_count == 0, target_count == 1))
-
-
-def test_wait_elements_count_negative(forms_page):
-    forms_page.validation_form.form_mixin.input.type_text('sample')
-    forms_page.validation_form.submit_form_button.click()
-
-    try:
-        forms_page.validation_form.any_error.wait_elements_count(3, timeout=1)
-    except UnexpectedElementsCountException:
-        pass
-    else:
-        raise Exception('Unexpected behaviour')
-
-
-@pytest.mark.xfail(reason='TODO: Implementation')
-def test_wait_element_stop_changing(progressbar_page):
-    # bar = progressbar_page.progress_bar.element
-    # progressbar_page.start_button.click()
-    # locations_list = [tuple(bar.size.values()) for _ in range(200) if not time.sleep(0.1)]
-    pass
-
-
-@pytest.mark.xfail(reason='TODO: Implementation')
-def test_wait_element_stop_moving(progressbar_page):
-    # bar = progressbar_page.progress_bar.element
-    # progressbar_page.start_button.click()
-    # locations_list = [tuple(bar.location.values()) for _ in range(200) if not time.sleep(0.1)]
-    pass
 
 
 # Cases when parent is another element

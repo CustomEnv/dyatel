@@ -5,7 +5,6 @@ from typing import Union, List
 from appium.webdriver.applicationstate import ApplicationState
 from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
-from selenium.webdriver.common.by import By
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 
@@ -22,19 +21,19 @@ class MobileDriver(CoreDriver):
 
         self.is_web = self.caps.get('browserName', False)
         self.is_app = self.caps.get('app', False)
-        self.is_android = self.caps.get('platformName').lower() == 'android'
 
+        self.is_android = self.caps.get('platformName').lower() == 'android'
         self.is_ios = self.caps.get('platformName').lower() == 'ios'
-        self.is_safari_driver = self.caps.get('automationName').lower() == 'safari'
-        self.is_xcui_driver = self.caps.get('automationName').lower() == 'xcuitest'
+        self.is_simulator = self.caps.get('useSimulator')
+        self.is_real_device = not self.caps.get('useSimulator')
 
         self.__class__.is_ios = self.is_ios
         self.__class__.is_android = self.is_android
-        self.__class__.is_safari_driver = self.is_safari_driver
-        self.__class__.is_xcui_driver = self.is_xcui_driver
+        self.__class__.is_simulator = self.is_simulator
+        self.__class__.is_real_device = self.is_real_device
 
         self.native_context_name = 'NATIVE_APP'
-        self.web_context_name = self.get_web_view_context() if self.is_xcui_driver else 'CHROMIUM'
+        self.web_context_name = self.get_web_view_context() if self.is_ios else 'CHROMIUM'
         self.__is_native_context = None
         self.__is_web_context = None
 
@@ -180,6 +179,29 @@ class MobileDriver(CoreDriver):
         """
         return self.driver.contexts
 
+    def hide_keyboard(self, **kwargs) -> MobileDriver:
+        """
+        Hide keyboard for real device
+
+        :param kwargs: kwargs from Keyboard.hide_keyboard
+        :return: MobileDriver
+        """
+        if self.is_real_device:
+            self.driver.hide_keyboard(**kwargs)
+        elif self.is_ios and self.is_simulator:
+
+            from dyatel.base.element import Element
+
+            try:
+                self.driver_wrapper.switch_to_native()
+                done_button = Element("//XCUIElementTypeButton[@name='Done']", name='Keyboard Done button')
+                if done_button.is_displayed():
+                    done_button.click()
+            finally:
+                self.driver_wrapper.switch_to_web()
+
+        return self
+
     def get_top_bar_height(self) -> int:
         """
         iOS only: Get top bar height
@@ -187,13 +209,15 @@ class MobileDriver(CoreDriver):
         :return: self
         """
         if not self.top_bar_height:
-            self.switch_to_native()
-            top_bar = self.driver.find_element(
-                By.XPATH,
-                '//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther'
-            )
-            self.top_bar_height = top_bar.size['height']
-            self.switch_to_web()
+
+            from dyatel.base.element import Element
+
+            try:
+                self.switch_to_native()
+                top_bar = Element('//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther')
+                self.top_bar_height = top_bar.element.size['height']
+            finally:
+                self.switch_to_web()
 
         return self.top_bar_height
 
@@ -205,14 +229,15 @@ class MobileDriver(CoreDriver):
         :return: self
         """
         if force or not self.top_bar_height:
-            self.switch_to_native()
 
-            bottom_bar = self.driver.find_element(
-                By.XPATH,
-                '//*[@name="CapsuleViewController"]/XCUIElementTypeOther[1]'
-            )
-            self.bottom_bar_height = bottom_bar.size['height']
-            self.switch_to_web()
+            from dyatel.base.element import Element
+
+            try:
+                self.switch_to_native()
+                bottom_bar = Element('//*[@name="CapsuleViewController"]/XCUIElementTypeOther[1]')
+                self.bottom_bar_height = bottom_bar.element.size['height']
+            finally:
+                self.switch_to_web()
 
         return self.top_bar_height
 

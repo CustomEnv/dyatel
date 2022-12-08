@@ -444,7 +444,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if scale != 1:
             new_image_size = (int(img_binary.size[0] / scale), int(img_binary.size[1] / scale))
-            img_binary = img_binary.resize(new_image_size, Image.ANTIALIAS)
+            img_binary = img_binary.resize(new_image_size, Image.Resampling.LANCZOS)
 
         return img_binary
 
@@ -492,9 +492,8 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             raise DriverWrapperException("Can't find driver") from None
 
         if self.driver_wrapper.mobile:
-            if not self.driver_wrapper.is_safari_driver:
-                if self.driver_wrapper.is_native_context:
-                    return base
+            if self.driver_wrapper.is_native_context:
+                return base
 
         if self.parent:
             self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')
@@ -547,7 +546,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: None
         """
         if 'invalid locator' in exc.msg or 'is not a valid' in exc.msg:
-            msg = f'"{self.name}" selector is invalid. {self.get_element_logging_data(self)}'
+            msg = f'Selector for "{self.name}" is invalid. {self.get_element_logging_data(self)}'
             raise InvalidSelectorException(msg) from None
         else:
             raise exc from None

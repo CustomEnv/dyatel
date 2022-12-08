@@ -51,7 +51,7 @@ class Element(WebElement, MobileElement, PlayElement):
         self._init_locals = locals() if not hasattr(self, '_init_locals') else getattr(self, '_init_locals')
         self._driver_instance = DriverWrapper
 
-        self.element_class = self.__set_base_class()
+        self.element_class = self._set_base_class()
         if self.element_class:
             self._initialized = True
             super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name, parent=self.parent,
@@ -254,7 +254,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
     def assert_screenshot(self, filename: str = '', test_name: str = '', name_suffix: str = '',
                           threshold: Union[int, float] = 0, delay: Union[int, float] = 0.5, scroll: bool = False,
-                          remove: List[Element] = None) -> None:
+                          remove: List[Element] = None, fill_background: Union[str, bool] = False) -> None:
         """
         Assert given (by name) and taken screenshot equals
 
@@ -265,14 +265,15 @@ class Element(WebElement, MobileElement, PlayElement):
         :param delay: delay before taking screenshot
         :param scroll: scroll to element before taking the screenshot
         :param remove: remove elements from screenshot
+        :param fill_background: fill background with given color or black color by default
         :return: None
         """
         VisualComparison(self.driver_wrapper, self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
-            scroll=scroll, remove=remove,
+            scroll=scroll, remove=remove, fill_background=fill_background,
         )
 
-    def __set_base_class(self):
+    def _set_base_class(self):
         """
         Get element class in according to current driver, and set him as base class
 
