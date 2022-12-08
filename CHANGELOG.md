@@ -1,10 +1,20 @@
 # Dyatel Changelog
 
 ---
-## v1.3.2
+## v1.3.3
 *Release date: in development*
 
---- 
+---
+
+## v1.3.2
+*Release date: 2022-12-08*
+- ios safaridriver support removed
+- mobile `element.hide_keyboard` method added
+- Pillow warning fixes
+- `fill_background` arg in `element.assert_screenshot`
+- reruns disabling for visual tests without references
+- other fixes and improvements
+
 
 ## v1.3.1
 *Release date: 2022-12-02*
