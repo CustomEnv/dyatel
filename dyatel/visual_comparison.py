@@ -79,25 +79,36 @@ class VisualComparison:
 
         time.sleep(delay)
 
-        def save_screenshot(screenshot_name):
+        def save_screenshot(screenshot_name, remove):
             element = self.element.element
+            remove_data = remove
             if fill_background is True:
                 self.driver_wrapper.execute_script('arguments[0].style.background = "#000";', element)
             if fill_background and type(fill_background) is str:
                 self.driver_wrapper.execute_script(f'arguments[0].style.background = "{fill_background}";', element)
 
-            self.element.get_screenshot(screenshot_name)
-            if remove:
-                self._remove_elements(self.element, remove, screenshot_name)
+            if remove_data:
+                for elem in remove_data:
+                    self.driver_wrapper.execute_script(
+                        'testing = document.createElement("div"); testing.style.zIndex=9999999;testing.setAttribute("class","hide_element_for_qa"); document.body.appendChild(testing); tmp = arguments[0].getBoundingClientRect(); testing.style.width= tmp.width+"px"; testing.style.height = tmp.height+"px"; testing.style.position = "fixed"; testing.style.top = tmp.y+"px"; testing.style.left = tmp.x+"px"; testing.style.backgroundColor="#000"',
+                        elem.element
+                    )
+                self.element.get_screenshot(screenshot_name)
+                for _ in range(len(remove_data)):
+                    self.driver_wrapper.execute_script(
+                        'document.getElementsByClassName("hide_element_for_qa")[0].remove()'
+                    )
+            else:
+                self.element.get_screenshot(screenshot_name)
 
         if self.hard_visual_reference_generation:
-            save_screenshot(reference_file)
+            save_screenshot(reference_file, remove)
             return self
 
         try:
             Image.open(reference_file)
         except FileNotFoundError:
-            save_screenshot(reference_file)
+            save_screenshot(reference_file, remove)
 
             if self.visual_reference_generation:
                 return self
@@ -110,7 +121,7 @@ class VisualComparison:
         if self.visual_reference_generation:
             return self
 
-        save_screenshot(output_file)
+        save_screenshot(output_file, remove)
         self._assert_same_images(output_file, reference_file, diff_file, threshold)
         return self
 
@@ -143,35 +154,6 @@ class VisualComparison:
                                  f'Expected:{reference_image.size}, Actual: {output_image.size}.')
         if is_different:
             raise AssertionError(f"{base_error} Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
-
-        return self
-
-    def _remove_elements(self, parent: Any, children: list, path: str) -> VisualComparison:
-        """
-        Remove elements from image
-
-        :param parent: parent element
-        :param children: list of children elements
-        :param path: path to output file
-
-        :return: self
-        """
-        parent_abs = {x: max(y, 0) for x, y in parent.get_rect().items()}
-
-        for element in children:
-            elem_rect = element.get_rect()
-
-            if self.driver_wrapper.is_ios:
-                elem_rect = {x: max(y, 0) for x, y in elem_rect.items()}
-
-                if elem_rect['y'] != 0:
-                    elem_rect['y'] += abs(self.driver_wrapper.get_top_bar_height())
-
-            zone = {item: int(elem_rect[item] - (parent_abs[item] if item in ['x', 'y'] else 0)) for item in elem_rect}
-            remove_coordinates = (zone['x'], zone['y'], zone['x'] + zone['width'], zone['y'] + zone['height'])
-            image = Image.open(path).convert('RGB')
-            image.paste("#000000", remove_coordinates)
-            image.save(path)
 
         return self
 
