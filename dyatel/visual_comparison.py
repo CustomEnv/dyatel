@@ -14,6 +14,7 @@ from string import punctuation
 from PIL import Image, ImageChops
 
 from dyatel.exceptions import DriverWrapperException
+from dyatel.js_scripts import add_element_over_js, delete_element_over_js
 from dyatel.mixins.log_mixin import autolog
 from dyatel.mixins.internal_utils import get_frame
 
@@ -79,36 +80,36 @@ class VisualComparison:
 
         time.sleep(delay)
 
-        def save_screenshot(screenshot_name, remove):
+        def save_screenshot(screenshot_name):
             element = self.element.element
-            remove_data = remove
             if fill_background is True:
                 self.driver_wrapper.execute_script('arguments[0].style.background = "#000";', element)
             if fill_background and type(fill_background) is str:
                 self.driver_wrapper.execute_script(f'arguments[0].style.background = "{fill_background}";', element)
 
-            if remove_data:
-                for elem in remove_data:
+            if remove:
+                for elem in remove:
                     self.driver_wrapper.execute_script(
-                        'testing = document.createElement("div"); testing.style.zIndex=9999999;testing.setAttribute("class","hide_element_for_qa"); document.body.appendChild(testing); tmp = arguments[0].getBoundingClientRect(); testing.style.width= tmp.width+"px"; testing.style.height = tmp.height+"px"; testing.style.position = "fixed"; testing.style.top = tmp.y+"px"; testing.style.left = tmp.x+"px"; testing.style.backgroundColor="#000"',
+                        add_element_over_js,
                         elem.element
                     )
                 self.element.get_screenshot(screenshot_name)
-                for _ in range(len(remove_data)):
+                Image.open(screenshot_name).save(screenshot_name)
+                for _ in range(len(remove)):
                     self.driver_wrapper.execute_script(
-                        'document.getElementsByClassName("hide_element_for_qa")[0].remove()'
+                        delete_element_over_js
                     )
             else:
                 self.element.get_screenshot(screenshot_name)
 
         if self.hard_visual_reference_generation:
-            save_screenshot(reference_file, remove)
+            save_screenshot(reference_file)
             return self
 
         try:
             Image.open(reference_file)
         except FileNotFoundError:
-            save_screenshot(reference_file, remove)
+            save_screenshot(reference_file)
 
             if self.visual_reference_generation:
                 return self
@@ -121,7 +122,7 @@ class VisualComparison:
         if self.visual_reference_generation:
             return self
 
-        save_screenshot(output_file, remove)
+        save_screenshot(output_file)
         self._assert_same_images(output_file, reference_file, diff_file, threshold)
         return self
 

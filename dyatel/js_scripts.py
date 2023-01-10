@@ -33,6 +33,20 @@ function getSize(elem) {
 return getSize(arguments[0])
 """
 
+add_element_over_js = """
+testing = document.createElement("div");
+testing.style.zIndex=9999999;testing.setAttribute("class","hide_element_for_qa");
+document.body.appendChild(testing);
+tmp = arguments[0].getBoundingClientRect();
+testing.style.width= tmp.width+"px";
+testing.style.height = tmp.height+"px";
+testing.style.position = "fixed";
+testing.style.top = tmp.y+"px";
+testing.style.left = tmp.x+"px";
+testing.style.backgroundColor="#000"
+"""
+delete_element_over_js = 'document.getElementsByClassName("hide_element_for_qa")[0].remove()'
+
 check_element_js = 'arguments[0].checked = true'
 uncheck_element_js = 'arguments[0].checked = false'
 is_element_checked_js = 'return arguments[0].checked'
