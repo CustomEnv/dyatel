@@ -33,19 +33,33 @@ function getSize(elem) {
 return getSize(arguments[0])
 """
 
-add_element_over_js = """
-testing = document.createElement("div");
-testing.style.zIndex=9999999;testing.setAttribute("class","hide_element_for_qa");
-document.body.appendChild(testing);
-tmp = arguments[0].getBoundingClientRect();
-testing.style.width= tmp.width+"px";
-testing.style.height = tmp.height+"px";
-testing.style.position = "fixed";
-testing.style.top = tmp.y+"px";
-testing.style.left = tmp.x+"px";
-testing.style.backgroundColor="#000"
+delete_element_over_js = """
+const elements = document.getElementsByClassName("dyatel-visual-comparison-support-element");
+
+for (var i=0, max=elements.length; i < max; i++) {
+     elements[0].remove()
+};
 """
-delete_element_over_js = 'document.getElementsByClassName("hide_element_for_qa")[0].remove()'
+add_element_over_js = """
+function appendElement(given_obj) {
+    given_obj = given_obj.getBoundingClientRect();
+    dyatel_obj = document.createElement("div");
+
+    dyatel_obj.style.zIndex=9999999;
+    dyatel_obj.setAttribute("class","dyatel-visual-comparison-support-element");
+    document.body.appendChild(dyatel_obj);
+
+    dyatel_obj.style.position = "fixed";
+    dyatel_obj.style.backgroundColor = "#000";
+
+    dyatel_obj.style.width = given_obj.width + "px";
+    dyatel_obj.style.height = given_obj.height + "px";
+    dyatel_obj.style.top = given_obj.y + "px";
+    dyatel_obj.style.left = given_obj.x + "px";
+};
+
+return appendElement(arguments[0]);
+"""
 
 check_element_js = 'arguments[0].checked = true'
 uncheck_element_js = 'arguments[0].checked = false'
@@ -58,7 +72,7 @@ add_driver_index_comment_js = """
 function addComment(driver_index) {
   comment = document.createComment(" " + driver_index + " ");
   document.body.appendChild(comment);
-} 
+};
 
 addComment(arguments[0])
 """
