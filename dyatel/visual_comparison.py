@@ -14,6 +14,7 @@ from string import punctuation
 from PIL import Image, ImageChops
 
 from dyatel.exceptions import DriverWrapperException
+from dyatel.js_scripts import add_element_over_js, delete_element_over_js
 from dyatel.mixins.log_mixin import autolog
 from dyatel.mixins.internal_utils import get_frame
 
@@ -28,7 +29,7 @@ class VisualComparison:
 
     def __init__(self, driver_wrapper, element):
         self.driver_wrapper = driver_wrapper
-        self.element = element
+        self.dyatel_element = element
 
     def assert_screenshot(self, filename: str = '', test_name: str = '', name_suffix: str = '',
                           threshold: Union[int, float] = 0, delay: Union[int, float] = 0.5, scroll: bool = False,
@@ -42,10 +43,12 @@ class VisualComparison:
         :param threshold: possible threshold
         :param delay: delay before taking screenshot
         :param scroll: scroll to element before taking the screenshot
-        :param remove: remove element from screenshot
+        :param remove: remove elements from screenshot
         :param fill_background: fill background with given color or black color by default
         :return: self
         """
+        remove = remove if remove else []
+
         if self.skip_screenshot_comparison:
             return self
 
@@ -75,20 +78,15 @@ class VisualComparison:
         os.makedirs(os.path.dirname(diff_directory), exist_ok=True)
 
         if scroll:
-            self.element.scroll_into_view()
+            self.dyatel_element.scroll_into_view()
 
         time.sleep(delay)
 
         def save_screenshot(screenshot_name):
-            element = self.element.element
-            if fill_background is True:
-                self.driver_wrapper.execute_script('arguments[0].style.background = "#000";', element)
-            if fill_background and type(fill_background) is str:
-                self.driver_wrapper.execute_script(f'arguments[0].style.background = "{fill_background}";', element)
-
-            self.element.get_screenshot(screenshot_name)
-            if remove:
-                self._remove_elements(self.element, remove, screenshot_name)
+            self._fill_background(fill_background)
+            self._appends_dummy_elements(remove)
+            self.dyatel_element.get_screenshot(screenshot_name)
+            self._remove_dummy_elements()
 
         if self.hard_visual_reference_generation:
             save_screenshot(reference_file)
@@ -112,6 +110,42 @@ class VisualComparison:
 
         save_screenshot(output_file)
         self._assert_same_images(output_file, reference_file, diff_file, threshold)
+        return self
+
+    def _appends_dummy_elements(self, remove_data: list) -> VisualComparison:
+        """
+        Placed an element above each from given list and paints it black
+
+        :param remove_data: list of elements to be fake removed
+        :return: VisualComparison
+        """
+        for obj in remove_data:
+            self.driver_wrapper.execute_script(add_element_over_js, obj.element)
+        return self
+
+    def _remove_dummy_elements(self) -> VisualComparison:
+        """
+        Remove all dummy elements from DOM
+
+        :return: VisualComparison
+        """
+        self.driver_wrapper.execute_script(delete_element_over_js)
+        return self
+
+    def _fill_background(self, fill_background_data) -> VisualComparison:
+        """
+        Fill background of element
+
+        :param fill_background_data: fill background with given color or black color by default
+        :return: VisualComparison
+        """
+        element = self.dyatel_element.element
+
+        if fill_background_data is True:
+            self.driver_wrapper.execute_script('arguments[0].style.background = "#000";', element)
+        if fill_background_data and type(fill_background_data) is str:
+            self.driver_wrapper.execute_script(f'arguments[0].style.background = "{fill_background_data}";', element)
+
         return self
 
     def _assert_same_images(self, actual_file: str, reference_file: str, filename: str,
@@ -143,35 +177,6 @@ class VisualComparison:
                                  f'Expected:{reference_image.size}, Actual: {output_image.size}.')
         if is_different:
             raise AssertionError(f"{base_error} Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
-
-        return self
-
-    def _remove_elements(self, parent: Any, children: list, path: str) -> VisualComparison:
-        """
-        Remove elements from image
-
-        :param parent: parent element
-        :param children: list of children elements
-        :param path: path to output file
-
-        :return: self
-        """
-        parent_abs = {x: max(y, 0) for x, y in parent.get_rect().items()}
-
-        for element in children:
-            elem_rect = element.get_rect()
-
-            if self.driver_wrapper.is_ios:
-                elem_rect = {x: max(y, 0) for x, y in elem_rect.items()}
-
-                if elem_rect['y'] != 0:
-                    elem_rect['y'] += abs(self.driver_wrapper.get_top_bar_height())
-
-            zone = {item: int(elem_rect[item] - (parent_abs[item] if item in ['x', 'y'] else 0)) for item in elem_rect}
-            remove_coordinates = (zone['x'], zone['y'], zone['x'] + zone['width'], zone['y'] + zone['height'])
-            image = Image.open(path).convert('RGB')
-            image.paste("#000000", remove_coordinates)
-            image.save(path)
 
         return self
 
@@ -229,7 +234,7 @@ class VisualComparison:
 
         name_suffix = f'_{name_suffix}_' if name_suffix else '_'
 
-        screenshot_name = f'{test_function_name}_{self.element.name}{name_suffix}{screenshot_name}'
+        screenshot_name = f'{test_function_name}_{self.dyatel_element.name}{name_suffix}{screenshot_name}'
 
         for item in (']', '"', "'"):
             screenshot_name = screenshot_name.replace(item, '')

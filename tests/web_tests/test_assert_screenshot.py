@@ -38,7 +38,8 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
     except FileNotFoundError:
         pass
     else:
-        raise Exception('Unexpected behavior')
+        if not request.config.getoption('--generate-reference'):
+            raise Exception('Unexpected behavior')
 
 
 def test_screenshot_fill_background_default(base_playground_page):

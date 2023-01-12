@@ -1,10 +1,13 @@
 # Dyatel Changelog
 
 ---
-## v1.3.3
+## v1.3.4
 *Release date: in development*
-
 ---
+
+## v1.3.3
+*Release date: 2022-01-12*
+- `element.assert_screenshot` elements removal rework
 
 ## v1.3.2
 *Release date: 2022-12-08*

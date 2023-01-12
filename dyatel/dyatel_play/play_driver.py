@@ -199,10 +199,10 @@ class PlayDriver(LogMixin):
         """
         script = script.replace('return ', '')
 
-        script_args = args
+        script_args = list(args)
         if 'arguments[0]' in script:
             script_args = [*args]
-            script = f'arguments => {script}'
+            script = f'arguments => {{{script}}}'
 
         for index, arg in enumerate(args):
             if isinstance(arg, Locator):
