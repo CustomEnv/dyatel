@@ -6,7 +6,7 @@
 ---
 
 ## v1.3.3
-*Release date: in development*
+*Release date: 2022-01-12*
 - `element.assert_screenshot` elements removal rework
 
 ## v1.3.2
