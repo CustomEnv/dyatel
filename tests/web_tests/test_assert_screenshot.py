@@ -17,7 +17,6 @@ def test_screenshot_name_with_suffix(base_playground_page, driver_engine, driver
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename, name_suffix='second', threshold=6)
 
 
-@pytest.mark.xfail_platform('playwright', reason='JS implementation required')
 def test_screenshot_remove(base_playground_page):
     base_playground_page.text_container.scroll_into_view(sleep=0.5).assert_screenshot(
             remove=[base_playground_page.inner_text_1, base_playground_page.inner_text_2])
