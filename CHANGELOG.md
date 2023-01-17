@@ -5,29 +5,49 @@
 *Release date: in development*
 ---
 
+## v1.3.5
+*Release date: 2022-01-17*
+
+### Fixed
+- Error logs fixes
+
 ## v1.3.3
 *Release date: 2022-01-12*
+
+### Changed
 - `element.assert_screenshot` elements removal rework
 
 ## v1.3.2
 *Release date: 2022-12-08*
-- ios safaridriver support removed
+
+### Added
 - mobile `element.hide_keyboard` method added
-- Pillow warning fixes
 - `fill_background` arg in `element.assert_screenshot`
+
+### Changed
+- ios safaridriver support removed
 - reruns disabling for visual tests without references
+
+### Fixed
+- Pillow warning fixes
 - other fixes and improvements
 
 
 ## v1.3.1
 *Release date: 2022-12-02*
+
+### Added
 - `element.wait_element_hidden_without_error` method
 - `element.assert_screenshot` hard reference generation support
 - `element.assert_screenshot` soft reference generation fix
 - `element.hover` silent argument
+
+### Changed
 - Reworked wait argument for `element`: False - wait element hidden; True - wait element visible
 - `page.is_page_opened` without url support
 - selenium - tags (locator type) updated
+
+### Fixed
 - DifferentDriverWrapper and elements initialization fixes
 
 

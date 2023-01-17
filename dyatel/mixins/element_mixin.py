@@ -21,7 +21,7 @@ class ElementMixin(DriverMixin):
         parent = element.parent
         current_data = f'Selector: ["{element.locator_type}": "{get_platform_locator(element)}"]'
         if parent:
-            parent_data = f'Parent selector: ["{parent.locator_type}": "{get_platform_locator(element)}"]'
+            parent_data = f'Parent selector: ["{parent.locator_type}": "{get_platform_locator(parent)}"]'
             current_data = f'{current_data}. {parent_data}'
         return current_data
 
