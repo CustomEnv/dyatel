@@ -248,6 +248,50 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         return self
 
+    def wait_enabled(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
+        """
+        Wait for disabled attribute will be removed from element
+
+        :param: timeout: time to stop waiting
+        :param: silent: erase log
+        :return: self
+        """
+        if not silent:
+            self.log(f'Wait until disabled attribute will be removed from "{self.name}"')
+
+        is_enabled = False
+        start_time = time.time()
+        while time.time() - start_time < timeout and not is_enabled:
+            is_enabled = not self.is_disabled()
+
+        if not is_enabled:
+            msg = f'"{self.name}" not enabled after {timeout} seconds. {self.get_element_logging_data()}'
+            raise TimeoutException(msg) from None
+
+        return self
+
+    def wait_disabled(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
+        """
+        Wait for disabled attribute will be occurred in element
+
+        :param: timeout: time to stop waiting
+        :param: silent: erase log
+        :return: self
+        """
+        if not silent:
+            self.log(f'Wait until disabled attribute will be occurred in "{self.name}"')
+
+        is_disabled = False
+        start_time = time.time()
+        while time.time() - start_time < timeout and not is_disabled:
+            is_disabled = self.is_disabled()
+
+        if not is_disabled:
+            msg = f'"{self.name}" not disabled after {timeout} seconds. {self.get_element_logging_data()}'
+            raise TimeoutException(msg) from None
+
+        return self
+
     # Element state
 
     def scroll_into_view(self, block: str = 'center', behavior: str = 'instant',
@@ -361,6 +405,18 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             self.log(f'Check invisibility of "{self.name}"')
 
         return not self.is_displayed(silent=True)
+
+    def is_disabled(self, silent: bool = False) -> bool:
+        """
+        Check if element disabled
+
+        :param: silent: erase log
+        :return: True if element disabled
+        """
+        if not silent:
+            self.log(f'Check disabled attr of "{self.name}"')
+
+        return self.get_attribute('disabled') is None
 
     def get_attribute(self, attribute: str, silent: bool = False) -> str:
         """
