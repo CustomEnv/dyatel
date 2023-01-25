@@ -416,7 +416,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         if not silent:
             self.log(f'Check disabled attr of "{self.name}"')
 
-        return self.get_attribute('disabled') is None
+        return self.get_attribute('disabled') is not None
 
     def get_attribute(self, attribute: str, silent: bool = False) -> str:
         """
