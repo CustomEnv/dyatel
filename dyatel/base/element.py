@@ -7,12 +7,11 @@ from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
+from dyatel.exceptions import *
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
-from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException, \
-    TimeoutException
 from dyatel.mixins.internal_utils import WAIT_EL, is_target_on_screen
 from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver

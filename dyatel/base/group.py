@@ -65,11 +65,11 @@ class Group(Element, metaclass=AfterInitMeta):
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
 
         super().__init__(
-            locator=self.locator,
-            locator_type=self.locator_type,
-            name=self.name,
-            parent=self.parent,
-            wait=self.wait
+            locator=locator,
+            locator_type=locator_type,
+            name=name,
+            parent=parent,
+            wait=wait
         )
 
         # it's necessary to leave it after super().__init__()

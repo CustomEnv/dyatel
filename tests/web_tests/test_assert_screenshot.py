@@ -24,6 +24,7 @@ def test_screenshot_remove(base_playground_page):
 
 @pytest.fixture
 def file(request):
+    request.node.execution_count = 1
     request.node.session.config.option.reruns = 1
     filename = 'reference_with_rerun'
     yield filename
