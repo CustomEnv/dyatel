@@ -16,7 +16,7 @@ def test_element_exception_without_parent(base_playground_page):
     try:
         el._get_element(wait=False)
     except NoSuchElementException as exc:
-        logs = ElementMixin().get_element_logging_data(el)
+        logs = ElementMixin().get_element_info(el)
         message = f'Cant find element "{el.name}". {logs}'
         assert exc.msg == message
 
@@ -30,7 +30,7 @@ def test_element_exception_with_broken_parent(base_playground_page):
     try:
         el._get_element(wait=False)
     except NoSuchElementException as exc:
-        logs = ElementMixin().get_element_logging_data(el.parent)
+        logs = ElementMixin().get_element_info(el.parent)
         message = f'Cant find parent element "{el.parent.name}". {logs}'
         assert exc.msg == message
 

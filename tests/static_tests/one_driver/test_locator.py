@@ -43,7 +43,7 @@ class SomeGroup(Group):
     ids=['selenium', 'appium', 'playwright']
 )
 def test_link_to_class_locator(driver):
-    assert SomeGroup().link_to_class.locator == 'some locator updated'
+    assert SomeGroup().link_to_class.locator == '[id="some locator updated"]'
 
 
 def test_multiple_locator_ios(mocked_ios_driver):

@@ -13,7 +13,8 @@ from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.exceptions import UnexpectedElementsCountException, UnexpectedValueException, UnexpectedTextException, \
     TimeoutException
-from dyatel.mixins.internal_utils import WAIT_EL, get_platform_locator, is_target_on_screen, driver_index
+from dyatel.mixins.internal_utils import WAIT_EL, is_target_on_screen
+from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
@@ -22,8 +23,21 @@ from dyatel.keyboard_keys import KeyboardKeys
 class Element(WebElement, MobileElement, PlayElement):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
-    def __init__(self, locator: str = '', locator_type: str = '', name: str = '',
-                 parent: Any = None, wait: bool = None, **kwargs):
+    def __new__(cls, *args, **kwargs):
+        return shadow_class(cls, Element)
+
+    def __repr__(self):
+        return repr_builder(self, Element)
+
+    def __init__(  # noqa
+            self,
+            locator: str = '',
+            locator_type: str = '',
+            name: str = '',
+            parent: Any = None,
+            wait: bool = None,
+            **kwargs
+    ):
         """
         Initializing of element based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group
@@ -31,7 +45,7 @@ class Element(WebElement, MobileElement, PlayElement):
         :param locator: locator of element. Can be defined without locator_type
         :param locator_type: Selenium only: specific locator type
         :param name: name of element (will be attached to logs)
-        :param parent: parent of element. Can be Group or other Element objects
+        :param parent: parent of element. Can be Group or other Element objects or False for skip
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         :param kwargs:
           - desktop: str = locator that will be used for desktop platform
@@ -46,33 +60,23 @@ class Element(WebElement, MobileElement, PlayElement):
         self.wait = wait
 
         if self.parent:
-            assert isinstance(self.parent, Element), 'The "parent" argument should take an Element/Group object'
+            assert isinstance(self.parent, Element), 'The "parent" should take an Element/Group object or False'
 
-        self._init_locals = locals() if not hasattr(self, '_init_locals') else getattr(self, '_init_locals')
-        self._driver_instance = DriverWrapper
+        # Taking from Group first if available
+        self._init_locals = getattr(self, '_init_locals', locals())
+        self._driver_instance = getattr(self, '_driver_instance', DriverWrapper)
 
+        self._modify_object()
         self.element_class = self._set_base_class()
         if self.element_class:
             self._initialized = True
-            super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name, parent=self.parent,
-                             wait=self.wait)
-
-    def __repr__(self):
-        cls = self.__class__
-        class_name = cls.__name__
-        locator = f'locator="{get_platform_locator(self)}"'
-        parent = self.parent.__class__.__name__ if self.parent else None
-
-        try:
-            index = driver_index(self.driver_wrapper, self.driver)
-            driver = index if index else 'driver'
-        except AttributeError:
-            index, driver = None, None
-
-        base = f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}", parent={parent}) ' \
-               f'at {hex(id(self))}'
-
-        return f'{base}, {driver}={self.driver}' if driver else base
+            super(self.element_class, self).__init__(
+                locator=self.locator,
+                locator_type=self.locator_type,
+                name=self.name,
+                parent=self.parent,
+                wait=self.wait
+            )
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 
@@ -273,28 +277,25 @@ class Element(WebElement, MobileElement, PlayElement):
             scroll=scroll, remove=remove, fill_background=fill_background,
         )
 
-    def _set_base_class(self):
+    def _set_base_class(self) -> Element:
         """
         Get element class in according to current driver, and set him as base class
 
         :return: element class
         """
-        if self.driver_wrapper:
-
-            PreviousObjectDriver().set_driver_from_previous_object_for_element(self, 5)
-
-            if not getattr(self, '_initialized', False):
-                if self.parent is None:
-                    PreviousObjectDriver().set_parent_from_previous_object_for_element(self, 5)
-
+        cls = None
         if isinstance(self.driver, PlaywrightDriver):
-            Element.__bases__ = PlayElement,
-            return PlayElement
+            cls = PlayElement,
         elif isinstance(self.driver, AppiumDriver):
-            Element.__bases__ = MobileElement,
-            return MobileElement
+            cls = MobileElement,
         elif isinstance(self.driver, SeleniumDriver):
-            Element.__bases__ = WebElement,
-            return WebElement
+            cls = WebElement,
 
         # No exception due to delayed initialization
+        return set_base_class(self, Element, cls)
+
+    def _modify_object(self):
+        if self.driver_wrapper:
+            PreviousObjectDriver().set_driver_from_previous_object_for_element(self, 5)
+            if not getattr(self, '_initialized', False) and self.parent is None:
+                PreviousObjectDriver().set_parent_from_previous_object_for_element(self, 5)

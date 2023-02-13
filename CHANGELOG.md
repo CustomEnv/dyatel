@@ -1,11 +1,11 @@
 # Dyatel Changelog
 
 ---
-## v1.3.4
+## v1.3.5
 *Release date: in development*
 ---
 
-## v1.3.5
+## v1.3.4
 *Release date: 2022-01-17*
 
 ### Fixed

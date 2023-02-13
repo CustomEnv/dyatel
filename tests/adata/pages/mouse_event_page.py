@@ -43,11 +43,11 @@ class MouseClickCard(Group):
 
     @property
     def any_button_without_parent(self):
-        return Element('button', name='any button', parent=False)
+        return Element('button', name='any button wo parent', parent=False)
 
     @property
     def any_button_with_custom_parent(self):
-        return Element('button', name='any button', parent=self.y_result)
+        return Element('button', name='any button custom parent', parent=self.y_result)
 
     def get_result_coordinates(self):
         return [int(element.text.split(' ')[1]) for element in (self.x_result, self.y_result)]

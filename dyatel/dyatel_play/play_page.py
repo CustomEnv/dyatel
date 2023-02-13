@@ -27,14 +27,3 @@ class PlayPage(DriverMixin, LogMixin):
         self.url = getattr(self, 'url', '')
         self.page_elements = get_child_elements(self, PlayElement)
         initialize_objects_with_args(self.page_elements)
-
-    @property
-    def anchor(self) -> PlayElement:
-        """
-        Get anchor PlayElement of page
-
-        :return: PlayElement object
-        """
-        anchor = Element(locator=self.locator, locator_type='', name=self.name)
-        anchor._driver_instance = self.driver_wrapper
-        return anchor

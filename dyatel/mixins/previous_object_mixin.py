@@ -4,6 +4,7 @@ from typing import Any, Union
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.mixins import internal_utils
+from dyatel.mixins.element_mixin import all_mid_level_elements
 
 
 class PreviousObjectDriver:
@@ -16,9 +17,9 @@ class PreviousObjectDriver:
         :param frame_index: frame start index
         :return: None
         """
-        if len(current_obj.driver_wrapper.all_drivers) > 1:
+        if len(DriverWrapper.all_drivers) > 1:
             if current_obj.driver == DriverWrapper.driver:
-                previous_object = self._get_correct_previous_object(frame_index)
+                previous_object = self._get_correct_previous_object_with_driver(frame_index)
                 if previous_object:
                     try:
                         current_obj.set_driver(previous_object.driver_wrapper)
@@ -38,7 +39,7 @@ class PreviousObjectDriver:
         if len(current_obj.driver_wrapper.all_drivers) > 1:
             if current_obj.driver == DriverWrapper.driver:
                 if not isinstance(current_obj, Group):
-                    previous_object = self._get_correct_previous_object(frame_index, current_obj=current_obj)
+                    previous_object = self._get_correct_previous_object_with_driver(frame_index, current_obj=current_obj)
                     if previous_object:
                         try:
                             current_obj.driver_wrapper = previous_object.driver_wrapper
@@ -54,11 +55,9 @@ class PreviousObjectDriver:
         :return: None
         """
         from dyatel.base.group import Group
-        from dyatel.base.element import Element
-        from dyatel.base.checkbox import Checkbox
 
-        if isinstance(current_obj, (Element, Checkbox)) and not isinstance(current_obj, Group):
-            previous_object = self._get_correct_previous_object(frame_index, current_obj=current_obj)
+        if isinstance(current_obj, all_mid_level_elements()) and not isinstance(current_obj, Group):
+            previous_object = self._get_correct_previous_object_with_parent(frame_index)
             if previous_object:
                 if isinstance(previous_object, Group):
                     current_obj.parent = previous_object
@@ -77,7 +76,7 @@ class PreviousObjectDriver:
         is_page = isinstance(obj, Page)
         return not (is_page or is_group) or obj is None
 
-    def _get_correct_previous_object(self, index: int, current_obj: Any = False) -> Union[None, Any]:
+    def _get_correct_previous_object_with_driver(self, index: int, current_obj: Any = False) -> Union[None, Any]:
         """
         Finds previous object with nested element/group/page
 
@@ -107,3 +106,21 @@ class PreviousObjectDriver:
             return None
 
         return prev_object
+
+    def _get_correct_previous_object_with_parent(self, index: int) -> Union[None, Any]:
+        """
+        Finds previous object with nested element/group/page
+
+        :param index: frame index to start
+        :return: None or object with driver_wrapper
+        """
+        from dyatel.base.group import Group
+
+        frame = internal_utils.get_frame(index)
+        prev_object = frame.f_locals.get('self', None)
+
+        if isinstance(prev_object, Group):
+            return prev_object
+
+        return None
+

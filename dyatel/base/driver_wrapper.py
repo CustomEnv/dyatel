@@ -9,7 +9,7 @@ from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.exceptions import DriverWrapperException
 from dyatel.js_scripts import get_inner_height_js, get_inner_width_js
-from dyatel.mixins.internal_utils import get_child_elements_with_names, driver_index
+from dyatel.mixins.internal_utils import get_child_elements_with_names, driver_with_index
 
 
 class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
@@ -26,7 +26,9 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
     is_android = False
     is_simulator = False
     is_real_device = False
+    is_multiplatform = False
 
+    # TODO: rewrite me
     def __new__(cls, *args, **kwargs):
         if DriverWrapper._init_count == 0:
             return super().__new__(cls)
@@ -42,22 +44,25 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
     def __init__(self, driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver]):
         """
         Initializing of driver wrapper based on given driver source
+
         :param driver: appium or selenium or playwright driver to initialize
         """
         self.driver = driver
-
         self.__set_base_class()
         super(self.__class__, self).__init__(driver=self.driver)
 
+    # TODO: rewrite me
+    # TODO: mobile=(android=False, ios=True) -> mobile=ios/mobile=android
+    # TODO: desktop=True, mobile=False -> platform=desktop/platform=mobile
     def __repr__(self):
         cls = self.__class__
         class_name = cls.__name__
         base_class_name = cls.__base__.__name__
         mobile_data = f'mobile=(android={cls.is_android}, ios={cls.is_ios})' if cls.mobile else f'mobile={cls.mobile}'
         driver = self.instance if cls.playwright else self.driver
-        index = driver_index(self.driver_wrapper, self.driver)
-        driver_with_index = index if index else 'driver'
-        return f'{class_name}({driver_with_index}={driver}) at {hex(id(self))}, ' \
+        index = driver_with_index(self.driver_wrapper, driver)
+        driver = index if index else 'driver'
+        return f'{class_name}({index}={driver}) at {hex(id(self))}, ' \
                f'base={base_class_name}, desktop={cls.desktop}, {mobile_data}'
 
     def get_inner_window_size(self) -> dict:
@@ -86,11 +91,19 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
             self.__class__.desktop = True
             return PlayDriver
         if isinstance(self.driver, AppiumDriver):
+            if DriverWrapper.desktop:
+                DriverWrapper.is_multiplatform = True
+                self.__class__.is_multiplatform = True
+
             self.__class__.__bases__ = MobileDriver,
             self.__class__.mobile = True
             self.__class__.desktop = False
             return MobileDriver
         if isinstance(self.driver, SeleniumDriver):
+            if DriverWrapper.mobile:
+                DriverWrapper.is_multiplatform = True
+                self.__class__.is_multiplatform = True
+
             self.__class__.__bases__ = WebDriver,
             self.__class__.mobile = False
             self.__class__.desktop = True

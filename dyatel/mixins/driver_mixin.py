@@ -14,23 +14,25 @@ from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.mixins.internal_utils import get_child_elements, get_child_elements_with_names
 
 
-def get_driver_wrapper_from_object(obj, custom_driver_wrapper_object: Union[DriverWrapper, Any]):
+def get_driver_wrapper_from_object(obj: Union[DriverWrapper, Any]):
     """
     Get driver wrapper from custom object
 
-    :param obj: self object of the class
-    :param custom_driver_wrapper_object: custom object. Can be driver_wrapper or object with driver_wrapper
+    :param obj: custom object. Can be driver_wrapper or object with driver_wrapper
     :return: driver wrapper object
     """
-    if isinstance(custom_driver_wrapper_object, (DriverWrapper, PlayDriver, WebDriver, MobileDriver)):
-        new_driver_instance = custom_driver_wrapper_object
-    elif hasattr(custom_driver_wrapper_object, 'driver_wrapper'):
-        new_driver_instance = custom_driver_wrapper_object.driver_wrapper
-    else:
-        msg = f'Cant get custom driver_wrapper object for "{getattr(obj, "name")}" of "{obj.__class__}"'
-        raise Exception(msg)
+    if obj is None:
+        return DriverWrapper
 
-    return new_driver_instance
+    if isinstance(obj, (DriverWrapper, PlayDriver, WebDriver, MobileDriver)):
+        driver_wrapper_instance = obj
+    elif hasattr(obj, 'driver_wrapper'):
+        driver_wrapper_instance = obj.driver_wrapper
+    else:
+        obj_nfo = f'"{getattr(obj, "name")}" of "{obj.__class__}"' if obj else obj
+        raise Exception(f'Cant get driver_wrapper from {obj_nfo}')
+
+    return driver_wrapper_instance
 
 
 class DriverMixin:
@@ -73,13 +75,12 @@ class DriverMixin:
         :param instance_class: instance of attributes of the class
         :return: self
         """
-        new_driver = copy(self.driver_wrapper)
-        setattr(new_driver, 'driver', copy(self.driver_wrapper.driver))
-        setattr(new_driver, 'driver_wrapper', copy(self.driver_wrapper))
+        if not driver_wrapper:
+            return self
 
-        new_driver.driver = driver_wrapper.driver
-        new_driver.driver_wrapper = driver_wrapper
+        driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
+        new_driver = copy(driver_wrapper)
         self._driver_instance = new_driver
         self.__set_driver_for_attr(self, instance_class, new_driver)
         self.page_elements = get_child_elements(self, instance_class)

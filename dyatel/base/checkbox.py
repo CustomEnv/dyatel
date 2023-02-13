@@ -9,7 +9,7 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_checkbox import PlayCheckbox
 from dyatel.dyatel_sel.core.core_checkbox import CoreCheckbox as SelCheckbox
-from dyatel.mixins.internal_utils import get_platform_locator, driver_index
+from dyatel.mixins.internal_utils import get_platform_locator, driver_with_index
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
 
@@ -53,7 +53,7 @@ class Checkbox(SelCheckbox, PlayCheckbox):
         cls = self.__class__
         class_name = cls.__name__
         locator = f'locator="{get_platform_locator(self)}"'
-        index = driver_index(self.driver_wrapper, self.driver)
+        index = driver_with_index(self.driver_wrapper, self.driver)
         driver = index if index else 'driver'
         parent = self.parent.__class__.__name__ if self.parent else None
         return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}", parent={parent}) '\

@@ -7,6 +7,7 @@ from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.internal_utils import get_child_elements_with_names
+from dyatel.mixins.element_mixin import shadow_class, repr_builder, all_mid_level_elements
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
 
@@ -22,15 +23,29 @@ class AfterInitMeta(type):
         :return: class object
         """
         obj = type.__call__(cls, *args, **kwargs)
-        obj.customise_children()
+        obj._modify_children()  # noqa
         return obj
 
 
 class Group(Element, metaclass=AfterInitMeta):
     """ Group of elements. Should be defined as class """
 
-    def __init__(self, locator: str = '', locator_type: str = '', name: str = '',
-                 parent: Any = None, wait: bool = None, driver_wrapper: Union[DriverWrapper, Any] = None, **kwargs):
+    def __new__(cls, *args, **kwargs):
+        return shadow_class(cls, Group)
+
+    def __repr__(self):
+        return repr_builder(self, Group)
+
+    def __init__(
+            self,
+            locator: str = '',
+            locator_type: str = '',
+            name: str = '',
+            parent: Any = None,
+            wait: bool = None,
+            driver_wrapper: Union[DriverWrapper, Any] = None,
+            **kwargs
+    ):
         """
         Initializing of group based on current driver
 
@@ -46,47 +61,37 @@ class Group(Element, metaclass=AfterInitMeta):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
-        self.locator = locator
-        self.locator_type = locator_type
-        self.name = name
-        self.parent = parent
-        self.wait = wait
         self._init_locals = locals()
+        self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
 
-        super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name, parent=self.parent,
-                         wait=self.wait)
-        # it's necessary to leave it after init
+        super().__init__(
+            locator=self.locator,
+            locator_type=self.locator_type,
+            name=self.name,
+            parent=self.parent,
+            wait=self.wait
+        )
+
+        # it's necessary to leave it after super().__init__()
+
+        # self._modify_object()  TODO: Research: Is it can be removed ?
+
         if driver_wrapper:
-            self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
-            self.set_driver(self._driver_instance)
-        elif self.driver_wrapper:
-            PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)
+            self._set_driver(self._driver_instance, all_mid_level_elements())
 
-    def __repr__(self):
-        return super().__repr__()
-
-    def set_driver(self, driver_wrapper) -> Group:
-        """
-        Set driver instance for group and elements
-
-        :param driver_wrapper: driver wrapper object ~ Driver/WebDriver/MobileDriver/CoreDriver/PlayDriver
-        :return: self
-        """
-        if not driver_wrapper:
-            return self
-
-        self._set_driver(driver_wrapper, Element)
-        return self
-
-    def customise_children(self):
+    def _modify_children(self):
         """
         Set parent and custom driver for Group class variables, if their instance is Element class
         Will be called automatically after __init__ by metaclass `AfterInitMeta`
         """
-        for name, value in get_child_elements_with_names(self, Element).items():
+        for name, value in get_child_elements_with_names(self, all_mid_level_elements()).items():
             setattr(self, name, copy.copy(value))
             value = getattr(self, name)
             if value.parent is None:
                 value.parent = self
             else:
                 setattr(value, 'parent', copy.copy(value.parent))
+
+    def _modify_object(self):
+        if self.driver_wrapper:
+            PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)

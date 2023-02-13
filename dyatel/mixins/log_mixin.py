@@ -5,7 +5,7 @@ from os.path import basename
 from typing import Any
 
 from dyatel.js_scripts import add_driver_index_comment_js, find_comments_js
-from dyatel.mixins.internal_utils import get_frame, driver_index
+from dyatel.mixins.internal_utils import get_frame, driver_with_index
 
 logging.basicConfig(
     level=logging.INFO,
@@ -64,13 +64,13 @@ class LogMixin:
         """
         driver = getattr(self, 'driver')
         driver_wrapper = getattr(self, 'driver_wrapper')
-        driver_log, index = '', driver_index(driver_wrapper, driver)
+        driver_log, index = '', driver_with_index(driver_wrapper, driver)
 
         if index:
             driver_log = f'[{index}]'
 
             if not hasattr(driver, 'driver_index'):
-                driver.driver_index = index
+                driver.driver_with_index = index
 
             if driver_wrapper.selenium:
                 if '_driver' not in str(driver_wrapper.execute_script(find_comments_js)):

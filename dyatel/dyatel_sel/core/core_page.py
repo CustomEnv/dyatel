@@ -32,14 +32,3 @@ class CorePage(DriverMixin, LogMixin):
 
         self.page_elements: List[CoreElement] = get_child_elements(self, CoreElement)
         initialize_objects_with_args(self.page_elements)
-
-    @property
-    def anchor(self) -> Element:
-        """
-        Get anchor Element of page
-
-        :return: Element object
-        """
-        anchor = Element(locator=self.locator, locator_type=self.locator_type, name=self.name)
-        anchor._driver_instance = self.driver_wrapper
-        return anchor

@@ -30,9 +30,7 @@ def mocked_ios_driver(mocked_shared_mobile_driver):
         }
     )()
     driver_wrapper = DriverWrapper(mocked_shared_mobile_driver())
-    yield driver_wrapper
-    DriverWrapper._DriverWrapper__init_count = 0
-    CoreDriver.driver = None
+    return driver_wrapper
 
 
 @pytest.fixture
@@ -45,9 +43,7 @@ def mocked_android_driver(mocked_shared_mobile_driver):
         }
     )()
     driver_wrapper = DriverWrapper(mocked_shared_mobile_driver())
-    yield driver_wrapper
-    DriverWrapper._DriverWrapper__init_count = 0
-    CoreDriver.driver = None
+    return driver_wrapper
 
 
 @pytest.fixture
@@ -59,15 +55,26 @@ def mocked_selenium_driver():
     selenium_driver.error_handler = MagicMock()
 
     driver_wrapper = DriverWrapper(selenium_driver())
-    yield driver_wrapper
-    DriverWrapper._DriverWrapper__init_count = 0
-    CoreDriver.driver = None
+    return driver_wrapper
 
 
 @pytest.fixture
 def mocked_play_driver():
     driver_wrapper = DriverWrapper(Browser(MagicMock()))
     DriverWrapper.driver = PlaywrightDriver(MagicMock())
-    yield driver_wrapper
+    return driver_wrapper
+
+
+@pytest.fixture(autouse=True)
+def base_teardown():
+    yield
+    DriverWrapper.all_drivers = []
+    DriverWrapper.mobile = False
+    DriverWrapper.desktop = False
+    DriverWrapper.is_ios = False
+    DriverWrapper.is_android = False
+    DriverWrapper.selenium = False
+    DriverWrapper.playwright = False
     DriverWrapper._DriverWrapper__init_count = 0
     PlayDriver.driver = None
+    CoreDriver.driver = None

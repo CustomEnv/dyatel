@@ -13,15 +13,29 @@ from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.internal_utils import WAIT_PAGE, get_platform_locator, driver_index
+from dyatel.mixins.internal_utils import WAIT_PAGE
+from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class, all_mid_level_elements
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
 
 class Page(WebPage, MobilePage, PlayPage):
     """ Page object crossroad. Should be defined as class """
 
-    def __init__(self, locator: str = '', locator_type: str = '', name: str = '',
-                 driver_wrapper: Union[DriverWrapper, Any] = None, **kwargs):
+    def __new__(cls, *args, **kwargs):
+        return shadow_class(cls, Page)
+
+    def __repr__(self):
+        return repr_builder(self, Page)
+
+    # noinspection PyInitNewSignature
+    def __init__(  # noqa
+            self,
+            locator: str = '',
+            locator_type: str = '',
+            name: str = '',
+            driver_wrapper: Union[DriverWrapper, Any] = None,
+            **kwargs
+    ):
         """
         Initializing of page based on current driver
 
@@ -40,24 +54,18 @@ class Page(WebPage, MobilePage, PlayPage):
         self.name = name
         self._init_locals = locals()
 
-        self._driver_instance = DriverWrapper
-        self.__set_base_class()
-        super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name)
+        self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
+        self.element_class = self.__set_base_class()
+        super(self.element_class, self).__init__(
+            locator=self.locator,
+            locator_type=self.locator_type,
+            name=self.name
+        )
         # it's necessary to leave it after init
         if driver_wrapper:
-            self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
-            self.set_driver(self._driver_instance)
+            self._set_driver(self._driver_instance, all_mid_level_elements())
         elif self.driver_wrapper:
             PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)
-
-    def __repr__(self):
-        cls = self.__class__
-        class_name = cls.__name__
-        locator = f'locator="{get_platform_locator(self)}"'
-        index = driver_index(self.driver_wrapper, self.driver)
-        driver = index if index else 'driver'
-        return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}") at {hex(id(self))}, '\
-               f'{driver}={self.driver}'
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 
@@ -132,33 +140,30 @@ class Page(WebPage, MobilePage, PlayPage):
 
         return result
 
-    def set_driver(self, driver_wrapper: DriverWrapper) -> Page:
+    @property
+    def anchor(self) -> Element:
         """
-        Set driver instance for page and elements/groups
+        Get anchor element of the page
 
-        :param driver_wrapper: driver wrapper object ~ DriverWrapper/WebDriver/MobileDriver/CoreDriver/PlayDriver
-        :return: self
+        :return: Element object
         """
-        if not driver_wrapper:
-            return self
+        anchor = Element(locator=self.locator, locator_type='', name=self.name)
+        anchor._driver_instance = self.driver_wrapper
+        return anchor
 
-        self._set_driver(driver_wrapper, Element)
-        return self
-
-    def __set_base_class(self):
+    def __set_base_class(self) -> Page:
         """
         Get page class in according to current driver, and set him as base class
 
         :return: page class
         """
         if isinstance(self.driver, PlaywrightDriver):
-            Page.__bases__ = PlayPage,
-            return PlayPage
+            cls = PlayPage,
         elif isinstance(self.driver, AppiumDriver):
-            Page.__bases__ = MobilePage,
-            return MobilePage
+            cls = MobilePage,
         elif isinstance(self.driver, SeleniumDriver):
-            Page.__bases__ = WebPage,
-            return WebPage
+            cls = WebPage,
         else:
-            raise DriverWrapperException('Cant specify Page')
+            raise DriverWrapperException(f'Cant specify {Page.__name__}')
+
+        return set_base_class(self, Page, cls)

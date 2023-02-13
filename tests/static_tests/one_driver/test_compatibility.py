@@ -6,7 +6,6 @@ from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.core.core_page import CorePage
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
-from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 
 

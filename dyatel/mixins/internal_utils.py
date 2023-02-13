@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 import inspect
-from typing import Any
+from typing import Any, Union
 
 from dyatel.exceptions import UnsuitableArgumentsException
 
@@ -104,7 +104,7 @@ def get_timeout_in_ms(timeout: int):
     return timeout * 1000 if timeout < 1000 else timeout
 
 
-def get_child_elements(obj: object, instance: type) -> list:
+def get_child_elements(obj: object, instance: Union[type, tuple]) -> list:
     """
     Return objects of this object by instance
 
@@ -113,7 +113,7 @@ def get_child_elements(obj: object, instance: type) -> list:
     return list(get_child_elements_with_names(obj, instance).values())
 
 
-def get_child_elements_with_names(obj: object, instance: type) -> dict:
+def get_child_elements_with_names(obj: object, instance: Union[type, tuple]) -> dict:
     """
     Return objects of this object by instance
 
@@ -187,7 +187,7 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
     return int(x), int(y)
 
 
-def driver_index(driver_wrapper, driver) -> str:
+def driver_with_index(driver_wrapper, driver) -> str:
     """
     Get driver index for logging
 
@@ -195,11 +195,9 @@ def driver_index(driver_wrapper, driver) -> str:
     :param driver: driver object
     :return: 'index_driver' data
     """
-    if len(driver_wrapper.all_drivers) > 1 and driver_wrapper.desktop:
-        try:
-            index = str(driver_wrapper.all_drivers.index(driver) + 1)
-        except ValueError:
-            index = '?'
-        return f'{index}_driver'
+    try:
+        index = driver_wrapper.all_drivers.index(driver) + 1
+    except ValueError:
+        index = '?'
 
-    return ''
+    return f'{index}_driver'

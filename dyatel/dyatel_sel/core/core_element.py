@@ -95,7 +95,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         self.log(f'Click into "{self.name}"')
 
         self.element = self._get_element()
-        exception_msg = f'Element "{self.name}" not interactable {self.get_element_logging_data()}'
+        exception_msg = f'Element "{self.name}" not interactable {self.get_element_info()}'
 
         try:
             self.wait_clickable(silent=True).element.click()
@@ -177,7 +177,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if not is_displayed:
             base_exception_msg = f'Element "{self.name}" not visible after {timeout} seconds'
-            raise TimeoutException(f'{base_exception_msg} {self.get_element_logging_data()}') from None
+            raise TimeoutException(f'{base_exception_msg} {self.get_element_info()}') from None
 
         return self
 
@@ -198,7 +198,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             is_hidden = self.is_hidden(silent=True)
 
         if not is_hidden:
-            msg = f'"{self.name}" still visible after {timeout} seconds. {self.get_element_logging_data()}'
+            msg = f'"{self.name}" still visible after {timeout} seconds. {self.get_element_info()}'
             raise TimeoutException(msg) from None
 
         return self
@@ -221,7 +221,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             is_clickable = element.is_enabled()
 
         if not is_clickable:
-            msg = f'"{self.name}" not clickable after {timeout} seconds. {self.get_element_logging_data()}'
+            msg = f'"{self.name}" not clickable after {timeout} seconds. {self.get_element_info()}'
             raise TimeoutException(msg) from None
 
         return self
@@ -243,7 +243,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             is_available = self.is_available()
 
         if not is_available:
-            msg = f'"{self.name}" not available in DOM after {timeout} seconds. {self.get_element_logging_data()}'
+            msg = f'"{self.name}" not available in DOM after {timeout} seconds. {self.get_element_info()}'
             raise TimeoutException(msg) from None
 
         return self
@@ -475,7 +475,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
                     element = None
 
         if not element:
-            msg = f'Cant find element "{self.name}". {self.get_element_logging_data()}'
+            msg = f'Cant find element "{self.name}". {self.get_element_info()}'
             raise NoSuchElementException(msg) from None
 
         return element
@@ -507,7 +507,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
                     base = get_element_func(wait=wait)
 
             except NoSuchElementException:
-                message = f'Cant find parent element "{self.parent.name}". {self.get_element_logging_data(self.parent)}'
+                message = f'Cant find parent element "{self.parent.name}". {self.get_element_info(self.parent)}'
                 raise NoSuchElementException(message) from None
 
         return base
@@ -546,7 +546,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: None
         """
         if 'invalid locator' in exc.msg or 'is not a valid' in exc.msg:
-            msg = f'Selector for "{self.name}" is invalid. {self.get_element_logging_data(self)}'
+            msg = f'Selector for "{self.name}" is invalid. {self.get_element_info(self)}'
             raise InvalidSelectorException(msg) from None
         else:
             raise exc from None
