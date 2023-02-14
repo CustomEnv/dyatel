@@ -19,12 +19,9 @@ class PreviousObjectDriver:
         """
         if len(DriverWrapper.all_drivers) > 1:
             if current_obj.driver == DriverWrapper.driver:
-                previous_object = self._get_correct_previous_object_with_driver(frame_index)
+                previous_object = self._get_correct_previous_object_with_driver(frame_index, current_obj=current_obj)
                 if previous_object:
-                    try:
-                        current_obj.set_driver(previous_object.driver_wrapper)
-                    except AttributeError:
-                        return None
+                    current_obj._set_driver(previous_object.driver_wrapper, all_mid_level_elements())  # noqa
 
     def set_driver_from_previous_object_for_element(self, current_obj: Any, frame_index: int) -> None:
         """
@@ -41,10 +38,7 @@ class PreviousObjectDriver:
                 if not isinstance(current_obj, Group):
                     previous_object = self._get_correct_previous_object_with_driver(frame_index, current_obj=current_obj)
                     if previous_object:
-                        try:
-                            current_obj.driver_wrapper = previous_object.driver_wrapper
-                        except AttributeError:
-                            pass
+                        current_obj.driver_wrapper = previous_object.driver_wrapper
 
     def set_parent_from_previous_object_for_element(self, current_obj: Any, frame_index: int) -> None:
         """
@@ -83,6 +77,7 @@ class PreviousObjectDriver:
         :param index: frame index to start
         :return: None or object with driver_wrapper
         """
+        timeout = 15
         frame = internal_utils.get_frame(index)
         prev_object = frame.f_locals.get('self', None)
         unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)
@@ -90,14 +85,16 @@ class PreviousObjectDriver:
         def get_driver(obj):
             return getattr(obj, 'driver', False)
 
-        while (unexpected_previous_obj or get_driver(prev_object) == DriverWrapper.driver) and index < 15:
-
-            if current_obj:
-                if prev_object:
-                    if str(current_obj) in str(vars(prev_object)) and current_obj != prev_object:
-                        return None
-
+        while (unexpected_previous_obj or get_driver(prev_object) == DriverWrapper.driver) and index < timeout:
             index += 1
+
+            if current_obj and prev_object:
+                if str(current_obj) in str(vars(prev_object)) and current_obj != prev_object:
+                    return None
+
+            if index == timeout:
+                return None
+
             frame = internal_utils.get_frame(index)
             prev_object = frame.f_locals.get('self', None)
             unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)

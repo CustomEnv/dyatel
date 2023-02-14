@@ -72,9 +72,7 @@ class Group(Element, metaclass=AfterInitMeta):
             wait=wait
         )
 
-        # it's necessary to leave it after super().__init__()
-
-        # self._modify_object()  TODO: Research: Is it can be removed ?
+        # it's necessary to leave it after init
 
         if driver_wrapper:
             self._set_driver(self._driver_instance, all_mid_level_elements())

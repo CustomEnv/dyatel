@@ -27,7 +27,6 @@ class Page(WebPage, MobilePage, PlayPage):
     def __repr__(self):
         return repr_builder(self, Page)
 
-    # noinspection PyInitNewSignature
     def __init__(  # noqa
             self,
             locator: str = '',

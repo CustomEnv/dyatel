@@ -4,7 +4,7 @@ from dyatel.base.page import Page
 from tests.settings import domain_name, repo_name
 
 
-class Frame(Group):
+class Frame(Element):
 
     button = Element('button', name='frame button')
 

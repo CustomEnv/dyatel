@@ -1,6 +1,4 @@
 from dyatel.base.group import Group
-from dyatel.dyatel_play.play_element import PlayElement
-from dyatel.dyatel_play.play_page import PlayPage
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.base.page import Page
