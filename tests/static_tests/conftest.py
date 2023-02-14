@@ -75,6 +75,6 @@ def base_teardown():
     DriverWrapper.is_android = False
     DriverWrapper.selenium = False
     DriverWrapper.playwright = False
-    DriverWrapper._DriverWrapper__init_count = 0
+    DriverWrapper._init_count = 0
     PlayDriver.driver = None
     CoreDriver.driver = None

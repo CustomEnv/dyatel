@@ -7,7 +7,7 @@ from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 
 
-def test_second_driver_for_mobile_same_page_set_driver(driver_wrapper, second_driver_wrapper):
+def test_second_driver_for_mobile_same_page(driver_wrapper, second_driver_wrapper):
     mouse_page_mobile = MouseEventPage(driver_wrapper)  # mobile driver
     mouse_page_desktop = MouseEventPage(second_driver_wrapper)  # desktop driver
     assert len(DriverWrapper.all_drivers) == 2
@@ -24,7 +24,7 @@ def test_second_driver_for_mobile_same_page_set_driver(driver_wrapper, second_dr
     assert mouse_page_mobile.is_page_opened()
 
 
-def test_second_driver_for_mobile_driver_by_arg(driver_wrapper, second_driver_wrapper):
+def test_second_driver_for_mobile_different_page(driver_wrapper, second_driver_wrapper):
     pizza_page = PizzaOrderPage(driver_wrapper)  # mobile driver
     mouse_page = MouseEventPage(second_driver_wrapper)  # desktop driver
     assert len(DriverWrapper.all_drivers) == 2

@@ -39,7 +39,20 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
                 class_objects.update({name: value})
         class_objects.update({name: False for name in get_child_elements_with_names(cls, bool).keys()})
         class_objects.update({'__repr__': cls.__repr__})
-        return super().__new__(type("DifferentDriverWrapper", (DriverWrapper, ), class_objects))
+        return super().__new__(type("DifferentDriverWrapper", (DriverWrapper, ), class_objects))  # noqa
+
+    def __repr__(self):
+        cls = self.__class__
+
+        label = 'desktop'
+        if cls.is_android:
+            label = 'android'
+        elif cls.is_ios:
+            label = 'ios'
+
+        driver = self.instance if cls.playwright else self.driver
+        index = driver_with_index(self.driver_wrapper, driver)
+        return f'{cls.__name__}({index}={driver}) at {hex(id(self))}, platform={label}'
 
     def __init__(self, driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver]):
         """
@@ -50,20 +63,6 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         self.driver = driver
         self.__set_base_class()
         super(self.__class__, self).__init__(driver=self.driver)
-
-    # TODO: rewrite me
-    # TODO: mobile=(android=False, ios=True) -> mobile=ios/mobile=android
-    # TODO: desktop=True, mobile=False -> platform=desktop/platform=mobile
-    def __repr__(self):
-        cls = self.__class__
-        class_name = cls.__name__
-        base_class_name = cls.__base__.__name__
-        mobile_data = f'mobile=(android={cls.is_android}, ios={cls.is_ios})' if cls.mobile else f'mobile={cls.mobile}'
-        driver = self.instance if cls.playwright else self.driver
-        index = driver_with_index(self.driver_wrapper, driver)
-        driver = index if index else 'driver'
-        return f'{class_name}({index}={driver}) at {hex(id(self))}, ' \
-               f'base={base_class_name}, desktop={cls.desktop}, {mobile_data}'
 
     def get_inner_window_size(self) -> dict:
         """
@@ -78,6 +77,7 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
             DriverWrapper._init_count = 0
         return super().__getattribute__(item)
 
+    # TODO: rewrite me
     def __set_base_class(self):
         """
         Get driver wrapper class in according to given driver source, and set him as base class
