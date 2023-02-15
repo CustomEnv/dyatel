@@ -157,6 +157,38 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         self.element.clear()
         return self
 
+    def check(self) -> CoreElement:
+        """
+        Check current checkbox
+
+        :return: self
+        """
+        self.element = self._get_element(wait=True, from_dom=True)
+
+        try:
+            if not self.is_checked():
+                self.click()
+        finally:
+            self.element = None
+
+        return self
+
+    def uncheck(self) -> CoreElement:
+        """
+        Uncheck current checkbox
+
+        :return: self
+        """
+        self.element = self._get_element(wait=True, from_dom=True)
+
+        try:
+            if self.is_checked():
+                self.click()
+        finally:
+            self.element = None
+
+        return self
+
     # Element waits
 
     def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
@@ -296,11 +328,12 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
     @property
     def text(self) -> str:
         """
-        Get current element text
+        Get text from current element
 
         :return: element text
         """
-        return self.element.text
+        element = self._get_element(wait=True, from_dom=True)
+        return element.text
 
     @property
     def inner_text(self) -> str:
@@ -412,6 +445,14 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         sorted_items: list = sorted({**size, **location}.items(), reverse=True)
         return dict(sorted_items)
 
+    def is_checked(self) -> bool:
+        """
+        Is checkbox checked
+
+        :return: bool
+        """
+        return self._get_element(wait=True, from_dom=True).is_selected()
+
     # Mixin
 
     def _get_wait(self, timeout: int = WAIT_EL) -> WebDriverWait:
@@ -448,11 +489,12 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         return img_binary
 
-    def _get_element(self, wait: bool = True) -> SeleniumWebElement:
+    def _get_element(self, wait: bool = True, from_dom: bool = False) -> SeleniumWebElement:
         """
         Get selenium element from driver or parent element
 
         :param wait: wait for element or element parent before grab
+        :param from_dom: check element presenting in dom while wait
         :return: SeleniumWebElement
         """
         element = self._element
@@ -469,8 +511,9 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
                 element = None
 
             if not element and wait:
+                wait_func = self.wait_availability if from_dom else self.wait_element
                 try:
-                    element = self.wait_element(silent=True).__element
+                    element = wait_func(silent=True).__element
                 except TimeoutException:
                     element = None
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import time
 import importlib
 import json
@@ -13,8 +14,9 @@ from string import punctuation
 
 from PIL import Image, ImageChops
 
-from dyatel.exceptions import DriverWrapperException
+from dyatel.exceptions import DriverWrapperException, TimeoutException
 from dyatel.js_scripts import add_element_over_js, delete_element_over_js
+from dyatel.mixins.element_mixin import get_element_info
 from dyatel.mixins.log_mixin import autolog
 from dyatel.mixins.internal_utils import get_frame
 
@@ -32,7 +34,7 @@ class VisualComparison:
         self.dyatel_element = element
 
     def assert_screenshot(self, filename: str = '', test_name: str = '', name_suffix: str = '',
-                          threshold: Union[int, float] = 0, delay: Union[int, float] = 0.5, scroll: bool = False,
+                          threshold: Union[int, float] = 0, delay: Union[int, float] = 0.75, scroll: bool = False,
                           remove: List[Any] = None, fill_background: Union[str, bool] = False) -> VisualComparison:
         """
         Assert given (by name) and taken screenshot equals
@@ -80,11 +82,10 @@ class VisualComparison:
         if scroll:
             self.dyatel_element.scroll_into_view()
 
-        time.sleep(delay)
-
         def save_screenshot(screenshot_name):
             self._fill_background(fill_background)
             self._appends_dummy_elements(remove)
+            time.sleep(delay)
             self.dyatel_element.get_screenshot(screenshot_name)
             self._remove_dummy_elements()
 
@@ -120,7 +121,14 @@ class VisualComparison:
         :return: VisualComparison
         """
         for obj in remove_data:
-            self.driver_wrapper.execute_script(add_element_over_js, obj.element)
+
+            try:
+                el = obj.element
+            except TimeoutException:
+                msg = f'Cannot find {obj.name} while removing background from screenshot. {get_element_info(obj)}'
+                raise TimeoutException(msg) from None
+
+            self.driver_wrapper.execute_script(add_element_over_js, el)
         return self
 
     def _remove_dummy_elements(self) -> VisualComparison:
@@ -242,6 +250,8 @@ class VisualComparison:
         for item in punctuation + ' ':
             screenshot_name = screenshot_name.replace(item, '_')
 
+        screenshot_name = self._remove_unexpected_underscores(screenshot_name)
+
         return screenshot_name.lower()
 
     @staticmethod
@@ -308,3 +318,11 @@ class VisualComparison:
 
         if hasattr(self.test_item, 'execution_count'):
             self.test_item.execution_count = pytest_rerun.get_reruns_count(self.test_item) + 1
+
+    def _remove_unexpected_underscores(self, text) -> str:
+        """
+        Remove multiple underscores from given text
+
+        :return: test_screenshot__data___name -> test_screenshot_data_name
+        """
+        return re.sub(r'_{2,}', '_', text)

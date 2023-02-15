@@ -106,7 +106,7 @@ class Page(WebPage, MobilePage, PlayPage):
         if not silent:
             self.log(f'Wait until page "{self.name}" loaded')
 
-        self.anchor.wait_element(timeout=timeout)
+        self.anchor.wait_element(timeout=timeout, silent=True)
 
         for element in self.page_elements:
             if getattr(element, 'wait') is False:

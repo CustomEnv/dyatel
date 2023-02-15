@@ -14,7 +14,7 @@ def test_wait_without_error(pizza_order_page):
 
 
 def test_wait_hidden(pizza_order_page):
-    pizza_order_page.error_modal.wait_element_without_error()
+    pizza_order_page.error_modal.wait_element_without_error(timeout=1)
     assert not pizza_order_page.error_modal.is_displayed()
 
 

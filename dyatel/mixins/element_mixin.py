@@ -50,13 +50,11 @@ def repr_builder(instance, cls):
 
 
 def all_mid_level_elements() -> tuple:
-    from dyatel.dyatel_play.play_checkbox import PlayCheckbox
     from dyatel.dyatel_play.play_element import PlayElement
     from dyatel.dyatel_sel.elements.mobile_element import MobileElement
     from dyatel.dyatel_sel.elements.web_element import WebElement
-    from dyatel.dyatel_sel.core.core_checkbox import CoreCheckbox
 
-    return WebElement, MobileElement, PlayElement, PlayCheckbox, CoreCheckbox
+    return WebElement, MobileElement, PlayElement
 
 
 def get_base_class(obj, current_cls):
@@ -72,6 +70,21 @@ def set_base_class(obj, current_cls, cls_to_set):
     return cls
 
 
+def get_element_info(element: Any) -> str:
+    """
+    Get full loging data depends on parent element
+
+    :param element: element to collect log data
+    :return: log string
+    """
+    parent = element.parent
+    current_data = f'Selector: ["{element.locator_type}": "{get_platform_locator(element)}"]'
+    if parent:
+        parent_data = f'Parent selector: ["{parent.locator_type}": "{get_platform_locator(parent)}"]'
+        current_data = f'{current_data}. {parent_data}'
+    return current_data
+
+
 class ElementMixin(DriverMixin):
     """ Mixin for PlayElement and CoreElement """
 
@@ -83,12 +96,7 @@ class ElementMixin(DriverMixin):
         :return: log string
         """
         element = element if element else self
-        parent = element.parent
-        current_data = f'Selector: ["{element.locator_type}": "{get_platform_locator(element)}"]'
-        if parent:
-            parent_data = f'Parent selector: ["{parent.locator_type}": "{get_platform_locator(parent)}"]'
-            current_data = f'{current_data}. {parent_data}'
-        return current_data
+        return get_element_info(element)
 
     def _get_all_elements(self, sources: Union[tuple, list], instance_class: type) -> List[Any]:
         """

@@ -199,6 +199,26 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         self._first_element.hover(position={'x': float(x), 'y': float(y)}, force=True)
         return self
 
+    def check(self) -> PlayElement:
+        """
+        Check current checkbox
+
+        :return: self
+        """
+        self._first_element.check()
+
+        return self
+
+    def uncheck(self) -> PlayElement:
+        """
+        Uncheck current checkbox
+
+        :return: self
+        """
+        self._first_element.uncheck()
+
+        return self
+
     # Element waits
 
     def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
@@ -307,7 +327,8 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         :return: element text
         """
         self.log(f'Get text from "{self.name}"')
-        return self._first_element.text_content()
+        element = self._first_element
+        return element.text_content() if element.text_content() else element.input_value()
 
     @property
     def inner_text(self) -> str:
@@ -404,6 +425,14 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         """
         sorted_items: list = sorted(self.element.bounding_box().items(), reverse=True)
         return dict(sorted_items)
+
+    def is_checked(self) -> bool:
+        """
+        Is checkbox checked
+
+        :return: bool
+        """
+        return self._first_element.is_checked()
 
     # Mixin
 

@@ -33,7 +33,7 @@ class Element(WebElement, MobileElement, PlayElement):
             locator: str = '',
             locator_type: str = '',
             name: str = '',
-            parent: Any = None,
+            parent: Union[Any, False] = None,
             wait: bool = None,
             **kwargs
     ):
@@ -59,7 +59,8 @@ class Element(WebElement, MobileElement, PlayElement):
         self.wait = wait
 
         if self.parent:
-            assert isinstance(self.parent, Element), 'The "parent" should take an Element/Group object or False'
+            assert isinstance(self.parent, (Element, bool)), \
+                f'The "parent" of "{self.name}" should take an Element/Group object or False for skip'
 
         # Taking from Group first if available
         self._init_locals = getattr(self, '_init_locals', locals())

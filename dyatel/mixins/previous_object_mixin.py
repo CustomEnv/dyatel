@@ -65,9 +65,12 @@ class PreviousObjectDriver:
         """
         from dyatel.base.group import Group
         from dyatel.base.page import Page
+        from dyatel.dyatel_play.play_page import PlayPage
+        from dyatel.dyatel_sel.pages.mobile_page import MobilePage
+        from dyatel.dyatel_sel.pages.web_page import WebPage
 
         is_group = isinstance(obj, Group)
-        is_page = isinstance(obj, Page)
+        is_page = isinstance(obj, (Page, WebPage, MobilePage, PlayPage))
         return not (is_page or is_group) or obj is None
 
     def _get_correct_previous_object_with_driver(self, index: int, current_obj: Any = False) -> Union[None, Any]:

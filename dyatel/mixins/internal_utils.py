@@ -22,7 +22,7 @@ def get_frame(frame=1):
     :param frame: frame id, "current" by default
     :return: frame
     """
-    return sys._getframe(frame)
+    return sys._getframe(frame)  # noqa
 
 
 def initialize_objects_with_args(objects: list):
@@ -71,12 +71,12 @@ def get_platform_locator(obj: Any):
     """
     Get locator for current platform from object
 
-    :param obj: Page/Group/Checkbox/Element
+    :param obj: Page/Group/Element
     :return: current platform locator
     """
     locator, data = obj.locator, getattr(obj, '_init_locals').get('kwargs', {})
 
-    if not data:
+    if not data or not obj.driver_wrapper:
         return locator
 
     if obj.driver_wrapper.desktop:

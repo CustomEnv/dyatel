@@ -41,7 +41,7 @@ class Group(Element, metaclass=AfterInitMeta):
             locator: str = '',
             locator_type: str = '',
             name: str = '',
-            parent: Any = None,
+            parent: Union[Any, False] = None,
             wait: bool = None,
             driver_wrapper: Union[DriverWrapper, Any] = None,
             **kwargs
@@ -52,7 +52,7 @@ class Group(Element, metaclass=AfterInitMeta):
         :param locator: anchor locator of group. Can be defined without locator_type
         :param locator_type: Selenium only: specific locator type
         :param name: name of group (will be attached to logs)
-        :param parent: parent of element. Can be Group or Page objects
+        :param parent: parent of element. Can be Group or Page objects of False for skip
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         :param driver_wrapper: set custom driver for group and group elements
         :param kwargs:
