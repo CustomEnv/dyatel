@@ -69,8 +69,9 @@ class LogMixin:
         if index:
             driver_log = f'[{index}]'
 
-            if not hasattr(driver, 'driver_index'):
-                driver.driver_with_index = index
+            # TODO: move to DriverWrapper
+            if not hasattr(driver_wrapper, 'driver_index'):
+                driver_wrapper.driver_index = index
 
             if driver_wrapper.selenium:
                 if '_driver' not in str(driver_wrapper.execute_script(find_comments_js)):
