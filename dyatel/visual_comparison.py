@@ -166,7 +166,7 @@ class VisualComparison:
         is_different = actual_threshold > threshold
 
         if is_different or not same_size:
-            diff.save(filename)
+            cv2.imwrite(filename, diff)
             self._attach_allure_diff(actual_file, reference_file, filename)
 
         base_error = f"The new screenshot '{actual_file}' did not match the reference '{reference_file}'."
