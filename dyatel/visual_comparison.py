@@ -5,13 +5,13 @@ import time
 import importlib
 import json
 import base64
-import math
-import operator
-from functools import reduce
 from typing import Union, List, Any
 from string import punctuation
 
-from PIL import Image, ImageChops
+import numpy
+from skimage.metrics import structural_similarity
+import cv2
+import numpy as np
 
 from dyatel.exceptions import DriverWrapperException
 from dyatel.js_scripts import add_element_over_js, delete_element_over_js
@@ -92,9 +92,8 @@ class VisualComparison:
             save_screenshot(reference_file)
             return self
 
-        try:
-            Image.open(reference_file)
-        except FileNotFoundError:
+        image = cv2.imread(reference_file)
+        if isinstance(image, type(None)):
             save_screenshot(reference_file)
 
             if self.visual_reference_generation:
@@ -159,8 +158,8 @@ class VisualComparison:
         :param threshold: possible difference in percents
         :return: VisualComparison
         """
-        reference_image = Image.open(reference_file).convert('RGB')
-        output_image = Image.open(actual_file).convert('RGB')
+        reference_image = cv2.imread(reference_file)
+        output_image = cv2.imread(actual_file)
         diff, actual_threshold = self._get_difference(reference_image, output_image)
 
         same_size = reference_image.size == output_image.size
@@ -245,27 +244,50 @@ class VisualComparison:
         return screenshot_name.lower()
 
     @staticmethod
-    def _get_difference(im1: Image, im2: Image):
+    def _get_difference(img1: numpy.ndarray, img2: numpy.ndarray) -> tuple[numpy.ndarray, float]:
         """
         Calculate difference between two images
 
-        :param im1: image 1
-        :param im2: image 2
+        :param img1: image 1, numpy.ndarray
+        :param img2: image 2, numpy.ndarray
         :return: (diff image, diff float value )
         """
-        diff = ImageChops.difference(im1, im2)
-        histogram = diff.histogram()
 
-        rms = reduce(
-            operator.add,
-            map(
-                lambda h, i: h * (i ** 2),
-                histogram,
-                range(256)
-            )
-        )
+        # Convert images to grayscale
+        before_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+        after_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
 
-        return diff, math.sqrt(rms / (float(im1.size[0]) * im1.size[1]))
+        # Compute SSIM between the two images
+        (score, diff) = structural_similarity(before_gray, after_gray, full=True)
+
+        # The diff image contains the actual image differences between the two images
+        # and is represented as a floating point data type in the range [0,1]
+        # so we must convert the array to 8-bit unsigned integers in the range
+        # [0,255] before we can use it with OpenCV
+        diff = (diff * 255).astype("uint8")
+        diff_box = cv2.merge([diff, diff, diff])
+
+        # Threshold the difference image, followed by finding contours to
+        # obtain the regions of the two input images that differ
+        thresh = cv2.threshold(diff, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+        contours = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours = contours[0] if len(contours) == 2 else contours[1]
+
+        mask = np.zeros(img1.shape, dtype='uint8')
+        filled_after = img2.copy()
+
+        for c in contours:
+            area = cv2.contourArea(c)
+            if area > 40:
+                x, y, w, h = cv2.boundingRect(c)
+                cv2.rectangle(img1, (x, y), (x + w, y + h), (36, 255, 12), 2)
+                cv2.rectangle(img2, (x, y), (x + w, y + h), (36, 255, 12), 2)
+                cv2.rectangle(diff_box, (x, y), (x + w, y + h), (36, 255, 12), 2)
+                cv2.drawContours(mask, [c], 0, (255, 255, 255), -1)
+                cv2.drawContours(filled_after, [c], 0, (0, 255, 0), -1)
+
+        diff_image, percent_diff = filled_after, 1 - score
+        return diff_image, percent_diff
 
     @staticmethod
     def _attach_allure_diff(actual_path: str, expected_path: str, diff_path: str) -> None:

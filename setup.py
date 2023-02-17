@@ -20,10 +20,13 @@ setup(
     ],
     install_requires=[
         'Appium-Python-Client>=2.1.2',
-        'selenium>=4.1.0',
-        'playwright>=1.22.0',
-        'webdriver-manager>=3.7.0',
+        'numpy>=1.24.2',
+        'opencv-python>=4.7.0.68',
         'Pillow>=9.1.1'
+        'playwright>=1.22.0',
+        'selenium>=4.1.0',
+        'scikit-image>=0.19.3',
+        'webdriver-manager>=3.7.0',
     ],
     keywords='selenium appium playwright web_automation mobile_automation',
     description='Wrapper of Selenium, Appium and Playwright with single API',
