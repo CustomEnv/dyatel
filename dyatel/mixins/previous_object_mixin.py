@@ -31,11 +31,9 @@ class PreviousObjectDriver:
         :param frame_index: frame start index
         :return: None
         """
-        from dyatel.base.group import Group
-
         if len(current_obj.driver_wrapper.all_drivers) > 1:
             if current_obj.driver == DriverWrapper.driver:
-                if not isinstance(current_obj, Group):
+                if self._is_element(current_obj):
                     previous_object = self._get_correct_previous_object_with_driver(frame_index, current_obj=current_obj)
                     if previous_object:
                         current_obj.driver_wrapper = previous_object.driver_wrapper
@@ -48,12 +46,10 @@ class PreviousObjectDriver:
         :param frame_index: frame start index
         :return: None
         """
-        from dyatel.base.group import Group
-
-        if isinstance(current_obj, all_mid_level_elements()) and not isinstance(current_obj, Group):
+        if isinstance(current_obj, all_mid_level_elements()) and self._is_element(current_obj):
             previous_object = self._get_correct_previous_object_with_parent(frame_index)
             if previous_object:
-                if isinstance(previous_object, Group):
+                if self._is_group(previous_object):
                     current_obj.parent = previous_object
 
     def previous_object_is_not_group_or_page(self, obj: Any) -> bool:
@@ -63,14 +59,8 @@ class PreviousObjectDriver:
         :param obj: obj to be checked
         :return: bool
         """
-        from dyatel.base.group import Group
-        from dyatel.base.page import Page
-        from dyatel.dyatel_play.play_page import PlayPage
-        from dyatel.dyatel_sel.pages.mobile_page import MobilePage
-        from dyatel.dyatel_sel.pages.web_page import WebPage
-
-        is_group = isinstance(obj, Group)
-        is_page = isinstance(obj, (Page, WebPage, MobilePage, PlayPage))
+        is_group = self._is_group(obj)
+        is_page = self._is_page(obj)
         return not (is_page or is_group) or obj is None
 
     def _get_correct_previous_object_with_driver(self, index: int, current_obj: Any = False) -> Union[None, Any]:
@@ -114,13 +104,21 @@ class PreviousObjectDriver:
         :param index: frame index to start
         :return: None or object with driver_wrapper
         """
-        from dyatel.base.group import Group
-
         frame = internal_utils.get_frame(index)
         prev_object = frame.f_locals.get('self', None)
 
-        if isinstance(prev_object, Group):
+        if self._is_group(prev_object):
             return prev_object
 
         return None
+
+    def _is_page(self, obj):
+        return getattr(obj, '_is_page', False)
+
+    def _is_element(self, obj):
+        return getattr(obj, '_is_element', False)
+
+    def _is_group(self, obj):
+        return getattr(obj, '_is_group', False)
+
 

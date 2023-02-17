@@ -13,7 +13,7 @@ from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.internal_utils import WAIT_EL, is_target_on_screen
-from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class
+from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class, all_mid_level_elements
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
@@ -57,10 +57,11 @@ class Element(WebElement, MobileElement, PlayElement):
         self.name = name
         self.parent = parent
         self.wait = wait
+        self._is_element = True
 
         if self.parent:
-            assert isinstance(self.parent, (Element, bool)), \
-                f'The "parent" of "{self.name}" should take an Element/Group object or False for skip'
+            assert isinstance(self.parent, (bool, all_mid_level_elements())), \
+                f'The "parent" of "{self.name}" should take an Element/Group object or False for skip. Get {self.parent}'
 
         # Taking from Group first if available
         self._init_locals = getattr(self, '_init_locals', locals())

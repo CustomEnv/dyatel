@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import copy
-from typing import List, Any, Union
+from typing import List, Any, Union, Callable
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.mixins.driver_mixin import DriverMixin
@@ -18,10 +18,8 @@ def shadow_class(current_cls, base_cls):
     """
     if DriverWrapper.is_multiplatform:
         if not getattr(current_cls, '__created', False):
-            class_objects = get_child_elements_with_names(current_cls, base_cls)
-            class_objects.update(dict(base_cls.__dict__))
-            class_objects.update(dict(current_cls.__dict__))
-            new_class = type(f'Shadow{base_cls.__name__}', (current_cls,), class_objects)
+            class_objects = get_child_elements_with_names(current_cls, (all_mid_level_elements(), Callable))
+            new_class = type(f'Shadow{current_cls.__name__}', (current_cls,), class_objects)
             new_class.__created = True
             # noinspection PyTypeChecker
             return object.__new__(new_class)

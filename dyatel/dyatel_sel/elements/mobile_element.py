@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Union, List, BinaryIO, Any
 
-from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.sel_utils import get_legacy_selector, get_locator_type
 from dyatel.mixins.internal_utils import calculate_coordinate_to_click
@@ -21,9 +20,6 @@ class MobileElement(CoreElement):
         :param parent: parent of element. Can be MobileElement, MobilePage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self.is_ios = DriverWrapper.is_ios
-        self.is_android = DriverWrapper.is_android
-
         self.locator_type = locator_type if locator_type else get_locator_type(locator)
         self.locator, self.locator_type = get_legacy_selector(locator, self.locator_type)
 
@@ -54,7 +50,7 @@ class MobileElement(CoreElement):
 
         x, y = calculate_coordinate_to_click(self, x, y)
 
-        if calculate_top_bar and self.is_ios:
+        if calculate_top_bar and self.driver_wrapper.is_ios:
             y += self.driver_wrapper.get_top_bar_height()
 
         self.log(f'Tap outside from "{self.name}" with coordinates (x: {x}, y: {y})')
@@ -76,7 +72,7 @@ class MobileElement(CoreElement):
 
         x, y = calculate_coordinate_to_click(self, 0, 0)
 
-        if calculate_top_bar and self.is_ios:
+        if calculate_top_bar and self.driver_wrapper.is_ios:
             y += self.driver_wrapper.get_top_bar_height()
 
         if not silent:

@@ -62,6 +62,7 @@ class Group(Element, metaclass=AfterInitMeta):
           - android: str = locator that will be used for android platform
         """
         self._init_locals = locals()
+        self._is_group = True
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
 
         super().__init__(

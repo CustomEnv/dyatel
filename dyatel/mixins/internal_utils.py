@@ -142,7 +142,7 @@ def get_child_elements_with_names(obj: object, instance: Union[type, tuple]) -> 
 
     for attribute, value in class_items:
         if isinstance(value, instance):
-            if attribute != 'parent':
+            if attribute != 'parent' and '__' not in attribute:
                 elements.update({attribute: value})
 
     return elements

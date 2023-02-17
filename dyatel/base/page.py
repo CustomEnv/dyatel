@@ -52,6 +52,7 @@ class Page(WebPage, MobilePage, PlayPage):
         self.locator_type = locator_type
         self.name = name
         self._init_locals = locals()
+        self._is_page = True
 
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
         self.element_class = self.__set_base_class()
