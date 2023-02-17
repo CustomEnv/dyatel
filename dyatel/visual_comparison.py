@@ -259,6 +259,7 @@ class VisualComparison:
 
         # Compute SSIM between the two images
         (score, diff) = structural_similarity(before_gray, after_gray, full=True)
+        score = score * 100
 
         # The diff image contains the actual image differences between the two images
         # and is represented as a floating point data type in the range [0,1]
@@ -286,7 +287,7 @@ class VisualComparison:
                 cv2.drawContours(mask, [c], 0, (255, 255, 255), -1)
                 cv2.drawContours(filled_after, [c], 0, (0, 255, 0), -1)
 
-        diff_image, percent_diff = filled_after, 1 - score
+        diff_image, percent_diff = filled_after, 100 - score
         return diff_image, percent_diff
 
     @staticmethod
