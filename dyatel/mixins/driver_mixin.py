@@ -78,6 +78,9 @@ class DriverMixin:
         if not driver_wrapper:
             return self
 
+        if getattr(driver_wrapper, 'driver', False) == DriverWrapper.driver:
+            return self
+
         driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
         new_driver = copy(driver_wrapper)
@@ -101,7 +104,7 @@ class DriverMixin:
         for name, child in child_elements:
             wrapped_child = copy(child)
             wrapped_child._driver_instance = driver_wrapper
-            wrapped_child._set_base_class()
+            # wrapped_child._set_base_class()  # TODO: remove me. base_cass should not be set there
             setattr(base_obj, name, wrapped_child)
 
             if getattr(wrapped_child, 'parent', None):

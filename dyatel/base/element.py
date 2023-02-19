@@ -22,6 +22,8 @@ from dyatel.keyboard_keys import KeyboardKeys
 class Element(WebElement, MobileElement, PlayElement):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
+    _is_element = True
+
     def __new__(cls, *args, **kwargs):
         return shadow_class(cls, Element)
 
@@ -57,7 +59,6 @@ class Element(WebElement, MobileElement, PlayElement):
         self.name = name
         self.parent = parent
         self.wait = wait
-        self._is_element = True
 
         if self.parent:
             assert isinstance(self.parent, (bool, all_mid_level_elements())), \

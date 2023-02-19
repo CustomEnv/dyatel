@@ -1,6 +1,16 @@
 from typing import Optional, Sequence
 
 
+def raise_exception(exception):
+    """
+    Raise exception without previous
+
+    :param exception:
+    :return:
+    """
+    raise exception from None
+
+
 class DriverWrapperException(Exception):
     """
     Base driver wrapper exceptions

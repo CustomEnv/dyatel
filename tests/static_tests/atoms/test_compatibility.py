@@ -1,5 +1,3 @@
-import pytest
-
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_page import PlayPage
 from dyatel.dyatel_sel.core.core_element import CoreElement

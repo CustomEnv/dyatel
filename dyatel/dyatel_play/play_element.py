@@ -79,12 +79,16 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         self._element = play_element
     
     @property
-    def all_elements(self) -> List[Any]:
+    def all_elements(self) -> Union[None, List[Any]]:
         """
         Get all wrapped elements with playwright bases
 
         :return: list of wrapped objects
         """
+        if getattr(self, '_wrapped', None):
+            self.log('all_elements property already used', level='warning')
+            return None
+
         return self._get_all_elements(self.element.element_handles(), PlayElement)
 
     # Element interaction

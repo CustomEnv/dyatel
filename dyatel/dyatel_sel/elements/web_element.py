@@ -23,12 +23,16 @@ class WebElement(CoreElement):
         super().__init__(locator=locator, locator_type=self.locator_type, name=name, parent=parent, wait=wait)
 
     @property
-    def all_elements(self) -> List[Any]:
+    def all_elements(self) -> Union[None, List[Any]]:
         """
         Get all wrapped elements with selenium bases
 
         :return: list of wrapped objects
         """
+        if getattr(self, '_wrapped', None):
+            self.log('all_elements property already used', level='warning')
+            return None
+
         selenium_elements = self._find_elements(self._get_base())
         return self._get_all_elements(selenium_elements, WebElement)
 

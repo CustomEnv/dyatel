@@ -13,7 +13,7 @@ from webdriver_manager.firefox import GeckoDriverManager
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_driver import PlayDriver
-from dyatel.shared_utils import set_logging_settings
+from dyatel.mixins.log_mixin import dyatel_logs_settings
 from dyatel.visual_comparison import VisualComparison
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
@@ -26,7 +26,7 @@ from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import PlaygroundMainPage, SecondPlaygroundMainPage
 
 
-set_logging_settings()
+dyatel_logs_settings()
 
 
 def pytest_addoption(parser):
@@ -77,6 +77,8 @@ def firefox_options(request):
 
 @pytest.fixture
 def driver_wrapper(platform, driver_name, driver_engine, request, driver_init):
+    # Prints are required for better readability: https://github.com/pytest-dev/pytest/issues/8574
+    print()
     skip_marks_iterator = tuple(request.node.iter_markers(name='skip_platform'))
     skip_platform = list(name for marker in skip_marks_iterator for name in marker.args)
     xfail_marks_iterator = tuple(request.node.iter_markers(name='xfail_platform'))
@@ -91,6 +93,7 @@ def driver_wrapper(platform, driver_name, driver_engine, request, driver_init):
         pytest.skip(f"Skip test {platform} with {driver_name}. Reason={skip_reason}")
 
     yield driver_init
+    print()
     driver_init.get('data:,')
 
 

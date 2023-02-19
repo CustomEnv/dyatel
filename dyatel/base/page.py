@@ -21,6 +21,8 @@ from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 class Page(WebPage, MobilePage, PlayPage):
     """ Page object crossroad. Should be defined as class """
 
+    _is_page = True
+
     def __new__(cls, *args, **kwargs):
         return shadow_class(cls, Page)
 
@@ -52,7 +54,6 @@ class Page(WebPage, MobilePage, PlayPage):
         self.locator_type = locator_type
         self.name = name
         self._init_locals = locals()
-        self._is_page = True
 
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
         self.element_class = self.__set_base_class()

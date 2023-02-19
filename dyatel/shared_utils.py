@@ -5,14 +5,6 @@ from subprocess import Popen, PIPE, run
 from PIL import Image
 
 
-def set_logging_settings(level=logging.INFO):
-    logging.getLogger('WDM').setLevel(logging.ERROR)
-    logging.getLogger("urllib3").setLevel(logging.ERROR)
-    logging.basicConfig(level=level, format='[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)s] %(message)s',
-                        datefmt='%Y-%m-%d %H:%M:%S')
-    return logging
-
-
 def resize_image(screenshot_binary, scale=3, img_format='JPEG'):
     img = Image.open(io.BytesIO(screenshot_binary))
     img = img.resize((img.width // scale, img.height // scale), Image.Resampling.LANCZOS)

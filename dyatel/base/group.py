@@ -30,6 +30,8 @@ class AfterInitMeta(type):
 class Group(Element, metaclass=AfterInitMeta):
     """ Group of elements. Should be defined as class """
 
+    _is_group = True
+
     def __new__(cls, *args, **kwargs):
         return shadow_class(cls, Group)
 
@@ -62,7 +64,6 @@ class Group(Element, metaclass=AfterInitMeta):
           - android: str = locator that will be used for android platform
         """
         self._init_locals = locals()
-        self._is_group = True
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
 
         super().__init__(

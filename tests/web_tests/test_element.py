@@ -2,6 +2,7 @@ import random
 
 import pytest
 
+from dyatel.base.element import Element
 from dyatel.exceptions import NoSuchElementException
 from dyatel.mixins.element_mixin import ElementMixin
 from tests.adata.pages.keyboard_page import KeyboardPage
@@ -89,7 +90,7 @@ def test_parent_element_wait_hidden_negative(base_playground_page):
     assert base_playground_page.kube_wrong_parent.wait_element_hidden()
 
 
-# Other cases with parent
+# All elements
 
 
 def test_all_elements_with_parent(base_playground_page):
@@ -112,3 +113,8 @@ def test_element_group_all_elements_child(second_playground_page):
 
     all_cards[1].button.click()
     assert KeyboardPage().wait_page_loaded().is_page_opened()
+
+
+def test_all_elements_recursion(base_playground_page):
+    assert base_playground_page.kube.all_elements[0].all_elements is None
+    assert hasattr(Element, 'all_elements')
