@@ -3,21 +3,25 @@ import pytest
 from dyatel.exceptions import UnexpectedElementsCountException
 
 
+# TODO: rework needed
 def test_wait_element(pizza_order_page):
     pizza_order_page.submit_button.wait_element()
     assert pizza_order_page.submit_button.is_displayed()
 
 
+# TODO: rework needed
 def test_wait_without_error(pizza_order_page):
     pizza_order_page.error_modal.wait_element_without_error(timeout=0.5)
     assert not pizza_order_page.error_modal.is_displayed()
 
 
+# TODO: rework needed
 def test_wait_hidden(pizza_order_page):
     pizza_order_page.error_modal.wait_element_without_error(timeout=1)
     assert not pizza_order_page.error_modal.is_displayed()
 
 
+# TODO: rework needed
 def test_wait_hidden_without_error(pizza_order_page):
     pizza_order_page.submit_button.wait_element_without_error(timeout=0.5)
     assert pizza_order_page.submit_button.is_displayed()

@@ -21,7 +21,7 @@ class PreviousObjectDriver:
             if current_obj.driver == DriverWrapper.driver:
                 previous_object = self._get_correct_previous_object_with_driver(frame_index, current_obj=current_obj)
                 if previous_object:
-                    current_obj._set_driver(previous_object.driver_wrapper, all_mid_level_elements())  # noqa
+                    current_obj.driver_wrapper = previous_object.driver_wrapper
 
     def set_driver_from_previous_object_for_element(self, current_obj: Any, frame_index: int) -> None:
         """
@@ -31,7 +31,7 @@ class PreviousObjectDriver:
         :param frame_index: frame start index
         :return: None
         """
-        if len(current_obj.driver_wrapper.all_drivers) > 1:
+        if len(DriverWrapper.all_drivers) > 1:
             if current_obj.driver == DriverWrapper.driver:
                 if self._is_element(current_obj):
                     previous_object = self._get_correct_previous_object_with_driver(frame_index, current_obj=current_obj)

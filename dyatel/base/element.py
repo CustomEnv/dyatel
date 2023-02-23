@@ -25,7 +25,7 @@ class Element(WebElement, MobileElement, PlayElement):
     _is_element = True
 
     def __new__(cls, *args, **kwargs):
-        return shadow_class(cls, Element)
+        return shadow_class(cls)
 
     def __repr__(self):
         return repr_builder(self, Element)
@@ -71,7 +71,6 @@ class Element(WebElement, MobileElement, PlayElement):
         self._modify_object()
         self.element_class = self._set_base_class()
         if self.element_class:
-            self._initialized = True
             super(self.element_class, self).__init__(
                 locator=self.locator,
                 locator_type=self.locator_type,
@@ -279,25 +278,26 @@ class Element(WebElement, MobileElement, PlayElement):
             scroll=scroll, remove=remove, fill_background=fill_background,
         )
 
-    def _set_base_class(self) -> Element:
+    def _set_base_class(self, driver=None) -> Element:
         """
         Get element class in according to current driver, and set him as base class
 
         :return: element class
         """
         cls = None
-        if isinstance(self.driver, PlaywrightDriver):
+        driver = driver if driver else self.driver
+        if isinstance(driver, PlaywrightDriver):
             cls = PlayElement,
-        elif isinstance(self.driver, AppiumDriver):
+        elif isinstance(driver, AppiumDriver):
             cls = MobileElement,
-        elif isinstance(self.driver, SeleniumDriver):
+        elif isinstance(driver, SeleniumDriver):
             cls = WebElement,
 
         # No exception due to delayed initialization
         return set_base_class(self, Element, cls)
 
     def _modify_object(self):
-        if self.driver_wrapper:
-            PreviousObjectDriver().set_driver_from_previous_object_for_element(self, 5)
-            if not getattr(self, '_initialized', False) and self.parent is None:
-                PreviousObjectDriver().set_parent_from_previous_object_for_element(self, 5)
+        prev_object_manager = PreviousObjectDriver()
+        prev_object_manager.set_driver_from_previous_object_for_element(self, 5)
+        if not getattr(self, '_initialized', False) and self.parent is None:
+            prev_object_manager.set_parent_from_previous_object_for_element(self, 5)

@@ -84,6 +84,7 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         :return: driver wrapper class
         """
         DriverWrapper._init_count += 1
+        self.__class__.all_drivers = DriverWrapper.all_drivers
         if isinstance(self.driver, PlaywrightDriver):
             self.__class__.__bases__ = PlayDriver,
             self.__class__.mobile = False

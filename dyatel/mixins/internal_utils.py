@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sys
 import inspect
+from copy import copy
 from typing import Any, Union
 
 from dyatel.exceptions import UnsuitableArgumentsException
@@ -25,46 +26,21 @@ def get_frame(frame=1):
     return sys._getframe(frame)  # noqa
 
 
-def initialize_objects_with_args(objects: list):
+def initialize_objects_with_args(current_object, objects: dict):
     """
     Initializing objects with itself args/kwargs
 
+    :param current_object: list of objects to initialize
     :param objects: list of objects to initialize
     :return: None
     """
-    for obj in objects:
+    for name, obj in objects.items():
         if not getattr(obj, '_initialized', False):
-            obj._initialized = True
-            obj_args = get_object_kwargs(obj)
-            obj.__init__(**obj_args)
-
-            from dyatel.base.group import Group
-            from dyatel.base.page import Page
-
-            if isinstance(obj, (Group, Page)):
-                for arg_name, arg_value in obj_args.items():
-                    if arg_value:
-                        setattr(obj, arg_name, arg_value)
-
-
-def get_object_kwargs(obj: Any) -> dict:
-    """
-    Get actual args/kwargs of object __init__
-
-    :param obj: object instance
-    :return: object kwargs
-    """
-    init_args = inspect.getfullargspec(obj.__init__).args
-    for index, key in enumerate(init_args):
-        if key == 'self':
-            init_args.pop(index)
-
-    obj_locals = getattr(obj, '_init_locals')
-    obj_locals.pop('self', None)
-    kwargs = obj_locals.get('kwargs', {})
-    kwargs.update({item: obj_locals.get(item, getattr(obj, item, None)) for item in init_args})
-
-    return kwargs
+            copied_obj = copy(obj)
+            copied_obj._driver_instance = current_object._driver_instance  # noqa
+            copied_obj._set_base_class()  # noqa
+            copied_obj._initialized = True
+            setattr(current_object, name, copied_obj)
 
 
 def get_platform_locator(obj: Any):
@@ -113,7 +89,7 @@ def get_child_elements(obj: object, instance: Union[type, tuple]) -> list:
     return list(get_child_elements_with_names(obj, instance).values())
 
 
-def get_child_elements_with_names(obj: object, instance: Union[type, tuple]) -> dict:
+def get_child_elements_with_names(obj: Any, instance: Union[type, tuple]) -> dict:
     """
     Return objects of this object by instance
 
@@ -121,31 +97,48 @@ def get_child_elements_with_names(obj: object, instance: Union[type, tuple]) -> 
     """
     elements = {}
 
-    def get_items(reference_obj, obj_items):
-
-        if not inspect.isclass(reference_obj):
-            reference_obj = reference_obj.__class__
-
-        for parent_class in reference_obj.__bases__:
-
-            if "'object'" in str(parent_class) or "'type'" in str(parent_class):
-                break
-
-            obj_items += list(parent_class.__dict__.items()) + list(parent_class.__class__.__dict__.items())
-
-            get_items(parent_class, obj_items)
-
-        return obj_items
-
-    class_items = get_items(obj, [])
-    class_items += list(list(obj.__class__.__dict__.items()) + list(obj.__dict__.items()))
-
-    for attribute, value in class_items:
+    for attribute, value in get_all_attributes_from_object(obj).items():
         if isinstance(value, instance):
             if attribute != 'parent' and '__' not in attribute:
                 elements.update({attribute: value})
 
     return elements
+
+
+def get_all_attributes_from_object(
+        reference_obj: Any,
+        obj_items: Any = None,
+        stop_on_base: bool = False
+) -> dict:
+    """
+
+    :param reference_obj:
+    :param obj_items:
+    :param stop_on_base:
+    :return:
+    """
+    if not obj_items:
+        obj_items = {}
+
+    reference_class = reference_obj if inspect.isclass(reference_obj) else reference_obj.__class__
+
+    for parent_class in reference_class.__bases__:
+        str_parent_class = str(parent_class)
+
+        if "'object'" in str_parent_class or "'type'" in str_parent_class:
+            break
+
+        if stop_on_base and 'dyatel' in str_parent_class and 'dyatel.base' not in str_parent_class:
+            continue
+
+        obj_items.update(dict(parent_class.__dict__))
+        get_all_attributes_from_object(parent_class, obj_items, stop_on_base)
+
+    obj_items.update({attr: value for attr, value in reference_class.__dict__.items() if '__' not in str(attr)})
+    # obj_items.update(dict(reference_class.__dict__))
+    obj_items.update(dict(reference_obj.__dict__))
+
+    return obj_items
 
 
 def is_target_on_screen(x: int, y: int, possible_range: dict):

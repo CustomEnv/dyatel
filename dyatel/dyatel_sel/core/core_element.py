@@ -35,8 +35,9 @@ from dyatel.exceptions import (
 from dyatel.mixins.internal_utils import (
     WAIT_EL,
     get_child_elements,
-    initialize_objects_with_args,
     get_platform_locator,
+    initialize_objects_with_args,
+    get_child_elements_with_names,
 )
 
 
@@ -61,8 +62,8 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         self.parent: Any = parent
         self.wait = wait
 
+        initialize_objects_with_args(self, get_child_elements_with_names(self, CoreElement))  # required for Group
         self.child_elements: List[CoreElement] = get_child_elements(self, CoreElement)
-        initialize_objects_with_args(self.child_elements)  # required for Group
 
     # Element
 

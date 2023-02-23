@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import List
 
-from dyatel.base.element import Element
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.sel_utils import get_locator_type
-from dyatel.mixins.internal_utils import get_child_elements, initialize_objects_with_args
+from dyatel.mixins.internal_utils import get_child_elements, initialize_objects_with_args, get_child_elements_with_names
 from dyatel.mixins.driver_mixin import DriverMixin
 from dyatel.mixins.log_mixin import LogMixin
 
@@ -30,5 +29,5 @@ class CorePage(DriverMixin, LogMixin):
         self.name = name if name else self.locator
         self.url = getattr(self, 'url', '')
 
+        initialize_objects_with_args(self, get_child_elements_with_names(self, CoreElement))
         self.page_elements: List[CoreElement] = get_child_elements(self, CoreElement)
-        initialize_objects_with_args(self.page_elements)

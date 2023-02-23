@@ -3,13 +3,11 @@ from __future__ import annotations
 import time
 from typing import Union, List, Any
 
-# noinspection PyProtectedMember
-from playwright._impl._api_types import TimeoutError as PlayTimeoutError
-
-from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
+from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
 from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
 
+from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
 from dyatel.exceptions import TimeoutException
 from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
@@ -22,6 +20,7 @@ from dyatel.mixins.internal_utils import (
     initialize_objects_with_args,
     calculate_coordinate_to_click,
     get_platform_locator,
+    get_child_elements_with_names,
 )
 
 
@@ -45,8 +44,8 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         self.parent = parent
         self.wait = wait
 
+        initialize_objects_with_args(self, get_child_elements_with_names(self, PlayElement))
         self.child_elements: List[PlayElement] = get_child_elements(self, PlayElement)
-        initialize_objects_with_args(self.child_elements)
 
     # Element
 

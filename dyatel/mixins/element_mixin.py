@@ -1,28 +1,28 @@
 from __future__ import annotations
 
 from copy import copy
-from typing import List, Any, Union, Callable
+from typing import List, Any, Union
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.internal_utils import get_child_elements_with_names, get_platform_locator, driver_with_index
+from dyatel.mixins.internal_utils import get_child_elements_with_names, get_platform_locator, driver_with_index, \
+    get_all_attributes_from_object
 
 
-def shadow_class(current_cls, base_cls):
+def shadow_class(current_cls):
     """
     Creates a "shadow" class from current one and base class of current
 
     :param current_cls: current class
-    :param base_cls: current.__base__ class
     :return: new "shadow" class
     """
     if DriverWrapper.is_multiplatform:
+
         if not getattr(current_cls, '__created', False):
-            class_objects = get_child_elements_with_names(current_cls, (all_mid_level_elements(), Callable))
+            class_objects = get_all_attributes_from_object(current_cls, stop_on_base=True)
             new_class = type(f'Shadow{current_cls.__name__}', (current_cls,), class_objects)
             new_class.__created = True
-            # noinspection PyTypeChecker
-            return object.__new__(new_class)
+            return object.__new__(new_class)  # noqa
 
     return object.__new__(current_cls)
 
@@ -107,8 +107,9 @@ class ElementMixin(DriverMixin):
         wrapped_elements = []
 
         for element in sources:
-            wrapped_object = copy(self)
+            wrapped_object: Any = copy(self)
             wrapped_object.element = element
+            wrapped_object._wrapped = True
             self.__set_parent_for_attr(instance_class, wrapped_object)
             wrapped_elements.append(wrapped_object)
 

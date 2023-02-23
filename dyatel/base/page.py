@@ -14,7 +14,7 @@ from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.internal_utils import WAIT_PAGE
-from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class, all_mid_level_elements
+from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
 
@@ -24,7 +24,7 @@ class Page(WebPage, MobilePage, PlayPage):
     _is_page = True
 
     def __new__(cls, *args, **kwargs):
-        return shadow_class(cls, Page)
+        return shadow_class(cls)
 
     def __repr__(self):
         return repr_builder(self, Page)
@@ -57,16 +57,15 @@ class Page(WebPage, MobilePage, PlayPage):
 
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
         self.element_class = self.__set_base_class()
+
+        if not driver_wrapper:
+            PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)
+
         super(self.element_class, self).__init__(
             locator=self.locator,
             locator_type=self.locator_type,
             name=self.name
         )
-        # it's necessary to leave it after init
-        if driver_wrapper:
-            self._set_driver(self._driver_instance, all_mid_level_elements())
-        elif self.driver_wrapper:
-            PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 

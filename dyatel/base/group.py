@@ -33,7 +33,7 @@ class Group(Element, metaclass=AfterInitMeta):
     _is_group = True
 
     def __new__(cls, *args, **kwargs):
-        return shadow_class(cls, Group)
+        return shadow_class(cls)
 
     def __repr__(self):
         return repr_builder(self, Group)
@@ -65,7 +65,6 @@ class Group(Element, metaclass=AfterInitMeta):
         """
         self._init_locals = locals()
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
-
         super().__init__(
             locator=locator,
             locator_type=locator_type,
@@ -73,11 +72,6 @@ class Group(Element, metaclass=AfterInitMeta):
             parent=parent,
             wait=wait
         )
-
-        # it's necessary to leave it after init
-
-        if driver_wrapper:
-            self._set_driver(self._driver_instance, all_mid_level_elements())
 
     def _modify_children(self):
         """
@@ -93,5 +87,4 @@ class Group(Element, metaclass=AfterInitMeta):
                 setattr(value, 'parent', copy.copy(value.parent))
 
     def _modify_object(self):
-        if self.driver_wrapper:
-            PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)
+        PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)
