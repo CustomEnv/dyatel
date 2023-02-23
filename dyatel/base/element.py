@@ -67,11 +67,11 @@ class Element(WebElement, MobileElement, PlayElement):
         # Taking from Group first if available
         self._init_locals = getattr(self, '_init_locals', locals())
         self._driver_instance = getattr(self, '_driver_instance', DriverWrapper)
-
         self._modify_object()
-        self.element_class = self._set_base_class()
-        if self.element_class:
-            super(self.element_class, self).__init__(
+
+        self.__base_class = self._set_base_class()
+        if self.__base_class:
+            super(self.__base_class, self).__init__(
                 locator=self.locator,
                 locator_type=self.locator_type,
                 name=self.name,

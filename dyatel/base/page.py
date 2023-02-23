@@ -53,15 +53,12 @@ class Page(WebPage, MobilePage, PlayPage):
         self.locator = locator
         self.locator_type = locator_type
         self.name = name
+
         self._init_locals = locals()
-
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
-        self.element_class = self.__set_base_class()
+        self._modify_object()
 
-        if not driver_wrapper:
-            PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)
-
-        super(self.element_class, self).__init__(
+        super(self.__set_base_class(), self).__init__(
             locator=self.locator,
             locator_type=self.locator_type,
             name=self.name
@@ -150,6 +147,9 @@ class Page(WebPage, MobilePage, PlayPage):
         anchor = Element(locator=self.locator, locator_type='', name=self.name)
         anchor._driver_instance = self.driver_wrapper
         return anchor
+
+    def _modify_object(self):
+        PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)
 
     def __set_base_class(self) -> Page:
         """

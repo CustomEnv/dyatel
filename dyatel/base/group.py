@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import copy
+from copy import copy
 from typing import Any, Union
 
 from dyatel.base.driver_wrapper import DriverWrapper
@@ -11,23 +11,7 @@ from dyatel.mixins.element_mixin import shadow_class, repr_builder, all_mid_leve
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
 
-class AfterInitMeta(type):
-    """ Call a custom function right after __init__ of original class """
-
-    def __call__(cls, *args, **kwargs):
-        """
-        Wrapper for calling a custom function right after __init__ of original class
-
-        :param args: original class args
-        :param kwargs: original class kwargs
-        :return: class object
-        """
-        obj = type.__call__(cls, *args, **kwargs)
-        obj._modify_children()  # noqa
-        return obj
-
-
-class Group(Element, metaclass=AfterInitMeta):
+class Group(Element):
     """ Group of elements. Should be defined as class """
 
     _is_group = True
@@ -65,6 +49,8 @@ class Group(Element, metaclass=AfterInitMeta):
         """
         self._init_locals = locals()
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
+        self._modify_children()
+
         super().__init__(
             locator=locator,
             locator_type=locator_type,
@@ -79,12 +65,12 @@ class Group(Element, metaclass=AfterInitMeta):
         Will be called automatically after __init__ by metaclass `AfterInitMeta`
         """
         for name, value in get_child_elements_with_names(self, all_mid_level_elements()).items():
-            setattr(self, name, copy.copy(value))
+            setattr(self, name, copy(value))
             value = getattr(self, name)
             if value.parent is None:
                 value.parent = self
             else:
-                setattr(value, 'parent', copy.copy(value.parent))
+                setattr(value, 'parent', copy(value.parent))
 
     def _modify_object(self):
         PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)
