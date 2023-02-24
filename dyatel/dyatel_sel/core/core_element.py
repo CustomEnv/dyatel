@@ -35,8 +35,7 @@ from dyatel.exceptions import (
 from dyatel.mixins.internal_utils import (
     WAIT_EL,
     get_child_elements,
-    get_platform_locator,
-    initialize_objects_with_args,
+    initialize_objects,
     get_child_elements_with_names,
 )
 
@@ -58,11 +57,11 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         self.locator = locator
         self.locator_type = locator_type
-        self.name = name if name else self.locator
+        self.name = name
         self.parent: Any = parent
         self.wait = wait
 
-        initialize_objects_with_args(self, get_child_elements_with_names(self, CoreElement))  # required for Group
+        initialize_objects(self, get_child_elements_with_names(self, CoreElement))  # required for Group
         self.child_elements: List[CoreElement] = get_child_elements(self, CoreElement)
 
     # Element
@@ -564,7 +563,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: SeleniumWebElement or AppiumWebElement
         """
         try:
-            return base.find_element(self.locator_type, get_platform_locator(self))
+            return base.find_element(self.locator_type, self.locator)
         except (SeleniumInvalidArgumentException, SeleniumInvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
         except SeleniumNoSuchElementException as exc:
@@ -578,7 +577,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: list of SeleniumWebElement or AppiumWebElement
         """
         try:
-            return base.find_elements(self.locator_type, get_platform_locator(self))
+            return base.find_elements(self.locator_type, self.locator)
         except (SeleniumInvalidArgumentException, InvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
 

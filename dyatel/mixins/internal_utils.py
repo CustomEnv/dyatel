@@ -5,9 +5,6 @@ import inspect
 from copy import copy
 from typing import Any, Union
 
-from dyatel.exceptions import UnsuitableArgumentsException
-
-
 WAIT_EL = 10
 WAIT_PAGE = 20
 
@@ -26,7 +23,17 @@ def get_frame(frame=1):
     return sys._getframe(frame)  # noqa
 
 
-def initialize_objects_with_args(current_object, objects: dict):
+def get_timeout_in_ms(timeout: int):
+    """
+    Get timeout in milliseconds for playwright
+
+    :param timeout: timeout in seconds
+    :return: timeout in milliseconds
+    """
+    return timeout * 1000 if timeout < 1000 else timeout
+
+
+def initialize_objects(current_object, objects: dict):
     """
     Initializing objects with itself args/kwargs
 
@@ -41,43 +48,6 @@ def initialize_objects_with_args(current_object, objects: dict):
             copied_obj._set_base_class()  # noqa
             copied_obj._initialized = True
             setattr(current_object, name, copied_obj)
-
-
-def get_platform_locator(obj: Any):
-    """
-    Get locator for current platform from object
-
-    :param obj: Page/Group/Element
-    :return: current platform locator
-    """
-    locator, data = obj.locator, getattr(obj, '_init_locals').get('kwargs', {})
-
-    if not data or not obj.driver_wrapper:
-        return locator
-
-    if obj.driver_wrapper.desktop:
-        locator = data.get('desktop', locator)
-
-    elif obj.driver_wrapper.mobile:
-        locator = data.get('mobile', locator)
-        if data.get('mobile', False) and (data.get('android', False) or data.get('ios', False)):
-            raise UnsuitableArgumentsException('Dont use mobile and android/ios locators together')
-        elif obj.driver_wrapper.is_ios:
-            locator = data.get('ios', locator)
-        elif obj.driver_wrapper.is_android:
-            locator = data.get('android', locator)
-
-    return locator
-
-
-def get_timeout_in_ms(timeout: int):
-    """
-    Get timeout in milliseconds for playwright
-
-    :param timeout: timeout in seconds
-    :return: timeout in milliseconds
-    """
-    return timeout * 1000 if timeout < 1000 else timeout
 
 
 def get_child_elements(obj: object, instance: Union[type, tuple]) -> list:
@@ -111,11 +81,12 @@ def get_all_attributes_from_object(
         stop_on_base: bool = False
 ) -> dict:
     """
+    Get all attributes from object
 
-    :param reference_obj:
-    :param obj_items:
-    :param stop_on_base:
-    :return:
+    :param reference_obj: reference object
+    :param obj_items: original attributes
+    :param stop_on_base: stop grabbing on dyatel base classes ~ WebElement/PlayPage etc.
+    :return: dict of all attributes
     """
     if not obj_items:
         obj_items = {}
@@ -135,7 +106,6 @@ def get_all_attributes_from_object(
         get_all_attributes_from_object(parent_class, obj_items, stop_on_base)
 
     obj_items.update({attr: value for attr, value in reference_class.__dict__.items() if '__' not in str(attr)})
-    # obj_items.update(dict(reference_class.__dict__))
     obj_items.update(dict(reference_obj.__dict__))
 
     return obj_items

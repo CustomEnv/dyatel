@@ -7,7 +7,6 @@ from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
 from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
 
-from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
 from dyatel.exceptions import TimeoutException
 from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
@@ -17,11 +16,11 @@ from dyatel.mixins.internal_utils import (
     WAIT_EL,
     get_child_elements,
     get_timeout_in_ms,
-    initialize_objects_with_args,
+    initialize_objects,
     calculate_coordinate_to_click,
-    get_platform_locator,
     get_child_elements_with_names,
 )
+from dyatel.mixins.locator_mixin import get_platform_locator, get_playwright_locator
 
 
 class PlayElement(ElementMixin, DriverMixin, LogMixin):
@@ -38,13 +37,13 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         """
         self._element = None
 
-        self.locator = get_selenium_completable_locator(locator)
+        self.locator = get_playwright_locator(get_platform_locator(self, default_locator=locator))
         self.locator_type = f'{locator_type} - locator_type does not supported for playwright'
         self.name = name if name else self.locator
         self.parent = parent
         self.wait = wait
 
-        initialize_objects_with_args(self, get_child_elements_with_names(self, PlayElement))
+        initialize_objects(self, get_child_elements_with_names(self, PlayElement))
         self.child_elements: List[PlayElement] = get_child_elements(self, PlayElement)
 
     # Element
@@ -60,11 +59,11 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         """
         element = self._element
         if not element:
-            driver, locator = self._get_driver(), get_platform_locator(self)
+            driver = self._get_driver()
             if isinstance(driver, ElementHandle):
-                element = driver.query_selector(locator)
+                element = driver.query_selector(self.locator)
             else:
-                element = driver.locator(locator)
+                element = driver.locator(self.locator)
 
         return element
 

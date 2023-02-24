@@ -14,7 +14,7 @@ from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.internal_utils import WAIT_PAGE
-from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class
+from dyatel.mixins.core_mixin import shadow_class, repr_builder, set_base_class
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
 
@@ -52,17 +52,13 @@ class Page(WebPage, MobilePage, PlayPage):
         """
         self.locator = locator
         self.locator_type = locator_type
-        self.name = name
+        self.name = name if name else locator
 
         self._init_locals = locals()
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
         self._modify_object()
 
-        super(self.__set_base_class(), self).__init__(
-            locator=self.locator,
-            locator_type=self.locator_type,
-            name=self.name
-        )
+        super(self.__set_base_class(), self).__init__()
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 
@@ -144,7 +140,7 @@ class Page(WebPage, MobilePage, PlayPage):
 
         :return: Element object
         """
-        anchor = Element(locator=self.locator, locator_type='', name=self.name)
+        anchor = Element(locator=self.locator, locator_type=self.locator_type, name=self.name)
         anchor._driver_instance = self.driver_wrapper
         return anchor
 
@@ -164,6 +160,8 @@ class Page(WebPage, MobilePage, PlayPage):
         elif isinstance(self.driver, SeleniumDriver):
             cls = WebPage,
         else:
+            breakpoint()
             raise DriverWrapperException(f'Cant specify {Page.__name__}')
+
 
         return set_base_class(self, Page, cls)

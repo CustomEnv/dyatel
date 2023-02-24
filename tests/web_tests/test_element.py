@@ -99,7 +99,7 @@ def test_all_elements_with_parent(base_playground_page):
     assert all_elements, 'did not find elements on page'
 
     for element in all_elements:
-        assert element.parent == base_playground_page.any_section
+        assert element.parent.locator == base_playground_page.any_section.locator
 
 
 def test_element_group_all_elements_child(second_playground_page):

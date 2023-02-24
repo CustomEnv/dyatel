@@ -13,7 +13,7 @@ from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.internal_utils import WAIT_EL, is_target_on_screen
-from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class, all_mid_level_elements
+from dyatel.mixins.core_mixin import shadow_class, repr_builder, all_mid_level_elements, set_base_class
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
@@ -56,7 +56,7 @@ class Element(WebElement, MobileElement, PlayElement):
         """
         self.locator = locator
         self.locator_type = locator_type
-        self.name = name
+        self.name = name if name else locator
         self.parent = parent
         self.wait = wait
 
@@ -257,9 +257,17 @@ class Element(WebElement, MobileElement, PlayElement):
 
         return is_visible
 
-    def assert_screenshot(self, filename: str = '', test_name: str = '', name_suffix: str = '',
-                          threshold: Union[int, float] = 0, delay: Union[int, float] = 0.5, scroll: bool = False,
-                          remove: List[Element] = None, fill_background: Union[str, bool] = False) -> None:
+    def assert_screenshot(
+            self,
+            filename: str = '',
+            test_name: str = '',
+            name_suffix: str = '',
+            threshold: Union[int, float] = None,
+            delay: Union[int, float] = None,
+            scroll: bool = False,
+            remove: List[Element] = None,
+            fill_background: Union[str, bool] = False
+    ) -> None:
         """
         Assert given (by name) and taken screenshot equals
 
@@ -273,6 +281,9 @@ class Element(WebElement, MobileElement, PlayElement):
         :param fill_background: fill background with given color or black color by default
         :return: None
         """
+        delay = delay if delay else VisualComparison.default_delay
+        threshold = threshold if threshold else VisualComparison.default_threshold
+
         VisualComparison(self.driver_wrapper, self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
             scroll=scroll, remove=remove, fill_background=fill_background,

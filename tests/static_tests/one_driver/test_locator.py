@@ -3,7 +3,8 @@ import pytest
 from dyatel.base.element import Element
 from dyatel.base.group import Group
 from dyatel.exceptions import UnsuitableArgumentsException
-from dyatel.mixins.internal_utils import get_platform_locator
+from dyatel.mixins.locator_mixin import get_platform_locator
+from tests.static_tests.conftest import mobile_ids, mobile_drivers, all_drivers, all_ids
 
 
 class ExtendedClass(Group):
@@ -35,12 +36,9 @@ class SomeGroup(Group):
                                           name='multiple element broken all')
 
 
-@pytest.mark.parametrize(
-    'driver',
-    ('mocked_selenium_driver', 'mocked_ios_driver', 'mocked_play_driver'),
-    ids=['selenium', 'appium', 'playwright']
-)
-def test_link_to_class_locator(driver):
+@pytest.mark.parametrize('driver', all_drivers, ids=all_ids)
+def test_link_to_class_locator(driver, request):
+    request.getfixturevalue(driver)
     assert SomeGroup().link_to_class.locator == '[id="some locator updated"]'
 
 
@@ -64,21 +62,13 @@ def test_multiple_locator_playwright(mocked_play_driver):
     assert 'default_group' in get_platform_locator(SomeGroup())
 
 
-@pytest.mark.parametrize(
-    'driver',
-    ('mocked_ios_driver', 'mocked_android_driver'),
-    ids=['ios', 'android']
-)
+@pytest.mark.parametrize('driver', mobile_drivers, ids=mobile_ids)
 def test_multiple_locator_mobile(driver, request):
     request.getfixturevalue(driver)
     assert 'mobile_locator' in get_platform_locator(SomeGroup().multiple_element_partial)
 
 
-@pytest.mark.parametrize(
-    'driver',
-    ('mocked_ios_driver', 'mocked_android_driver'),
-    ids=['ios', 'android']
-)
+@pytest.mark.parametrize('driver', mobile_drivers, ids=mobile_ids)
 def test_multiple_locator_negative_all(driver, request):
     request.getfixturevalue(driver)
     try:

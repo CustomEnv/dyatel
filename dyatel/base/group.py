@@ -7,7 +7,7 @@ from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.internal_utils import get_child_elements_with_names
-from dyatel.mixins.element_mixin import shadow_class, repr_builder, all_mid_level_elements
+from dyatel.mixins.core_mixin import shadow_class, repr_builder, all_mid_level_elements
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
 

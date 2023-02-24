@@ -9,7 +9,7 @@ from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.exceptions import DriverWrapperException
 from dyatel.js_scripts import get_inner_height_js, get_inner_width_js
-from dyatel.mixins.internal_utils import get_child_elements_with_names, driver_with_index
+from dyatel.mixins.internal_utils import get_child_elements_with_names, driver_with_index, get_child_elements
 
 
 class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
@@ -77,38 +77,48 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
             DriverWrapper._init_count = 0
         return super().__getattribute__(item)
 
-    # TODO: rewrite me
+    def quit(self, silent=False):
+        super(self.__class__, self).quit(silent=silent)
+        DriverWrapper.all_drivers.remove(self.driver)
+
+        if self.driver == DriverWrapper.driver:  # Clear only if original driver closed
+            DriverWrapper.driver = None
+            DriverWrapper.instance = None
+            DriverWrapper.driver_wrapper = None
+
     def __set_base_class(self):
         """
         Get driver wrapper class in according to given driver source, and set him as base class
+
         :return: driver wrapper class
         """
-        DriverWrapper._init_count += 1
-        self.__class__.all_drivers = DriverWrapper.all_drivers
+        self.__reset_settings()
+        dcls, scls = DriverWrapper, self.__class__
+        scls.all_drivers = dcls.all_drivers
         if isinstance(self.driver, PlaywrightDriver):
-            self.__class__.__bases__ = PlayDriver,
-            self.__class__.mobile = False
-            self.__class__.playwright = True
-            self.__class__.desktop = True
-            return PlayDriver
-        if isinstance(self.driver, AppiumDriver):
-            if DriverWrapper.desktop:
-                DriverWrapper.is_multiplatform = True
-                self.__class__.is_multiplatform = True
-
-            self.__class__.__bases__ = MobileDriver,
-            self.__class__.mobile = True
-            self.__class__.desktop = False
-            return MobileDriver
-        if isinstance(self.driver, SeleniumDriver):
-            if DriverWrapper.mobile:
-                DriverWrapper.is_multiplatform = True
-                self.__class__.is_multiplatform = True
-
-            self.__class__.__bases__ = WebDriver,
-            self.__class__.mobile = False
-            self.__class__.desktop = True
-            self.__class__.selenium = True
-            return WebDriver
+            scls.playwright = True
+            scls.desktop = True
+            bcls = PlayDriver,
+        elif isinstance(self.driver, AppiumDriver):
+            scls.mobile = True
+            bcls = MobileDriver,
+        elif isinstance(self.driver, SeleniumDriver):
+            scls.desktop = True
+            scls.selenium = True
+            bcls = WebDriver,
         else:
             raise DriverWrapperException('Cant specify Driver')
+
+        self.__set_multiplatform(dcls, scls)
+        scls.__bases__ = bcls
+        dcls._init_count += 1
+        return self
+
+    def __reset_settings(self):
+        for name, _ in get_child_elements_with_names(self, bool).items():
+            setattr(self.__class__, name, False)
+
+    def __set_multiplatform(self, dcls, scls):
+        if (dcls.mobile and scls.desktop) or (dcls.desktop and scls.mobile):
+            dcls.is_multiplatform = True
+            scls.is_multiplatform = True

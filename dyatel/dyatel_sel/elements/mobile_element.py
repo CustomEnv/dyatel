@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import Union, List, BinaryIO, Any
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.dyatel_sel.sel_utils import get_legacy_selector, get_locator_type
 from dyatel.mixins.internal_utils import calculate_coordinate_to_click
 from dyatel.js_scripts import get_element_position_on_screen_js
+from dyatel.mixins.locator_mixin import get_platform_locator, get_selenium_locator_type, get_appium_selector
 
 
 class MobileElement(CoreElement):
@@ -20,10 +20,11 @@ class MobileElement(CoreElement):
         :param parent: parent of element. Can be MobileElement, MobilePage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self.locator_type = locator_type if locator_type else get_locator_type(locator)
-        self.locator, self.locator_type = get_legacy_selector(locator, self.locator_type)
+        locator = get_platform_locator(self, default_locator=locator)
+        locator_type = locator_type if locator_type else get_selenium_locator_type(locator)
+        locator, locator_type = get_appium_selector(locator, locator_type)
 
-        super().__init__(locator=self.locator, locator_type=self.locator_type, name=name, parent=parent, wait=wait)
+        super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
 
     @property
     def all_elements(self) -> Union[None, List[Any]]:

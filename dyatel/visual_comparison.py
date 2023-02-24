@@ -28,14 +28,24 @@ class VisualComparison:
     skip_screenshot_comparison = False
     visual_reference_generation = False
     hard_visual_reference_generation = False
+    default_delay = 0.75
+    default_threshold = 0
 
     def __init__(self, driver_wrapper, element):
         self.driver_wrapper = driver_wrapper
         self.dyatel_element = element
 
-    def assert_screenshot(self, filename: str = '', test_name: str = '', name_suffix: str = '',
-                          threshold: Union[int, float] = 0, delay: Union[int, float] = 0.75, scroll: bool = False,
-                          remove: List[Any] = None, fill_background: Union[str, bool] = False) -> VisualComparison:
+    def assert_screenshot(
+            self,
+            filename: str,
+            test_name: str,
+            name_suffix: str,
+            threshold: Union[int, float],
+            delay: Union[int, float],
+            scroll: bool,
+            remove: List[Any],
+            fill_background: Union[str, bool],
+    ) -> VisualComparison:
         """
         Assert given (by name) and taken screenshot equals
 

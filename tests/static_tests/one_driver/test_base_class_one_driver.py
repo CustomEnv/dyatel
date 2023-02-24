@@ -48,16 +48,16 @@ def test_base_group_class_selenium(mocked_selenium_driver):
 # Playwright
 
 
-def test_base_page_playwright(mocked_play_driver):
+def test_base_page_playwright(initialised_mocked_play_driver):
     page = Page('locator')
     assert page.__class__.__base__ == PlayPage
 
 
-def test_base_element_playwright(mocked_play_driver):
+def test_base_element_playwright(initialised_mocked_play_driver):
     element = Element('locator')
     assert element.__class__.__base__ == PlayElement
 
 
-def test_base_group_class_playwright(mocked_play_driver):
+def test_base_group_class_playwright(initialised_mocked_play_driver):
     group = Group('locator')
     assert group.__class__.__base__ == Element

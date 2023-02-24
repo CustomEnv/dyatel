@@ -4,7 +4,7 @@ from typing import Any, Union
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.mixins import internal_utils
-from dyatel.mixins.element_mixin import all_mid_level_elements
+from dyatel.mixins.core_mixin import all_mid_level_elements
 
 
 class PreviousObjectDriver:
@@ -46,7 +46,7 @@ class PreviousObjectDriver:
         :param frame_index: frame start index
         :return: None
         """
-        if isinstance(current_obj, all_mid_level_elements()) and self._is_element(current_obj):
+        if not self._is_group(current_obj) and self._is_element(current_obj):
             previous_object = self._get_correct_previous_object_with_parent(frame_index)
             if previous_object:
                 if self._is_group(previous_object):

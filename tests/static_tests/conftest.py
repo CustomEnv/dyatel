@@ -61,6 +61,12 @@ def mocked_selenium_driver():
 @pytest.fixture
 def mocked_play_driver():
     driver_wrapper = DriverWrapper(Browser(MagicMock()))
+    return driver_wrapper
+
+
+@pytest.fixture
+def initialised_mocked_play_driver():
+    driver_wrapper = DriverWrapper(Browser(MagicMock()))
     DriverWrapper.driver = PlaywrightDriver(MagicMock())
     return driver_wrapper
 
@@ -78,3 +84,19 @@ def base_teardown():
     DriverWrapper._init_count = 0
     PlayDriver.driver = None
     CoreDriver.driver = None
+
+
+mobile_drivers = [mocked_ios_driver.__name__, mocked_android_driver.__name__]
+mobile_ids = ['appium ios', 'appium android']
+
+
+desktop_drivers = [mocked_selenium_driver.__name__, mocked_play_driver.__name__]
+desktop_ids = ['selenium', 'playwright']
+
+
+all_drivers = mobile_drivers + desktop_drivers
+all_ids = mobile_ids + desktop_ids
+
+
+selenium_drivers = [mocked_selenium_driver.__name__] + mobile_drivers
+selenium_ids = ['selenium'] + mobile_ids
