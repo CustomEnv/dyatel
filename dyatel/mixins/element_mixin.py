@@ -32,9 +32,10 @@ def repr_builder(instance, cls):
         class_name = instance.__class__.__name__
         driver_title = driver_with_index(instance.driver_wrapper, instance.driver)
         parent_class = instance.parent.__class__.__name__ if hasattr(instance, 'parent') else None
+        locator_holder = getattr(instance, 'anchor', instance)
 
-        locator = f'locator="{instance.locator}"'
-        locator_type = f'locator_type="{instance.locator_type}"'
+        locator = f'locator="{locator_holder.locator}"'
+        locator_type = f'locator_type="{locator_holder.locator_type}"'
         name = f'name="{instance.name}"'
         parent = f'parent={parent_class}'
         obj_id = hex(id(instance))
