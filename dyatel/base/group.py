@@ -1,20 +1,25 @@
 from __future__ import annotations
 
-from copy import copy
-from typing import Any, Union
+from typing import Any, Union, List
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.internal_utils import get_child_elements_with_names
-from dyatel.mixins.core_mixin import shadow_class, repr_builder, all_mid_level_elements
+from dyatel.mixins.element_mixin import shadow_class, repr_builder
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
+from dyatel.mixins.core_mixin import (
+    get_child_elements_with_names,
+    all_mid_level_elements,
+    set_parent_for_attr,
+    initialize_objects,
+    get_child_elements,
+)
 
 
 class Group(Element):
     """ Group of elements. Should be defined as class """
 
-    _is_group = True
+    _object = 'group'
 
     def __new__(cls, *args, **kwargs):
         return shadow_class(cls)
@@ -64,13 +69,10 @@ class Group(Element):
         Set parent and custom driver for Group class variables, if their instance is Element class
         Will be called automatically after __init__ by metaclass `AfterInitMeta`
         """
-        for name, value in get_child_elements_with_names(self, all_mid_level_elements()).items():
-            setattr(self, name, copy(value))
-            value = getattr(self, name)
-            if value.parent is None:
-                value.parent = self
-            else:
-                setattr(value, 'parent', copy(value.parent))
+        elements_types = all_mid_level_elements()
+        initialize_objects(self, get_child_elements_with_names(self, elements_types))
+        set_parent_for_attr(elements_types, self, check_parent=True)
+        self.child_elements: List[Element] = get_child_elements(self, elements_types)
 
     def _modify_object(self):
         PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)

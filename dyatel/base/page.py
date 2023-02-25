@@ -13,15 +13,15 @@ from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.internal_utils import WAIT_PAGE
-from dyatel.mixins.core_mixin import shadow_class, repr_builder, set_base_class
+from dyatel.mixins.core_mixin import WAIT_PAGE
+from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
 
 class Page(WebPage, MobilePage, PlayPage):
     """ Page object crossroad. Should be defined as class """
 
-    _is_page = True
+    _object = 'page'
 
     def __new__(cls, *args, **kwargs):
         return shadow_class(cls)
@@ -162,6 +162,5 @@ class Page(WebPage, MobilePage, PlayPage):
         else:
             breakpoint()
             raise DriverWrapperException(f'Cant specify {Page.__name__}')
-
 
         return set_base_class(self, Page, cls)

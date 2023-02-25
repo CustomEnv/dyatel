@@ -5,7 +5,7 @@ from typing import Any
 from selenium.webdriver.common.by import By
 
 from dyatel.exceptions import UnsuitableArgumentsException, InvalidSelectorException
-from dyatel.mixins.internal_utils import get_child_elements, all_tags
+from dyatel.mixins.core_mixin import get_child_elements, all_tags
 
 
 selenium_locator_types = get_child_elements(By, str)

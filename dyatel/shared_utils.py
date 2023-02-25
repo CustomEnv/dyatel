@@ -1,5 +1,4 @@
 import io
-import logging
 from subprocess import Popen, PIPE, run
 
 from PIL import Image

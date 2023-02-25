@@ -3,8 +3,7 @@ from __future__ import annotations
 from typing import Any, Union
 
 from dyatel.base.driver_wrapper import DriverWrapper
-from dyatel.mixins import internal_utils
-from dyatel.mixins.core_mixin import all_mid_level_elements
+from dyatel.mixins.core_mixin import get_frame
 
 
 class PreviousObjectDriver:
@@ -71,7 +70,7 @@ class PreviousObjectDriver:
         :return: None or object with driver_wrapper
         """
         timeout = 15
-        frame = internal_utils.get_frame(index)
+        frame = get_frame(index)
         prev_object = frame.f_locals.get('self', None)
         unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)
 
@@ -88,7 +87,7 @@ class PreviousObjectDriver:
             if index == timeout:
                 return None
 
-            frame = internal_utils.get_frame(index)
+            frame = get_frame(index)
             prev_object = frame.f_locals.get('self', None)
             unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)
 
@@ -104,7 +103,7 @@ class PreviousObjectDriver:
         :param index: frame index to start
         :return: None or object with driver_wrapper
         """
-        frame = internal_utils.get_frame(index)
+        frame = get_frame(index)
         prev_object = frame.f_locals.get('self', None)
 
         if self._is_group(prev_object):
@@ -113,12 +112,10 @@ class PreviousObjectDriver:
         return None
 
     def _is_page(self, obj):
-        return getattr(obj, '_is_page', False)
+        return getattr(obj, '_object', False) == 'page'
 
     def _is_element(self, obj):
-        return getattr(obj, '_is_element', False)
+        return getattr(obj, '_object', False) == 'element'
 
     def _is_group(self, obj):
-        return getattr(obj, '_is_group', False)
-
-
+        return getattr(obj, '_object', False) == 'group'

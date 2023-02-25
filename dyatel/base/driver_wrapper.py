@@ -1,4 +1,4 @@
-from typing import Union, Callable
+from typing import Union
 
 from playwright.sync_api import Browser as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -9,7 +9,11 @@ from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.exceptions import DriverWrapperException
 from dyatel.js_scripts import get_inner_height_js, get_inner_width_js
-from dyatel.mixins.internal_utils import get_child_elements_with_names, driver_with_index, get_child_elements
+from dyatel.mixins.core_mixin import (
+    get_child_elements_with_names,
+    driver_with_index,
+    get_all_attributes_from_object,
+)
 
 
 class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
@@ -28,18 +32,12 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
     is_real_device = False
     is_multiplatform = False
 
-    # TODO: rewrite me
     def __new__(cls, *args, **kwargs):
         if DriverWrapper._init_count == 0:
             return super().__new__(cls)
 
-        class_objects = {}
-        for name, value in get_child_elements_with_names(cls, Callable).items():
-            if not name.endswith('__'):
-                class_objects.update({name: value})
-        class_objects.update({name: False for name in get_child_elements_with_names(cls, bool).keys()})
-        class_objects.update({'__repr__': cls.__repr__})
-        return super().__new__(type("DifferentDriverWrapper", (DriverWrapper, ), class_objects))  # noqa
+        class_objects = get_all_attributes_from_object(cls, stop_on_base=True)
+        return super().__new__(type(f'Shadow{DriverWrapper.__name__}', (cls, ), class_objects))  # noqa
 
     def __repr__(self):
         cls = self.__class__
@@ -72,14 +70,10 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         """
         return {'height': self.execute_script(get_inner_height_js), 'width': self.execute_script(get_inner_width_js)}
 
-    def __getattribute__(self, item):
-        if item == 'quit':
-            DriverWrapper._init_count = 0
-        return super().__getattribute__(item)
-
     def quit(self, silent=False):
         super(self.__class__, self).quit(silent=silent)
         DriverWrapper.all_drivers.remove(self.driver)
+        DriverWrapper._init_count -= 1
 
         if self.driver == DriverWrapper.driver:  # Clear only if original driver closed
             DriverWrapper.driver = None
@@ -112,7 +106,7 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         self.__set_multiplatform(dcls, scls)
         scls.__bases__ = bcls
         dcls._init_count += 1
-        return self
+        return self.__class__
 
     def __reset_settings(self):
         for name, _ in get_child_elements_with_names(self, bool).items():

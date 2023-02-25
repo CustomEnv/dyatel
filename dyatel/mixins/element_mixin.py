@@ -3,40 +3,61 @@ from __future__ import annotations
 from copy import copy
 from typing import List, Any, Union
 
+from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.internal_utils import get_child_elements_with_names
+from dyatel.mixins.core_mixin import get_all_attributes_from_object, \
+    driver_with_index, get_element_info, set_parent_for_attr
 
 
-def get_element_info(element: Any) -> str:
+def shadow_class(current_cls):
     """
-    Get full loging data depends on parent element
+    Creates a "shadow" class from current one and base class of current
 
-    :param element: element to collect log data
-    :return: log string
+    :param current_cls: current class
+    :return: new "shadow" class
     """
-    parent = element.parent
-    current_data = f'Selector: ["{element.locator_type}": "{element.locator}"]'
-    if parent:
-        parent_data = f'Parent selector: ["{parent.locator_type}": "{parent.locator}"]'
-        current_data = f'{current_data}. {parent_data}'
-    return current_data
+    if DriverWrapper.is_multiplatform:
+
+        if not getattr(current_cls, '__created', False):
+            class_objects = get_all_attributes_from_object(current_cls, stop_on_base=True)
+            new_class = type(f'Shadow{current_cls.__name__}', (current_cls,), class_objects)
+            new_class.__created = True
+            return object.__new__(new_class)  # noqa
+
+    return object.__new__(current_cls)
 
 
-def set_parent_for_attr(instance_class: type, base_obj: object):
-    """
-    Copy attributes of given object and set new parent for him
+def repr_builder(instance, cls):
+    try:
+        class_name = instance.__class__.__name__
+        driver_title = driver_with_index(instance.driver_wrapper, instance.driver)
+        parent_class = instance.parent.__class__.__name__ if hasattr(instance, 'parent') else None
 
-    :param instance_class: attribute class to looking for
-    :param base_obj: object of attribute
-    :return: self
-    """
-    child_elements = get_child_elements_with_names(base_obj, instance_class).items()
+        locator = f'locator="{instance.locator}"'
+        locator_type = f'locator_type="{instance.locator_type}"'
+        name = f'name="{instance.name}"'
+        parent = f'parent={parent_class}'
+        obj_id = hex(id(instance))
+        driver = f'{driver_title}={instance.driver}'
 
-    for name, child in child_elements:
-        wrapped_child = copy(child)
-        wrapped_child.parent = base_obj
-        setattr(base_obj, name, wrapped_child)
-        set_parent_for_attr(instance_class, wrapped_child)
+        base = f'{class_name}({locator}, {locator_type}, {name}, {parent}) at {obj_id}'
+        additional_info = driver
+        return f'{base}, {additional_info}'
+    except AttributeError:
+        return super(get_base_class(instance, cls), instance).__repr__()
+
+
+def get_base_class(obj, current_cls):
+    return obj.__class__ if DriverWrapper.is_multiplatform else current_cls
+
+
+def set_base_class(obj, current_cls, cls_to_set):
+    cls = get_base_class(obj, current_cls)
+
+    if cls_to_set:
+        cls.__bases__ = cls_to_set
+
+    return cls
 
 
 class ElementMixin(DriverMixin):

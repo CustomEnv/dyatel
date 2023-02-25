@@ -12,13 +12,10 @@ from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.internal_utils import (
+from dyatel.mixins.core_mixin import (
     WAIT_EL,
-    get_child_elements,
     get_timeout_in_ms,
-    initialize_objects,
     calculate_coordinate_to_click,
-    get_child_elements_with_names,
 )
 from dyatel.mixins.locator_mixin import get_platform_locator, get_playwright_locator
 
@@ -42,9 +39,6 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         self.name = name if name else self.locator
         self.parent = parent
         self.wait = wait
-
-        initialize_objects(self, get_child_elements_with_names(self, PlayElement))
-        self.child_elements: List[PlayElement] = get_child_elements(self, PlayElement)
 
     # Element
 

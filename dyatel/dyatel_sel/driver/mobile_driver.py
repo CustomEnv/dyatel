@@ -225,7 +225,7 @@ class MobileDriver(CoreDriver):
         """
         iOS only: Get bottom bar height
 
-        :param force: get the new value forcly
+        :param force: get the new value forcibly
         :return: self
         """
         if force or not self.top_bar_height:

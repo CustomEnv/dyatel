@@ -5,7 +5,7 @@ from typing import List, Union, Any
 from playwright.sync_api import Page as PlaywrightPage, Locator, Page
 from playwright.sync_api import Browser
 
-from dyatel.mixins.internal_utils import get_timeout_in_ms
+from dyatel.mixins.core_mixin import get_timeout_in_ms
 from dyatel.mixins.log_mixin import LogMixin
 
 

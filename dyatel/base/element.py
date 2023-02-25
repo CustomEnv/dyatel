@@ -12,8 +12,8 @@ from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
-from dyatel.mixins.internal_utils import WAIT_EL, is_target_on_screen
-from dyatel.mixins.core_mixin import shadow_class, repr_builder, all_mid_level_elements, set_base_class
+from dyatel.mixins.core_mixin import WAIT_EL, is_target_on_screen, all_mid_level_elements
+from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
@@ -23,6 +23,7 @@ class Element(WebElement, MobileElement, PlayElement):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
     _is_element = True
+    _object = 'element'
 
     def __new__(cls, *args, **kwargs):
         return shadow_class(cls)

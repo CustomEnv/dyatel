@@ -6,7 +6,7 @@ from os.path import basename
 from typing import Any
 
 from dyatel.js_scripts import add_driver_index_comment_js, find_comments_js
-from dyatel.mixins.internal_utils import get_frame, driver_with_index
+from dyatel.mixins.core_mixin import get_frame, driver_with_index
 
 
 def dyatel_logs_settings():

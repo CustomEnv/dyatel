@@ -25,18 +25,13 @@ from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
+from dyatel.mixins.core_mixin import WAIT_EL
 from dyatel.exceptions import (
     TimeoutException,
     InvalidSelectorException,
     DriverWrapperException,
     NoSuchElementException,
     ElementNotInteractableException,
-)
-from dyatel.mixins.internal_utils import (
-    WAIT_EL,
-    get_child_elements,
-    initialize_objects,
-    get_child_elements_with_names,
 )
 
 
@@ -60,9 +55,6 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         self.name = name
         self.parent: Any = parent
         self.wait = wait
-
-        initialize_objects(self, get_child_elements_with_names(self, CoreElement))  # required for Group
-        self.child_elements: List[CoreElement] = get_child_elements(self, CoreElement)
 
     # Element
 
@@ -539,7 +531,6 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
                 return base
 
         if self.parent:
-            self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')
 
             try:
 
