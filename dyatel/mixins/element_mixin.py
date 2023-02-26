@@ -27,25 +27,26 @@ def shadow_class(current_cls):
     return object.__new__(current_cls)
 
 
-def repr_builder(instance, cls):
+def repr_builder(instance):
+    class_name = instance.__class__.__name__
+    obj_id = hex(id(instance))
+
     try:
-        class_name = instance.__class__.__name__
         driver_title = driver_with_index(instance.driver_wrapper, instance.driver)
-        parent_class = instance.parent.__class__.__name__ if hasattr(instance, 'parent') else None
+        parent_class = instance.parent.__class__.__name__ if getattr(instance, 'parent', False) else None
         locator_holder = getattr(instance, 'anchor', instance)
 
         locator = f'locator="{locator_holder.locator}"'
         locator_type = f'locator_type="{locator_holder.locator_type}"'
         name = f'name="{instance.name}"'
         parent = f'parent={parent_class}'
-        obj_id = hex(id(instance))
         driver = f'{driver_title}={instance.driver}'
 
         base = f'{class_name}({locator}, {locator_type}, {name}, {parent}) at {obj_id}'
         additional_info = driver
         return f'{base}, {additional_info}'
     except AttributeError:
-        return super(get_base_class(instance, cls), instance).__repr__()
+        return f'{class_name} object at {obj_id}'
 
 
 def get_base_class(obj, current_cls):

@@ -27,7 +27,10 @@ class Page(WebPage, MobilePage, PlayPage):
         return shadow_class(cls)
 
     def __repr__(self):
-        return repr_builder(self, Page)
+        return repr_builder(self)
+
+    def __call__(self, *arg, **kwargs):
+        return self
 
     def __init__(  # noqa
             self,
@@ -160,7 +163,6 @@ class Page(WebPage, MobilePage, PlayPage):
         elif isinstance(self.driver, SeleniumDriver):
             cls = WebPage,
         else:
-            breakpoint()
             raise DriverWrapperException(f'Cant specify {Page.__name__}')
 
         return set_base_class(self, Page, cls)

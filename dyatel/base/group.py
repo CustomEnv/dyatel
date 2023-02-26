@@ -8,15 +8,29 @@ from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.element_mixin import shadow_class, repr_builder
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 from dyatel.mixins.core_mixin import (
-    get_child_elements_with_names,
     all_mid_level_elements,
     set_parent_for_attr,
-    initialize_objects,
     get_child_elements,
 )
 
 
-class Group(Element):
+class AfterInitMeta(type):
+    """ Call a custom function right after __init__ of original class """
+
+    def __call__(cls, *args, **kwargs):
+        """
+        Wrapper for calling a custom function right after __init__ of original class
+
+        :param args: original class args
+        :param kwargs: original class kwargs
+        :return: class object
+        """
+        obj = type.__call__(cls, *args, **kwargs)
+        obj._modify_children()  # noqa
+        return obj
+
+
+class Group(Element, metaclass=AfterInitMeta):
     """ Group of elements. Should be defined as class """
 
     _object = 'group'
@@ -25,7 +39,7 @@ class Group(Element):
         return shadow_class(cls)
 
     def __repr__(self):
-        return repr_builder(self, Group)
+        return repr_builder(self)
 
     def __init__(
             self,
@@ -54,7 +68,6 @@ class Group(Element):
         """
         self._init_locals = locals()
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
-        self._modify_children()
 
         super().__init__(
             locator=locator,
@@ -69,8 +82,8 @@ class Group(Element):
         Set parent and custom driver for Group class variables, if their instance is Element class
         Will be called automatically after __init__ by metaclass `AfterInitMeta`
         """
+        self._initialize_objects()
         elements_types = all_mid_level_elements()
-        initialize_objects(self, get_child_elements_with_names(self, elements_types))
         set_parent_for_attr(elements_types, self, check_parent=True)
         self.child_elements: List[Element] = get_child_elements(self, elements_types)
 

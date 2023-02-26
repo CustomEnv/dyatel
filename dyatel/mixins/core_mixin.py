@@ -44,10 +44,7 @@ def initialize_objects(current_object, objects: dict):
     for name, obj in objects.items():
         if not getattr(obj, '_initialized', False):
             copied_obj = copy(obj)
-            copied_obj._driver_instance = current_object._driver_instance  # noqa
-            copied_obj._set_base_class()  # noqa
-            copied_obj._initialized = True
-            setattr(current_object, name, copied_obj)
+            setattr(current_object, name, copied_obj(driver_wrapper=current_object.driver_wrapper))
 
 
 def get_child_elements(obj: object, instance: Union[type, tuple]) -> list:

@@ -61,8 +61,8 @@ def test_mobile_and_desktop_element_repr(driver, request):
     assert 'appium.webdriver.webdriver.WebDriver' in mobile_info
 
     assert 'Element' in desktop_info
-    assert 'locator="[id="element-repr"]"' in desktop_info
-    assert 'locator_type="css selector"' in desktop_info
+    assert 'locator="element-repr"' in desktop_info
+    assert 'locator_type="id"' in desktop_info
     assert 'name="element-repr"' in desktop_info
     assert 'parent=ShadowMyGroup' in desktop_info
     assert 'at 0x' in desktop_info
@@ -85,7 +85,7 @@ def test_mobile_and_desktop_group_repr(driver, request):
     assert 'locator="[id="repr-group"]"' in mobile_info
     assert 'locator_type="css selector"' in mobile_info
     assert 'name="repr-group"' in mobile_info
-    assert 'parent=NoneType' in mobile_info
+    assert 'parent=None' in mobile_info
     assert 'at 0x' in mobile_info
     assert '1_driver' in mobile_info
     assert 'appium.webdriver.webdriver.WebDriver' in mobile_info
@@ -94,7 +94,7 @@ def test_mobile_and_desktop_group_repr(driver, request):
     assert 'locator="repr-group"' in desktop_info
     assert 'locator_type="id"' in desktop_info
     assert 'name="repr-group"' in desktop_info
-    assert 'parent=NoneType' in desktop_info
+    assert 'parent=None' in desktop_info
     assert 'at 0x' in desktop_info
     assert '2_driver' in desktop_info
     assert 'selenium.webdriver' in desktop_info

@@ -30,6 +30,7 @@ def mocked_ios_driver(mocked_shared_mobile_driver):
         }
     )()
     driver_wrapper = DriverWrapper(mocked_shared_mobile_driver())
+    DriverWrapper.driver = driver_wrapper.driver
     return driver_wrapper
 
 
@@ -43,6 +44,7 @@ def mocked_android_driver(mocked_shared_mobile_driver):
         }
     )()
     driver_wrapper = DriverWrapper(mocked_shared_mobile_driver())
+    DriverWrapper.driver = driver_wrapper.driver
     return driver_wrapper
 
 
@@ -55,17 +57,12 @@ def mocked_selenium_driver():
     selenium_driver.error_handler = MagicMock()
 
     driver_wrapper = DriverWrapper(selenium_driver())
+    DriverWrapper.driver = driver_wrapper.driver
     return driver_wrapper
 
 
 @pytest.fixture
 def mocked_play_driver():
-    driver_wrapper = DriverWrapper(Browser(MagicMock()))
-    return driver_wrapper
-
-
-@pytest.fixture
-def initialised_mocked_play_driver():
     driver_wrapper = DriverWrapper(Browser(MagicMock()))
     DriverWrapper.driver = PlaywrightDriver(MagicMock())
     return driver_wrapper

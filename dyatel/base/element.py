@@ -12,24 +12,36 @@ from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
-from dyatel.mixins.core_mixin import WAIT_EL, is_target_on_screen, all_mid_level_elements
+from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
+from dyatel.mixins.core_mixin import (
+    WAIT_EL,
+    is_target_on_screen,
+    all_mid_level_elements,
+    initialize_objects,
+    get_child_elements_with_names,
+)
 
 
 class Element(WebElement, MobileElement, PlayElement):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
-    _is_element = True
     _object = 'element'
 
     def __new__(cls, *args, **kwargs):
         return shadow_class(cls)
 
     def __repr__(self):
-        return repr_builder(self, Element)
+        return repr_builder(self)
+
+    def __call__(self, driver_wrapper=None):
+        if not self._initialized:
+            self.__full_init__(driver_wrapper=driver_wrapper)
+
+        return self
 
     def __init__(  # noqa
             self,
@@ -66,19 +78,26 @@ class Element(WebElement, MobileElement, PlayElement):
                 f'The "parent" of "{self.name}" should take an Element/Group object or False for skip. Get {self.parent}'
 
         # Taking from Group first if available
+        self._initialized = False
         self._init_locals = getattr(self, '_init_locals', locals())
         self._driver_instance = getattr(self, '_driver_instance', DriverWrapper)
-        self._modify_object()
 
-        self.__base_class = self._set_base_class()
-        if self.__base_class:
-            super(self.__base_class, self).__init__(
-                locator=self.locator,
-                locator_type=self.locator_type,
-                name=self.name,
-                parent=self.parent,
-                wait=self.wait
-            )
+        if self.driver:
+            self.__full_init__(self.driver_wrapper if self._object == 'group' else None)
+
+    def __full_init__(self, driver_wrapper=None):
+        self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
+        self._modify_object()
+        self._initialize_objects()
+        self._initialized = True
+
+        super(self._set_base_class(), self).__init__(
+            locator=self.locator,
+            locator_type=self.locator_type,
+            name=self.name,
+            parent=self.parent,
+            wait=self.wait
+        )
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 
@@ -308,8 +327,11 @@ class Element(WebElement, MobileElement, PlayElement):
         # No exception due to delayed initialization
         return set_base_class(self, Element, cls)
 
+    def _initialize_objects(self):
+        initialize_objects(self, get_child_elements_with_names(self, all_mid_level_elements()))
+
     def _modify_object(self):
         prev_object_manager = PreviousObjectDriver()
-        prev_object_manager.set_driver_from_previous_object_for_element(self, 5)
-        if not getattr(self, '_initialized', False) and self.parent is None:
-            prev_object_manager.set_parent_from_previous_object_for_element(self, 5)
+        prev_object_manager.set_driver_from_previous_object_for_element(self, 6)
+        if not self._initialized and self.parent is None:
+            prev_object_manager.set_parent_from_previous_object_for_element(self, 6)

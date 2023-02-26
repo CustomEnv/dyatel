@@ -41,7 +41,7 @@ def test_mobile_element_repr(driver, request):
     assert 'locator="[id="element-repr"]"' in info
     assert 'locator_type="css selector"' in info
     assert 'name="element-repr"' in info
-    assert 'parent=NoneType' in info
+    assert 'parent=None' in info
     assert 'at 0x' in info
     assert '1_driver' in info
     assert 'appium.webdriver.webdriver.WebDriver' in info
@@ -53,7 +53,7 @@ def test_selenium_element_repr(mocked_selenium_driver):
     assert 'locator="element-repr"' in info
     assert 'locator_type="id"' in info
     assert 'name="element-repr"' in info
-    assert 'parent=NoneType' in info
+    assert 'parent=None' in info
     assert 'at 0x' in info
     assert '1_driver' in info
     assert 'selenium.webdriver' in info
@@ -67,7 +67,7 @@ def test_mobile_group_repr(driver, request):
     assert 'locator="[id="element-repr"]"' in info
     assert 'locator_type="css selector"' in info
     assert 'name="element-repr"' in info
-    assert 'parent=NoneType' in info
+    assert 'parent=None' in info
     assert 'at 0x' in info
     assert '1_driver' in info
     assert 'appium.webdriver.webdriver.WebDriver' in info
@@ -79,7 +79,7 @@ def test_selenium_group_repr(mocked_selenium_driver):
     assert 'locator="element-repr"' in info
     assert 'locator_type="id"' in info
     assert 'name="element-repr"' in info
-    assert 'parent=NoneType' in info
+    assert 'parent=None' in info
     assert 'at 0x' in info
     assert '1_driver' in info
     assert 'selenium.webdriver' in info
