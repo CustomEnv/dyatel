@@ -74,34 +74,39 @@ def get_child_elements_with_names(obj: Any, instance: Union[type, tuple]) -> dic
 
 def get_all_attributes_from_object(
         reference_obj: Any,
-        obj_items: Any = None,
         stop_on_base: bool = False
 ) -> dict:
     """
     Get all attributes from object
 
     :param reference_obj: reference object
-    :param obj_items: original attributes
     :param stop_on_base: stop grabbing on dyatel base classes ~ WebElement/PlayPage etc.
     :return: dict of all attributes
     """
-    if not obj_items:
-        obj_items = {}
-
     reference_class = reference_obj if inspect.isclass(reference_obj) else reference_obj.__class__
 
-    for parent_class in reference_class.__bases__:
-        str_parent_class = str(parent_class)
+    def get_items(cls, items=None):
 
-        if "'object'" in str_parent_class or "'type'" in str_parent_class:
-            break
+        if not items:
+            items = {}
 
-        if stop_on_base and 'dyatel' in str_parent_class and 'dyatel.base' not in str_parent_class:
-            continue
+        for parent_class in cls.__bases__:
 
-        obj_items.update(dict(parent_class.__dict__))
-        get_all_attributes_from_object(parent_class, obj_items, stop_on_base)
+            str_parent_class = str(parent_class)
 
+            if "'object'" in str_parent_class or "'type'" in str_parent_class:
+                break
+
+            if stop_on_base and 'dyatel' in str_parent_class and 'dyatel.base' not in str_parent_class:
+                continue
+
+            items.update({name: value for name, value in parent_class.__dict__.items() if name not in items.keys()})
+
+            get_items(parent_class, items)
+
+        return items
+
+    obj_items = get_items(reference_class)
     obj_items.update({attr: value for attr, value in reference_class.__dict__.items() if '__' not in str(attr)})
     obj_items.update(dict(reference_obj.__dict__))
 
@@ -157,7 +162,7 @@ def driver_with_index(driver_wrapper, driver) -> str:
     """
     try:
         index = driver_wrapper.all_drivers.index(driver) + 1
-    except ValueError:
+    except (ValueError, AttributeError):
         index = '?'
 
     return f'{index}_driver'
@@ -199,10 +204,15 @@ def set_parent_for_attr(instance_class: Union[type, tuple], base_obj: object, ch
 
     for name, child in child_elements:
         wrapped_child = copy(child)
-        wrapped_child.parent = base_obj
-        setattr(base_obj, name, wrapped_child)
 
-        if check_parent and wrapped_child.parent is None:
+        parent = wrapped_child.parent
+        parent_object_type = getattr(parent, '_object', None)
+
+        if parent_object_type == 'group' or parent is None:
             wrapped_child.parent = base_obj
 
-        set_parent_for_attr(instance_class, wrapped_child)
+        if parent_object_type == 'element' and not parent._initialized:  # noqa
+            wrapped_child.parent = parent()  # noqa
+
+        setattr(base_obj, name, wrapped_child)
+        set_parent_for_attr(instance_class, wrapped_child, check_parent=check_parent)
