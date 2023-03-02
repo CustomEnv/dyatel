@@ -144,7 +144,7 @@ class Page(WebPage, MobilePage, PlayPage):
         :return: Element object
         """
         anchor = Element(locator=self.locator, locator_type=self.locator_type, name=self.name)
-        anchor._driver_instance = self.driver_wrapper
+        anchor.driver_wrapper = self.driver_wrapper
         return anchor
 
     def _modify_object(self):

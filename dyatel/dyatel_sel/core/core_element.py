@@ -92,9 +92,9 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         try:
             self.wait_clickable(silent=True).element.click()
         except SeleniumElementNotInteractableException:
-            raise ElementNotInteractableException(exception_msg) from None
+            raise ElementNotInteractableException(exception_msg)
         except SeleniumElementClickInterceptedException as exc:
-            raise ElementNotInteractableException(f'{exception_msg}. Original error: {exc.msg}') from None
+            raise ElementNotInteractableException(f'{exception_msg}. Original error: {exc.msg}')
         finally:
             self.element = None
 
@@ -201,7 +201,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if not is_displayed:
             base_exception_msg = f'Element "{self.name}" not visible after {timeout} seconds'
-            raise TimeoutException(f'{base_exception_msg} {self.get_element_info()}') from None
+            raise TimeoutException(f'{base_exception_msg} {self.get_element_info()}')
 
         return self
 
@@ -223,7 +223,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if not is_hidden:
             msg = f'"{self.name}" still visible after {timeout} seconds. {self.get_element_info()}'
-            raise TimeoutException(msg) from None
+            raise TimeoutException(msg)
 
         return self
 
@@ -246,7 +246,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if not is_clickable:
             msg = f'"{self.name}" not clickable after {timeout} seconds. {self.get_element_info()}'
-            raise TimeoutException(msg) from None
+            raise TimeoutException(msg)
 
         return self
 
@@ -268,7 +268,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if not is_available:
             msg = f'"{self.name}" not available in DOM after {timeout} seconds. {self.get_element_info()}'
-            raise TimeoutException(msg) from None
+            raise TimeoutException(msg)
 
         return self
 
@@ -511,7 +511,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if not element:
             msg = f'Cant find element "{self.name}". {self.get_element_info()}'
-            raise NoSuchElementException(msg) from None
+            raise NoSuchElementException(msg)
 
         return element
 
@@ -524,7 +524,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         base = self.driver
 
         if not base:
-            raise DriverWrapperException("Can't find driver") from None
+            raise DriverWrapperException("Can't find driver")
 
         if self.driver_wrapper.mobile:
             if self.driver_wrapper.is_native_context:
@@ -540,7 +540,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
             except NoSuchElementException:
                 message = f'Cant find parent element "{self.parent.name}". {self.get_element_info(self.parent)}'
-                raise NoSuchElementException(message) from None
+                raise NoSuchElementException(message)
 
         return base
 
@@ -556,7 +556,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         except (SeleniumInvalidArgumentException, SeleniumInvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
         except SeleniumNoSuchElementException as exc:
-            raise NoSuchElementException(exc.msg) from None
+            raise NoSuchElementException(exc.msg)
 
     def _find_elements(self, base: Any) -> List[Union[SeleniumWebElement, AppiumWebElement]]:
         """
@@ -579,6 +579,6 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         """
         if 'invalid locator' in exc.msg or 'is not a valid' in exc.msg:
             msg = f'Selector for "{self.name}" is invalid. {self.get_element_info(self)}'
-            raise InvalidSelectorException(msg) from None
+            raise InvalidSelectorException(msg)
         else:
-            raise exc from None
+            raise exc

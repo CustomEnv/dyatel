@@ -38,7 +38,7 @@ class Element(WebElement, MobileElement, PlayElement):
         return repr_builder(self)
 
     def __call__(self, driver_wrapper=None):
-        if not self._initialized:
+        if self.driver and not self._initialized:
             self.__full_init__(driver_wrapper=driver_wrapper)
 
         return self
@@ -88,7 +88,10 @@ class Element(WebElement, MobileElement, PlayElement):
     def __full_init__(self, driver_wrapper=None):
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
         self._modify_object()
-        self._initialize_objects()
+
+        if self._object == 'element':
+            self._initialize_objects()
+
         self._initialized = True
 
         super(self._set_base_class(), self).__init__(

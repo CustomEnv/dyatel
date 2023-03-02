@@ -1,8 +1,6 @@
 get_inner_height_js = 'return window.innerHeight'
 get_inner_width_js = 'return window.innerWidth'
 
-get_outer_height_js = 'return window.outerHeight'
-
 get_element_position_on_screen_js = """
 function getPositionOnScreen(elem) {
   let box = elem.getBoundingClientRect();
@@ -40,6 +38,7 @@ for (var i=0, max=elements.length; i < max; i++) {
      elements[0].remove()
 };
 """
+
 add_element_over_js = """
 function appendElement(given_obj) {
     given_obj = given_obj.getBoundingClientRect();
@@ -61,12 +60,6 @@ function appendElement(given_obj) {
 return appendElement(arguments[0]);
 """
 
-check_element_js = 'arguments[0].checked = true'
-uncheck_element_js = 'arguments[0].checked = false'
-is_element_checked_js = 'return arguments[0].checked'
-
-click_js = 'arguments[0].click();'
-is_displayed_js = 'return arguments[0].style.display == false;'
 
 add_driver_index_comment_js = """
 function addComment(driver_index) {

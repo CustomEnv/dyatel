@@ -154,7 +154,7 @@ class MobileDriver(CoreDriver):
 
         :return: bool
         """
-        if not self.__is_native_context:
+        if self.__is_native_context is None:
             self.__is_native_context = self.get_current_context() == self.native_context_name
 
         return self.__is_native_context
@@ -166,7 +166,7 @@ class MobileDriver(CoreDriver):
 
         :return: bool
         """
-        if not self.__is_web_context:
+        if self.__is_web_context is None:
             self.__is_web_context = self.get_current_context() == self.web_context_name
 
         return self.__is_web_context

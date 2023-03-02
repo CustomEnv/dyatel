@@ -113,7 +113,7 @@ class VisualComparison:
             self._disable_reruns()
 
             raise FileNotFoundError(f'Reference file "{reference_file}" not found, but its just saved. '
-                                    f'If it CI run, then you need to commit reference files.') from None
+                                    f'If it CI run, then you need to commit reference files.')
 
         if self.visual_reference_generation:
             return self
@@ -135,7 +135,7 @@ class VisualComparison:
                 el = obj.element
             except TimeoutException:
                 msg = f'Cannot find {obj.name} while removing background from screenshot. {get_element_info(obj)}'
-                raise TimeoutException(msg) from None
+                raise TimeoutException(msg)
 
             self.driver_wrapper.execute_script(add_element_over_js, el)
         return self

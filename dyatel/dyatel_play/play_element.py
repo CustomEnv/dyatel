@@ -231,7 +231,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         try:
             self._first_element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
         except PlayTimeoutError:
-            raise TimeoutException(f'Element "{self.name}" not visible after {timeout} seconds') from None
+            raise TimeoutException(f'Element "{self.name}" not visible after {timeout} seconds')
         return self
 
     def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
@@ -248,7 +248,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         try:
             self._first_element.wait_for(state='hidden', timeout=get_timeout_in_ms(timeout))
         except PlayTimeoutError:
-            raise TimeoutException(f'Element "{self.name}" still visible after {timeout} seconds') from None
+            raise TimeoutException(f'Element "{self.name}" still visible after {timeout} seconds')
         return self
 
     def wait_clickable(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
