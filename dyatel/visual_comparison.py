@@ -9,10 +9,9 @@ import base64
 from typing import Union, List, Any
 from string import punctuation
 
+import cv2
 import numpy
 from skimage.metrics import structural_similarity
-import cv2
-import numpy as np
 
 from dyatel.exceptions import DriverWrapperException, TimeoutException
 from dyatel.js_scripts import add_element_over_js, delete_element_over_js
@@ -293,7 +292,7 @@ class VisualComparison:
         contours = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         contours = contours[0] if len(contours) == 2 else contours[1]
 
-        mask = np.zeros(img1.shape, dtype='uint8')
+        mask = numpy.zeros(img1.shape, dtype='uint8')
         filled_after = img2.copy()
 
         for c in contours:

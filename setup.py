@@ -21,7 +21,7 @@ setup(
     install_requires=[
         'Appium-Python-Client>=2.1.2',
         'numpy>=1.24.2',
-        'opencv-python>=4.7.0.68',
+        'opencv-python>=4.7.0.72',
         'Pillow>=9.1.1'
         'playwright>=1.22.0',
         'selenium>=4.1.0',
