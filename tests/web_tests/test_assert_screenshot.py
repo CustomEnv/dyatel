@@ -5,7 +5,7 @@ import pytest_rerunfailures
 
 
 @pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])
-def test_screenshot1(base_playground_page, driver_engine, driver_name, platform, with_name):
+def test_screenshot(base_playground_page, driver_engine, driver_name, platform, with_name):
     filename = f'{driver_engine}-{driver_name}-{platform}-kube' if with_name else ''
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename)
 
