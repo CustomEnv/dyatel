@@ -130,7 +130,10 @@ def test_driver_in_hidden_group(driver_wrapper, second_driver_wrapper):
     pizza_page.open_page()
 
     assert mouse_page.is_page_opened()
-    assert mouse_page.mouse_click_card().click_area.is_displayed()  # mouse_click_card without specified driver
+    assert mouse_page.mouse_click_card().is_displayed()  # mouse_click_card without specified driver
+    assert mouse_page.mouse_click_card().click_area.parent.is_displayed()
+    assert mouse_page.mouse_click_card().click_area.element  # can fail on unexpected __call__ to object
+    assert mouse_page.mouse_click_card().click_area.is_displayed()  # can fail on unexpected __call__ to parent
 
     assert pizza_page.is_page_opened()
     assert pizza_page.quantity_input.is_displayed()

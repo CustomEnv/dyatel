@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Any
+from typing import Union, Any, List
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -13,7 +13,8 @@ from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.core_mixin import WAIT_PAGE
+from dyatel.mixins.core_mixin import WAIT_PAGE, initialize_objects, get_child_elements_with_names, \
+    all_mid_level_elements, get_child_elements
 from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 
@@ -57,9 +58,15 @@ class Page(WebPage, MobilePage, PlayPage):
         self.locator_type = locator_type
         self.name = name if name else locator
 
+        self.url = getattr(self, 'url', '')
+
+        self._element = None
         self._init_locals = locals()
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
         self._modify_object()
+        self._modify_children()
+
+        self.page_elements: List[Element] = get_child_elements(self, Element)
 
         super(self.__set_base_class(), self).__init__()
 
@@ -147,9 +154,6 @@ class Page(WebPage, MobilePage, PlayPage):
         anchor.driver_wrapper = self.driver_wrapper
         return anchor
 
-    def _modify_object(self):
-        PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)
-
     def __set_base_class(self) -> Page:
         """
         Get page class in according to current driver, and set him as base class
@@ -166,3 +170,11 @@ class Page(WebPage, MobilePage, PlayPage):
             raise DriverWrapperException(f'Cant specify {Page.__name__}')
 
         return set_base_class(self, Page, cls)
+
+    def _modify_children(self):
+        """ Initialize child Group/Page objects """
+        initialize_objects(self, get_child_elements_with_names(self, all_mid_level_elements()))
+
+    def _modify_object(self):
+        """ Set driver from previous object """
+        PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)

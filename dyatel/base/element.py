@@ -38,7 +38,7 @@ class Element(WebElement, MobileElement, PlayElement):
         return repr_builder(self)
 
     def __call__(self, driver_wrapper=None):
-        if self.driver and not self._initialized:
+        if self.driver or driver_wrapper:
             self.__full_init__(driver_wrapper=driver_wrapper)
 
         return self
@@ -92,15 +92,16 @@ class Element(WebElement, MobileElement, PlayElement):
         self._modify_object()
         self._modify_children()
 
-        self._initialized = True
+        if not self._initialized:
+            super(self._set_base_class(), self).__init__(
+                locator=self.locator,
+                locator_type=self.locator_type,
+                name=self.name,
+                parent=self.parent,
+                wait=self.wait
+            )
 
-        super(self._set_base_class(), self).__init__(
-            locator=self.locator,
-            locator_type=self.locator_type,
-            name=self.name,
-            parent=self.parent,
-            wait=self.wait
-        )
+        self._initialized = True
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 

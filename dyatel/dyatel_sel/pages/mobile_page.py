@@ -8,9 +8,6 @@ from dyatel.dyatel_sel.core.core_page import CorePage
 
 class MobilePage(CorePage):
 
-    def __init__(self):
-        super().__init__()
-
     def swipe(self, start_x: int, start_y: int, end_x: int, end_y: int,
               duration: int = 0, sleep: Union[int, float] = 0) -> MobilePage:
         """
