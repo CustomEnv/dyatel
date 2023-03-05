@@ -10,27 +10,11 @@ from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 from dyatel.mixins.core_mixin import (
     all_mid_level_elements,
     set_parent_for_attr,
-    get_child_elements,
+    get_child_elements, initialize_objects, get_child_elements_with_names,
 )
 
 
-class AfterInitMeta(type):
-    """ Call a custom function right after __init__ of original class """
-
-    def __call__(cls, *args, **kwargs):
-        """
-        Wrapper for calling a custom function right after __init__ of original class
-
-        :param args: original class args
-        :param kwargs: original class kwargs
-        :return: class object
-        """
-        obj = type.__call__(cls, *args, **kwargs)
-        obj._modify_children()  # noqa
-        return obj
-
-
-class Group(Element, metaclass=AfterInitMeta):
+class Group(Element):
     """ Group of elements. Should be defined as class """
 
     _object = 'group'
@@ -41,7 +25,7 @@ class Group(Element, metaclass=AfterInitMeta):
     def __repr__(self):
         return repr_builder(self)
 
-    def __init__(
+    def __init__(  # noqa
             self,
             locator: str = '',
             locator_type: str = '',
@@ -82,7 +66,8 @@ class Group(Element, metaclass=AfterInitMeta):
         Set parent and custom driver for Group class variables, if their instance is Element class
         Will be called automatically after __init__ by metaclass `AfterInitMeta`
         """
-        self._initialize_objects()
+        initialize_objects(self, get_child_elements_with_names(self, all_mid_level_elements()))
+
         elements_types = all_mid_level_elements()
         set_parent_for_attr(elements_types, self, check_parent=True)
         self.child_elements: List[Element] = get_child_elements(self, elements_types)

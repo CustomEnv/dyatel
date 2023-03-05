@@ -45,6 +45,7 @@ def initialize_objects(current_object, objects: dict):
         if not getattr(obj, '_initialized', False):
             copied_obj = copy(obj)
             setattr(current_object, name, copied_obj(driver_wrapper=current_object.driver_wrapper))
+            initialize_objects(obj, get_child_elements_with_names(obj, all_mid_level_elements()))
 
 
 def get_child_elements(obj: object, instance: Union[type, tuple]) -> list:

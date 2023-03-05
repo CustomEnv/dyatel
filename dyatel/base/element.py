@@ -72,6 +72,8 @@ class Element(WebElement, MobileElement, PlayElement):
         self.name = name if name else locator
         self.parent = parent
         self.wait = wait
+        self.is_element = self._object == 'element'
+        self.is_group = self._object == 'group'
 
         if self.parent:
             assert isinstance(self.parent, (bool, all_mid_level_elements())), \
@@ -83,14 +85,12 @@ class Element(WebElement, MobileElement, PlayElement):
         self._driver_instance = getattr(self, '_driver_instance', DriverWrapper)
 
         if self.driver:
-            self.__full_init__(self.driver_wrapper if self._object == 'group' else None)
+            self.__full_init__(self.driver_wrapper if self.is_group else None)
 
     def __full_init__(self, driver_wrapper=None):
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
         self._modify_object()
-
-        if self._object == 'element':
-            self._initialize_objects()
+        self._modify_children()
 
         self._initialized = True
 
@@ -330,7 +330,11 @@ class Element(WebElement, MobileElement, PlayElement):
         # No exception due to delayed initialization
         return set_base_class(self, Element, cls)
 
-    def _initialize_objects(self):
+    def _modify_children(self):
+        """
+        Set parent and custom driver for Group class variables, if their instance is Element class
+        Will be called automatically after __init__ by metaclass `AfterInitMeta`
+        """
         initialize_objects(self, get_child_elements_with_names(self, all_mid_level_elements()))
 
     def _modify_object(self):
