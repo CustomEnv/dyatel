@@ -62,6 +62,10 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         self.__set_base_class()
         super(self.__class__, self).__init__(driver=self.driver)
 
+    def quit(self, silent: bool = True):
+        super(self.__class__, self).quit(silent=silent)
+        DriverWrapper._init_count -= 1
+
     def get_inner_window_size(self) -> dict:
         """
         Get inner size of driver window
@@ -69,16 +73,6 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         :return: {'height': value, 'width': value}
         """
         return {'height': self.execute_script(get_inner_height_js), 'width': self.execute_script(get_inner_width_js)}
-
-    def quit(self, silent=False):
-        super(self.__class__, self).quit(silent=silent)
-        DriverWrapper.all_drivers.remove(self.driver)
-        DriverWrapper._init_count -= 1
-
-        if self.driver == DriverWrapper.driver:  # Clear only if original driver closed
-            DriverWrapper.driver = None
-            DriverWrapper.instance = None
-            DriverWrapper.driver_wrapper = None
 
     def __set_base_class(self):
         """

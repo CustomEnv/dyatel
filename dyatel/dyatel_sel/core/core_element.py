@@ -533,8 +533,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         if self.parent:
             try:
                 if self.parent._object in ('group', 'element'):  # noqa
-                    if not self.parent._initialized:  # noqa
-                        self.parent = self.parent()
+                    self.parent = self.parent(self.driver_wrapper)
 
                     base = self.parent._get_element(wait=wait)  # noqa
                 else:

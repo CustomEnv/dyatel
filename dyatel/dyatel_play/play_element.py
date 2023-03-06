@@ -443,8 +443,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
             self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')
 
             if self.parent._object in ('group', 'element'):  # noqa
-                if not self.parent._initialized:  # noqa
-                    self.parent = self.parent()  # noqa
+                self.parent = self.parent(self.driver_wrapper)  # noqa
 
                 base = self.parent.element
             else:

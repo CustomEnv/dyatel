@@ -116,6 +116,12 @@ class CoreDriver(LogMixin):
 
         self.driver.quit()
 
+        self.all_drivers.remove(self.driver)
+
+        if self.driver == CoreDriver.driver:  # Clear only if original driver closed
+            CoreDriver.driver = None
+            CoreDriver.driver_wrapper = None
+
     def set_cookie(self, cookies: List[dict]) -> CoreDriver:
         """
         Adds a list of cookie dictionaries to current session
