@@ -100,7 +100,7 @@ def promote_parent_element(obj: Any, base_obj: Any):
     if not initial_parent:
         return None
 
-    if is_element(initial_parent):
+    if is_element(initial_parent) and initial_parent != base_obj:
         obj.parent = copy(initial_parent(base_obj.driver_wrapper))
         new_parent = get_parent(obj)
         top_parent = get_parent(new_parent)
