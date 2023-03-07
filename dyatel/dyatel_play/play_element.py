@@ -16,6 +16,8 @@ from dyatel.mixins.core_mixin import (
     WAIT_EL,
     get_timeout_in_ms,
     calculate_coordinate_to_click,
+    is_group,
+    is_element,
 )
 from dyatel.mixins.locator_mixin import get_platform_locator, get_playwright_locator
 
@@ -53,7 +55,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         """
         element = self._element
         if not element:
-            driver = self._get_driver()
+            driver = self._get_base()
             if isinstance(driver, ElementHandle):
                 element = driver.query_selector(self.locator)
             else:
@@ -432,7 +434,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
 
     # Mixin
 
-    def _get_driver(self) -> Union[PlaywrightPage, Locator, ElementHandle]:
+    def _get_base(self) -> Union[PlaywrightPage, Locator, ElementHandle]:
         """
         Get driver depends on parent element if available
 
@@ -442,12 +444,8 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         if self.parent:
             self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')
 
-            if self.parent._object in ('group', 'element'):  # noqa
-                self.parent = self.parent(self.driver_wrapper)  # noqa
-
+            if is_group(self.parent) or is_element(self.parent):
                 base = self.parent.element
-            else:
-                base = self.parent.anchor.element  # noqa
 
         return base
 

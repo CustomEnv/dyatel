@@ -66,10 +66,10 @@ class Group(Element):
         Set parent and custom driver for Group class variables, if their instance is Element class
         Will be called automatically after __init__ by metaclass `AfterInitMeta`
         """
-        initialize_objects(self, get_child_elements_with_names(self, all_mid_level_elements()))
-
         elements_types = all_mid_level_elements()
-        set_parent_for_attr(elements_types, self, check_parent=True)
+
+        initialize_objects(self, get_child_elements_with_names(self, elements_types))
+        set_parent_for_attr(elements_types, self)
         self.child_elements: List[Element] = get_child_elements(self, elements_types)
 
     def _modify_object(self):

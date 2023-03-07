@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Union
 
 from dyatel.base.driver_wrapper import DriverWrapper
-from dyatel.mixins.core_mixin import get_frame
+from dyatel.mixins.core_mixin import get_frame, is_group, is_page, is_element
 
 
 class PreviousObjectDriver:
@@ -32,7 +32,7 @@ class PreviousObjectDriver:
         """
         if len(DriverWrapper.all_drivers) > 1:
             if current_obj.driver == DriverWrapper.driver:
-                if self._is_element(current_obj):
+                if is_element(current_obj):
                     previous_object = self._get_correct_previous_object_with_driver(frame_index, current_obj=current_obj)
                     if previous_object:
                         current_obj.driver_wrapper = previous_object.driver_wrapper
@@ -45,10 +45,10 @@ class PreviousObjectDriver:
         :param frame_index: frame start index
         :return: None
         """
-        if not self._is_group(current_obj) and self._is_element(current_obj):
+        if not is_group(current_obj) and is_element(current_obj):
             previous_object = self._get_correct_previous_object_with_parent(frame_index)
             if previous_object:
-                if self._is_group(previous_object):
+                if is_group(previous_object):
                     current_obj.parent = previous_object
 
     def previous_object_is_not_group_or_page(self, obj: Any) -> bool:
@@ -58,9 +58,7 @@ class PreviousObjectDriver:
         :param obj: obj to be checked
         :return: bool
         """
-        is_group = self._is_group(obj)
-        is_page = self._is_page(obj)
-        return not (is_page or is_group) or obj is None
+        return not (is_group(obj) or is_page(obj)) or obj is None
 
     def _get_correct_previous_object_with_driver(self, index: int, current_obj: Any = False) -> Union[None, Any]:
         """
@@ -106,16 +104,7 @@ class PreviousObjectDriver:
         frame = get_frame(index)
         prev_object = frame.f_locals.get('self', None)
 
-        if self._is_group(prev_object):
+        if is_group(prev_object):
             return prev_object
 
         return None
-
-    def _is_page(self, obj):
-        return getattr(obj, '_object', False) == 'page'
-
-    def _is_element(self, obj):
-        return getattr(obj, '_object', False) == 'element'
-
-    def _is_group(self, obj):
-        return getattr(obj, '_object', False) == 'group'

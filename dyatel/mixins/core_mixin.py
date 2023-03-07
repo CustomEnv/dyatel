@@ -33,6 +33,18 @@ def get_timeout_in_ms(timeout: int):
     return timeout * 1000 if timeout < 1000 else timeout
 
 
+def is_element(any_obj):
+    return getattr(any_obj, '_object', None) == 'element'
+
+
+def is_group(any_obj):
+    return getattr(any_obj, '_object', None) == 'group'
+
+
+def is_page(any_obj):
+    return getattr(any_obj, '_object', None) == 'page'
+
+
 def initialize_objects(current_object, objects: dict):
     """
     Initializing objects with itself args/kwargs
@@ -43,8 +55,57 @@ def initialize_objects(current_object, objects: dict):
     """
     for name, obj in objects.items():
         copied_obj = copy(obj)
+        promote_parent_element(copied_obj, current_object)
         setattr(current_object, name, copied_obj(driver_wrapper=current_object.driver_wrapper))
-        initialize_objects(obj, get_child_elements_with_names(obj, all_mid_level_elements()))
+        initialize_objects(copied_obj, get_child_elements_with_names(copied_obj, all_mid_level_elements()))
+
+
+def set_parent_for_attr(instance_class: Union[type, tuple], base_obj: object, with_copy: bool = False):
+    """
+    Copy attributes of given object and set new parent for him
+
+    :param instance_class: attribute class to looking for
+    :param base_obj: object of attribute
+    :param with_copy: copy child object or not
+    :return: self
+    """
+    child_elements = get_child_elements_with_names(base_obj, instance_class).items()
+
+    for name, child in child_elements:
+        if with_copy:
+            child = copy(child)
+
+        if is_group(child.parent) or child.parent is None:
+            child.parent = base_obj
+
+        if with_copy:
+            setattr(base_obj, name, child)
+
+        set_parent_for_attr(instance_class, child, with_copy)
+
+
+def promote_parent_element(obj: Any, base_obj: Any):
+    """
+    Promote parent element in element if parent is another element
+
+    :param obj: any element
+    :param base_obj: base object of element: Page/Group instance
+    :return: None
+    """
+    def get_parent(any_obj):
+        return getattr(any_obj, 'parent', None)
+
+    initial_parent = get_parent(obj)
+
+    if not initial_parent:
+        return None
+
+    if is_element(initial_parent):
+        obj.parent = copy(initial_parent(base_obj.driver_wrapper))
+        new_parent = get_parent(obj)
+        top_parent = get_parent(new_parent)
+        if is_group(base_obj) and top_parent is None:
+            new_parent.parent = base_obj
 
 
 def get_child_elements(obj: object, instance: Union[type, tuple]) -> list:
@@ -189,30 +250,3 @@ def get_element_info(element: Any) -> str:
         parent_data = f'Parent selector: ["{parent.locator_type}": "{parent.locator}"]'
         current_data = f'{current_data}. {parent_data}'
     return current_data
-
-
-def set_parent_for_attr(instance_class: Union[type, tuple], base_obj: object, check_parent: bool = False):
-    """
-    Copy attributes of given object and set new parent for him
-
-    :param instance_class: attribute class to looking for
-    :param base_obj: object of attribute
-    :param check_parent: object of attribute
-    :return: self
-    """
-    child_elements = get_child_elements_with_names(base_obj, instance_class).items()
-
-    for name, child in child_elements:
-        wrapped_child = copy(child)
-
-        parent = wrapped_child.parent
-        parent_object_type = getattr(parent, '_object', None)
-
-        if parent_object_type == 'group' or parent is None:
-            wrapped_child.parent = base_obj
-
-        if parent_object_type == 'element' and not parent._initialized:  # noqa
-            wrapped_child.parent = parent()  # noqa
-
-        setattr(base_obj, name, wrapped_child)
-        set_parent_for_attr(instance_class, wrapped_child, check_parent=check_parent)

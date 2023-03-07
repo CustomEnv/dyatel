@@ -89,7 +89,7 @@ class ElementMixin(DriverMixin):
             wrapped_object: Any = copy(self)
             wrapped_object.element = element
             wrapped_object._wrapped = True
-            set_parent_for_attr(instance_class, wrapped_object)
+            set_parent_for_attr(instance_class, wrapped_object, with_copy=True)
             wrapped_elements.append(wrapped_object)
 
         return wrapped_elements

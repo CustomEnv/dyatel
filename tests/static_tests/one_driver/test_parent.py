@@ -19,6 +19,7 @@ def test_element_with_parent(driver, request):
     request.getfixturevalue(driver)
     section = Section()
     assert section.elwp.parent == section
+    assert section.elwithop.parent.parent == section
     assert section.elwoutp.parent is False
     assert section.elwithop.parent.locator in section.elwp.locator
     assert section.elwithop.parent._initialized

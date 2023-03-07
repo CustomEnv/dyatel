@@ -148,3 +148,22 @@ def test_driver_in_hidden_page(driver_wrapper, second_driver_wrapper):
 
     assert exp_cond_page.max_wait_input.wait_element(2).is_displayed()
     assert keyboard_page.input_area.wait_element(2).is_displayed()
+
+
+def test_second_driver_in_parent_element(driver_wrapper, second_driver_wrapper):
+    mouse_page2 = MouseEventPage(second_driver_wrapper)
+    mouse_page2.open_page()
+    card = mouse_page2.drag_n_drop()
+
+    assert card.drag_target.parent._initialized
+    assert card.card_body._initialized
+
+    assert card.card_body.parent == card
+    assert card.drag_target.parent.parent == card
+    assert card.drag_target.parent.locator == card.card_body.locator
+
+    assert mouse_page2.is_page_opened()
+    assert card.drag_target.is_displayed()
+
+    assert card.drag_target.parent.driver_wrapper == second_driver_wrapper
+    assert card.card_body.driver_wrapper == second_driver_wrapper

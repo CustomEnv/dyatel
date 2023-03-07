@@ -25,7 +25,7 @@ from dyatel.mixins.log_mixin import LogMixin
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.core_mixin import WAIT_EL
+from dyatel.mixins.core_mixin import WAIT_EL, is_group, is_element
 from dyatel.exceptions import (
     TimeoutException,
     InvalidSelectorException,
@@ -90,7 +90,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         exception_msg = f'Element "{self.name}" not interactable {self.get_element_info()}'
 
         try:
-            self.wait_clickable(silent=True).element.click()
+            self.wait_element(silent=True).wait_clickable(silent=True).element.click()
         except SeleniumElementNotInteractableException:
             raise ElementNotInteractableException(exception_msg)
         except SeleniumElementClickInterceptedException as exc:
@@ -532,14 +532,8 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if self.parent:
             try:
-                if self.parent._object in ('group', 'element'):  # noqa
-                    self.parent = self.parent(self.driver_wrapper)
-
+                if is_group(self.parent) or is_element(self.parent):
                     base = self.parent._get_element(wait=wait)  # noqa
-                else:
-                    get_element_func = getattr(self.parent.anchor, '_get_element')
-                    base = get_element_func(wait=wait)
-
             except NoSuchElementException:
                 message = f'Cant find parent element "{self.parent.name}". {self.get_element_info(self.parent)}'
                 raise NoSuchElementException(message)

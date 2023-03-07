@@ -21,9 +21,20 @@ class MouseEventPage(Page):
     def mouse_click_card(self):
         return MouseClickCard()
 
+    def drag_n_drop(self):
+        return DragAndDrop()
+
 
 class MouseEventPageWithUnexpectedWait(MouseEventPage):
     dropdown = Element('div.dropdown-content', name='dropdown with languages and wait', wait=True)
+
+
+class DragAndDrop(Group):
+    def __init__(self):
+        super().__init__('//*[contains(@class, "card") and .//.="Drag and Drop"]', name='drag and drop card')
+
+    card_body = Element('.card-body', name='card body')
+    drag_target = Element('drop_target', name='drag target button', parent=card_body)
 
 
 class MouseClickCard(Group):
