@@ -5,6 +5,8 @@ import sys
 from os.path import basename
 from typing import Any
 
+from selenium.common import WebDriverException as SeleniumWebDriverException
+
 from dyatel.js_scripts import add_driver_index_comment_js, find_comments_js
 from dyatel.mixins.core_mixin import get_frame, driver_with_index
 
@@ -39,7 +41,11 @@ def send_log_message(log_message: str, level: str, ) -> None:
     :param log_message: custom message
     :return: None
     """
-    logging.log(getattr(logging, level.upper()), log_message)
+    try:
+        # workaround for https://github.com/pytest-dev/pytest/issues/5502
+        logging.log(getattr(logging, level.upper()), log_message)
+    except ValueError:
+        pass
 
 
 def autolog(message: Any, level: str = 'info') -> Any:
@@ -74,9 +80,13 @@ class LogMixin:
 
         if index:
             driver_log = f'[{index}]'
-            if driver_wrapper.selenium:
-                if '_driver' not in str(driver_wrapper.execute_script(find_comments_js)):
-                    driver_wrapper.execute_script(add_driver_index_comment_js, index)
+
+            try:
+                if driver_wrapper.selenium:
+                    if '_driver' not in str(driver_wrapper.execute_script(find_comments_js)):
+                        driver_wrapper.execute_script(add_driver_index_comment_js, index)
+            except SeleniumWebDriverException:
+                pass
 
         send_log_message(f'{driver_log}{get_log_message(message)}', level)
         return None
