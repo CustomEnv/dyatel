@@ -2,7 +2,6 @@ import random
 
 import pytest
 
-from dyatel.base.element import Element
 from dyatel.exceptions import NoSuchElementException
 from dyatel.mixins.element_mixin import ElementMixin
 from tests.adata.pages.keyboard_page import KeyboardPage
@@ -116,5 +115,9 @@ def test_element_group_all_elements_child(second_playground_page):
 
 
 def test_all_elements_recursion(base_playground_page):
-    assert base_playground_page.kube.all_elements[0].all_elements is None
-    assert hasattr(Element, 'all_elements')
+    try:
+        base_playground_page.kube.all_elements[0].all_elements
+    except RecursionError:
+        pass
+    else:
+        raise AssertionError('RecursionError was not raised')

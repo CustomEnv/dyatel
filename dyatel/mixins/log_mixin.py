@@ -5,7 +5,7 @@ import sys
 from os.path import basename
 from typing import Any
 
-from selenium.common import WebDriverException as SeleniumWebDriverException
+from selenium.common.exceptions import WebDriverException as SeleniumWebDriverException
 
 from dyatel.js_scripts import add_driver_index_comment_js, find_comments_js
 from dyatel.mixins.core_mixin import get_frame, driver_with_index

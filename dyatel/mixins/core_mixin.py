@@ -92,20 +92,24 @@ def promote_parent_element(obj: Any, base_obj: Any):
     :param base_obj: base object of element: Page/Group instance
     :return: None
     """
-    def get_parent(any_obj):
-        return getattr(any_obj, 'parent', None)
-
-    initial_parent = get_parent(obj)
+    initial_parent = getattr(obj, 'parent', None)
 
     if not initial_parent:
         return None
 
     if is_element(initial_parent) and initial_parent != base_obj:
-        obj.parent = copy(initial_parent(base_obj.driver_wrapper))
-        new_parent = get_parent(obj)
-        top_parent = get_parent(new_parent)
-        if is_group(base_obj) and top_parent is None:
-            new_parent.parent = base_obj
+        for el in get_child_elements(base_obj, all_mid_level_elements()):
+
+            if el.locator == obj.parent.locator:
+                obj.parent = el
+
+            appium_match = f'"{obj.parent.locator}"' in el.locator
+            if obj.driver_wrapper.mobile and appium_match:
+                obj.parent = el
+
+            playwright_match = f'={obj.parent.locator}' in el.locator
+            if obj.driver_wrapper.playwright and playwright_match:
+                obj.parent = el
 
 
 def get_child_elements(obj: object, instance: Union[type, tuple]) -> list:

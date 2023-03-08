@@ -33,10 +33,6 @@ class MobileElement(CoreElement):
 
         :return: list of wrapped objects
         """
-        if getattr(self, '_wrapped', None):
-            self.log('all_elements property already used', level='warning')
-            return None
-
         appium_elements = self._find_elements(self._get_base())
         return self._get_all_elements(appium_elements, MobileElement)
 

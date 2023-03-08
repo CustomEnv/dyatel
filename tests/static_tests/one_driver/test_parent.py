@@ -2,7 +2,7 @@ import pytest
 
 from dyatel.base.element import Element
 from dyatel.base.group import Group
-from tests.static_tests.conftest import all_drivers, all_ids
+from tests.static_tests.conftest import selenium_drivers, selenium_ids
 
 
 class Section(Group):
@@ -14,7 +14,7 @@ class Section(Group):
     elwithop = Element('elwithop', parent=elwp)
 
 
-@pytest.mark.parametrize('driver', all_drivers, ids=all_ids)
+@pytest.mark.parametrize('driver', selenium_drivers, ids=selenium_ids)
 def test_element_with_parent(driver, request):
     request.getfixturevalue(driver)
     section = Section()

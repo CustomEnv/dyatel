@@ -30,10 +30,6 @@ class WebElement(CoreElement):
 
         :return: list of wrapped objects
         """
-        if getattr(self, '_wrapped', None):
-            self.log('all_elements property already used', level='warning')
-            return None
-
         selenium_elements = self._find_elements(self._get_base())
         return self._get_all_elements(selenium_elements, WebElement)
 

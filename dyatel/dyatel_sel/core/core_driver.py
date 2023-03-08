@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Union, List, Any
 
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException as SeleniumWebDriverException
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
 from dyatel.dyatel_sel.sel_utils import ActionChains
@@ -44,7 +44,7 @@ class CoreDriver(LogMixin):
 
         try:
             self.driver.get(url)
-        except WebDriverException:
+        except SeleniumWebDriverException:
             raise DriverWrapperException(f'Can\'t proceed to {url}')
 
         return self

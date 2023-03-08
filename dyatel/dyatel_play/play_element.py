@@ -79,10 +79,6 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
 
         :return: list of wrapped objects
         """
-        if getattr(self, '_wrapped', None):
-            self.log('all_elements property already used', level='warning')
-            return None
-
         return self._get_all_elements(self.element.element_handles(), PlayElement)
 
     # Element interaction

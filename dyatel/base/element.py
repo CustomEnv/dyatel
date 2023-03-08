@@ -93,7 +93,8 @@ class Element(WebElement, MobileElement, PlayElement):
         self._modify_children()
 
         if not self._initialized:
-            super(self._set_base_class(), self).__init__(
+            self.__bcls = self._set_base_class()
+            super(self.__bcls, self).__init__(
                 locator=self.locator,
                 locator_type=self.locator_type,
                 name=self.name,
@@ -238,6 +239,13 @@ class Element(WebElement, MobileElement, PlayElement):
             if not silent:
                 self.log(f'Ignored exception: "{exception.msg}"')
         return self
+
+    @property
+    def all_elements(self) -> Union[Any]:
+        if getattr(self, '_wrapped', None):
+            raise RecursionError('all_elements property already used')
+
+        return super(self.__bcls, self).all_elements
 
     def is_visible(self, silent: bool = False) -> bool:
         """

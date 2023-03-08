@@ -5,8 +5,12 @@ from typing import List, Any, Union
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.core_mixin import get_all_attributes_from_object, \
-    driver_with_index, get_element_info, set_parent_for_attr
+from dyatel.mixins.core_mixin import (
+    get_all_attributes_from_object,
+    driver_with_index,
+    get_element_info,
+    set_parent_for_attr,
+)
 
 
 def shadow_class(current_cls):

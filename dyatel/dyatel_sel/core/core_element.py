@@ -78,10 +78,11 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
     # Element interaction
 
-    def click(self) -> CoreElement:
+    def click(self, with_wait=True) -> CoreElement:
         """
         Click to current element
 
+        :param with_wait: wait for element before click
         :return: self
         """
         self.log(f'Click into "{self.name}"')
@@ -90,7 +91,10 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         exception_msg = f'Element "{self.name}" not interactable {self.get_element_info()}'
 
         try:
-            self.wait_element(silent=True).wait_clickable(silent=True).element.click()
+            if with_wait:
+                self.wait_element(silent=True)
+
+            self.wait_clickable(silent=True).element.click()
         except SeleniumElementNotInteractableException:
             raise ElementNotInteractableException(exception_msg)
         except SeleniumElementClickInterceptedException as exc:
@@ -159,7 +163,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         try:
             if not self.is_checked():
-                self.click()
+                self.click(with_wait=False)
         finally:
             self.element = None
 
@@ -175,7 +179,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         try:
             if self.is_checked():
-                self.click()
+                self.click(with_wait=False)
         finally:
             self.element = None
 
