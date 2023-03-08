@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from copy import copy
 from typing import List, Any, Union
 
@@ -68,6 +69,15 @@ def set_base_class(obj, current_cls, cls_to_set):
 
 class ElementMixin(DriverMixin):
     """ Mixin for PlayElement and CoreElement """
+
+    @property
+    @abstractmethod
+    def all_elements(self):
+        raise NotImplementedError('all_elements method is not implemented for current class')
+
+    @abstractmethod
+    def wait_enabled(self, *args, **kwargs):
+        raise NotImplementedError('wait_enabled method is not implemented for current class')
 
     def get_element_info(self, element: Any = None) -> str:
         """

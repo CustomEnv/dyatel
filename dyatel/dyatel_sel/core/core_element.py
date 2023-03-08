@@ -94,7 +94,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             if with_wait:
                 self.wait_element(silent=True)
 
-            self.wait_clickable(silent=True).element.click()
+            self.wait_enabled(silent=True).element.click()
         except SeleniumElementNotInteractableException:
             raise ElementNotInteractableException(exception_msg)
         except SeleniumElementClickInterceptedException as exc:
@@ -227,29 +227,6 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if not is_hidden:
             msg = f'"{self.name}" still visible after {timeout} seconds. {self.get_element_info()}'
-            raise TimeoutException(msg)
-
-        return self
-
-    def wait_clickable(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
-        """
-        Wait until element clickable
-
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait until "{self.name}" become clickable')
-
-        element = self.element
-        is_clickable = False
-        start_time = time.time()
-        while time.time() - start_time < timeout and not is_clickable:
-            is_clickable = element.is_enabled()
-
-        if not is_clickable:
-            msg = f'"{self.name}" not clickable after {timeout} seconds. {self.get_element_info()}'
             raise TimeoutException(msg)
 
         return self
@@ -415,7 +392,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             self.log(f'Get all texts from "{self.name}"')
 
         self.wait_element(silent=True)
-        return list(element_item.text for element_item in getattr(self, 'all_elements'))
+        return list(element_item.text for element_item in self.all_elements)
 
     def get_elements_count(self, silent: bool = False) -> int:
         """
@@ -427,7 +404,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         if not silent:
             self.log(f'Get elements count of "{self.name}"')
 
-        return len(getattr(self, 'all_elements'))
+        return len(self.all_elements)
 
     def get_rect(self) -> dict:
         """
@@ -440,6 +417,18 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         location = self.driver.execute_script(get_element_position_on_screen_js, element)
         sorted_items: list = sorted({**size, **location}.items(), reverse=True)
         return dict(sorted_items)
+
+    def is_enabled(self, silent: bool = False) -> bool:
+        """
+        Check if element enabled
+
+        :param silent: erase log
+        :return: True if element enabled
+        """
+        if not silent:
+            self.log(f'Check is element "{self.name}" enabled')
+
+        return self.element.is_enabled()
 
     def is_checked(self) -> bool:
         """

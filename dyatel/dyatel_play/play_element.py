@@ -249,20 +249,6 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
             raise TimeoutException(f'Element "{self.name}" still visible after {timeout} seconds')
         return self
 
-    def wait_clickable(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
-        """
-        Compatibility placeholder
-        Wait until element clickable
-
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Skip wait until clickable of "{self.name}". Timeout: {timeout}')
-
-        return self
-
     def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait for current element available in DOM
@@ -419,6 +405,18 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         """
         sorted_items: list = sorted(self.element.bounding_box().items(), reverse=True)
         return dict(sorted_items)
+
+    def is_enabled(self, silent: bool = False) -> bool:
+        """
+        Check if element enabled
+
+        :param silent: erase log
+        :return: True if element enabled
+        """
+        if not silent:
+            self.log(f'Check is element "{self.name}" enabled')
+
+        return self._first_element.is_enabled()
 
     def is_checked(self) -> bool:
         """

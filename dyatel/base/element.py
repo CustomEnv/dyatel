@@ -240,6 +240,52 @@ class Element(WebElement, MobileElement, PlayElement):
                 self.log(f'Ignored exception: "{exception.msg}"')
         return self
 
+    def wait_enabled(self, timeout: int = WAIT_EL, silent: bool = False) -> Element:
+        """
+        Wait until element clickable
+
+        :param: timeout: time to stop waiting
+        :param: silent: erase log
+        :return: self
+        """
+        if not silent:
+            self.log(f'Wait until "{self.name}" become enabled')
+
+        element = self.element
+        enabled = False
+        start_time = time.time()
+        while time.time() - start_time < timeout and not enabled:
+            enabled = element.is_enabled()
+
+        if not enabled:
+            msg = f'"{self.name}" not enabled after {timeout} seconds. {self.get_element_info()}'
+            raise TimeoutException(msg)
+
+        return self
+
+    def wait_disabled(self, timeout: int = WAIT_EL, silent: bool = False) -> Element:
+        """
+        Wait until element clickable
+
+        :param: timeout: time to stop waiting
+        :param: silent: erase log
+        :return: self
+        """
+        if not silent:
+            self.log(f'Wait until "{self.name}" become disabled')
+
+        element = self.element
+        disabled = False
+        start_time = time.time()
+        while time.time() - start_time < timeout and not disabled:
+            disabled = not element.is_enabled()
+
+        if not disabled:
+            msg = f'"{self.name}" not disabled after {timeout} seconds. {self.get_element_info()}'
+            raise TimeoutException(msg)
+
+        return self
+
     @property
     def all_elements(self) -> Union[Any]:
         if getattr(self, '_wrapped', None):
