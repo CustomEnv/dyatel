@@ -54,19 +54,6 @@ def repr_builder(instance):
         return f'{class_name} object at {obj_id}'
 
 
-def get_base_class(obj, current_cls):
-    return obj.__class__ if DriverWrapper.is_multiplatform else current_cls
-
-
-def set_base_class(obj, current_cls, cls_to_set):
-    cls = get_base_class(obj, current_cls)
-
-    if cls_to_set:
-        cls.__bases__ = cls_to_set
-
-    return cls
-
-
 class ElementMixin(DriverMixin):
     """ Mixin for PlayElement and CoreElement """
 

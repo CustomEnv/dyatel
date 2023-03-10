@@ -36,7 +36,7 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         if DriverWrapper._init_count == 0:
             return super().__new__(cls)
 
-        class_objects = get_all_attributes_from_object(cls, stop_on_base=True)
+        class_objects = get_all_attributes_from_object(cls, top_level=True)
         return super().__new__(type(f'Shadow{DriverWrapper.__name__}', (cls, ), class_objects))  # noqa
 
     def __repr__(self):

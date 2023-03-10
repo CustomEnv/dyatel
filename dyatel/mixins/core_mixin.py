@@ -45,6 +45,10 @@ def is_page(any_obj):
     return getattr(any_obj, '_object', None) == 'page'
 
 
+def set_static(obj):
+    for name, item in get_child_elements_with_names(obj.base_cls).items():
+        setattr(obj.__class__, name, item)
+
 def initialize_objects(current_object, objects: dict):
     """
     Initializing objects with itself args/kwargs
@@ -121,7 +125,7 @@ def get_child_elements(obj: object, instance: Union[type, tuple]) -> list:
     return list(get_child_elements_with_names(obj, instance).values())
 
 
-def get_child_elements_with_names(obj: Any, instance: Union[type, tuple]) -> dict:
+def get_child_elements_with_names(obj: Any, instance: Union[type, tuple] = None) -> dict:
     """
     Return objects of this object by instance
 
@@ -129,9 +133,14 @@ def get_child_elements_with_names(obj: Any, instance: Union[type, tuple]) -> dic
     """
     elements = {}
 
-    for attribute, value in get_all_attributes_from_object(obj).items():
-        if isinstance(value, instance):
-            if attribute != 'parent' and '__' not in attribute:
+    if instance:
+        for attribute, value in get_all_attributes_from_object(obj).items():
+            if isinstance(value, instance):
+                if attribute != 'parent' and not attribute.startswith('__') and not attribute.endswith('__'):
+                    elements.update({attribute: value})
+    else:
+        for attribute, value in get_all_attributes_from_object(obj).items():
+            if not attribute.startswith('__') and not attribute.endswith('__'):
                 elements.update({attribute: value})
 
     return elements
@@ -139,13 +148,13 @@ def get_child_elements_with_names(obj: Any, instance: Union[type, tuple]) -> dic
 
 def get_all_attributes_from_object(
         reference_obj: Any,
-        stop_on_base: bool = False
+        top_level: bool = False
 ) -> dict:
     """
     Get all attributes from object
 
     :param reference_obj: reference object
-    :param stop_on_base: stop grabbing on dyatel base classes ~ WebElement/PlayPage etc.
+    :param top_level: get attributes only from top level (without bases)
     :return: dict of all attributes
     """
     reference_class = reference_obj if inspect.isclass(reference_obj) else reference_obj.__class__
@@ -162,7 +171,7 @@ def get_all_attributes_from_object(
             if "'object'" in str_parent_class or "'type'" in str_parent_class:
                 break
 
-            if stop_on_base and 'dyatel' in str_parent_class and 'dyatel.base' not in str_parent_class:
+            if 'dyatel' in str_parent_class and 'dyatel.base' not in str_parent_class:
                 continue
 
             items.update({name: value for name, value in parent_class.__dict__.items() if name not in items.keys()})
@@ -171,9 +180,15 @@ def get_all_attributes_from_object(
 
         return items
 
-    obj_items = get_items(reference_class)
-    obj_items.update({attr: value for attr, value in reference_class.__dict__.items() if '__' not in str(attr)})
-    obj_items.update(dict(reference_obj.__dict__))
+    obj_items = {}
+
+    if not top_level:
+        obj_items = get_items(reference_class)
+
+    obj_items.update(dict(reference_class.__dict__))
+
+    if reference_class != reference_obj and reference_obj:
+        obj_items.update(dict(reference_obj.__dict__))
 
     return obj_items
 

@@ -24,7 +24,14 @@ class MobileElement(CoreElement):
         locator_type = locator_type if locator_type else get_selenium_locator_type(locator)
         locator, locator_type = get_appium_selector(locator, locator_type)
 
-        super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
+        CoreElement.__init__(
+            self,
+            locator=locator,
+            locator_type=locator_type,
+            name=name,
+            parent=parent,
+            wait=wait
+        )
 
     @property
     def all_elements(self) -> Union[None, List[Any]]:

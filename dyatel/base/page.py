@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Any, List
+from typing import Union, Any, List, Type
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -13,19 +13,21 @@ from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.core_mixin import WAIT_PAGE, initialize_objects, get_child_elements_with_names, \
-    all_mid_level_elements, get_child_elements
-from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class
+from dyatel.mixins.element_mixin import repr_builder
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
+from dyatel.mixins.core_mixin import (
+    WAIT_PAGE,
+    initialize_objects,
+    get_child_elements_with_names,
+    all_mid_level_elements,
+    get_child_elements, set_static
+)
 
 
 class Page(WebPage, MobilePage, PlayPage):
     """ Page object crossroad. Should be defined as class """
 
     _object = 'page'
-
-    def __new__(cls, *args, **kwargs):
-        return shadow_class(cls)
 
     def __repr__(self):
         return repr_builder(self)
@@ -68,7 +70,9 @@ class Page(WebPage, MobilePage, PlayPage):
 
         self.page_elements: List[Element] = get_child_elements(self, Element)
 
-        super(self.__set_base_class(), self).__init__()
+        self.base_cls = self._get_base_class()
+        set_static(self)
+        self.base_cls.__init__(self)
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 
@@ -154,22 +158,22 @@ class Page(WebPage, MobilePage, PlayPage):
         anchor.driver_wrapper = self.driver_wrapper
         return anchor
 
-    def __set_base_class(self) -> Page:
+    def _get_base_class(self) -> Type[PlayPage, MobilePage, WebPage]:
         """
         Get page class in according to current driver, and set him as base class
 
         :return: page class
         """
         if isinstance(self.driver, PlaywrightDriver):
-            cls = PlayPage,
+            cls = PlayPage
         elif isinstance(self.driver, AppiumDriver):
-            cls = MobilePage,
+            cls = MobilePage
         elif isinstance(self.driver, SeleniumDriver):
-            cls = WebPage,
+            cls = WebPage
         else:
             raise DriverWrapperException(f'Cant specify {Page.__name__}')
 
-        return set_base_class(self, Page, cls)
+        return cls
 
     def _modify_children(self):
         """ Initialize child Group/Page objects """

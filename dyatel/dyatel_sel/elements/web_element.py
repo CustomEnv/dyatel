@@ -21,7 +21,14 @@ class WebElement(CoreElement):
         locator = get_platform_locator(self, default_locator=locator)
         locator_type = locator_type if locator_type else get_selenium_locator_type(locator)
 
-        super().__init__(locator=locator, locator_type=locator_type, name=name, parent=parent, wait=wait)
+        CoreElement.__init__(
+            self,
+            locator=locator,
+            locator_type=locator_type,
+            name=name,
+            parent=parent,
+            wait=wait
+        )
 
     @property
     def all_elements(self) -> Union[None, List[Any]]:

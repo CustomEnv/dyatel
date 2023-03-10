@@ -19,9 +19,6 @@ class Group(Element):
 
     _object = 'group'
 
-    def __new__(cls, *args, **kwargs):
-        return shadow_class(cls)
-
     def __repr__(self):
         return repr_builder(self)
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Union, List
+from typing import Any, Union, List, Type
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -13,7 +13,7 @@ from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.element_mixin import shadow_class, repr_builder, set_base_class
+from dyatel.mixins.element_mixin import repr_builder
 from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
@@ -22,7 +22,7 @@ from dyatel.mixins.core_mixin import (
     is_target_on_screen,
     all_mid_level_elements,
     initialize_objects,
-    get_child_elements_with_names,
+    get_child_elements_with_names, set_static,
 )
 
 
@@ -30,9 +30,6 @@ class Element(WebElement, MobileElement, PlayElement):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
     _object = 'element'
-
-    def __new__(cls, *args, **kwargs):
-        return shadow_class(cls)
 
     def __repr__(self):
         return repr_builder(self)
@@ -93,15 +90,16 @@ class Element(WebElement, MobileElement, PlayElement):
         self._modify_children()
 
         if not self._initialized:
-            self.__bcls = self._set_base_class()
-            super(self.__bcls, self).__init__(
+            self.base_cls = self._get_base_class()
+            set_static(self)
+            self.base_cls.__init__(
+                self,
                 locator=self.locator,
                 locator_type=self.locator_type,
                 name=self.name,
                 parent=self.parent,
                 wait=self.wait
             )
-
         self._initialized = True
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
@@ -291,7 +289,7 @@ class Element(WebElement, MobileElement, PlayElement):
         if getattr(self, '_wrapped', None):
             raise RecursionError('all_elements property already used')
 
-        return super(self.__bcls, self).all_elements
+        return super().all_elements
 
     def is_visible(self, silent: bool = False) -> bool:
         """
@@ -367,23 +365,22 @@ class Element(WebElement, MobileElement, PlayElement):
             scroll=scroll, remove=remove, fill_background=fill_background,
         )
 
-    def _set_base_class(self, driver=None) -> Element:
+    def _get_base_class(self) -> Type[WebElement, MobileElement, PlayElement]:
         """
         Get element class in according to current driver, and set him as base class
 
         :return: element class
         """
-        cls = None
-        driver = driver if driver else self.driver
-        if isinstance(driver, PlaywrightDriver):
-            cls = PlayElement,
-        elif isinstance(driver, AppiumDriver):
-            cls = MobileElement,
-        elif isinstance(driver, SeleniumDriver):
-            cls = WebElement,
+        base_cls = None
+        if isinstance(self.driver, PlaywrightDriver):
+            base_cls = PlayElement
+        elif isinstance(self.driver, AppiumDriver):
+            base_cls = MobileElement
+        elif isinstance(self.driver, SeleniumDriver):
+            base_cls = WebElement
 
         # No exception due to delayed initialization
-        return set_base_class(self, Element, cls)
+        return base_cls
 
     def _modify_children(self):
         """
