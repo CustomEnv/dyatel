@@ -22,7 +22,7 @@ from dyatel.mixins.core_mixin import (
     is_target_on_screen,
     all_mid_level_elements,
     initialize_objects,
-    get_child_elements_with_names, set_static,
+    get_child_elements_with_names, set_static, is_group,
 )
 
 
@@ -69,8 +69,6 @@ class Element(WebElement, MobileElement, PlayElement):
         self.name = name if name else locator
         self.parent = parent
         self.wait = wait
-        self.is_element = self._object == 'element'
-        self.is_group = self._object == 'group'
 
         if self.parent:
             assert isinstance(self.parent, (bool, all_mid_level_elements())), \
@@ -78,11 +76,12 @@ class Element(WebElement, MobileElement, PlayElement):
 
         # Taking from Group first if available
         self._initialized = False
+        self._scls = getattr(self, 'scls', Element)
         self._init_locals = getattr(self, '_init_locals', locals())
         self._driver_instance = getattr(self, '_driver_instance', DriverWrapper)
 
         if self.driver:
-            self.__full_init__(self.driver_wrapper if self.is_group else None)
+            self.__full_init__(self.driver_wrapper if is_group(self) else None)
 
     def __full_init__(self, driver_wrapper=None):
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
@@ -90,9 +89,9 @@ class Element(WebElement, MobileElement, PlayElement):
         self._modify_children()
 
         if not self._initialized:
-            self.base_cls = self._get_base_class()
+            self._base_cls = self._get_base_class()
             set_static(self)
-            self.base_cls.__init__(
+            self._base_cls.__init__(
                 self,
                 locator=self.locator,
                 locator_type=self.locator_type,
@@ -287,9 +286,9 @@ class Element(WebElement, MobileElement, PlayElement):
     @property
     def all_elements(self) -> Union[Any]:
         if getattr(self, '_wrapped', None):
-            raise RecursionError('all_elements property already used')
+            raise RecursionError(f'all_elements property already used for {self.name}')
 
-        return super().all_elements
+        return self._base_cls.all_elements.fget(self)
 
     def is_visible(self, silent: bool = False) -> bool:
         """

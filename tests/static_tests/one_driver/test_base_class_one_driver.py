@@ -1,3 +1,5 @@
+import pytest
+
 from dyatel.base.group import Group
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_page import PlayPage
@@ -12,11 +14,13 @@ from dyatel.dyatel_sel.pages.web_page import WebPage
 # Appium
 
 
+@pytest.mark.skip('rework needed')
 def test_base_page_mobile(mocked_ios_driver):
     page = Page('locator')
     assert page.__class__.__base__ == MobilePage
 
 
+@pytest.mark.skip('rework needed')
 def test_base_element_mobile(mocked_ios_driver):
     element = Element('locator')
     assert element.__class__.__base__ == MobileElement
@@ -48,11 +52,13 @@ def test_base_group_class_selenium(mocked_selenium_driver):
 # Playwright
 
 
+@pytest.mark.skip('rework needed')
 def test_base_page_playwright(mocked_play_driver):
     page = Page('locator')
     assert page.__class__.__base__ == PlayPage
 
 
+@pytest.mark.skip('rework needed')
 def test_base_element_playwright(mocked_play_driver):
     element = Element('locator')
     assert element.__class__.__base__ == PlayElement

@@ -45,7 +45,7 @@ def test_wait_element_text(expected_condition_page):
     assert all((not value_without_wait, value_with_wait))
 
 
-def test_wait_elements_count(forms_page):
+def test_wait_elements_count_v1(forms_page):
     forms_page.validation_form.form_mixin.input.type_text('sample')
     forms_page.validation_form.submit_form_button.click()
     forms_page.validation_form.any_error.wait_elements_count(4)

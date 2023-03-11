@@ -70,9 +70,10 @@ class Page(WebPage, MobilePage, PlayPage):
 
         self.page_elements: List[Element] = get_child_elements(self, Element)
 
-        self.base_cls = self._get_base_class()
+        self._scls = Page
+        self._base_cls = self._get_base_class()
         set_static(self)
-        self.base_cls.__init__(self)
+        self._base_cls.__init__(self)
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 

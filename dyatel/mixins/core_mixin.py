@@ -45,9 +45,21 @@ def is_page(any_obj):
     return getattr(any_obj, '_object', None) == 'page'
 
 
+statics = {}
+
+
 def set_static(obj):
-    for name, item in get_child_elements_with_names(obj.base_cls).items():
+    cls = obj._base_cls  # noqa
+    scls = obj._scls  # noqa
+
+    if cls not in statics.keys():
+        child_static = get_child_elements_with_names(cls).items()
+        data = {name: value for name, value in child_static if name not in scls.__dict__.keys()}
+        statics.update({cls: data.items()})
+
+    for name, item in statics[cls]:
         setattr(obj.__class__, name, item)
+
 
 def initialize_objects(current_object, objects: dict):
     """
