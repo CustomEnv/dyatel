@@ -138,11 +138,15 @@ class VisualComparison:
 
         base_error = f"The new screenshot '{actual_file}' did not match the reference '{reference_file}'."
 
-        if not same_size:
-            raise AssertionError(f'{base_error} Image size (width, height) is different: '
-                                 f'Expected:{reference_image.size}, Actual: {output_image.size}.')
-        if is_different:
-            raise AssertionError(f"{base_error} Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
+        def not_same_size():
+            assert same_size, f'{base_error} Image size (width, height) is different: ' \
+                              f'Expected:{reference_image.size}, Actual: {output_image.size}.'
+
+        def threshold_fail():
+            assert is_different, f"{base_error} Threshold is: {actual_threshold}; Possible threshold is: {threshold}"
+
+        self.test_item.addfinalizer(threshold_fail)
+        self.test_item.addfinalizer(not_same_size)
 
         return self
 
@@ -289,6 +293,7 @@ class VisualComparison:
                 image.close()
 
             allure.attach(name='diff', body=json.dumps(diff_dict), attachment_type='application/vnd.allure.image.diff')
+            allure.attach(name=actual_path, body=diff_dict['actual'], attachment_type=("image/png", "png"))
 
     def _disable_reruns(self) -> None:
         """
