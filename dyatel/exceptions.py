@@ -68,3 +68,10 @@ class UnsuitableArgumentsException(DriverWrapperException):
     Thrown when object initialised with unsuitable arguments
     """
     pass
+
+
+class NotInitializedException(DriverWrapperException):
+    """
+    Thrown when getting access to not initialized object
+    """
+    pass

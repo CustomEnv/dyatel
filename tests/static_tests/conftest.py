@@ -71,6 +71,7 @@ def mocked_play_driver():
 @pytest.fixture(autouse=True)
 def base_teardown():
     yield
+    DriverWrapper.is_multiplatform = False
     DriverWrapper.all_drivers = []
     DriverWrapper.mobile = False
     DriverWrapper.desktop = False

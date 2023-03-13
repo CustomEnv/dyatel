@@ -5,8 +5,8 @@ from typing import Any, Union, List
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.element_mixin import shadow_class, repr_builder
-from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
+from dyatel.mixins.element_mixin import repr_builder
+from dyatel.mixins.previous_object_driver import PreviousObjectDriver
 from dyatel.mixins.core_mixin import (
     all_mid_level_elements,
     set_parent_for_attr,
@@ -67,7 +67,7 @@ class Group(Element):
         elements_types = all_mid_level_elements()
 
         initialize_objects(self, get_child_elements_with_names(self, elements_types))
-        set_parent_for_attr(elements_types, self)
+        set_parent_for_attr(self, elements_types)
         self.child_elements: List[Element] = get_child_elements(self, elements_types)
 
     def _modify_object(self):

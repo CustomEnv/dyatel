@@ -8,7 +8,7 @@ from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
 
 from dyatel.exceptions import TimeoutException
-from dyatel.mixins.log_mixin import LogMixin
+from dyatel.mixins.logging import Logging
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
@@ -19,10 +19,10 @@ from dyatel.mixins.core_mixin import (
     is_group,
     is_element,
 )
-from dyatel.mixins.locator_mixin import get_platform_locator, get_playwright_locator
+from dyatel.mixins.selector_synchronizer import get_platform_locator, get_playwright_locator
 
 
-class PlayElement(ElementMixin, DriverMixin, LogMixin):
+class PlayElement(ElementMixin, DriverMixin, Logging):
 
     def __init__(self, locator: str, locator_type: str, name: str, parent: Union[PlayElement, Any], wait: bool):
         """

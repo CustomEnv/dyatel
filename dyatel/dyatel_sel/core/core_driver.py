@@ -8,10 +8,10 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.exceptions import DriverWrapperException
-from dyatel.mixins.log_mixin import LogMixin
+from dyatel.mixins.logging import Logging
 
 
-class CoreDriver(LogMixin):
+class CoreDriver(Logging):
     all_drivers: Union[List[AppiumDriver], List[SeleniumWebDriver]] = []
     driver: Union[AppiumDriver, SeleniumWebDriver] = None
     driver_wrapper = None

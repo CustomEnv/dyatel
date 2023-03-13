@@ -62,7 +62,7 @@ def autolog(message: Any, level: str = 'info') -> Any:
     return message
 
 
-class LogMixin:
+class Logging:
 
     def log(self, message: str, level: str = 'info') -> None:
         """

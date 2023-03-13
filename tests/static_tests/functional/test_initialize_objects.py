@@ -1,5 +1,6 @@
 from dyatel.base.element import Element
 from dyatel.base.group import Group
+from dyatel.exceptions import NotInitializedException
 
 
 class Section(Group):
@@ -20,3 +21,9 @@ def test_initialize_objects(mocked_selenium_driver):
     assert root_section._initialized
     assert root_section.section._initialized
     assert root_section.section.el._initialized
+    try:
+        RootSection.section.el.element
+    except NotInitializedException:
+        pass
+    else:
+        raise AssertionError('NotInitializedException should be raised')

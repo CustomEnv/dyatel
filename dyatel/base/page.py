@@ -14,7 +14,7 @@ from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.element_mixin import repr_builder
-from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
+from dyatel.mixins.previous_object_driver import PreviousObjectDriver
 from dyatel.mixins.core_mixin import (
     WAIT_PAGE,
     initialize_objects,

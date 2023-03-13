@@ -14,7 +14,7 @@ from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.element_mixin import repr_builder
-from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
+from dyatel.mixins.previous_object_driver import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.core_mixin import (
@@ -40,6 +40,13 @@ class Element(WebElement, MobileElement, PlayElement):
 
         return self
 
+    def __getattribute__(self, item):
+        if 'element' in item and not object.__getattribute__(self, '_initialized'):
+            raise NotInitializedException('The element is not initialized. '
+                                          'Try to initialize base object first or call it directly as a method')
+
+        return object.__getattribute__(self, item)
+
     def __init__(  # noqa
             self,
             locator: str = '',
@@ -64,6 +71,8 @@ class Element(WebElement, MobileElement, PlayElement):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
+        self._initialized = False
+
         self.locator = locator
         self.locator_type = locator_type
         self.name = name if name else locator
@@ -75,7 +84,6 @@ class Element(WebElement, MobileElement, PlayElement):
                 f'The "parent" of "{self.name}" should take an Element/Group object or False for skip. Get {self.parent}'
 
         # Taking from Group first if available
-        self._initialized = False
         self._scls = getattr(self, 'scls', Element)
         self._init_locals = getattr(self, '_init_locals', locals())
         self._driver_instance = getattr(self, '_driver_instance', DriverWrapper)

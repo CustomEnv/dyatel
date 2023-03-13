@@ -11,5 +11,6 @@ class Section(Element):
 
 def test_promote_parent_element_recursion(mocked_selenium_driver):
     section = Section()
-    section.oiel.parent = None
-    section.iel.parent = None
+    assert section.oiel.parent is None
+    assert section.iel.parent == section
+    assert section.iel.parent.parent is None

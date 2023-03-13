@@ -3,7 +3,7 @@ import pytest
 from dyatel.base.element import Element
 from dyatel.base.group import Group
 from dyatel.exceptions import UnsuitableArgumentsException
-from dyatel.mixins.locator_mixin import get_platform_locator
+from dyatel.mixins.selector_synchronizer import get_platform_locator
 from tests.static_tests.conftest import mobile_ids, mobile_drivers, desktop_drivers, desktop_ids
 
 

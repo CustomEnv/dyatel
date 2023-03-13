@@ -13,7 +13,7 @@ from webdriver_manager.firefox import GeckoDriverManager
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_driver import PlayDriver
-from dyatel.mixins.log_mixin import dyatel_logs_settings
+from dyatel.mixins.logging import dyatel_logs_settings
 from dyatel.visual_comparison import VisualComparison
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage

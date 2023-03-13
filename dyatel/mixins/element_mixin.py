@@ -4,32 +4,12 @@ from abc import abstractmethod
 from copy import copy
 from typing import List, Any, Union
 
-from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.mixins.driver_mixin import DriverMixin
 from dyatel.mixins.core_mixin import (
-    get_all_attributes_from_object,
     driver_with_index,
     get_element_info,
     set_parent_for_attr,
 )
-
-
-def shadow_class(current_cls):
-    """
-    Creates a "shadow" class from current one and base class of current
-
-    :param current_cls: current class
-    :return: new "shadow" class
-    """
-    if DriverWrapper.is_multiplatform:
-
-        if not getattr(current_cls, '__created', False):
-            class_objects = get_all_attributes_from_object(current_cls, stop_on_base=True)
-            new_class = type(f'Shadow{current_cls.__name__}', (current_cls,), class_objects)
-            new_class.__created = True
-            return object.__new__(new_class)  # noqa
-
-    return object.__new__(current_cls)
 
 
 def repr_builder(instance):
@@ -90,7 +70,7 @@ class ElementMixin(DriverMixin):
             wrapped_object: Any = copy(self)
             wrapped_object.element = element
             wrapped_object._wrapped = True
-            set_parent_for_attr(instance_class, wrapped_object, with_copy=True)
+            set_parent_for_attr(wrapped_object, instance_class, with_copy=True)
             wrapped_elements.append(wrapped_object)
 
         return wrapped_elements

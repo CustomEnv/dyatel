@@ -12,7 +12,7 @@ from dyatel.js_scripts import get_inner_height_js, get_inner_width_js
 from dyatel.mixins.core_mixin import (
     get_child_elements_with_names,
     driver_with_index,
-    get_all_attributes_from_object,
+    get_attributes_from_object,
 )
 
 
@@ -36,8 +36,7 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         if DriverWrapper._init_count == 0:
             return super().__new__(cls)
 
-        class_objects = get_all_attributes_from_object(cls, top_level=True)
-        return super().__new__(type(f'Shadow{DriverWrapper.__name__}', (cls, ), class_objects))  # noqa
+        return super().__new__(type(f'ShadowDriverWrapper', (cls, ), get_attributes_from_object(cls)))  # noqa
 
     def __repr__(self):
         cls = self.__class__
