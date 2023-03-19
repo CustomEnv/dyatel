@@ -10,7 +10,9 @@ from dyatel.mixins.previous_object_driver import PreviousObjectDriver
 from dyatel.mixins.core_mixin import (
     all_mid_level_elements,
     set_parent_for_attr,
-    get_child_elements, initialize_objects, get_child_elements_with_names,
+    get_child_elements,
+    initialize_objects,
+    get_child_elements_with_names,
 )
 
 
@@ -61,8 +63,8 @@ class Group(Element):
 
     def _modify_children(self):
         """
-        Set parent and custom driver for Group class variables, if their instance is Element class
-        Will be called automatically after __init__ by metaclass `AfterInitMeta`
+        Initializing of attributes with type == Group/Element.
+        Required for classes with base == Group.
         """
         elements_types = all_mid_level_elements()
 
@@ -71,4 +73,8 @@ class Group(Element):
         self.child_elements: List[Element] = get_child_elements(self, elements_types)
 
     def _modify_object(self):
+        """
+        Modify current object. Required for Group that placed into functions:
+        - set driver from previous object if previous driver different.
+        """
         PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)

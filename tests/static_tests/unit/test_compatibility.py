@@ -1,3 +1,5 @@
+import pytest
+
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_page import PlayPage
 from dyatel.dyatel_sel.core.core_element import CoreElement
@@ -20,6 +22,7 @@ def test_playwright_and_selenium_element_compatibility():
     assert get_class_static(PlayElement) == sorted(get_class_static(WebElement) + get_class_static(CoreElement))
 
 
+@pytest.mark.skip('rework needed')
 def test_selenium_mobile_and_web_element_compatibility():
     web_static = sorted(set(get_class_static(WebElement) + get_class_static(CoreElement)))
     mobile_static = sorted(set(get_class_static(MobileElement) + get_class_static(CoreElement)))

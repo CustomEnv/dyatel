@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import time
 from typing import Union, List, Any
 
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
-from selenium.common.exceptions import WebDriverException as SeleniumWebDriverException
+from selenium.common.exceptions import WebDriverException as SeleniumWebDriverException, NoAlertPresentException
+from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
 from dyatel.dyatel_sel.sel_utils import ActionChains
-from dyatel.exceptions import DriverWrapperException
+from dyatel.exceptions import DriverWrapperException, TimeoutException
+from dyatel.mixins.core_mixin import WAIT_EL
 from dyatel.mixins.logging import Logging
 
 
@@ -271,6 +274,47 @@ class CoreDriver(Logging):
             tab = self.get_all_tabs()[tab - 1]
 
         self.driver.switch_to.window(tab)
+        return self
+
+    def switch_to_alert(self, timeout=WAIT_EL) -> Alert:
+        """
+        Wait for alert and switch to it
+
+        :param timeout: timeout to wait
+        :return: alert
+        """
+        alert = None
+        end_time = time.time() + timeout
+
+        while not alert and time.time() < end_time:
+            try:
+                alert = self.driver.switch_to.alert
+            except NoAlertPresentException:
+                alert = None
+
+        if not alert:
+            raise TimeoutException(f'Alert not found after {timeout} seconds')
+
+        return alert
+
+    def accept_alert(self) -> CoreDriver:
+        """
+        Wait for alert -> switch to it -> click accept
+
+        :return: self
+        """
+        self.switch_to_alert().accept()
+        self.switch_to_default_content()
+        return self
+
+    def dismiss_alert(self) -> CoreDriver:
+        """
+        Wait for alert -> switch to it -> click dismiss
+
+        :return: self
+        """
+        self.switch_to_alert().dismiss()
+        self.switch_to_default_content()
         return self
 
     def close_unused_tabs(self) -> CoreDriver:

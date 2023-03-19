@@ -6,10 +6,11 @@ import time
 import importlib
 import json
 import base64
+from urllib.parse import urljoin
 from typing import Union, List, Any
 from string import punctuation
 
-import cv2
+import cv2.cv2 as cv2
 import numpy
 from skimage.metrics import structural_similarity
 
@@ -28,6 +29,7 @@ class VisualComparison:
     hard_visual_reference_generation = False
     default_delay = 0.75
     default_threshold = 0
+    diff_color_scheme = (0, 255, 0)
 
     def __init__(self, driver_wrapper, element):
         self.driver_wrapper = driver_wrapper
@@ -81,7 +83,7 @@ class VisualComparison:
 
         reference_file = f'{reference_directory}{filename}.png'
         output_file = f'{output_directory}{filename}.png'
-        diff_file = f'{diff_directory}/diff_{filename}.png'
+        diff_file = f'{diff_directory}diff_{filename}.png'
 
         os.makedirs(os.path.dirname(reference_directory), exist_ok=True)
         os.makedirs(os.path.dirname(output_directory), exist_ok=True)
@@ -110,8 +112,8 @@ class VisualComparison:
 
             self._disable_reruns()
 
-            raise FileNotFoundError(f'Reference file "{reference_file}" not found, but its just saved. '
-                                    f'If it CI run, then you need to commit reference files.')
+            raise AssertionError(f'Reference file "{reference_file}" not found, but its just saved. '
+                                 f'If it CI run, then you need to commit reference files.')
 
         if self.visual_reference_generation:
             return self
@@ -163,14 +165,14 @@ class VisualComparison:
 
         return self
 
-    def _assert_same_images(self, actual_file: str, reference_file: str, filename: str,
+    def _assert_same_images(self, actual_file: str, reference_file: str, diff_file: str,
                             threshold: Union[int, float]) -> VisualComparison:
         """
         Assert that given images are equal to each other
 
         :param actual_file: actual image path
         :param reference_file: reference image path
-        :param filename: difference image name
+        :param diff_file: difference image name
         :param threshold: possible difference in percents
         :return: VisualComparison
         """
@@ -178,20 +180,18 @@ class VisualComparison:
         output_image = cv2.imread(actual_file)
         diff, actual_threshold = self._get_difference(reference_image, output_image)
 
-        same_size = reference_image.size == output_image.size
         is_different = actual_threshold > threshold
 
-        if is_different or not same_size:
-            cv2.imwrite(filename, diff)
-            self._attach_allure_diff(actual_file, reference_file, filename)
-
-        base_error = f"The new screenshot '{actual_file}' did not match the reference '{reference_file}'."
-
-        if not same_size:
-            raise AssertionError(f'{base_error} Image size (width, height) is different: '
-                                 f'Expected:{reference_image.size}, Actual: {output_image.size}.')
         if is_different:
-            raise AssertionError(f"{base_error} Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
+            cv2.imwrite(diff_file, diff)
+            self._attach_allure_diff(actual_file, reference_file, diff_file)
+
+        base_error = f"New screenshot '{actual_file}' did not match the\n" \
+                     f"Reference screenshot '{reference_file}'.\n" \
+                     f"Diff image {urljoin('file:', diff_file)}.\n"
+
+        if is_different:
+            raise AssertionError(f"{base_error}Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
 
         return self
 
@@ -261,23 +261,26 @@ class VisualComparison:
 
         return screenshot_name.lower()
 
-    @staticmethod
-    def _get_difference(img1: numpy.ndarray, img2: numpy.ndarray) -> tuple[numpy.ndarray, float]:
+    def _get_difference(self, reference_img: numpy.ndarray, actual_img: numpy.ndarray) -> tuple[numpy.ndarray, float]:
         """
         Calculate difference between two images
 
-        :param img1: image 1, numpy.ndarray
-        :param img2: image 2, numpy.ndarray
+        :param reference_img: image 1, numpy.ndarray
+        :param actual_img: image 2, numpy.ndarray
         :return: (diff image, diff float value )
         """
-
         # Convert images to grayscale
-        before_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-        after_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+        reference_img_gray = cv2.cvtColor(reference_img, cv2.COLOR_BGR2GRAY)
+        actual_img_gray = cv2.cvtColor(actual_img, cv2.COLOR_BGR2GRAY)
 
         # Compute SSIM between the two images
-        (score, diff) = structural_similarity(before_gray, after_gray, full=True)
-        score = score * 100
+        try:
+            score, diff = structural_similarity(reference_img_gray, actual_img_gray, full=True)
+        except ValueError:
+            raise AssertionError(f'Image size (width, height) is different for {reference_img}: '
+                                 f'Expected: {reference_img_gray.shape}; Actual: {actual_img_gray.shape}')
+
+        score *= 100
 
         # The diff image contains the actual image differences between the two images
         # and is represented as a floating point data type in the range [0,1]
@@ -292,18 +295,18 @@ class VisualComparison:
         contours = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         contours = contours[0] if len(contours) == 2 else contours[1]
 
-        mask = numpy.zeros(img1.shape, dtype='uint8')
-        filled_after = img2.copy()
+        mask = numpy.zeros(reference_img.shape, dtype='uint8')
+        filled_after = actual_img.copy()
 
         for c in contours:
             area = cv2.contourArea(c)
             if area > 40:
                 x, y, w, h = cv2.boundingRect(c)
-                cv2.rectangle(img1, (x, y), (x + w, y + h), (36, 255, 12), 2)
-                cv2.rectangle(img2, (x, y), (x + w, y + h), (36, 255, 12), 2)
-                cv2.rectangle(diff_box, (x, y), (x + w, y + h), (36, 255, 12), 2)
+                cv2.rectangle(reference_img, (x, y), (x + w, y + h), self.diff_color_scheme, 2)
+                cv2.rectangle(actual_img, (x, y), (x + w, y + h), self.diff_color_scheme, 2)
+                cv2.rectangle(diff_box, (x, y), (x + w, y + h), self.diff_color_scheme, 2)
                 cv2.drawContours(mask, [c], 0, (255, 255, 255), -1)
-                cv2.drawContours(filled_after, [c], 0, (0, 255, 0), -1)
+                cv2.drawContours(filled_after, [c], 0, self.diff_color_scheme, -1)
 
         diff_image, percent_diff = filled_after, 100 - score
         return diff_image, percent_diff
@@ -330,9 +333,8 @@ class VisualComparison:
 
             diff_dict = {}
             for name, path in (('actual', actual_path), ('expected', expected_path), ('diff', diff_path)):
-                image = open(path, 'rb')
-                diff_dict.update({name: f'data:image/png;base64,{base64.b64encode(image.read()).decode("ascii")}'})
-                image.close()
+                with open(path, 'rb') as image:
+                    diff_dict.update({name: f'data:image/png;base64,{base64.b64encode(image.read()).decode("ascii")}'})
 
             allure.attach(name='diff', body=json.dumps(diff_dict), attachment_type='application/vnd.allure.image.diff')
 

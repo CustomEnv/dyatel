@@ -36,10 +36,10 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
     assert pytest_rerunfailures.get_reruns_count(request.node) == 1
     try:
         base_playground_page.text_container.scroll_into_view(sleep=0.5).assert_screenshot(filename=file)
-    except FileNotFoundError:
+    except AssertionError:
         pass
     else:
-        if not request.config.getoption('--gr'):
+        if not request.config.getoption('--gr') or not request.config.getoption('--hgr'):
             raise Exception('Unexpected behavior')
 
 

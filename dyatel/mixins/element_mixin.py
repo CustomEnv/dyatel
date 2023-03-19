@@ -46,6 +46,10 @@ class ElementMixin(DriverMixin):
     def wait_enabled(self, *args, **kwargs):
         raise NotImplementedError('wait_enabled method is not implemented for current class')
 
+    @abstractmethod
+    def wait_element_without_error(self, *args, **kwargs):
+        raise NotImplementedError('wait_element_without_error method is not implemented for current class')
+
     def get_element_info(self, element: Any = None) -> str:
         """
         Get full loging data depends on parent element

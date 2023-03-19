@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from typing import Union, List, BinaryIO, Any
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
@@ -114,6 +115,22 @@ class MobileElement(CoreElement):
         :return: self
         """
         return self.click_outside(x=x, y=y, calculate_top_bar=calculate_top_bar)
+
+    def click_in_alert(self) -> MobileElement:
+        """
+        Click on element in alert with switch to native context
+
+        :return: self
+        """
+        try:
+            self.driver_wrapper.switch_to_native()
+            time.sleep(1)
+            if self.wait_element_without_error(timeout=5, silent=True).is_displayed(silent=True):
+                self.click()
+        finally:
+            self.driver_wrapper.switch_to_web()
+
+        return self
 
     def get_screenshot(self, filename: str, legacy: bool = True) -> BinaryIO:
         """

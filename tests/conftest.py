@@ -35,6 +35,7 @@ def pytest_addoption(parser):
     parser.addoption('--driver', default='chrome', help='Browser name')
     parser.addoption('--platform', default='desktop', help='Platform name')
     parser.addoption('--gr', action='store_true', help='Generate reference images in visual tests')
+    parser.addoption('--hgr', action='store_true', help='Hard generate reference images in visual tests')
     parser.addoption('--appium-port', default='1000')
     parser.addoption('--appium-ip', default='0.0.0.0')
 
@@ -164,6 +165,8 @@ def driver_func(request, driver_name, driver_engine, chrome_options, firefox_opt
 
     VisualComparison.visual_regression_path = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
     VisualComparison.visual_reference_generation = request.config.getoption('--gr')
+    VisualComparison.hard_visual_reference_generation = request.config.getoption('--hgr')
+    VisualComparison.default_threshold = 0.1
 
     if 'appium' not in driver_engine:
         driver_wrapper.set_window_size(1024, 900)

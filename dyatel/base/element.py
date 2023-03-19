@@ -22,7 +22,9 @@ from dyatel.mixins.core_mixin import (
     is_target_on_screen,
     all_mid_level_elements,
     initialize_objects,
-    get_child_elements_with_names, set_static, is_group,
+    get_child_elements_with_names,
+    set_static,
+    is_group,
 )
 
 
@@ -71,7 +73,6 @@ class Element(WebElement, MobileElement, PlayElement):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
-        self._initialized = False
 
         self.locator = locator
         self.locator_type = locator_type
@@ -83,6 +84,7 @@ class Element(WebElement, MobileElement, PlayElement):
             assert isinstance(self.parent, (bool, all_mid_level_elements())), \
                 f'The "parent" of "{self.name}" should take an Element/Group object or False for skip. Get {self.parent}'
 
+        self._initialized = False
         # Taking from Group first if available
         self._scls = getattr(self, 'scls', Element)
         self._init_locals = getattr(self, '_init_locals', locals())
@@ -391,12 +393,17 @@ class Element(WebElement, MobileElement, PlayElement):
 
     def _modify_children(self):
         """
-        Set parent and custom driver for Group class variables, if their instance is Element class
-        Will be called automatically after __init__ by metaclass `AfterInitMeta`
+        Initializing of attributes with  type == Element.
+        Required for classes with base == Element.
         """
         initialize_objects(self, get_child_elements_with_names(self, all_mid_level_elements()))
 
     def _modify_object(self):
+        """
+        Modify current object. Required for Element that placed into functions:
+        - set driver from previous object if previous driver different.
+        - set parent from previous object if previous is Group.
+        """
         prev_object_manager = PreviousObjectDriver()
         prev_object_manager.set_driver_from_previous_object_for_element(self, 6)
         if not self._initialized and self.parent is None:

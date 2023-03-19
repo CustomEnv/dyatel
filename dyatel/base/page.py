@@ -20,7 +20,8 @@ from dyatel.mixins.core_mixin import (
     initialize_objects,
     get_child_elements_with_names,
     all_mid_level_elements,
-    get_child_elements, set_static
+    get_child_elements,
+    set_static,
 )
 
 
@@ -177,9 +178,15 @@ class Page(WebPage, MobilePage, PlayPage):
         return cls
 
     def _modify_children(self):
-        """ Initialize child Group/Page objects """
+        """
+        Initializing of attributes with type == Element.
+        Required for classes with base == Page.
+        """
         initialize_objects(self, get_child_elements_with_names(self, all_mid_level_elements()))
 
     def _modify_object(self):
-        """ Set driver from previous object """
+        """
+        Modify current object. Required for Page that placed into functions:
+        - set driver from previous object if previous driver different.
+        """
         PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)

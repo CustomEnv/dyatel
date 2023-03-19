@@ -492,7 +492,7 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
 
             try:
                 element = self._find_element(base)
-            except NoSuchElementException:
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 element = None
 
             if not element and wait:
