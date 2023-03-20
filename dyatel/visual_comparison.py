@@ -12,6 +12,7 @@ from string import punctuation
 
 import cv2.cv2 as cv2
 import numpy
+from skimage._shared.utils import check_shape_equality  # noqa
 from skimage.metrics import structural_similarity
 
 from dyatel.exceptions import DriverWrapperException, TimeoutException
@@ -181,14 +182,19 @@ class VisualComparison:
         diff, actual_threshold = self._get_difference(reference_image, output_image)
 
         is_different = actual_threshold > threshold
+        is_same_size = check_shape_equality(reference_image, output_image)
 
-        if is_different:
+        if is_different or not is_same_size:
             cv2.imwrite(diff_file, diff)
             self._attach_allure_diff(actual_file, reference_file, diff_file)
 
         base_error = f"New screenshot '{actual_file}' did not match the\n" \
                      f"Reference screenshot '{reference_file}'.\n" \
                      f"Diff image {urljoin('file:', diff_file)}.\n"
+
+        if not is_same_size:
+            raise AssertionError(f'Image size (width, height) is not same for {reference_file}: '
+                                 f'Expected: {reference_image.shape}; Actual: {output_image.shape}')
 
         if is_different:
             raise AssertionError(f"{base_error}Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
@@ -274,12 +280,7 @@ class VisualComparison:
         actual_img_gray = cv2.cvtColor(actual_img, cv2.COLOR_BGR2GRAY)
 
         # Compute SSIM between the two images
-        try:
-            score, diff = structural_similarity(reference_img_gray, actual_img_gray, full=True)
-        except ValueError:
-            raise AssertionError(f'Image size (width, height) is different for {reference_img}: '
-                                 f'Expected: {reference_img_gray.shape}; Actual: {actual_img_gray.shape}')
-
+        score, diff = structural_similarity(reference_img_gray, actual_img_gray, full=True)
         score *= 100
 
         # The diff image contains the actual image differences between the two images
