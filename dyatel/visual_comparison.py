@@ -179,22 +179,24 @@ class VisualComparison:
         """
         reference_image = cv2.imread(reference_file)
         output_image = cv2.imread(actual_file)
+
+        try:
+            check_shape_equality(reference_image, output_image)
+        except ValueError:
+            # TODO: Actual file can be added to allure report
+            raise AssertionError(f'Image size (width, height) is not same for {reference_file}: '
+                                 f'Expected: {reference_image.shape}; Actual: {output_image.shape}')
+
         diff, actual_threshold = self._get_difference(reference_image, output_image)
-
         is_different = actual_threshold > threshold
-        is_same_size = check_shape_equality(reference_image, output_image)
 
-        if is_different or not is_same_size:
+        if is_different:
             cv2.imwrite(diff_file, diff)
             self._attach_allure_diff(actual_file, reference_file, diff_file)
 
         base_error = f"New screenshot '{actual_file}' did not match the\n" \
                      f"Reference screenshot '{reference_file}'.\n" \
                      f"Diff image {urljoin('file:', diff_file)}.\n"
-
-        if not is_same_size:
-            raise AssertionError(f'Image size (width, height) is not same for {reference_file}: '
-                                 f'Expected: {reference_image.shape}; Actual: {output_image.shape}')
 
         if is_different:
             raise AssertionError(f"{base_error}Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
