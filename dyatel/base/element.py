@@ -371,7 +371,7 @@ class Element(WebElement, MobileElement, PlayElement):
         """
         delay = delay if delay else VisualComparison.default_delay
         threshold = threshold if threshold else VisualComparison.default_threshold
-        remove = remove if type(remove) is list else [remove]
+        remove = [remove] if type(remove) is not list and remove else remove
 
         VisualComparison(self.driver_wrapper, self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
