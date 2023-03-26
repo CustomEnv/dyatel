@@ -24,7 +24,7 @@ from dyatel.mixins.core_mixin import (
     initialize_objects,
     get_child_elements_with_names,
     set_static,
-    is_group,
+    is_group, all_locator_types,
 )
 
 
@@ -44,7 +44,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
     def __getattribute__(self, item):
         if 'element' in item and not object.__getattribute__(self, '_initialized'):
-            raise NotInitializedException('The element is not initialized. '
+            raise NotInitializedException(f'The element is not initialized for {self.__class__.__name__} '
                                           'Try to initialize base object first or call it directly as a method')
 
         return object.__getattribute__(self, item)
@@ -73,16 +73,19 @@ class Element(WebElement, MobileElement, PlayElement):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
+        if locator_type:
+            assert locator_type in all_locator_types, f'Locator type "{locator_type}" is not supported. ' \
+                                                      f'Choose from {all_locator_types}'
+
+        if parent:
+            assert isinstance(parent, (bool, all_mid_level_elements())), \
+                f'The "parent" of "{self.name}" should take an Element/Group object or False for skip. Get {parent}'
 
         self.locator = locator
         self.locator_type = locator_type
         self.name = name if name else locator
         self.parent = parent
         self.wait = wait
-
-        if self.parent:
-            assert isinstance(self.parent, (bool, all_mid_level_elements())), \
-                f'The "parent" of "{self.name}" should take an Element/Group object or False for skip. Get {self.parent}'
 
         self._initialized = False
         # Taking from Group first if available
@@ -350,7 +353,7 @@ class Element(WebElement, MobileElement, PlayElement):
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
             scroll: bool = False,
-            remove: List[Element] = None,
+            remove: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False
     ) -> None:
         """
@@ -368,6 +371,7 @@ class Element(WebElement, MobileElement, PlayElement):
         """
         delay = delay if delay else VisualComparison.default_delay
         threshold = threshold if threshold else VisualComparison.default_threshold
+        remove = list(remove)
 
         VisualComparison(self.driver_wrapper, self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,

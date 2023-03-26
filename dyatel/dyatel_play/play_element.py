@@ -66,10 +66,14 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
     @element.setter
     def element(self, play_element: Locator):
         """
-        Current class element setter. Try to avoid usage of this function
+        Core element setter. Try to avoid usage of this function
 
-        :param: play_element: playwright Locator object, that will be set for current class
+        :param: play_element: playwright Locator object
         """
+        given_type = type(play_element)
+        assert given_type is Locator, \
+            f'element attr must be Locator object, but {given_type} given'
+
         self._element = play_element
     
     @property

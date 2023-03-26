@@ -68,12 +68,16 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
         return self._get_element(wait=True)
 
     @element.setter
-    def element(self, selenium_element: SeleniumWebElement):
+    def element(self, selenium_element: Union[SeleniumWebElement, AppiumWebElement]):
         """
-        Current class element setter. Try to avoid usage of this function
+        Core element setter. Try to avoid usage of this function
 
-        :param: selenium_element: selenium WebElement object, that will be set for current class
+        :param: selenium_element: selenium WebElement or appium WebElement
         """
+        given_type = type(selenium_element)
+        assert given_type in (SeleniumWebElement, AppiumWebElement), \
+            f'element attr must be SeleniumWebElement or AppiumWebElement, but {given_type} given'
+
         self._element = selenium_element
 
     # Element interaction

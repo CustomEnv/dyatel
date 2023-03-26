@@ -5,6 +5,8 @@ import inspect
 from copy import copy
 from typing import Any, Union
 
+from appium.webdriver.common.appiumby import AppiumBy
+
 WAIT_EL = 10
 WAIT_PAGE = 15
 
@@ -298,3 +300,6 @@ def get_element_info(element: Any) -> str:
         parent_data = f'Parent selector: ["{parent.locator_type}": "{parent.locator}"]'
         current_data = f'{current_data}. {parent_data}'
     return current_data
+
+
+all_locator_types = get_child_elements(AppiumBy, str)
