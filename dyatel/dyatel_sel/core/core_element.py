@@ -68,14 +68,14 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
         return self._get_element(wait=True)
 
     @element.setter
-    def element(self, selenium_element: Union[SeleniumWebElement, AppiumWebElement]):
+    def element(self, selenium_element: Union[SeleniumWebElement, AppiumWebElement, None]):
         """
         Core element setter. Try to avoid usage of this function
 
         :param: selenium_element: selenium WebElement or appium WebElement
         """
         given_type = type(selenium_element)
-        assert given_type in (SeleniumWebElement, AppiumWebElement), \
+        assert given_type in (SeleniumWebElement, AppiumWebElement, None), \
             f'element attr must be SeleniumWebElement or AppiumWebElement, but {given_type} given'
 
         self._element = selenium_element

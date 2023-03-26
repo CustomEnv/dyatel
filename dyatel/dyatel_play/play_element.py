@@ -64,14 +64,14 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
         return element
 
     @element.setter
-    def element(self, play_element: Locator):
+    def element(self, play_element: Union[Locator, None]):
         """
         Core element setter. Try to avoid usage of this function
 
         :param: play_element: playwright Locator object
         """
         given_type = type(play_element)
-        assert given_type is Locator, \
+        assert given_type in (Locator, None), \
             f'element attr must be Locator object, but {given_type} given'
 
         self._element = play_element
