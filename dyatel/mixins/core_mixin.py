@@ -164,40 +164,32 @@ def get_child_elements_with_names(obj: Any, instance: Union[type, tuple] = None)
     return elements
 
 
-def get_all_attributes_from_object(reference_obj: Any,) -> dict:
+def get_all_attributes_from_object(reference_obj: Any) -> dict:
     """
     Get attributes from given object and all its bases
 
     :param reference_obj: reference object
     :return: dict of all attributes
     """
+    items = {}
+
     if not reference_obj:
-        return {}
-
-    reference_class = reference_obj if inspect.isclass(reference_obj) else reference_obj.__class__
-
-    def get_items(cls, items=None):
-
-        if not items:
-            items = {}
-
-        for parent_class in cls.__bases__:
-
-            str_parent_class = str(parent_class)
-
-            if "'object'" in str_parent_class or "'type'" in str_parent_class:
-                break
-
-            if 'dyatel' in str_parent_class and 'dyatel.base' not in str_parent_class:
-                continue
-
-            items.update({name: value for name, value in parent_class.__dict__.items() if name not in items.keys()})
-
-            get_items(parent_class, items)
-
         return items
 
-    return {**get_items(reference_class), **get_attributes_from_object(reference_obj)}
+    reference_class = reference_obj if inspect.isclass(reference_obj) else reference_obj.__class__
+    all_bases = list(inspect.getmro(reference_class))
+    all_bases.reverse()  # Reverse needed for getting child classes attributes first
+    all_bases.remove(object)
+
+    for parent_class in all_bases:
+        str_parent_class = str(parent_class)
+
+        if 'dyatel.base' not in str_parent_class and 'dyatel' in str_parent_class:
+            continue
+
+        items.update(dict(parent_class.__dict__))
+
+    return {**items, **get_attributes_from_object(reference_obj)}
 
 
 def get_attributes_from_object(reference_obj: Any) -> dict:
@@ -207,16 +199,17 @@ def get_attributes_from_object(reference_obj: Any) -> dict:
     :param reference_obj:
     :return:
     """
-    obj_items = {}
+    items = {}
+
     if not reference_obj:
-        return obj_items
+        return items
 
     if not inspect.isclass(reference_obj):
-        obj_items.update(dict(reference_obj.__class__.__dict__))
+        items.update(dict(reference_obj.__class__.__dict__))
 
-    obj_items.update(dict(reference_obj.__dict__))
+    items.update(dict(reference_obj.__dict__))
 
-    return obj_items
+    return items
 
 
 def is_target_on_screen(x: int, y: int, possible_range: dict):
