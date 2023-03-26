@@ -101,7 +101,7 @@ def set_parent_for_attr(base_obj: object, instance_class: Union[type, tuple], wi
         if with_copy:
             child = copy(child)
 
-        if is_group(child.parent) or child.parent is None:
+        if is_group(base_obj) and child.parent is None:
             child.parent = base_obj
 
         if with_copy:
