@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from types import NoneType
 from typing import Union, List, Any
 
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
@@ -64,14 +65,14 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
         return element
 
     @element.setter
-    def element(self, play_element: Union[Locator, None]):
+    def element(self, play_element: Union[Locator, NoneType]):
         """
         Core element setter. Try to avoid usage of this function
 
         :param: play_element: playwright Locator object
         """
         given_type = type(play_element)
-        assert given_type in (Locator, None), \
+        assert given_type in (Locator, NoneType), \
             f'element attr must be Locator object, but {given_type} given'
 
         self._element = play_element

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from io import BytesIO
+from types import NoneType
 from typing import Union, List, Any
 
 from PIL import Image
@@ -68,14 +69,14 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
         return self._get_element(wait=True)
 
     @element.setter
-    def element(self, selenium_element: Union[SeleniumWebElement, AppiumWebElement, None]):
+    def element(self, selenium_element: Union[SeleniumWebElement, AppiumWebElement, NoneType]):
         """
         Core element setter. Try to avoid usage of this function
 
         :param: selenium_element: selenium WebElement or appium WebElement
         """
         given_type = type(selenium_element)
-        assert given_type in (SeleniumWebElement, AppiumWebElement, None), \
+        assert given_type in (SeleniumWebElement, AppiumWebElement, NoneType), \
             f'element attr must be SeleniumWebElement or AppiumWebElement, but {given_type} given'
 
         self._element = selenium_element
