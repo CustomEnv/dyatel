@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from types import NoneType
 from typing import Union, List, Any
 
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
