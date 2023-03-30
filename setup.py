@@ -23,7 +23,7 @@ setup(
         'numpy>=1.18.1',
         'opencv-python==4.5.5.62',
         'Pillow>=6.2.2'
-        'playwright>=1.22.0',
+        'playwright>=1.30.0',
         'selenium>=4.1.0',
         'scikit-image>=0.17.1',
     ],
