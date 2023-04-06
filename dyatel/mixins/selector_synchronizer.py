@@ -91,16 +91,16 @@ def get_appium_selector(locator: str, locator_type: str):
     :return: selenium like locator and locator_type
     """
     if locator_type == By.ID:
-        locator_type = By.CSS_SELECTOR
         locator = f'[id="{locator}"]'
+        locator_type = By.CSS_SELECTOR
     elif locator_type == By.TAG_NAME:
         locator_type = By.CSS_SELECTOR
     elif locator_type == By.CLASS_NAME:
-        locator_type = By.CSS_SELECTOR
         locator = f".{locator}"
-    elif locator_type == By.NAME:
         locator_type = By.CSS_SELECTOR
+    elif locator_type == By.NAME:
         locator = f'[name="{locator}"]'
+        locator_type = By.CSS_SELECTOR
     return locator, locator_type
 
 

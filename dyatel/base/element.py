@@ -369,8 +369,8 @@ class Element(WebElement, MobileElement, PlayElement):
         :param fill_background: fill background with given color or black color by default
         :return: None
         """
-        delay = delay if delay else VisualComparison.default_delay
-        threshold = threshold if threshold else VisualComparison.default_threshold
+        delay = delay or VisualComparison.default_delay
+        threshold = threshold or VisualComparison.default_threshold
         remove = [remove] if type(remove) is not list and remove else remove
 
         VisualComparison(self.driver_wrapper, self).assert_screenshot(

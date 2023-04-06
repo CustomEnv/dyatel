@@ -72,8 +72,6 @@ def test_mobile_and_desktop_element_repr(driver, request):
 
 @pytest.mark.parametrize('driver', mobile_drivers, ids=mobile_ids)
 def test_mobile_and_desktop_group_repr(driver, request):
-    request.getfixturevalue(driver)
-    request.getfixturevalue('mocked_selenium_driver')
     mobile_driver = request.getfixturevalue(driver)
     desktop_driver = request.getfixturevalue('mocked_selenium_driver')
     mobile_group = MyGroup('repr-group', driver_wrapper=mobile_driver)
@@ -102,8 +100,6 @@ def test_mobile_and_desktop_group_repr(driver, request):
 
 @pytest.mark.parametrize('driver', mobile_drivers, ids=mobile_ids)
 def test_mobile_and_desktop_page_repr(driver, request):
-    request.getfixturevalue(driver)
-    request.getfixturevalue('mocked_selenium_driver')
     mobile_driver = request.getfixturevalue(driver)
     desktop_driver = request.getfixturevalue('mocked_selenium_driver')
     mobile_page = Page('repr-page', driver_wrapper=mobile_driver)
