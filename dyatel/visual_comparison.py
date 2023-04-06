@@ -94,9 +94,9 @@ class VisualComparison:
             self.dyatel_element.scroll_into_view()
 
         def save_screenshot(screenshot_name):
+            time.sleep(delay)
             self._fill_background(fill_background)
             self._appends_dummy_elements(remove)
-            time.sleep(delay)
             self.dyatel_element.get_screenshot(screenshot_name)
             self._remove_dummy_elements()
 
