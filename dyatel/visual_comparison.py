@@ -1,22 +1,24 @@
 from __future__ import annotations
 
 import os
+import re
 import time
 import importlib
 import json
 import base64
-import math
-import operator
-from functools import reduce
+from urllib.parse import urljoin
 from typing import Union, List, Any
 from string import punctuation
 
-from PIL import Image, ImageChops
+import cv2.cv2 as cv2
+import numpy
+from skimage._shared.utils import check_shape_equality  # noqa
+from skimage.metrics import structural_similarity
 
-from dyatel.exceptions import DriverWrapperException
+from dyatel.exceptions import DriverWrapperException, TimeoutException
 from dyatel.js_scripts import add_element_over_js, delete_element_over_js
-from dyatel.mixins.log_mixin import autolog
-from dyatel.mixins.internal_utils import get_frame
+from dyatel.mixins.logging import autolog
+from dyatel.mixins.core_mixin import get_frame, get_element_info
 
 
 class VisualComparison:
@@ -26,14 +28,25 @@ class VisualComparison:
     skip_screenshot_comparison = False
     visual_reference_generation = False
     hard_visual_reference_generation = False
+    default_delay = 0.75
+    default_threshold = 0
+    diff_color_scheme = (0, 255, 0)
 
     def __init__(self, driver_wrapper, element):
         self.driver_wrapper = driver_wrapper
         self.dyatel_element = element
 
-    def assert_screenshot(self, filename: str = '', test_name: str = '', name_suffix: str = '',
-                          threshold: Union[int, float] = 0, delay: Union[int, float] = 0.5, scroll: bool = False,
-                          remove: List[Any] = None, fill_background: Union[str, bool] = False) -> VisualComparison:
+    def assert_screenshot(
+            self,
+            filename: str,
+            test_name: str,
+            name_suffix: str,
+            threshold: Union[int, float],
+            delay: Union[int, float],
+            scroll: bool,
+            remove: List[Any],
+            fill_background: Union[str, bool],
+    ) -> VisualComparison:
         """
         Assert given (by name) and taken screenshot equals
 
@@ -71,7 +84,7 @@ class VisualComparison:
 
         reference_file = f'{reference_directory}{filename}.png'
         output_file = f'{output_directory}{filename}.png'
-        diff_file = f'{diff_directory}/diff_{filename}.png'
+        diff_file = f'{diff_directory}diff_{filename}.png'
 
         os.makedirs(os.path.dirname(reference_directory), exist_ok=True)
         os.makedirs(os.path.dirname(output_directory), exist_ok=True)
@@ -80,9 +93,8 @@ class VisualComparison:
         if scroll:
             self.dyatel_element.scroll_into_view()
 
-        time.sleep(delay)
-
         def save_screenshot(screenshot_name):
+            time.sleep(delay)
             self._fill_background(fill_background)
             self._appends_dummy_elements(remove)
             self.dyatel_element.get_screenshot(screenshot_name)
@@ -92,9 +104,8 @@ class VisualComparison:
             save_screenshot(reference_file)
             return self
 
-        try:
-            Image.open(reference_file)
-        except FileNotFoundError:
+        image = cv2.imread(reference_file)
+        if isinstance(image, type(None)):
             save_screenshot(reference_file)
 
             if self.visual_reference_generation:
@@ -102,8 +113,8 @@ class VisualComparison:
 
             self._disable_reruns()
 
-            raise FileNotFoundError(f'Reference file "{reference_file}" not found, but its just saved. '
-                                    f'If it CI run, then you need to commit reference files.') from None
+            raise AssertionError(f'Reference file "{reference_file}" not found, but its just saved. '
+                                 f'If it CI run, then you need to commit reference files.')
 
         if self.visual_reference_generation:
             return self
@@ -120,7 +131,14 @@ class VisualComparison:
         :return: VisualComparison
         """
         for obj in remove_data:
-            self.driver_wrapper.execute_script(add_element_over_js, obj.element)
+
+            try:
+                el = obj.element
+            except TimeoutException:
+                msg = f'Cannot find {obj.name} while removing background from screenshot. {get_element_info(obj)}'
+                raise TimeoutException(msg)
+
+            self.driver_wrapper.execute_script(add_element_over_js, el)
         return self
 
     def _remove_dummy_elements(self) -> VisualComparison:
@@ -148,35 +166,40 @@ class VisualComparison:
 
         return self
 
-    def _assert_same_images(self, actual_file: str, reference_file: str, filename: str,
+    def _assert_same_images(self, actual_file: str, reference_file: str, diff_file: str,
                             threshold: Union[int, float]) -> VisualComparison:
         """
         Assert that given images are equal to each other
 
         :param actual_file: actual image path
         :param reference_file: reference image path
-        :param filename: difference image name
+        :param diff_file: difference image name
         :param threshold: possible difference in percents
         :return: VisualComparison
         """
-        reference_image = Image.open(reference_file).convert('RGB')
-        output_image = Image.open(actual_file).convert('RGB')
-        diff, actual_threshold = self._get_difference(reference_image, output_image)
+        reference_image = cv2.imread(reference_file)
+        output_image = cv2.imread(actual_file)
 
-        same_size = reference_image.size == output_image.size
+        try:
+            check_shape_equality(reference_image, output_image)
+        except ValueError:
+            # TODO: Actual file can be added to allure report
+            raise AssertionError(f'Image size (width, height) is not same for {reference_file}: '
+                                 f'Expected: {reference_image.shape}; Actual: {output_image.shape}')
+
+        diff, actual_threshold = self._get_difference(reference_image, output_image)
         is_different = actual_threshold > threshold
 
-        if is_different or not same_size:
-            diff.save(filename)
-            self._attach_allure_diff(actual_file, reference_file, filename)
-
-        base_error = f"The new screenshot '{actual_file}' did not match the reference '{reference_file}'."
-
-        if not same_size:
-            raise AssertionError(f'{base_error} Image size (width, height) is different: '
-                                 f'Expected:{reference_image.size}, Actual: {output_image.size}.')
         if is_different:
-            raise AssertionError(f"{base_error} Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
+            cv2.imwrite(diff_file, diff)
+            self._attach_allure_diff(actual_file, reference_file, diff_file)
+
+        base_error = f"New screenshot '{actual_file}' did not match the\n" \
+                     f"Reference screenshot '{reference_file}'.\n" \
+                     f"Diff image {urljoin('file:', diff_file)}.\n"
+
+        if is_different:
+            raise AssertionError(f"{base_error}Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
 
         return self
 
@@ -242,30 +265,54 @@ class VisualComparison:
         for item in punctuation + ' ':
             screenshot_name = screenshot_name.replace(item, '_')
 
+        screenshot_name = self._remove_unexpected_underscores(screenshot_name)
+
         return screenshot_name.lower()
 
-    @staticmethod
-    def _get_difference(im1: Image, im2: Image):
+    def _get_difference(self, reference_img: numpy.ndarray, actual_img: numpy.ndarray) -> tuple[numpy.ndarray, float]:
         """
         Calculate difference between two images
 
-        :param im1: image 1
-        :param im2: image 2
+        :param reference_img: image 1, numpy.ndarray
+        :param actual_img: image 2, numpy.ndarray
         :return: (diff image, diff float value )
         """
-        diff = ImageChops.difference(im1, im2)
-        histogram = diff.histogram()
+        # Convert images to grayscale
+        reference_img_gray = cv2.cvtColor(reference_img, cv2.COLOR_BGR2GRAY)
+        actual_img_gray = cv2.cvtColor(actual_img, cv2.COLOR_BGR2GRAY)
 
-        rms = reduce(
-            operator.add,
-            map(
-                lambda h, i: h * (i ** 2),
-                histogram,
-                range(256)
-            )
-        )
+        # Compute SSIM between the two images
+        score, diff = structural_similarity(reference_img_gray, actual_img_gray, full=True)
+        score *= 100
 
-        return diff, math.sqrt(rms / (float(im1.size[0]) * im1.size[1]))
+        # The diff image contains the actual image differences between the two images
+        # and is represented as a floating point data type in the range [0,1]
+        # so we must convert the array to 8-bit unsigned integers in the range
+        # [0,255] before we can use it with OpenCV
+        diff = (diff * 255).astype("uint8")
+        diff_box = cv2.merge([diff, diff, diff])
+
+        # Threshold the difference image, followed by finding contours to
+        # obtain the regions of the two input images that differ
+        thresh = cv2.threshold(diff, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+        contours = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours = contours[0] if len(contours) == 2 else contours[1]
+
+        mask = numpy.zeros(reference_img.shape, dtype='uint8')
+        filled_after = actual_img.copy()
+
+        for c in contours:
+            area = cv2.contourArea(c)
+            if area > 40:
+                x, y, w, h = cv2.boundingRect(c)
+                cv2.rectangle(reference_img, (x, y), (x + w, y + h), self.diff_color_scheme, 2)
+                cv2.rectangle(actual_img, (x, y), (x + w, y + h), self.diff_color_scheme, 2)
+                cv2.rectangle(diff_box, (x, y), (x + w, y + h), self.diff_color_scheme, 2)
+                cv2.drawContours(mask, [c], 0, (255, 255, 255), -1)
+                cv2.drawContours(filled_after, [c], 0, self.diff_color_scheme, -1)
+
+        diff_image, percent_diff = filled_after, 100 - score
+        return diff_image, percent_diff
 
     @staticmethod
     def _attach_allure_diff(actual_path: str, expected_path: str, diff_path: str) -> None:
@@ -289,9 +336,8 @@ class VisualComparison:
 
             diff_dict = {}
             for name, path in (('actual', actual_path), ('expected', expected_path), ('diff', diff_path)):
-                image = open(path, 'rb')
-                diff_dict.update({name: f'data:image/png;base64,{base64.b64encode(image.read()).decode("ascii")}'})
-                image.close()
+                with open(path, 'rb') as image:
+                    diff_dict.update({name: f'data:image/png;base64,{base64.b64encode(image.read()).decode("ascii")}'})
 
             allure.attach(name='diff', body=json.dumps(diff_dict), attachment_type='application/vnd.allure.image.diff')
 
@@ -308,3 +354,11 @@ class VisualComparison:
 
         if hasattr(self.test_item, 'execution_count'):
             self.test_item.execution_count = pytest_rerun.get_reruns_count(self.test_item) + 1
+
+    def _remove_unexpected_underscores(self, text) -> str:
+        """
+        Remove multiple underscores from given text
+
+        :return: test_screenshot__data___name -> test_screenshot_data_name
+        """
+        return re.sub(r'_{2,}', '_', text)

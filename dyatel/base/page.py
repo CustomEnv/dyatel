@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Any
+from typing import Union, Any, List, Type
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -13,15 +13,37 @@ from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.internal_utils import WAIT_PAGE, get_platform_locator, driver_index
-from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
+from dyatel.mixins.element_mixin import repr_builder
+from dyatel.mixins.previous_object_driver import PreviousObjectDriver
+from dyatel.mixins.core_mixin import (
+    WAIT_PAGE,
+    initialize_objects,
+    get_child_elements_with_names,
+    all_mid_level_elements,
+    get_child_elements,
+    set_static,
+)
 
 
 class Page(WebPage, MobilePage, PlayPage):
     """ Page object crossroad. Should be defined as class """
 
-    def __init__(self, locator: str = '', locator_type: str = '', name: str = '',
-                 driver_wrapper: Union[DriverWrapper, Any] = None, **kwargs):
+    _object = 'page'
+
+    def __repr__(self):
+        return repr_builder(self)
+
+    def __call__(self, *arg, **kwargs):
+        return self
+
+    def __init__(  # noqa
+            self,
+            locator: str = '',
+            locator_type: str = '',
+            name: str = '',
+            driver_wrapper: Union[DriverWrapper, Any] = None,
+            **kwargs
+    ):
         """
         Initializing of page based on current driver
 
@@ -37,27 +59,22 @@ class Page(WebPage, MobilePage, PlayPage):
         """
         self.locator = locator
         self.locator_type = locator_type
-        self.name = name
+        self.name = name if name else locator
+
+        self.url = getattr(self, 'url', '')
+
+        self._element = None
         self._init_locals = locals()
+        self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
+        self._modify_object()
+        self._modify_children()
 
-        self._driver_instance = DriverWrapper
-        self.__set_base_class()
-        super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name)
-        # it's necessary to leave it after init
-        if driver_wrapper:
-            self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
-            self.set_driver(self._driver_instance)
-        elif self.driver_wrapper:
-            PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)
+        self.page_elements: List[Element] = get_child_elements(self, Element)
 
-    def __repr__(self):
-        cls = self.__class__
-        class_name = cls.__name__
-        locator = f'locator="{get_platform_locator(self)}"'
-        index = driver_index(self.driver_wrapper, self.driver)
-        driver = index if index else 'driver'
-        return f'{class_name}({locator}, locator_type="{self.locator_type}", name="{self.name}") at {hex(id(self))}, '\
-               f'{driver}={self.driver}'
+        self._scls = Page
+        self._base_cls = self._get_base_class()
+        set_static(self)
+        self._base_cls.__init__(self)
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 
@@ -99,7 +116,7 @@ class Page(WebPage, MobilePage, PlayPage):
         if not silent:
             self.log(f'Wait until page "{self.name}" loaded')
 
-        self.anchor.wait_element(timeout=timeout)
+        self.anchor.wait_element(timeout=timeout, silent=True)
 
         for element in self.page_elements:
             if getattr(element, 'wait') is False:
@@ -132,33 +149,44 @@ class Page(WebPage, MobilePage, PlayPage):
 
         return result
 
-    def set_driver(self, driver_wrapper: DriverWrapper) -> Page:
+    @property
+    def anchor(self) -> Element:
         """
-        Set driver instance for page and elements/groups
+        Get anchor element of the page
 
-        :param driver_wrapper: driver wrapper object ~ DriverWrapper/WebDriver/MobileDriver/CoreDriver/PlayDriver
-        :return: self
+        :return: Element object
         """
-        if not driver_wrapper:
-            return self
+        anchor = Element(locator=self.locator, locator_type=self.locator_type, name=self.name)
+        anchor.driver_wrapper = self.driver_wrapper
+        return anchor
 
-        self._set_driver(driver_wrapper, Element)
-        return self
-
-    def __set_base_class(self):
+    def _get_base_class(self) -> Type[PlayPage, MobilePage, WebPage]:
         """
         Get page class in according to current driver, and set him as base class
 
         :return: page class
         """
         if isinstance(self.driver, PlaywrightDriver):
-            Page.__bases__ = PlayPage,
-            return PlayPage
+            cls = PlayPage
         elif isinstance(self.driver, AppiumDriver):
-            Page.__bases__ = MobilePage,
-            return MobilePage
+            cls = MobilePage
         elif isinstance(self.driver, SeleniumDriver):
-            Page.__bases__ = WebPage,
-            return WebPage
+            cls = WebPage
         else:
-            raise DriverWrapperException('Cant specify Page')
+            raise DriverWrapperException(f'Cant specify {Page.__name__}')
+
+        return cls
+
+    def _modify_children(self):
+        """
+        Initializing of attributes with type == Element.
+        Required for classes with base == Page.
+        """
+        initialize_objects(self, get_child_elements_with_names(self, all_mid_level_elements()))
+
+    def _modify_object(self):
+        """
+        Modify current object. Required for Page that placed into functions:
+        - set driver from previous object if previous driver different.
+        """
+        PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)

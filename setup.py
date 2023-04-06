@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setup(
     name='dyatel-wrapper',
-    version='1.3.4',
+    version='2.0.0',
     url='https://github.com/EnvInc/dyatel',
     packages=[
         'dyatel',
@@ -20,10 +20,12 @@ setup(
     ],
     install_requires=[
         'Appium-Python-Client>=2.1.2',
+        'numpy>=1.18.1',
+        'opencv-python==4.5.5.62',
+        'Pillow>=6.2.2'
+        'playwright>=1.30.0',
         'selenium>=4.1.0',
-        'playwright>=1.22.0',
-        'webdriver-manager>=3.7.0',
-        'Pillow>=9.1.1'
+        'scikit-image>=0.17.1',
     ],
     keywords='selenium appium playwright web_automation mobile_automation',
     description='Wrapper of Selenium, Appium and Playwright with single API',
@@ -37,11 +39,12 @@ setup(
         'Changelog': 'https://github.com/EnvInc/dyatel/blob/master/CHANGELOG.md'
     },
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 2 - Beta',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Quality Assurance',
         'Topic :: Software Development :: Testing :: Acceptance',

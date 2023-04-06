@@ -30,9 +30,8 @@ def mocked_ios_driver(mocked_shared_mobile_driver):
         }
     )()
     driver_wrapper = DriverWrapper(mocked_shared_mobile_driver())
-    yield driver_wrapper
-    DriverWrapper._DriverWrapper__init_count = 0
-    CoreDriver.driver = None
+    DriverWrapper.driver = driver_wrapper.driver
+    return driver_wrapper
 
 
 @pytest.fixture
@@ -45,9 +44,8 @@ def mocked_android_driver(mocked_shared_mobile_driver):
         }
     )()
     driver_wrapper = DriverWrapper(mocked_shared_mobile_driver())
-    yield driver_wrapper
-    DriverWrapper._DriverWrapper__init_count = 0
-    CoreDriver.driver = None
+    DriverWrapper.driver = driver_wrapper.driver
+    return driver_wrapper
 
 
 @pytest.fixture
@@ -59,15 +57,44 @@ def mocked_selenium_driver():
     selenium_driver.error_handler = MagicMock()
 
     driver_wrapper = DriverWrapper(selenium_driver())
-    yield driver_wrapper
-    DriverWrapper._DriverWrapper__init_count = 0
-    CoreDriver.driver = None
+    DriverWrapper.driver = driver_wrapper.driver
+    return driver_wrapper
 
 
 @pytest.fixture
 def mocked_play_driver():
     driver_wrapper = DriverWrapper(Browser(MagicMock()))
     DriverWrapper.driver = PlaywrightDriver(MagicMock())
-    yield driver_wrapper
-    DriverWrapper._DriverWrapper__init_count = 0
+    return driver_wrapper
+
+
+@pytest.fixture(autouse=True)
+def base_teardown():
+    yield
+    DriverWrapper.is_multiplatform = False
+    DriverWrapper.all_drivers = []
+    DriverWrapper.mobile = False
+    DriverWrapper.desktop = False
+    DriverWrapper.is_ios = False
+    DriverWrapper.is_android = False
+    DriverWrapper.selenium = False
+    DriverWrapper.playwright = False
+    DriverWrapper._init_count = 0
     PlayDriver.driver = None
+    CoreDriver.driver = None
+
+
+mobile_drivers = [mocked_ios_driver.__name__, mocked_android_driver.__name__]
+mobile_ids = ['appium ios', 'appium android']
+
+
+desktop_drivers = [mocked_selenium_driver.__name__, mocked_play_driver.__name__]
+desktop_ids = ['selenium', 'playwright']
+
+
+all_drivers = mobile_drivers + desktop_drivers
+all_ids = mobile_ids + desktop_ids
+
+
+selenium_drivers = [mocked_selenium_driver.__name__] + mobile_drivers
+selenium_ids = ['selenium'] + mobile_ids

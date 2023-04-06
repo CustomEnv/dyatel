@@ -17,7 +17,7 @@ def test_checkbox_uncheck(forms_page):
 
 
 def test_checkbox_value(forms_page):
-    assert forms_page.controls_form.python_checkbox.text == 'PYTHON'
+    assert forms_page.controls_form.python_checkbox.get_attribute('value') == 'PYTHON'
 
 
 # Radiobutton tests
@@ -39,4 +39,4 @@ def test_radio_uncheck(forms_page):
 
 
 def test_radio_value(forms_page):
-    assert forms_page.controls_form.selenium_radio.text == 'SELENIUM'
+    assert forms_page.controls_form.selenium_radio.get_attribute('value') == 'SELENIUM'

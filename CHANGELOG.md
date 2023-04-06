@@ -1,21 +1,58 @@
 # Dyatel Changelog
 
 ---
-## v1.3.4
+
+## v2.0.1
+
 *Release date: in development*
+
 ---
 
-## v1.3.5
-*Release date: 2022-01-17*
+## v2.0.0
+*Release date: in development*
+
+### Added
+- `element.wait_enabled` method
+- `element.wait_disabled` method
+- `element.is_enabled` method
+- `VisualComparison.default_delay` property
+- `VisualComparison.default_threshold` property
+- `DriverWrapper.switch_to_alert` method (Selenium Only)
+- `DriverWrapper.accept_alert` method (Selenium Only)
+- `DriverWrapper.dismiss_alert` method (Selenium Only)
+- `MobileDriver.click_in_alert` method (Appium Only)
+
+### Fixed
+- MRO for Mobile + Desktop session
+- Rapidly requests for current context on mobile
+- `element.all_elements` recursion
+- logging stderr to stdout
+
+### Changed
+- Checkbox class removed (all methods in Element class)
+- New screenshot comparison engine. By: [@laruss](https://github.com/laruss)
+- Elements initialization
+- `element.wait_clickable` renamed to `element.wait_enabled`
+- `__repr__` for Element/Group/Page
+- Driver with index will be added to logs always
+
+---
+
+## v1.3.4
+*Release date: 2023-01-17*
 
 ### Fixed
 - Error logs fixes
 
+---
+
 ## v1.3.3
-*Release date: 2022-01-12*
+*Release date: 2023-01-12*
 
 ### Changed
 - `element.assert_screenshot` elements removal rework
+
+---
 
 ## v1.3.2
 *Release date: 2022-12-08*
@@ -32,6 +69,7 @@
 - Pillow warning fixes
 - other fixes and improvements
 
+---
 
 ## v1.3.1
 *Release date: 2022-12-02*
@@ -50,6 +88,7 @@
 ### Fixed
 - DifferentDriverWrapper and elements initialization fixes
 
+---
 
 ## v1.3.0
 *Release date: 2022-10-18*
@@ -81,6 +120,7 @@
 - Click by location after scroll
 
 ---
+
 ## v1.2.8
 *Release date: 2022-09-20*
 
@@ -102,6 +142,7 @@
 - `driver_wrapper.switch_to_tab` with default params
 
 ---
+
 ## v1.2.6/7
 *Release date: 2022-09-15*
 
@@ -109,6 +150,7 @@
 - screenshot name generation
 
 ---
+
 ## v1.2.5
 *Release date: 2022-09-13*
 
@@ -121,6 +163,7 @@
 - Shared object of groups become unique for each class
 
 ---
+
 ## v1.2.4
 *Release date: 2022-09-08*
 
@@ -128,6 +171,7 @@
 - `assert_screenshot()` elements removal
 
 ---
+
 ## v1.2.3
 *Release date: 2022-09-02*
 
@@ -135,6 +179,7 @@
 - `element.is_displayed()` exception handler
 
 ---
+
 ## v1.2.1/2
 *Release date: 2022-08-31*
 
@@ -142,6 +187,7 @@
 - Annotations
 
 ---
+
 ## v1.2.0
 *Release date: 2022-08-31*
 
@@ -166,6 +212,7 @@
 - Page `driver_wrapper` getter exception
 
 ---
+
 ## v1.1.1
 *Release date: 2022-08-10*
 

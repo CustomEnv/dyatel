@@ -21,9 +21,20 @@ class MouseEventPage(Page):
     def mouse_click_card(self):
         return MouseClickCard()
 
+    def drag_n_drop(self):
+        return DragAndDrop()
+
 
 class MouseEventPageWithUnexpectedWait(MouseEventPage):
     dropdown = Element('div.dropdown-content', name='dropdown with languages and wait', wait=True)
+
+
+class DragAndDrop(Group):
+    def __init__(self):
+        super().__init__('//*[contains(@class, "card") and .//.="Drag and Drop"]', name='drag and drop card')
+
+    card_body = Element('.card-body', name='card body')
+    drag_target = Element('drop_target', name='drag target button', parent=card_body)
 
 
 class MouseClickCard(Group):
@@ -43,14 +54,14 @@ class MouseClickCard(Group):
 
     @property
     def any_button_without_parent(self):
-        return Element('button', name='any button', parent=False)
+        return Element('button', name='any button wo parent', parent=False)
 
     @property
     def any_button_with_custom_parent(self):
-        return Element('button', name='any button', parent=self.y_result)
+        return Element('button', name='any button custom parent', parent=self.y_result)
 
     def get_result_coordinates(self):
-        return [int(element.text.split(' ')[1]) for element in (self.x_result, self.y_result)]
+        return [int(element.wait_element_text().text.split(' ')[1]) for element in (self.x_result, self.y_result)]
 
     def get_click_area_middle(self):
         el_rect = self.click_area.get_rect()

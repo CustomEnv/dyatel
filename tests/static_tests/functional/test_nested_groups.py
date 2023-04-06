@@ -3,6 +3,7 @@ import pytest
 from dyatel.base.element import Element
 from dyatel.base.group import Group
 from dyatel.base.page import Page
+from tests.static_tests.conftest import all_drivers, all_ids
 
 
 class Group1(Group):
@@ -24,11 +25,7 @@ class Page1(Page):
         super().__init__('page1')
 
 
-@pytest.mark.parametrize(
-    'driver',
-    ('mocked_selenium_driver', 'mocked_ios_driver', 'mocked_play_driver'),
-    ids=['selenium', 'appium', 'playwright']
-)
+@pytest.mark.parametrize('driver', all_drivers, ids=all_ids)
 def test_object_in_nested_groups(driver, request):
     request.getfixturevalue(driver)
     page = Page1()

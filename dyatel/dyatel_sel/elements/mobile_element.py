@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import time
 from typing import Union, List, BinaryIO, Any
 
-from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.dyatel_sel.sel_utils import get_legacy_selector, get_locator_type
-from dyatel.mixins.internal_utils import calculate_coordinate_to_click
+from dyatel.mixins.core_mixin import calculate_coordinate_to_click
 from dyatel.js_scripts import get_element_position_on_screen_js
+from dyatel.mixins.selector_synchronizer import get_platform_locator, get_selenium_locator_type, get_appium_selector
 
 
 class MobileElement(CoreElement):
@@ -21,16 +21,21 @@ class MobileElement(CoreElement):
         :param parent: parent of element. Can be MobileElement, MobilePage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self.is_ios = DriverWrapper.is_ios
-        self.is_android = DriverWrapper.is_android
+        locator = get_platform_locator(self, default_locator=locator)
+        locator_type = locator_type if locator_type else get_selenium_locator_type(locator)
+        locator, locator_type = get_appium_selector(locator, locator_type)
 
-        self.locator_type = locator_type if locator_type else get_locator_type(locator)
-        self.locator, self.locator_type = get_legacy_selector(locator, self.locator_type)
-
-        super().__init__(locator=self.locator, locator_type=self.locator_type, name=name, parent=parent, wait=wait)
+        CoreElement.__init__(
+            self,
+            locator=locator,
+            locator_type=locator_type,
+            name=name,
+            parent=parent,
+            wait=wait
+        )
 
     @property
-    def all_elements(self) -> List[Any]:
+    def all_elements(self) -> Union[None, List[Any]]:
         """
         Get all wrapped elements with appium bases
 
@@ -54,7 +59,7 @@ class MobileElement(CoreElement):
 
         x, y = calculate_coordinate_to_click(self, x, y)
 
-        if calculate_top_bar and self.is_ios:
+        if calculate_top_bar and self.driver_wrapper.is_ios:
             y += self.driver_wrapper.get_top_bar_height()
 
         self.log(f'Tap outside from "{self.name}" with coordinates (x: {x}, y: {y})')
@@ -76,7 +81,7 @@ class MobileElement(CoreElement):
 
         x, y = calculate_coordinate_to_click(self, 0, 0)
 
-        if calculate_top_bar and self.is_ios:
+        if calculate_top_bar and self.driver_wrapper.is_ios:
             y += self.driver_wrapper.get_top_bar_height()
 
         if not silent:
@@ -111,6 +116,22 @@ class MobileElement(CoreElement):
         """
         return self.click_outside(x=x, y=y, calculate_top_bar=calculate_top_bar)
 
+    def click_in_alert(self) -> MobileElement:
+        """
+        Click on element in alert with switch to native context
+
+        :return: self
+        """
+        try:
+            self.driver_wrapper.switch_to_native()
+            time.sleep(1)
+            if self.wait_element_without_error(timeout=5, silent=True).is_displayed(silent=True):
+                self.click()
+        finally:
+            self.driver_wrapper.switch_to_web()
+
+        return self
+
     def get_screenshot(self, filename: str, legacy: bool = True) -> BinaryIO:
         """
         Taking element screenshot and saving with given path/filename
@@ -130,7 +151,7 @@ class MobileElement(CoreElement):
 
             image_binary.save(filename)
         else:
-            image_binary = super().get_screenshot(filename)
+            image_binary = CoreElement.get_screenshot(self, filename)
 
         return image_binary
 

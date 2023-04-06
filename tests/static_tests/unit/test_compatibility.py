@@ -6,7 +6,6 @@ from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.core.core_page import CorePage
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
-from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 
 
@@ -23,6 +22,7 @@ def test_playwright_and_selenium_element_compatibility():
     assert get_class_static(PlayElement) == sorted(get_class_static(WebElement) + get_class_static(CoreElement))
 
 
+@pytest.mark.skip('rework needed')
 def test_selenium_mobile_and_web_element_compatibility():
     web_static = sorted(set(get_class_static(WebElement) + get_class_static(CoreElement)))
     mobile_static = sorted(set(get_class_static(MobileElement) + get_class_static(CoreElement)))

@@ -13,7 +13,7 @@ from webdriver_manager.firefox import GeckoDriverManager
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_driver import PlayDriver
-from dyatel.shared_utils import set_logging_settings
+from dyatel.mixins.logging import dyatel_logs_settings
 from dyatel.visual_comparison import VisualComparison
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
@@ -26,7 +26,7 @@ from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import PlaygroundMainPage, SecondPlaygroundMainPage
 
 
-set_logging_settings()
+dyatel_logs_settings()
 
 
 def pytest_addoption(parser):
@@ -34,7 +34,8 @@ def pytest_addoption(parser):
     parser.addoption('--headless', action='store_true', help='Run in headless mode')
     parser.addoption('--driver', default='chrome', help='Browser name')
     parser.addoption('--platform', default='desktop', help='Platform name')
-    parser.addoption('--generate-reference', action='store_true', help='Generate reference images in visual tests')
+    parser.addoption('--gr', action='store_true', help='Generate reference images in visual tests')
+    parser.addoption('--hgr', action='store_true', help='Hard generate reference images in visual tests')
     parser.addoption('--appium-port', default='1000')
     parser.addoption('--appium-ip', default='0.0.0.0')
 
@@ -77,6 +78,8 @@ def firefox_options(request):
 
 @pytest.fixture
 def driver_wrapper(platform, driver_name, driver_engine, request, driver_init):
+    # Prints are required for better readability: https://github.com/pytest-dev/pytest/issues/8574
+    print()
     skip_marks_iterator = tuple(request.node.iter_markers(name='skip_platform'))
     skip_platform = list(name for marker in skip_marks_iterator for name in marker.args)
     xfail_marks_iterator = tuple(request.node.iter_markers(name='xfail_platform'))
@@ -91,6 +94,7 @@ def driver_wrapper(platform, driver_name, driver_engine, request, driver_init):
         pytest.skip(f"Skip test {platform} with {driver_name}. Reason={skip_reason}")
 
     yield driver_init
+    print()
     driver_init.get('data:,')
 
 
@@ -160,7 +164,9 @@ def driver_func(request, driver_name, driver_engine, chrome_options, firefox_opt
     driver_wrapper = DriverWrapper(driver)
 
     VisualComparison.visual_regression_path = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
-    VisualComparison.visual_reference_generation = request.config.getoption('--generate-reference')
+    VisualComparison.visual_reference_generation = request.config.getoption('--gr')
+    VisualComparison.hard_visual_reference_generation = request.config.getoption('--hgr')
+    VisualComparison.default_threshold = 0.1
 
     if 'appium' not in driver_engine:
         driver_wrapper.set_window_size(1024, 900)

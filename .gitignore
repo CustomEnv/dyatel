@@ -6,6 +6,12 @@ __pycache__/
 # C extensions
 *.so
 
+# profiling
+prof/
+
+# driver logs
+geckodriver.log
+
 # Distribution / packaging
 .Python
 build/

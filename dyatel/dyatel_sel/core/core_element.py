@@ -21,10 +21,11 @@ from selenium.common.exceptions import (
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.mixins.log_mixin import LogMixin
+from dyatel.mixins.logging import Logging
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
+from dyatel.mixins.core_mixin import WAIT_EL, is_group, is_element
 from dyatel.exceptions import (
     TimeoutException,
     InvalidSelectorException,
@@ -32,15 +33,9 @@ from dyatel.exceptions import (
     NoSuchElementException,
     ElementNotInteractableException,
 )
-from dyatel.mixins.internal_utils import (
-    WAIT_EL,
-    get_child_elements,
-    initialize_objects_with_args,
-    get_platform_locator,
-)
 
 
-class CoreElement(ElementMixin, DriverMixin, LogMixin):
+class CoreElement(ElementMixin, DriverMixin, Logging):
 
     def __init__(self, locator: str, locator_type: str, name: str, parent: Any, wait: bool):
         """
@@ -57,12 +52,9 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         self.locator = locator
         self.locator_type = locator_type
-        self.name = name if name else self.locator
+        self.name = name
         self.parent: Any = parent
         self.wait = wait
-
-        self.child_elements: List[CoreElement] = get_child_elements(self, CoreElement)
-        initialize_objects_with_args(self.child_elements)  # required for Group
 
     # Element
 
@@ -76,33 +68,37 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         return self._get_element(wait=True)
 
     @element.setter
-    def element(self, selenium_element: SeleniumWebElement):
+    def element(self, selenium_element: Union[SeleniumWebElement, AppiumWebElement]):
         """
-        Current class element setter. Try to avoid usage of this function
+        Core element setter. Try to avoid usage of this function
 
-        :param: selenium_element: selenium WebElement object, that will be set for current class
+        :param: selenium_element: selenium WebElement or appium WebElement
         """
         self._element = selenium_element
 
     # Element interaction
 
-    def click(self) -> CoreElement:
+    def click(self, with_wait=True) -> CoreElement:
         """
         Click to current element
 
+        :param with_wait: wait for element before click
         :return: self
         """
         self.log(f'Click into "{self.name}"')
 
         self.element = self._get_element()
-        exception_msg = f'Element "{self.name}" not interactable {self.get_element_logging_data()}'
+        exception_msg = f'Element "{self.name}" not interactable {self.get_element_info()}'
 
         try:
-            self.wait_clickable(silent=True).element.click()
+            if with_wait:
+                self.wait_element(silent=True)
+
+            self.wait_enabled(silent=True).element.click()
         except SeleniumElementNotInteractableException:
-            raise ElementNotInteractableException(exception_msg) from None
+            raise ElementNotInteractableException(exception_msg)
         except SeleniumElementClickInterceptedException as exc:
-            raise ElementNotInteractableException(f'{exception_msg}. Original error: {exc.msg}') from None
+            raise ElementNotInteractableException(f'{exception_msg}. Original error: {exc.msg}')
         finally:
             self.element = None
 
@@ -157,6 +153,38 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         self.element.clear()
         return self
 
+    def check(self) -> CoreElement:
+        """
+        Check current checkbox
+
+        :return: self
+        """
+        self.element = self._get_element(wait=True, from_dom=True)
+
+        try:
+            if not self.is_checked():
+                self.click(with_wait=False)
+        finally:
+            self.element = None
+
+        return self
+
+    def uncheck(self) -> CoreElement:
+        """
+        Uncheck current checkbox
+
+        :return: self
+        """
+        self.element = self._get_element(wait=True, from_dom=True)
+
+        try:
+            if self.is_checked():
+                self.click(with_wait=False)
+        finally:
+            self.element = None
+
+        return self
+
     # Element waits
 
     def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
@@ -177,7 +205,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         if not is_displayed:
             base_exception_msg = f'Element "{self.name}" not visible after {timeout} seconds'
-            raise TimeoutException(f'{base_exception_msg} {self.get_element_logging_data()}') from None
+            raise TimeoutException(f'{base_exception_msg} {self.get_element_info()}')
 
         return self
 
@@ -198,31 +226,8 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             is_hidden = self.is_hidden(silent=True)
 
         if not is_hidden:
-            msg = f'"{self.name}" still visible after {timeout} seconds. {self.get_element_logging_data()}'
-            raise TimeoutException(msg) from None
-
-        return self
-
-    def wait_clickable(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
-        """
-        Wait until element clickable
-
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait until "{self.name}" become clickable')
-
-        element = self.element
-        is_clickable = False
-        start_time = time.time()
-        while time.time() - start_time < timeout and not is_clickable:
-            is_clickable = element.is_enabled()
-
-        if not is_clickable:
-            msg = f'"{self.name}" not clickable after {timeout} seconds. {self.get_element_logging_data()}'
-            raise TimeoutException(msg) from None
+            msg = f'"{self.name}" still visible after {timeout} seconds. {self.get_element_info()}'
+            raise TimeoutException(msg)
 
         return self
 
@@ -243,8 +248,8 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             is_available = self.is_available()
 
         if not is_available:
-            msg = f'"{self.name}" not available in DOM after {timeout} seconds. {self.get_element_logging_data()}'
-            raise TimeoutException(msg) from None
+            msg = f'"{self.name}" not available in DOM after {timeout} seconds. {self.get_element_info()}'
+            raise TimeoutException(msg)
 
         return self
 
@@ -296,11 +301,12 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
     @property
     def text(self) -> str:
         """
-        Get current element text
+        Get text from current element
 
         :return: element text
         """
-        return self.element.text
+        element = self._get_element(wait=True, from_dom=True)
+        return element.text
 
     @property
     def inner_text(self) -> str:
@@ -386,7 +392,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
             self.log(f'Get all texts from "{self.name}"')
 
         self.wait_element(silent=True)
-        return list(element_item.text for element_item in getattr(self, 'all_elements'))
+        return list(element_item.text for element_item in self.all_elements)
 
     def get_elements_count(self, silent: bool = False) -> int:
         """
@@ -398,7 +404,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         if not silent:
             self.log(f'Get elements count of "{self.name}"')
 
-        return len(getattr(self, 'all_elements'))
+        return len(self.all_elements)
 
     def get_rect(self) -> dict:
         """
@@ -411,6 +417,26 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         location = self.driver.execute_script(get_element_position_on_screen_js, element)
         sorted_items: list = sorted({**size, **location}.items(), reverse=True)
         return dict(sorted_items)
+
+    def is_enabled(self, silent: bool = False) -> bool:
+        """
+        Check if element enabled
+
+        :param silent: erase log
+        :return: True if element enabled
+        """
+        if not silent:
+            self.log(f'Check is element "{self.name}" enabled')
+
+        return self.element.is_enabled()
+
+    def is_checked(self) -> bool:
+        """
+        Is checkbox checked
+
+        :return: bool
+        """
+        return self._get_element(wait=True, from_dom=True).is_selected()
 
     # Mixin
 
@@ -448,11 +474,12 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
         return img_binary
 
-    def _get_element(self, wait: bool = True) -> SeleniumWebElement:
+    def _get_element(self, wait: bool = True, from_dom: bool = False) -> SeleniumWebElement:
         """
         Get selenium element from driver or parent element
 
         :param wait: wait for element or element parent before grab
+        :param from_dom: check element presenting in dom while wait
         :return: SeleniumWebElement
         """
         element = self._element
@@ -465,18 +492,19 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
 
             try:
                 element = self._find_element(base)
-            except NoSuchElementException:
+            except (NoSuchElementException, SeleniumStaleElementReferenceException):
                 element = None
 
             if not element and wait:
+                wait_func = self.wait_availability if from_dom else self.wait_element
                 try:
-                    element = self.wait_element(silent=True).__element
+                    element = wait_func(silent=True).__element
                 except TimeoutException:
                     element = None
 
         if not element:
-            msg = f'Cant find element "{self.name}". {self.get_element_logging_data()}'
-            raise NoSuchElementException(msg) from None
+            msg = f'Cant find element "{self.name}". {self.get_element_info()}'
+            raise NoSuchElementException(msg)
 
         return element
 
@@ -489,26 +517,19 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         base = self.driver
 
         if not base:
-            raise DriverWrapperException("Can't find driver") from None
+            raise DriverWrapperException("Can't find driver")
 
         if self.driver_wrapper.mobile:
             if self.driver_wrapper.is_native_context:
                 return base
 
         if self.parent:
-            self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')
-
             try:
-
-                if isinstance(self.parent, CoreElement):
-                    base = self.parent._get_element(wait=wait)
-                else:
-                    get_element_func = getattr(self.parent.anchor, '_get_element')
-                    base = get_element_func(wait=wait)
-
+                if is_group(self.parent) or is_element(self.parent):
+                    base = self.parent._get_element(wait=wait)  # noqa
             except NoSuchElementException:
-                message = f'Cant find parent element "{self.parent.name}". {self.get_element_logging_data(self.parent)}'
-                raise NoSuchElementException(message) from None
+                message = f'Cant find parent element "{self.parent.name}". {self.get_element_info(self.parent)}'
+                raise NoSuchElementException(message)
 
         return base
 
@@ -520,11 +541,11 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: SeleniumWebElement or AppiumWebElement
         """
         try:
-            return base.find_element(self.locator_type, get_platform_locator(self))
+            return base.find_element(self.locator_type, self.locator)
         except (SeleniumInvalidArgumentException, SeleniumInvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
         except SeleniumNoSuchElementException as exc:
-            raise NoSuchElementException(exc.msg) from None
+            raise NoSuchElementException(exc.msg)
 
     def _find_elements(self, base: Any) -> List[Union[SeleniumWebElement, AppiumWebElement]]:
         """
@@ -534,7 +555,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: list of SeleniumWebElement or AppiumWebElement
         """
         try:
-            return base.find_elements(self.locator_type, get_platform_locator(self))
+            return base.find_elements(self.locator_type, self.locator)
         except (SeleniumInvalidArgumentException, InvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
 
@@ -546,7 +567,7 @@ class CoreElement(ElementMixin, DriverMixin, LogMixin):
         :return: None
         """
         if 'invalid locator' in exc.msg or 'is not a valid' in exc.msg:
-            msg = f'Selector for "{self.name}" is invalid. {self.get_element_logging_data(self)}'
-            raise InvalidSelectorException(msg) from None
+            msg = f'Selector for "{self.name}" is invalid. {self.get_element_info(self)}'
+            raise InvalidSelectorException(msg)
         else:
-            raise exc from None
+            raise exc

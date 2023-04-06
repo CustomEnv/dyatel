@@ -1,4 +1,3 @@
-from dyatel.base.checkbox import Checkbox
 from dyatel.base.element import Element
 from dyatel.base.group import Group
 
@@ -24,7 +23,7 @@ class ControlsForm(Group):
     def __init__(self):
         super().__init__('//*[contains(@class, "card") and .//.="Basic Form Controls"]', name='Controls form')
 
-    python_checkbox = Checkbox('check_python', name='python checkbox')
-    selenium_radio = Checkbox('rad_selenium', name='selenium radiobutton')
-    protractor_radio = Checkbox('rad_protractor', name='protractor radiobutton')
-    german_slider = Checkbox('.custom-control-label', name='german language slider')
+    python_checkbox = Element('check_python', name='python checkbox')
+    selenium_radio = Element('rad_selenium', name='selenium radiobutton')
+    protractor_radio = Element('rad_protractor', name='protractor radiobutton')
+    german_slider = Element('.custom-control-label', name='german language slider')

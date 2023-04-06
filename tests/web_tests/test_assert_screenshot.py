@@ -7,14 +7,14 @@ import pytest_rerunfailures
 @pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])
 def test_screenshot(base_playground_page, driver_engine, driver_name, platform, with_name):
     filename = f'{driver_engine}-{driver_name}-{platform}-kube' if with_name else ''
-    base_playground_page.kube.scroll_into_view().assert_screenshot(filename, threshold=6)
+    base_playground_page.kube.scroll_into_view().assert_screenshot(filename)
 
 
 @pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])
 def test_screenshot_name_with_suffix(base_playground_page, driver_engine, driver_name, platform, with_name):
     filename = f'{driver_engine}-{driver_name}-{platform}-kube' if with_name else ''
-    base_playground_page.kube.scroll_into_view().assert_screenshot(filename, name_suffix='first', threshold=6)
-    base_playground_page.kube.scroll_into_view().assert_screenshot(filename, name_suffix='second', threshold=6)
+    base_playground_page.kube.scroll_into_view().assert_screenshot(filename, name_suffix='first')
+    base_playground_page.kube.scroll_into_view().assert_screenshot(filename, name_suffix='second')
 
 
 def test_screenshot_remove(base_playground_page):
@@ -24,6 +24,7 @@ def test_screenshot_remove(base_playground_page):
 
 @pytest.fixture
 def file(request):
+    request.node.execution_count = 1
     request.node.session.config.option.reruns = 1
     filename = 'reference_with_rerun'
     yield filename
@@ -35,16 +36,16 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
     assert pytest_rerunfailures.get_reruns_count(request.node) == 1
     try:
         base_playground_page.text_container.scroll_into_view(sleep=0.5).assert_screenshot(filename=file)
-    except FileNotFoundError:
+    except AssertionError:
         pass
     else:
-        if not request.config.getoption('--generate-reference'):
+        if not request.config.getoption('--gr') or not request.config.getoption('--hgr'):
             raise Exception('Unexpected behavior')
 
 
 def test_screenshot_fill_background_default(base_playground_page):
-    base_playground_page.kube.scroll_into_view().assert_screenshot(threshold=6, fill_background=True)
+    base_playground_page.kube.scroll_into_view().assert_screenshot(fill_background=True)
 
 
 def test_screenshot_fill_background_blue(base_playground_page):
-    base_playground_page.kube.scroll_into_view().assert_screenshot(threshold=6, fill_background='blue')
+    base_playground_page.kube.scroll_into_view().assert_screenshot(fill_background='blue')

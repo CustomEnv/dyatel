@@ -3,21 +3,25 @@ import pytest
 from dyatel.exceptions import UnexpectedElementsCountException
 
 
+# TODO: rework needed
 def test_wait_element(pizza_order_page):
     pizza_order_page.submit_button.wait_element()
     assert pizza_order_page.submit_button.is_displayed()
 
 
+# TODO: rework needed
 def test_wait_without_error(pizza_order_page):
     pizza_order_page.error_modal.wait_element_without_error(timeout=0.5)
     assert not pizza_order_page.error_modal.is_displayed()
 
 
+# TODO: rework needed
 def test_wait_hidden(pizza_order_page):
-    pizza_order_page.error_modal.wait_element_without_error()
+    pizza_order_page.error_modal.wait_element_without_error(timeout=1)
     assert not pizza_order_page.error_modal.is_displayed()
 
 
+# TODO: rework needed
 def test_wait_hidden_without_error(pizza_order_page):
     pizza_order_page.submit_button.wait_element_without_error(timeout=0.5)
     assert pizza_order_page.submit_button.is_displayed()
@@ -41,7 +45,7 @@ def test_wait_element_text(expected_condition_page):
     assert all((not value_without_wait, value_with_wait))
 
 
-def test_wait_elements_count(forms_page):
+def test_wait_elements_count_v1(forms_page):
     forms_page.validation_form.form_mixin.input.type_text('sample')
     forms_page.validation_form.submit_form_button.click()
     forms_page.validation_form.any_error.wait_elements_count(4)

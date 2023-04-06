@@ -1,16 +1,56 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from copy import copy
 from typing import List, Any, Union
 
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.internal_utils import get_child_elements_with_names, get_platform_locator
+from dyatel.mixins.core_mixin import (
+    driver_with_index,
+    get_element_info,
+    set_parent_for_attr,
+)
+
+
+def repr_builder(instance):
+    class_name = instance.__class__.__name__
+    obj_id = hex(id(instance))
+
+    try:
+        driver_title = driver_with_index(instance.driver_wrapper, instance.driver)
+        parent_class = instance.parent.__class__.__name__ if getattr(instance, 'parent', False) else None
+        locator_holder = getattr(instance, 'anchor', instance)
+
+        locator = f'locator="{locator_holder.locator}"'
+        locator_type = f'locator_type="{locator_holder.locator_type}"'
+        name = f'name="{instance.name}"'
+        parent = f'parent={parent_class}'
+        driver = f'{driver_title}={instance.driver}'
+
+        base = f'{class_name}({locator}, {locator_type}, {name}, {parent}) at {obj_id}'
+        additional_info = driver
+        return f'{base}, {additional_info}'
+    except AttributeError:
+        return f'{class_name} object at {obj_id}'
 
 
 class ElementMixin(DriverMixin):
     """ Mixin for PlayElement and CoreElement """
 
-    def get_element_logging_data(self, element: Any = None) -> str:
+    @property
+    @abstractmethod
+    def all_elements(self):
+        raise NotImplementedError('all_elements method is not implemented for current class')
+
+    @abstractmethod
+    def wait_enabled(self, *args, **kwargs):
+        raise NotImplementedError('wait_enabled method is not implemented for current class')
+
+    @abstractmethod
+    def wait_element_without_error(self, *args, **kwargs):
+        raise NotImplementedError('wait_element_without_error method is not implemented for current class')
+
+    def get_element_info(self, element: Any = None) -> str:
         """
         Get full loging data depends on parent element
 
@@ -18,12 +58,7 @@ class ElementMixin(DriverMixin):
         :return: log string
         """
         element = element if element else self
-        parent = element.parent
-        current_data = f'Selector: ["{element.locator_type}": "{get_platform_locator(element)}"]'
-        if parent:
-            parent_data = f'Parent selector: ["{parent.locator_type}": "{get_platform_locator(parent)}"]'
-            current_data = f'{current_data}. {parent_data}'
-        return current_data
+        return get_element_info(element)
 
     def _get_all_elements(self, sources: Union[tuple, list], instance_class: type) -> List[Any]:
         """
@@ -36,27 +71,10 @@ class ElementMixin(DriverMixin):
         wrapped_elements = []
 
         for element in sources:
-            wrapped_object = copy(self)
+            wrapped_object: Any = copy(self)
             wrapped_object.element = element
-            self.__set_parent_for_attr(instance_class, wrapped_object)
+            wrapped_object._wrapped = True
+            set_parent_for_attr(wrapped_object, instance_class, with_copy=True)
             wrapped_elements.append(wrapped_object)
 
         return wrapped_elements
-
-    def __set_parent_for_attr(self, instance_class: type, base_obj: object):
-        """
-        Copy attributes of given object and set new parent for him
-
-        :param instance_class: attribute class to looking for
-        :param base_obj: object of attribute
-        :return: self
-        """
-        child_elements = get_child_elements_with_names(base_obj, instance_class).items()
-
-        for name, child in child_elements:
-            wrapped_child = copy(child)
-            wrapped_child.parent = base_obj
-            setattr(base_obj, name, wrapped_child)
-            self.__set_parent_for_attr(instance_class, wrapped_child)
-
-        return self

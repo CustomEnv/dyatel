@@ -16,7 +16,7 @@ def test_element_exception_without_parent(base_playground_page):
     try:
         el._get_element(wait=False)
     except NoSuchElementException as exc:
-        logs = ElementMixin().get_element_logging_data(el)
+        logs = ElementMixin().get_element_info(el)
         message = f'Cant find element "{el.name}". {logs}'
         assert exc.msg == message
 
@@ -30,7 +30,7 @@ def test_element_exception_with_broken_parent(base_playground_page):
     try:
         el._get_element(wait=False)
     except NoSuchElementException as exc:
-        logs = ElementMixin().get_element_logging_data(el.parent)
+        logs = ElementMixin().get_element_info(el.parent)
         message = f'Cant find parent element "{el.parent.name}". {logs}'
         assert exc.msg == message
 
@@ -89,7 +89,7 @@ def test_parent_element_wait_hidden_negative(base_playground_page):
     assert base_playground_page.kube_wrong_parent.wait_element_hidden()
 
 
-# Other cases with parent
+# All elements
 
 
 def test_all_elements_with_parent(base_playground_page):
@@ -98,7 +98,7 @@ def test_all_elements_with_parent(base_playground_page):
     assert all_elements, 'did not find elements on page'
 
     for element in all_elements:
-        assert element.parent == base_playground_page.any_section
+        assert element.parent.locator == base_playground_page.any_section.locator
 
 
 def test_element_group_all_elements_child(second_playground_page):
@@ -112,3 +112,12 @@ def test_element_group_all_elements_child(second_playground_page):
 
     all_cards[1].button.click()
     assert KeyboardPage().wait_page_loaded().is_page_opened()
+
+
+def test_all_elements_recursion(base_playground_page):
+    try:
+        base_playground_page.kube.all_elements[0].all_elements
+    except RecursionError:
+        pass
+    else:
+        raise AssertionError('RecursionError was not raised')

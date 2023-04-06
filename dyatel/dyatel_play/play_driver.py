@@ -5,11 +5,11 @@ from typing import List, Union, Any
 from playwright.sync_api import Page as PlaywrightPage, Locator, Page
 from playwright.sync_api import Browser
 
-from dyatel.mixins.internal_utils import get_timeout_in_ms
-from dyatel.mixins.log_mixin import LogMixin
+from dyatel.mixins.core_mixin import get_timeout_in_ms
+from dyatel.mixins.logging import Logging
 
 
-class PlayDriver(LogMixin):
+class PlayDriver(Logging):
     instance: Browser = None
     driver: PlaywrightPage = None
     all_drivers: List[PlaywrightPage] = []
@@ -109,6 +109,7 @@ class PlayDriver(LogMixin):
             self.log('Quit driver instance')
 
         self.driver.close()
+
         self.all_drivers.remove(self.driver)
 
         if self.driver == PlayDriver.driver:  # Clear only if original driver closed

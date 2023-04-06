@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional
 
 
 class DriverWrapperException(Exception):
@@ -6,20 +6,12 @@ class DriverWrapperException(Exception):
     Base driver wrapper exceptions
     """
 
-    def __init__(self, msg: Optional[str] = None, screen: Optional[str] = None,
-                 stacktrace: Optional[Sequence[str]] = None) -> None:
+    def __init__(self, msg: Optional[str] = None):
         self.msg = msg
-        self.screen = screen
-        self.stacktrace = stacktrace
+        self.__suppress_context__ = True
 
     def __str__(self) -> str:
-        exception_msg = "Message: %s\n" % self.msg
-        if self.screen:
-            exception_msg += "Screenshot: available via screen\n"
-        if self.stacktrace:
-            stacktrace = "\n".join(self.stacktrace)
-            exception_msg += "Stacktrace:\n%s" % stacktrace
-        return exception_msg
+        return f"Message: {self.msg}"
 
 
 class UnexpectedElementsCountException(DriverWrapperException):
@@ -74,5 +66,12 @@ class ElementNotInteractableException(DriverWrapperException):
 class UnsuitableArgumentsException(DriverWrapperException):
     """
     Thrown when object initialised with unsuitable arguments
+    """
+    pass
+
+
+class NotInitializedException(DriverWrapperException):
+    """
+    Thrown when getting access to not initialized object
     """
     pass

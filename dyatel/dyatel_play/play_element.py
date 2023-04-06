@@ -3,29 +3,26 @@ from __future__ import annotations
 import time
 from typing import Union, List, Any
 
-# noinspection PyProtectedMember
-from playwright._impl._api_types import TimeoutError as PlayTimeoutError
-
-from dyatel.dyatel_play.play_utils import get_selenium_completable_locator
+from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
 from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
 
 from dyatel.exceptions import TimeoutException
-from dyatel.mixins.log_mixin import LogMixin
+from dyatel.mixins.logging import Logging
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.internal_utils import (
+from dyatel.mixins.core_mixin import (
     WAIT_EL,
-    get_child_elements,
     get_timeout_in_ms,
-    initialize_objects_with_args,
     calculate_coordinate_to_click,
-    get_platform_locator,
+    is_group,
+    is_element,
 )
+from dyatel.mixins.selector_synchronizer import get_platform_locator, get_playwright_locator
 
 
-class PlayElement(ElementMixin, DriverMixin, LogMixin):
+class PlayElement(ElementMixin, DriverMixin, Logging):
 
     def __init__(self, locator: str, locator_type: str, name: str, parent: Union[PlayElement, Any], wait: bool):
         """
@@ -39,14 +36,11 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         """
         self._element = None
 
-        self.locator = get_selenium_completable_locator(locator)
+        self.locator = get_playwright_locator(get_platform_locator(self, default_locator=locator))
         self.locator_type = f'{locator_type} - locator_type does not supported for playwright'
         self.name = name if name else self.locator
         self.parent = parent
         self.wait = wait
-
-        self.child_elements: List[PlayElement] = get_child_elements(self, PlayElement)
-        initialize_objects_with_args(self.child_elements)
 
     # Element
 
@@ -61,25 +55,25 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         """
         element = self._element
         if not element:
-            driver, locator = self._get_driver(), get_platform_locator(self)
+            driver = self._get_base()
             if isinstance(driver, ElementHandle):
-                element = driver.query_selector(locator)
+                element = driver.query_selector(self.locator)
             else:
-                element = driver.locator(locator)
+                element = driver.locator(self.locator)
 
         return element
 
     @element.setter
-    def element(self, play_element: Locator):
+    def element(self, play_element: Union[Locator, None]):
         """
-        Current class element setter. Try to avoid usage of this function
+        Core element setter. Try to avoid usage of this function
 
-        :param: play_element: playwright Locator object, that will be set for current class
+        :param: play_element: playwright Locator object
         """
         self._element = play_element
     
     @property
-    def all_elements(self) -> List[Any]:
+    def all_elements(self) -> Union[None, List[Any]]:
         """
         Get all wrapped elements with playwright bases
 
@@ -199,6 +193,26 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         self._first_element.hover(position={'x': float(x), 'y': float(y)}, force=True)
         return self
 
+    def check(self) -> PlayElement:
+        """
+        Check current checkbox
+
+        :return: self
+        """
+        self._first_element.check()
+
+        return self
+
+    def uncheck(self) -> PlayElement:
+        """
+        Uncheck current checkbox
+
+        :return: self
+        """
+        self._first_element.uncheck()
+
+        return self
+
     # Element waits
 
     def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
@@ -215,7 +229,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         try:
             self._first_element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
         except PlayTimeoutError:
-            raise TimeoutException(f'Element "{self.name}" not visible after {timeout} seconds') from None
+            raise TimeoutException(f'Element "{self.name}" not visible after {timeout} seconds')
         return self
 
     def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
@@ -232,21 +246,7 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         try:
             self._first_element.wait_for(state='hidden', timeout=get_timeout_in_ms(timeout))
         except PlayTimeoutError:
-            raise TimeoutException(f'Element "{self.name}" still visible after {timeout} seconds') from None
-        return self
-
-    def wait_clickable(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
-        """
-        Compatibility placeholder
-        Wait until element clickable
-
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Skip wait until clickable of "{self.name}". Timeout: {timeout}')
-
+            raise TimeoutException(f'Element "{self.name}" still visible after {timeout} seconds')
         return self
 
     def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
@@ -307,7 +307,8 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         :return: element text
         """
         self.log(f'Get text from "{self.name}"')
-        return self._first_element.text_content()
+        element = self._first_element
+        return element.text_content() if element.text_content() else element.input_value()
 
     @property
     def inner_text(self) -> str:
@@ -405,9 +406,29 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         sorted_items: list = sorted(self.element.bounding_box().items(), reverse=True)
         return dict(sorted_items)
 
+    def is_enabled(self, silent: bool = False) -> bool:
+        """
+        Check if element enabled
+
+        :param silent: erase log
+        :return: True if element enabled
+        """
+        if not silent:
+            self.log(f'Check is element "{self.name}" enabled')
+
+        return self._first_element.is_enabled()
+
+    def is_checked(self) -> bool:
+        """
+        Is checkbox checked
+
+        :return: bool
+        """
+        return self._first_element.is_checked()
+
     # Mixin
 
-    def _get_driver(self) -> Union[PlaywrightPage, Locator, ElementHandle]:
+    def _get_base(self) -> Union[PlaywrightPage, Locator, ElementHandle]:
         """
         Get driver depends on parent element if available
 
@@ -417,10 +438,8 @@ class PlayElement(ElementMixin, DriverMixin, LogMixin):
         if self.parent:
             self.log(f'Get element "{self.name}" from parent element "{self.parent.name}"', level='debug')
 
-            if isinstance(self.parent, PlayElement):
+            if is_group(self.parent) or is_element(self.parent):
                 base = self.parent.element
-            else:
-                base = self.parent.anchor.element
 
         return base
 

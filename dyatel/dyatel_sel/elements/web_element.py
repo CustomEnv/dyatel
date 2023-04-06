@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Union, List, Any
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.dyatel_sel.sel_utils import get_locator_type
-from dyatel.mixins.internal_utils import calculate_coordinate_to_click
+from dyatel.mixins.core_mixin import calculate_coordinate_to_click
+from dyatel.mixins.selector_synchronizer import get_platform_locator, get_selenium_locator_type
 
 
 class WebElement(CoreElement):
@@ -18,12 +18,20 @@ class WebElement(CoreElement):
         :param parent: parent of element. Can be WebElement, WebPage, Group objects
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self.locator_type = locator_type if locator_type else get_locator_type(locator)
+        locator = get_platform_locator(self, default_locator=locator)
+        locator_type = locator_type if locator_type else get_selenium_locator_type(locator)
 
-        super().__init__(locator=locator, locator_type=self.locator_type, name=name, parent=parent, wait=wait)
+        CoreElement.__init__(
+            self,
+            locator=locator,
+            locator_type=locator_type,
+            name=name,
+            parent=parent,
+            wait=wait
+        )
 
     @property
-    def all_elements(self) -> List[Any]:
+    def all_elements(self) -> Union[None, List[Any]]:
         """
         Get all wrapped elements with selenium bases
 

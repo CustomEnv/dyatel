@@ -1,43 +1,46 @@
 from __future__ import annotations
 
-import copy
-from typing import Any, Union
+from typing import Any, Union, List
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.internal_utils import get_child_elements_with_names
-from dyatel.mixins.previous_object_mixin import PreviousObjectDriver
+from dyatel.mixins.element_mixin import repr_builder
+from dyatel.mixins.previous_object_driver import PreviousObjectDriver
+from dyatel.mixins.core_mixin import (
+    all_mid_level_elements,
+    set_parent_for_attr,
+    get_child_elements,
+    initialize_objects,
+    get_child_elements_with_names,
+)
 
 
-class AfterInitMeta(type):
-    """ Call a custom function right after __init__ of original class """
-
-    def __call__(cls, *args, **kwargs):
-        """
-        Wrapper for calling a custom function right after __init__ of original class
-
-        :param args: original class args
-        :param kwargs: original class kwargs
-        :return: class object
-        """
-        obj = type.__call__(cls, *args, **kwargs)
-        obj.customise_children()
-        return obj
-
-
-class Group(Element, metaclass=AfterInitMeta):
+class Group(Element):
     """ Group of elements. Should be defined as class """
 
-    def __init__(self, locator: str = '', locator_type: str = '', name: str = '',
-                 parent: Any = None, wait: bool = None, driver_wrapper: Union[DriverWrapper, Any] = None, **kwargs):
+    _object = 'group'
+
+    def __repr__(self):
+        return repr_builder(self)
+
+    def __init__(  # noqa
+            self,
+            locator: str = '',
+            locator_type: str = '',
+            name: str = '',
+            parent: Union[Any, False] = None,
+            wait: bool = None,
+            driver_wrapper: Union[DriverWrapper, Any] = None,
+            **kwargs
+    ):
         """
         Initializing of group based on current driver
 
         :param locator: anchor locator of group. Can be defined without locator_type
         :param locator_type: Selenium only: specific locator type
         :param name: name of group (will be attached to logs)
-        :param parent: parent of element. Can be Group or Page objects
+        :param parent: parent of element. Can be Group or Page objects of False for skip
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         :param driver_wrapper: set custom driver for group and group elements
         :param kwargs:
@@ -46,47 +49,32 @@ class Group(Element, metaclass=AfterInitMeta):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
-        self.locator = locator
-        self.locator_type = locator_type
-        self.name = name
-        self.parent = parent
-        self.wait = wait
+        self._scls = Group
         self._init_locals = locals()
+        self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
 
-        super().__init__(locator=self.locator, locator_type=self.locator_type, name=self.name, parent=self.parent,
-                         wait=self.wait)
-        # it's necessary to leave it after init
-        if driver_wrapper:
-            self._driver_instance = get_driver_wrapper_from_object(self, driver_wrapper)
-            self.set_driver(self._driver_instance)
-        elif self.driver_wrapper:
-            PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)
+        super().__init__(
+            locator=locator,
+            locator_type=locator_type,
+            name=name,
+            parent=parent,
+            wait=wait
+        )
 
-    def __repr__(self):
-        return super().__repr__()
-
-    def set_driver(self, driver_wrapper) -> Group:
+    def _modify_children(self):
         """
-        Set driver instance for group and elements
-
-        :param driver_wrapper: driver wrapper object ~ Driver/WebDriver/MobileDriver/CoreDriver/PlayDriver
-        :return: self
+        Initializing of attributes with type == Group/Element.
+        Required for classes with base == Group.
         """
-        if not driver_wrapper:
-            return self
+        elements_types = all_mid_level_elements()
 
-        self._set_driver(driver_wrapper, Element)
-        return self
+        initialize_objects(self, get_child_elements_with_names(self, elements_types))
+        set_parent_for_attr(self, elements_types)
+        self.child_elements: List[Element] = get_child_elements(self, elements_types)
 
-    def customise_children(self):
+    def _modify_object(self):
         """
-        Set parent and custom driver for Group class variables, if their instance is Element class
-        Will be called automatically after __init__ by metaclass `AfterInitMeta`
+        Modify current object. Required for Group that placed into functions:
+        - set driver from previous object if previous driver different.
         """
-        for name, value in get_child_elements_with_names(self, Element).items():
-            setattr(self, name, copy.copy(value))
-            value = getattr(self, name)
-            if value.parent is None:
-                value.parent = self
-            else:
-                setattr(value, 'parent', copy.copy(value.parent))
+        PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)

@@ -1,10 +1,10 @@
 import pytest
 
-from dyatel.base.checkbox import Checkbox
 from dyatel.base.element import Element
 from dyatel.base.group import Group
 from dyatel.exceptions import UnsuitableArgumentsException
-from dyatel.mixins.internal_utils import get_platform_locator
+from dyatel.mixins.selector_synchronizer import get_platform_locator
+from tests.static_tests.conftest import mobile_ids, mobile_drivers, desktop_drivers, desktop_ids
 
 
 class ExtendedClass(Group):
@@ -18,7 +18,6 @@ class SomeGroup(Group):
 
     link_to_class = ExtendedClass('some locator', name='nested element')  # all elements initialised two times
 
-    multiple_checkbox_partial = Checkbox(desktop='desktop_checkbox', mobile='mobile_checkbox', name='multiple checkbox all')
     multiple_element_partial = Element(desktop='desktop_locator', mobile='mobile_locator', name='multiple element all')
     multiple_element_all = Element(
         desktop='desktop_locator',
@@ -27,22 +26,16 @@ class SomeGroup(Group):
         name='multiple element all'
     )
 
-    multiple_element_broken_ios = Element(ios='ios_locator', mobile='mobile_locator',
-                                          name='multiple element broken ios')
 
-    multiple_element_broken_android = Element(android='android_locator', mobile='mobile_locator',
-                                              name='multiple element broken android')
-
-    multiple_element_broken_all = Element(android='android_locator', ios='ios_locator', mobile='mobile_locator',
-                                          name='multiple element broken all')
+@pytest.mark.parametrize('driver', mobile_drivers, ids=mobile_ids)
+def test_link_to_class_locator_mobile(driver, request):
+    request.getfixturevalue(driver)
+    assert SomeGroup().link_to_class.locator == '[id="some locator updated"]'
 
 
-@pytest.mark.parametrize(
-    'driver',
-    ('mocked_selenium_driver', 'mocked_ios_driver', 'mocked_play_driver'),
-    ids=['selenium', 'appium', 'playwright']
-)
-def test_link_to_class_locator(driver):
+@pytest.mark.parametrize('driver', desktop_drivers, ids=desktop_ids)
+def test_link_to_class_locator_desktop(driver, request):
+    request.getfixturevalue(driver)
     assert SomeGroup().link_to_class.locator == 'some locator updated'
 
 
@@ -66,25 +59,24 @@ def test_multiple_locator_playwright(mocked_play_driver):
     assert 'default_group' in get_platform_locator(SomeGroup())
 
 
-@pytest.mark.parametrize(
-    'driver',
-    ('mocked_ios_driver', 'mocked_android_driver'),
-    ids=['ios', 'android']
-)
+@pytest.mark.parametrize('driver', mobile_drivers, ids=mobile_ids)
 def test_multiple_locator_mobile(driver, request):
     request.getfixturevalue(driver)
     assert 'mobile_locator' in get_platform_locator(SomeGroup().multiple_element_partial)
 
 
-@pytest.mark.parametrize(
-    'driver',
-    ('mocked_ios_driver', 'mocked_android_driver'),
-    ids=['ios', 'android']
-)
+@pytest.mark.parametrize('driver', mobile_drivers, ids=mobile_ids)
 def test_multiple_locator_negative_all(driver, request):
     request.getfixturevalue(driver)
     try:
-        get_platform_locator(SomeGroup().multiple_element_broken_all)
+        get_platform_locator(
+            Element(
+                android='android_locator',
+                ios='ios_locator',
+                mobile='mobile_locator',
+                name='multiple element broken all'
+            )
+        )
     except UnsuitableArgumentsException:
         pass
     else:
@@ -93,7 +85,9 @@ def test_multiple_locator_negative_all(driver, request):
 
 def test_multiple_locator_negative_ios(mocked_ios_driver):
     try:
-        get_platform_locator(SomeGroup().multiple_element_broken_ios)
+        get_platform_locator(
+            Element(ios='ios_locator', mobile='mobile_locator', name='multiple element broken ios')
+        )
     except UnsuitableArgumentsException:
         pass
     else:
@@ -102,7 +96,9 @@ def test_multiple_locator_negative_ios(mocked_ios_driver):
 
 def test_multiple_locator_negative_android(mocked_android_driver):
     try:
-        get_platform_locator(SomeGroup().multiple_element_broken_android)
+        get_platform_locator(
+            Element(android='android_locator', mobile='mobile_locator', name='multiple element broken android')
+        )
     except UnsuitableArgumentsException:
         pass
     else:
