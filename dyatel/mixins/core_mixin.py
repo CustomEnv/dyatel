@@ -50,6 +50,11 @@ def is_page(obj: Any) -> bool:
     return getattr(obj, '_object', None) == 'page'
 
 
+def safe_setter(obj: Any, var: str, value: Any):
+    if not hasattr(obj, var):
+        setattr(obj, var, value)
+
+
 def set_static(obj: Any) -> None:
     """
     Set static attributes for given object from base class
@@ -78,10 +83,16 @@ def initialize_objects(current_object, objects: dict):
     :return: None
     """
     for name, obj in objects.items():
+        set_name_for_attr(obj, name)
         copied_obj = copy(obj)
         promote_parent_element(copied_obj, current_object)
         setattr(current_object, name, copied_obj(driver_wrapper=current_object.driver_wrapper))
         initialize_objects(copied_obj, get_child_elements_with_names(copied_obj, all_mid_level_elements()))
+
+
+def set_name_for_attr(attr, name):
+    if not attr.name:
+        attr.name = name.replace('_', ' ')
 
 
 def set_parent_for_attr(base_obj: object, instance_class: Union[type, tuple], with_copy: bool = False):
@@ -125,16 +136,7 @@ def promote_parent_element(obj: Any, base_obj: Any):
 
     if is_element(initial_parent) and initial_parent != base_obj:
         for el in get_child_elements(base_obj, all_mid_level_elements()):
-
-            if el.locator == obj.parent.locator:
-                obj.parent = el
-
-            appium_match = f'"{obj.parent.locator}"' in el.locator
-            if obj.driver_wrapper.mobile and appium_match:
-                obj.parent = el
-
-            playwright_match = f'={obj.parent.locator}' in el.locator
-            if obj.driver_wrapper.playwright and playwright_match:
+            if obj.parent.__base_obj_id == el.__base_obj_id:
                 obj.parent = el
 
 

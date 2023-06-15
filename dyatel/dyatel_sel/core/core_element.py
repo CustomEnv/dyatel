@@ -260,15 +260,18 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
         """
         Scroll element into view by js script
 
-        :param: block: start - element on the top; end - element at the bottom
+        :param: block: start - element on the top; end - element at the bottom. All: start, center, end, nearest
         :param: behavior: scroll type: smooth or instant
         :param: sleep: delay after scroll
         :return: self
         """
         self.log(f'Scroll element "{self.name}" into view')
 
+        assert block in ('start', 'center', 'end', 'nearest')
+
         self.driver.execute_script(
-            'arguments[0].scrollIntoView({{block: "{}", behavior: "{}"}});'.format(block, behavior), self.element
+            f'arguments[0].scrollIntoView({{block: "{block}", behavior: "{behavior}"}});',
+            self.element
         )
 
         if sleep:
@@ -503,10 +506,20 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
                     element = None
 
         if not element:
-            msg = f'Cant find element "{self.name}". {self.get_element_info()}'
+            msg = f'Cant find element "{self.name}". {self.get_element_info()}. {self._ensure_unique_parent()}'
             raise NoSuchElementException(msg)
 
         return element
+
+    def _ensure_unique_parent(self):
+        info = ''
+        if is_group(self.parent) or is_element(self.parent):
+            parents_count = self.parent.get_elements_count(silent=True)
+            if parents_count > 1:
+                info = '\nWARNING: The parent object is not unique, ' \
+                       f'count of possible parent elements are: {parents_count}'
+
+        return info
 
     def _get_base(self, wait: bool = True) -> Union[SeleniumWebDriver, SeleniumWebElement]:
         """

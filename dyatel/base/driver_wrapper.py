@@ -14,6 +14,7 @@ from dyatel.mixins.core_mixin import (
     driver_with_index,
     get_attributes_from_object,
 )
+from dyatel.utils.cdp import CDPManager
 
 
 class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
@@ -58,6 +59,7 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         :param driver: appium or selenium or playwright driver to initialize
         """
         self.driver = driver
+        self.cdp = CDPManager(self.driver)
         self.__set_base_class()
         super(self.__class__, self).__init__(driver=self.driver)
 

@@ -22,6 +22,7 @@ from dyatel.mixins.core_mixin import (
     all_mid_level_elements,
     get_child_elements,
     set_static,
+    safe_setter,
 )
 
 
@@ -68,6 +69,7 @@ class Page(WebPage, MobilePage, PlayPage):
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
         self._modify_object()
         self._modify_children()
+        safe_setter(self, '__base_obj_id', id(self))
 
         self.page_elements: List[Element] = get_child_elements(self, Element)
 

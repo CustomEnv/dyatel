@@ -24,7 +24,9 @@ from dyatel.mixins.core_mixin import (
     initialize_objects,
     get_child_elements_with_names,
     set_static,
-    is_group, all_locator_types,
+    is_group,
+    all_locator_types,
+    safe_setter,
 )
 
 
@@ -83,15 +85,16 @@ class Element(WebElement, MobileElement, PlayElement):
 
         self.locator = locator
         self.locator_type = locator_type
-        self.name = name if name else locator
+        self.name = name
         self.parent = parent
         self.wait = wait
 
         self._initialized = False
         # Taking from Group first if available
-        self._scls = getattr(self, 'scls', Element)
+        self._scls = getattr(self, '_scls', Element)
         self._init_locals = getattr(self, '_init_locals', locals())
         self._driver_instance = getattr(self, '_driver_instance', DriverWrapper)
+        safe_setter(self, '__base_obj_id', id(self))
 
         if self.driver:
             self.__full_init__(self.driver_wrapper if is_group(self) else None)
