@@ -17,7 +17,7 @@ from dyatel.mixins.previous_object_driver import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.element_mixin import all_locator_types
-from dyatel.mixins.core_mixin import (
+from dyatel.utils.internal_utils import (
     WAIT_EL,
     is_target_on_screen,
     all_mid_level_elements,
@@ -26,7 +26,9 @@ from dyatel.mixins.core_mixin import (
     set_static,
     repr_builder,
     is_group,
-    safe_setter, safe_getter, check_kwargs,
+    safe_setter,
+    safe_getter,
+    check_kwargs,
 )
 
 

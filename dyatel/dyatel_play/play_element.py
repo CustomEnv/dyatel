@@ -12,7 +12,7 @@ from dyatel.utils.logging import Logging
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.core_mixin import (
+from dyatel.utils.internal_utils import (
     WAIT_EL,
     get_timeout_in_ms,
     calculate_coordinate_to_click,

@@ -8,7 +8,7 @@ from typing import Any
 from selenium.common.exceptions import WebDriverException as SeleniumWebDriverException
 
 from dyatel.js_scripts import add_driver_index_comment_js, find_comments_js
-from dyatel.mixins.core_mixin import get_frame
+from dyatel.utils.internal_utils import get_frame
 
 
 def dyatel_logs_settings():

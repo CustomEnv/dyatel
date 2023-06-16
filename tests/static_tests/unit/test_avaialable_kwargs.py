@@ -1,4 +1,4 @@
-from dyatel.mixins.core_mixin import check_kwargs, available_kwarg_keys
+from dyatel.utils.internal_utils import check_kwargs, available_kwarg_keys
 
 
 def test_check_kwargs_negative():

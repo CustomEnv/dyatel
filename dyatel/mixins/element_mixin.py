@@ -6,7 +6,7 @@ from typing import List, Any, Union
 
 from appium.webdriver.common.appiumby import AppiumBy
 
-from dyatel.mixins.core_mixin import set_parent_for_attr, get_child_elements
+from dyatel.utils.internal_utils import set_parent_for_attr, get_child_elements
 
 
 all_locator_types = get_child_elements(AppiumBy, str)

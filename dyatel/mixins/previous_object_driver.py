@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Union
 
 from dyatel.base.driver_wrapper import DriverWrapper
-from dyatel.mixins.core_mixin import get_frame, is_group, is_page, is_element
+from dyatel.utils.internal_utils import get_frame, is_group, is_page, is_element
 
 
 class PreviousObjectDriver:

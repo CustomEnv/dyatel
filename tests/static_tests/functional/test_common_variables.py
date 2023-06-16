@@ -5,7 +5,7 @@ from dyatel.base.element import Element
 from dyatel.base.page import Page
 from dyatel.utils.selector_synchronizer import selenium_locator_types
 from dyatel.exceptions import InvalidSelectorException
-from dyatel.mixins.core_mixin import all_tags
+from dyatel.utils.internal_utils import all_tags
 from tests.static_tests.conftest import selenium_ids, selenium_drivers, all_drivers, all_ids
 
 tags = {'header h4', *all_tags}

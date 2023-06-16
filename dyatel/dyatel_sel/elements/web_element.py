@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Union, List, Any
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.mixins.core_mixin import calculate_coordinate_to_click
+from dyatel.utils.internal_utils import calculate_coordinate_to_click
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type
 
 

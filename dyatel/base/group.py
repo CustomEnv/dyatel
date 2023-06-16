@@ -6,7 +6,7 @@ from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.previous_object_driver import PreviousObjectDriver
-from dyatel.mixins.core_mixin import (
+from dyatel.utils.internal_utils import (
     all_mid_level_elements,
     set_parent_for_attr,
     get_child_elements,

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Any, List, Type, Callable
+from typing import Union, Any, List, Type
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -14,7 +14,7 @@ from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
 from dyatel.mixins.previous_object_driver import PreviousObjectDriver
-from dyatel.mixins.core_mixin import (
+from dyatel.utils.internal_utils import (
     WAIT_PAGE,
     initialize_objects,
     get_child_elements_with_names,

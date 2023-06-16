@@ -25,7 +25,7 @@ from dyatel.utils.logging import Logging
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.core_mixin import WAIT_EL, is_group, is_element
+from dyatel.utils.internal_utils import WAIT_EL, is_group, is_element
 from dyatel.exceptions import (
     TimeoutException,
     InvalidSelectorException,

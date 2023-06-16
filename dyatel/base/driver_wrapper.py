@@ -9,7 +9,7 @@ from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.exceptions import DriverWrapperException
 from dyatel.js_scripts import get_inner_height_js, get_inner_width_js
-from dyatel.mixins.core_mixin import get_attributes_from_object, get_child_elements_with_names
+from dyatel.utils.internal_utils import get_attributes_from_object, get_child_elements_with_names
 
 
 class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
