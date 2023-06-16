@@ -3,17 +3,17 @@ import time
 import pytest
 
 
-def test_click_and_wait(pizza_order_page, driver_engine):
+def test_click_and_wait(pizza_order_page, platform):
     pizza_order_page.submit_button.click()
     after_click_displayed = pizza_order_page.error_modal.wait_element().is_displayed()
-    if 'play' in driver_engine:
+    if 'play' in platform:
         time.sleep(1)
     pizza_order_page.error_modal.click_outside()
     after_click_outside_not_displayed = not pizza_order_page.error_modal.wait_element_hidden().is_displayed()
     assert all((after_click_displayed, after_click_outside_not_displayed))
 
 
-def test_click_into_center(mouse_event_page, platform):
+def test_click_into_center(mouse_event_page):
     mouse_event_page.mouse_click_card().click_area.click_into_center()
     result_x, result_y = mouse_event_page.mouse_click_card().get_result_coordinates()
     expected_x_range, expected_y_range = mouse_event_page.mouse_click_card().get_click_area_middle()
@@ -22,6 +22,6 @@ def test_click_into_center(mouse_event_page, platform):
 
 
 @pytest.mark.parametrize('coordinates', [(-2, -2), (2, 2), (2, -2), (-2, 2), (2, 0), (0, 2)])
-def test_click_outside(mouse_event_page, platform, coordinates):
+def test_click_outside(mouse_event_page, coordinates):
     mouse_event_page.mouse_click_card().click_area_parent.click_outside(*coordinates)
     assert not mouse_event_page.mouse_click_card().is_click_proceeded()

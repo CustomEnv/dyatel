@@ -1,6 +1,6 @@
 from dyatel.base.element import Element
 from dyatel.base.group import Group
-from dyatel.mixins.core_mixin import get_element_info
+from dyatel.mixins.element_mixin import get_element_info
 
 
 class SomeGroup(Group):

@@ -33,6 +33,22 @@ def get_driver_wrapper_from_object(obj: Union[DriverWrapper, Any]):
     return driver_wrapper_instance
 
 
+def driver_with_index(driver_wrapper, driver) -> str:
+    """
+    Get driver with index caption for logging
+
+    :param driver_wrapper: driver wrapper object
+    :param driver: driver object
+    :return: '1_driver' or '2_driver' etc.
+    """
+    try:
+        index = driver_wrapper.all_drivers.index(driver) + 1
+    except (ValueError, AttributeError):
+        index = '?'
+
+    return f'{index}_driver'
+
+
 class DriverMixin:
 
     @property

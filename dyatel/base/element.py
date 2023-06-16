@@ -13,10 +13,10 @@ from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.element_mixin import repr_builder
 from dyatel.mixins.previous_object_driver import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
+from dyatel.mixins.element_mixin import all_locator_types
 from dyatel.mixins.core_mixin import (
     WAIT_EL,
     is_target_on_screen,
@@ -24,7 +24,9 @@ from dyatel.mixins.core_mixin import (
     initialize_objects,
     get_child_elements_with_names,
     set_static,
-    is_group, all_locator_types,
+    repr_builder,
+    is_group,
+    safe_setter, safe_getter, check_kwargs,
 )
 
 
@@ -43,11 +45,13 @@ class Element(WebElement, MobileElement, PlayElement):
         return self
 
     def __getattribute__(self, item):
-        if 'element' in item and not object.__getattribute__(self, '_initialized'):
-            raise NotInitializedException(f'The element is not initialized for {self.__class__.__name__} '
-                                          'Try to initialize base object first or call it directly as a method')
+        if 'element' in item and not safe_getter(self, '_initialized'):
+            raise NotInitializedException(
+                f'The element is not initialized for {self.__class__.__name__} '
+                'Try to initialize base object first or call it directly as a method'
+            )
 
-        return object.__getattribute__(self, item)
+        return safe_getter(self, item)
 
     def __init__(  # noqa
             self,
@@ -73,9 +77,11 @@ class Element(WebElement, MobileElement, PlayElement):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
+        check_kwargs(kwargs)
+
         if locator_type:
-            assert locator_type in all_locator_types, f'Locator type "{locator_type}" is not supported. ' \
-                                                      f'Choose from {all_locator_types}'
+            assert locator_type in all_locator_types, \
+                f'Locator type "{locator_type}" is not supported. Choose from {all_locator_types}'
 
         if parent:
             assert isinstance(parent, (bool, all_mid_level_elements())), \
@@ -89,9 +95,10 @@ class Element(WebElement, MobileElement, PlayElement):
 
         self._initialized = False
         # Taking from Group first if available
-        self._scls = getattr(self, 'scls', Element)
+        self._scls = getattr(self, '_scls', Element)
         self._init_locals = getattr(self, '_init_locals', locals())
         self._driver_instance = getattr(self, '_driver_instance', DriverWrapper)
+        safe_setter(self, '__base_obj_id', id(self))
 
         if self.driver:
             self.__full_init__(self.driver_wrapper if is_group(self) else None)

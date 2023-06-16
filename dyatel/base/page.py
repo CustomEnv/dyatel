@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Any, List, Type
+from typing import Union, Any, List, Type, Callable
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -13,7 +13,6 @@ from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.element_mixin import repr_builder
 from dyatel.mixins.previous_object_driver import PreviousObjectDriver
 from dyatel.mixins.core_mixin import (
     WAIT_PAGE,
@@ -22,6 +21,8 @@ from dyatel.mixins.core_mixin import (
     all_mid_level_elements,
     get_child_elements,
     set_static,
+    repr_builder,
+    safe_setter, check_kwargs,
 )
 
 
@@ -57,6 +58,8 @@ class Page(WebPage, MobilePage, PlayPage):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
+        check_kwargs(kwargs)
+
         self.locator = locator
         self.locator_type = locator_type
         self.name = name if name else locator
@@ -68,6 +71,7 @@ class Page(WebPage, MobilePage, PlayPage):
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
         self._modify_object()
         self._modify_children()
+        safe_setter(self, '__base_obj_id', id(self))
 
         self.page_elements: List[Element] = get_child_elements(self, Element)
 

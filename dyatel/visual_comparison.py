@@ -17,8 +17,9 @@ from skimage.metrics import structural_similarity
 
 from dyatel.exceptions import DriverWrapperException, TimeoutException
 from dyatel.js_scripts import add_element_over_js, delete_element_over_js
-from dyatel.mixins.logging import autolog
-from dyatel.mixins.core_mixin import get_frame, get_element_info
+from dyatel.utils.logging import autolog
+from dyatel.mixins.core_mixin import get_frame
+from dyatel.mixins.element_mixin import get_element_info
 
 
 class VisualComparison:

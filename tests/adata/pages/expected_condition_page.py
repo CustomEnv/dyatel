@@ -58,3 +58,11 @@ class WaitFrameCard(Group):
 
     trigger_button = Element('wait_for_frame', name='trigger button')
     frame = Element('iframe', name='target iframe')
+
+
+class WaitValueCardBroken(Group):
+    def __init__(self):
+        super().__init__('.card', name='value card broken selector')
+
+    trigger_button = Element('text_value_trigger', name='trigger wait button1')
+    any_row = Element('.row', name='any row')

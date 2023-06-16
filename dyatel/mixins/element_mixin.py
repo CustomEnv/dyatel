@@ -4,37 +4,15 @@ from abc import abstractmethod
 from copy import copy
 from typing import List, Any, Union
 
-from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.core_mixin import (
-    driver_with_index,
-    get_element_info,
-    set_parent_for_attr,
-)
+from appium.webdriver.common.appiumby import AppiumBy
+
+from dyatel.mixins.core_mixin import set_parent_for_attr, get_child_elements
 
 
-def repr_builder(instance):
-    class_name = instance.__class__.__name__
-    obj_id = hex(id(instance))
-
-    try:
-        driver_title = driver_with_index(instance.driver_wrapper, instance.driver)
-        parent_class = instance.parent.__class__.__name__ if getattr(instance, 'parent', False) else None
-        locator_holder = getattr(instance, 'anchor', instance)
-
-        locator = f'locator="{locator_holder.locator}"'
-        locator_type = f'locator_type="{locator_holder.locator_type}"'
-        name = f'name="{instance.name}"'
-        parent = f'parent={parent_class}'
-        driver = f'{driver_title}={instance.driver}'
-
-        base = f'{class_name}({locator}, {locator_type}, {name}, {parent}) at {obj_id}'
-        additional_info = driver
-        return f'{base}, {additional_info}'
-    except AttributeError:
-        return f'{class_name} object at {obj_id}'
+all_locator_types = get_child_elements(AppiumBy, str)
 
 
-class ElementMixin(DriverMixin):
+class ElementMixin:
     """ Mixin for PlayElement and CoreElement """
 
     @property
@@ -78,3 +56,18 @@ class ElementMixin(DriverMixin):
             wrapped_elements.append(wrapped_object)
 
         return wrapped_elements
+
+
+def get_element_info(element: Any) -> str:
+    """
+    Get element selector information with parent object selector if it exists
+
+    :param element: element to collect log data
+    :return: log string
+    """
+    parent = element.parent
+    current_data = f'Selector: ["{element.locator_type}": "{element.locator}"]'
+    if parent:
+        parent_data = f'Parent selector: ["{parent.locator_type}": "{parent.locator}"]'
+        current_data = f'{current_data}. {parent_data}'
+    return current_data

@@ -2,6 +2,7 @@ import random
 
 import pytest
 
+from tests.adata.pages.expected_condition_page import WaitValueCardBroken
 from dyatel.exceptions import NoSuchElementException
 from dyatel.mixins.element_mixin import ElementMixin
 from tests.adata.pages.keyboard_page import KeyboardPage
@@ -19,6 +20,8 @@ def test_element_exception_without_parent(base_playground_page):
         logs = ElementMixin().get_element_info(el)
         message = f'Cant find element "{el.name}". {logs}'
         assert exc.msg == message
+    else:
+        raise Exception('Unexpected behaviour')
 
 
 @pytest.mark.skip_platform(
@@ -33,6 +36,31 @@ def test_element_exception_with_broken_parent(base_playground_page):
         logs = ElementMixin().get_element_info(el.parent)
         message = f'Cant find parent element "{el.parent.name}". {logs}'
         assert exc.msg == message
+    else:
+        raise Exception('Unexpected behaviour')
+
+
+@pytest.mark.skip_platform(
+    'playwright',
+    reason='Playwright handle these cases and does not throw some Exceptions in such cases'
+)
+def test_multiple_parents_found_negative(expected_condition_page):
+    """ Check that warning with count of parent elements added to NoSuchElementException """
+    try:
+        WaitValueCardBroken().trigger_button._get_element(wait=False)
+    except NoSuchElementException as exc:
+        assert 'WARNING: The parent object is not unique, count of possible parent elements are: 8' in exc.msg
+    else:
+        raise Exception('Unexpected behaviour')
+
+
+@pytest.mark.skip_platform(
+    'playwright',
+    reason='Playwright handle these cases and does not throw some Exceptions in such cases'
+)
+def test_multiple_parents_found_positive(expected_condition_page):
+    """ There should not be any exception if element found even there are multiple parents for him """
+    WaitValueCardBroken().any_row._get_element(wait=False)
 
 
 def test_element_displayed_positive(base_playground_page):

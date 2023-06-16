@@ -11,11 +11,10 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.exceptions import DriverWrapperException, TimeoutException
 from dyatel.mixins.core_mixin import WAIT_EL
-from dyatel.mixins.logging import Logging
+from dyatel.utils.logging import Logging
 
 
 class CoreDriver(Logging):
-    all_drivers: Union[List[AppiumDriver], List[SeleniumWebDriver]] = []
     driver: Union[AppiumDriver, SeleniumWebDriver] = None
     driver_wrapper = None
 
@@ -29,7 +28,6 @@ class CoreDriver(Logging):
         driver.implicitly_wait(0.001)  # reduce selenium wait
         self.driver = driver
         self.driver_wrapper: Any = self
-        self.all_drivers.append(driver)
         self.original_tab = driver.current_window_handle
 
         if not CoreDriver.driver:
@@ -118,8 +116,6 @@ class CoreDriver(Logging):
             self.log('Quit driver instance')
 
         self.driver.quit()
-
-        self.all_drivers.remove(self.driver)
 
         if self.driver == CoreDriver.driver:  # Clear only if original driver closed
             CoreDriver.driver = None

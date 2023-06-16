@@ -9,11 +9,7 @@ from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.exceptions import DriverWrapperException
 from dyatel.js_scripts import get_inner_height_js, get_inner_width_js
-from dyatel.mixins.core_mixin import (
-    get_child_elements_with_names,
-    driver_with_index,
-    get_attributes_from_object,
-)
+from dyatel.mixins.core_mixin import get_attributes_from_object, get_child_elements_with_names
 
 
 class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
@@ -30,7 +26,8 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
     is_android = False
     is_simulator = False
     is_real_device = False
-    is_multiplatform = False
+
+    all_drivers = []
 
     def __new__(cls, *args, **kwargs):
         if DriverWrapper._init_count == 0:
@@ -48,8 +45,7 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
             label = 'ios'
 
         driver = self.instance if cls.playwright else self.driver
-        index = driver_with_index(self.driver_wrapper, driver)
-        return f'{cls.__name__}({index}={driver}) at {hex(id(self))}, platform={label}'
+        return f'{cls.__name__}({self.driver.index}={driver}) at {hex(id(self))}, platform={label}'  # noqa
 
     def __init__(self, driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver]):
         """
@@ -58,11 +54,14 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         :param driver: appium or selenium or playwright driver to initialize
         """
         self.driver = driver
+        self.all_drivers.append(driver)
+        self.driver.index = f'{self.all_drivers.index(driver) + 1}_driver'
         self.__set_base_class()
         super(self.__class__, self).__init__(driver=self.driver)
 
     def quit(self, silent: bool = True):
         super(self.__class__, self).quit(silent=silent)
+        self.all_drivers.remove(self.driver)
         DriverWrapper._init_count -= 1
 
     def get_inner_window_size(self) -> dict:
@@ -80,8 +79,7 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         :return: driver wrapper class
         """
         self.__reset_settings()
-        dcls, scls = DriverWrapper, self.__class__
-        scls.all_drivers = dcls.all_drivers
+        scls = self.__class__
         if isinstance(self.driver, PlaywrightDriver):
             scls.playwright = True
             scls.desktop = True
@@ -96,16 +94,11 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         else:
             raise DriverWrapperException('Cant specify Driver')
 
-        self.__set_multiplatform(dcls, scls)
         scls.__bases__ = bcls
-        dcls._init_count += 1
+        DriverWrapper._init_count += 1
         return self.__class__
 
     def __reset_settings(self):
         for name, _ in get_child_elements_with_names(self, bool).items():
             setattr(self.__class__, name, False)
 
-    def __set_multiplatform(self, dcls, scls):
-        if (dcls.mobile and scls.desktop) or (dcls.desktop and scls.mobile):
-            dcls.is_multiplatform = True
-            scls.is_multiplatform = True

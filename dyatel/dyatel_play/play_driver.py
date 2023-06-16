@@ -6,13 +6,12 @@ from playwright.sync_api import Page as PlaywrightPage, Locator, Page
 from playwright.sync_api import Browser
 
 from dyatel.mixins.core_mixin import get_timeout_in_ms
-from dyatel.mixins.logging import Logging
+from dyatel.utils.logging import Logging
 
 
 class PlayDriver(Logging):
     instance: Browser = None
     driver: PlaywrightPage = None
-    all_drivers: List[PlaywrightPage] = []
     driver_wrapper: PlayDriver = None
 
     def __init__(self, driver: Browser):
@@ -24,7 +23,6 @@ class PlayDriver(Logging):
         self.driver_context = driver.new_context()
         self.driver = self.driver_context.new_page()
         self.driver_wrapper: Any = self
-        self.all_drivers.append(self.driver)
         self.original_tab = self.driver
 
         if not PlayDriver.driver:
@@ -109,8 +107,6 @@ class PlayDriver(Logging):
             self.log('Quit driver instance')
 
         self.driver.close()
-
-        self.all_drivers.remove(self.driver)
 
         if self.driver == PlayDriver.driver:  # Clear only if original driver closed
             PlayDriver.driver = None

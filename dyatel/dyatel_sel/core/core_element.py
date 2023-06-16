@@ -21,7 +21,7 @@ from selenium.common.exceptions import (
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.mixins.logging import Logging
+from dyatel.utils.logging import Logging
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
@@ -260,15 +260,17 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
         """
         Scroll element into view by js script
 
-        :param: block: start - element on the top; end - element at the bottom
+        :param: block: start - element on the top; end - element at the bottom. All: start, center, end, nearest
         :param: behavior: scroll type: smooth or instant
         :param: sleep: delay after scroll
         :return: self
         """
         self.log(f'Scroll element "{self.name}" into view')
 
+        assert block in ('start', 'center', 'end', 'nearest')
+
         self.driver.execute_script(
-            'arguments[0].scrollIntoView({{block: "{}", behavior: "{}"}});'.format(block, behavior), self.element
+            f'arguments[0].scrollIntoView({{block: "{block}", behavior: "{behavior}"}});', self.element
         )
 
         if sleep:
@@ -503,10 +505,20 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
                     element = None
 
         if not element:
-            msg = f'Cant find element "{self.name}". {self.get_element_info()}'
+            msg = f'Cant find element "{self.name}". {self.get_element_info()}{self._ensure_unique_parent()}'
             raise NoSuchElementException(msg)
 
         return element
+
+    def _ensure_unique_parent(self):
+        info = ''
+        if is_group(self.parent) or is_element(self.parent):
+            parents_count = self.parent.get_elements_count(silent=True)
+            if parents_count > 1:
+                info = '\nWARNING: The parent object is not unique, ' \
+                       f'count of possible parent elements are: {parents_count}'
+
+        return info
 
     def _get_base(self, wait: bool = True) -> Union[SeleniumWebDriver, SeleniumWebElement]:
         """

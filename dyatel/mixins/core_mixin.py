@@ -3,19 +3,55 @@ from __future__ import annotations
 import sys
 import inspect
 from copy import copy
+from functools import cache
 from typing import Any, Union
 
-from appium.webdriver.common.appiumby import AppiumBy
 
 WAIT_EL = 10
 WAIT_PAGE = 15
+
 
 all_tags = {'h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
             'textarea', 'svg', 'circle', 'iframe', 'label', 'tr', 'th', 'table', 'tbody', 'td', 'select', 'nav', 'li',
             'form', 'footer', 'frame', 'area', 'span'}
 
 
-__statics = {}
+available_kwarg_keys = ('desktop', 'mobile', 'ios', 'android')
+
+
+def check_kwargs(kwargs):
+    assert all(item in available_kwarg_keys for item in kwargs), \
+        f'The given kwargs is not available. Please provide them according to available keys: {available_kwarg_keys}'
+
+
+@cache
+def get_timeout_in_ms(timeout: int):
+    """
+    Get timeout in milliseconds for playwright
+
+    :param timeout: timeout in seconds
+    :return: timeout in milliseconds
+    """
+    return timeout * 1000
+
+
+@cache
+def get_static(cls: Any):
+    return get_child_elements_with_names(cls).items()
+
+
+def safe_setter(obj: Any, var: str, value: Any):
+    if not hasattr(obj, var):
+        setattr(obj, var, value)
+
+
+def safe_getter(obj, item):
+    return object.__getattribute__(obj, item)
+
+
+def set_name_for_attr(attr, name):
+    if not attr.name or attr.name == attr.locator:
+        attr.name = name.replace('_', ' ')
 
 
 def get_frame(frame=1):
@@ -26,16 +62,6 @@ def get_frame(frame=1):
     :return: frame
     """
     return sys._getframe(frame)  # noqa
-
-
-def get_timeout_in_ms(timeout: int):
-    """
-    Get timeout in milliseconds for playwright
-
-    :param timeout: timeout in seconds
-    :return: timeout in milliseconds
-    """
-    return timeout * 1000 if timeout < 1000 else timeout
 
 
 def is_element(obj: Any) -> bool:
@@ -60,12 +86,7 @@ def set_static(obj: Any) -> None:
     cls = obj._base_cls  # noqa
     scls = obj._scls  # noqa
 
-    if cls not in __statics.keys():
-        child_static = get_child_elements_with_names(cls).items()
-        data = {name: value for name, value in child_static if name not in scls.__dict__.keys()}
-        __statics.update({cls: data.items()})
-
-    for name, item in __statics[cls]:
+    for name, item in {name: value for name, value in get_static(cls) if name not in scls.__dict__.keys()}.items():
         setattr(obj.__class__, name, item)
 
 
@@ -78,6 +99,7 @@ def initialize_objects(current_object, objects: dict):
     :return: None
     """
     for name, obj in objects.items():
+        set_name_for_attr(obj, name)
         copied_obj = copy(obj)
         promote_parent_element(copied_obj, current_object)
         setattr(current_object, name, copied_obj(driver_wrapper=current_object.driver_wrapper))
@@ -125,16 +147,7 @@ def promote_parent_element(obj: Any, base_obj: Any):
 
     if is_element(initial_parent) and initial_parent != base_obj:
         for el in get_child_elements(base_obj, all_mid_level_elements()):
-
-            if el.locator == obj.parent.locator:
-                obj.parent = el
-
-            appium_match = f'"{obj.parent.locator}"' in el.locator
-            if obj.driver_wrapper.mobile and appium_match:
-                obj.parent = el
-
-            playwright_match = f'={obj.parent.locator}' in el.locator
-            if obj.driver_wrapper.playwright and playwright_match:
+            if obj.parent.__base_obj_id == el.__base_obj_id:
                 obj.parent = el
 
 
@@ -251,22 +264,6 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
     return int(x), int(y)
 
 
-def driver_with_index(driver_wrapper, driver) -> str:
-    """
-    Get driver with index caption for logging
-
-    :param driver_wrapper: driver wrapper object
-    :param driver: driver object
-    :return: '1_driver' or '2_driver' etc.
-    """
-    try:
-        index = driver_wrapper.all_drivers.index(driver) + 1
-    except (ValueError, AttributeError):
-        index = '?'
-
-    return f'{index}_driver'
-
-
 def all_mid_level_elements() -> tuple:
     """
     Get all mid level elements. Workaround for circular import
@@ -280,19 +277,23 @@ def all_mid_level_elements() -> tuple:
     return WebElement, MobileElement, PlayElement
 
 
-def get_element_info(element: Any) -> str:
-    """
-    Get element selector information with parent object selector if it exists
+def repr_builder(instance):
+    class_name = instance.__class__.__name__
+    obj_id = hex(id(instance))
 
-    :param element: element to collect log data
-    :return: log string
-    """
-    parent = element.parent
-    current_data = f'Selector: ["{element.locator_type}": "{element.locator}"]'
-    if parent:
-        parent_data = f'Parent selector: ["{parent.locator_type}": "{parent.locator}"]'
-        current_data = f'{current_data}. {parent_data}'
-    return current_data
+    try:
+        driver_title = instance.driver.index
+        parent_class = instance.parent.__class__.__name__ if getattr(instance, 'parent', False) else None
+        locator_holder = getattr(instance, 'anchor', instance)
 
+        locator = f'locator="{locator_holder.locator}"'
+        locator_type = f'locator_type="{locator_holder.locator_type}"'
+        name = f'name="{instance.name}"'
+        parent = f'parent={parent_class}'
+        driver = f'{driver_title}={instance.driver}'
 
-all_locator_types = get_child_elements(AppiumBy, str)
+        base = f'{class_name}({locator}, {locator_type}, {name}, {parent}) at {obj_id}'
+        additional_info = driver
+        return f'{base}, {additional_info}'
+    except AttributeError:
+        return f'{class_name} object at {obj_id}'

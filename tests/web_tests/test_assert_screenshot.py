@@ -5,14 +5,14 @@ import pytest_rerunfailures
 
 
 @pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])
-def test_screenshot(base_playground_page, driver_engine, driver_name, platform, with_name):
-    filename = f'{driver_engine}-{driver_name}-{platform}-kube' if with_name else ''
+def test_screenshot(base_playground_page, driver_name, platform, with_name):
+    filename = f'{driver_name}-{platform}-kube' if with_name else ''
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename)
 
 
 @pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])
-def test_screenshot_name_with_suffix(base_playground_page, driver_engine, driver_name, platform, with_name):
-    filename = f'{driver_engine}-{driver_name}-{platform}-kube' if with_name else ''
+def test_screenshot_name_with_suffix(base_playground_page, driver_name, platform, with_name):
+    filename = f'{driver_name}-{platform}-kube' if with_name else ''
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename, name_suffix='first')
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename, name_suffix='second')
 
@@ -39,7 +39,8 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
     except AssertionError:
         pass
     else:
-        if not request.config.getoption('--gr') or not request.config.getoption('--hgr'):
+        options = request.config.option
+        if not (options.gr or options.hgr or options.sv):
             raise Exception('Unexpected behavior')
 
 

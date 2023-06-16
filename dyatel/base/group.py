@@ -5,14 +5,13 @@ from typing import Any, Union, List
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.element_mixin import repr_builder
 from dyatel.mixins.previous_object_driver import PreviousObjectDriver
 from dyatel.mixins.core_mixin import (
     all_mid_level_elements,
     set_parent_for_attr,
     get_child_elements,
     initialize_objects,
-    get_child_elements_with_names,
+    get_child_elements_with_names, repr_builder,
 )
 
 

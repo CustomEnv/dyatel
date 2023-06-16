@@ -4,7 +4,7 @@ from typing import Union, List, Any
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.mixins.core_mixin import calculate_coordinate_to_click
-from dyatel.mixins.selector_synchronizer import get_platform_locator, get_selenium_locator_type
+from dyatel.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type
 
 
 class WebElement(CoreElement):
