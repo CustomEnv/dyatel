@@ -21,7 +21,7 @@ from selenium.common.exceptions import (
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.utils.logging import Logging
+from dyatel.utils.logs import Logging
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin

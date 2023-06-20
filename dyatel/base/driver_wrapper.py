@@ -45,7 +45,7 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
             label = 'ios'
 
         driver = self.instance if cls.playwright else self.driver
-        return f'{cls.__name__}({self.driver.index}={driver}) at {hex(id(self))}, platform={label}'  # noqa
+        return f'{cls.__name__}({self.driver.label}={driver}) at {hex(id(self))}, platform={label}'  # noqa
 
     def __init__(self, driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver]):
         """
@@ -55,7 +55,7 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         """
         self.driver = driver
         self.all_drivers.append(driver)
-        self.driver.index = f'{self.all_drivers.index(driver) + 1}_driver'
+        self.driver.label = f'{self.all_drivers.index(driver) + 1}_driver'
         self.__set_base_class()
         super(self.__class__, self).__init__(driver=self.driver)
 

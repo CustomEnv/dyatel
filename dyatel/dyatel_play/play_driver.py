@@ -6,7 +6,7 @@ from playwright.sync_api import Page as PlaywrightPage, Locator, Page
 from playwright.sync_api import Browser
 
 from dyatel.utils.internal_utils import get_timeout_in_ms
-from dyatel.utils.logging import Logging
+from dyatel.utils.logs import Logging
 
 
 class PlayDriver(Logging):

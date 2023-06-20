@@ -13,7 +13,8 @@ from webdriver_manager.firefox import GeckoDriverManager
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_driver import PlayDriver
-from dyatel.utils.logging import dyatel_logs_settings
+from dyatel.shared_utils import disable_logging
+from dyatel.utils.logs import dyatel_logs_settings
 from dyatel.visual_comparison import VisualComparison
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
@@ -68,7 +69,7 @@ def firefox_options(request):
 
 
 @pytest.fixture
-def driver_wrapper(platform, driver_name, request, driver_init):
+def driver_wrapper(platform, driver_name, driver_init):
     # Prints are required for better readability: https://github.com/pytest-dev/pytest/issues/8574
     print()
     yield driver_init

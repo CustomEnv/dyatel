@@ -1,5 +1,4 @@
 from dyatel.base.element import Element
-from dyatel.base.group import Group
 from dyatel.base.page import Page
 from tests.settings import domain_name, repo_name
 

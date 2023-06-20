@@ -1,4 +1,5 @@
 import io
+import logging
 from subprocess import Popen, PIPE, run
 
 from PIL import Image
@@ -39,3 +40,26 @@ def cut_log_data(data: str, length=50) -> str:
     :return: edited data ~ 'Type text: "very long string for >>> 36 characters"'
     """
     return f'{data[:length]} >>> {len(data[length:])} characters' if len(data) > length else data
+
+
+def disable_logging(loggers: list) -> None:
+    """
+    Disable logging for given loggers
+
+    :param loggers: list of loggers to be disabled
+    :return: None
+    """
+    for logger in loggers:
+        logging.getLogger(logger).disabled = True
+
+
+def set_log_level(loggers: list, level: int) -> None:
+    """
+    Set log level for given loggers
+
+    :param loggers: list of loggers to be disabled
+    :param level: level to be set
+    :return: None
+    """
+    for logger in loggers:
+        logging.getLogger(logger).setLevel(level)

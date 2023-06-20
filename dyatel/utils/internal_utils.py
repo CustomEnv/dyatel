@@ -282,7 +282,7 @@ def repr_builder(instance):
     obj_id = hex(id(instance))
 
     try:
-        driver_title = instance.driver.index
+        driver_title = instance.driver.label
         parent_class = instance.parent.__class__.__name__ if getattr(instance, 'parent', False) else None
         locator_holder = getattr(instance, 'anchor', instance)
 

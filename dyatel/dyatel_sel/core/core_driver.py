@@ -11,7 +11,7 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.exceptions import DriverWrapperException, TimeoutException
 from dyatel.utils.internal_utils import WAIT_EL
-from dyatel.utils.logging import Logging
+from dyatel.utils.logs import Logging
 
 
 class CoreDriver(Logging):

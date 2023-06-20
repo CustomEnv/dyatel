@@ -8,7 +8,7 @@ from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
 
 from dyatel.exceptions import TimeoutException
-from dyatel.utils.logging import Logging
+from dyatel.utils.logs import Logging
 from dyatel.shared_utils import cut_log_data
 from dyatel.mixins.element_mixin import ElementMixin
 from dyatel.mixins.driver_mixin import DriverMixin
