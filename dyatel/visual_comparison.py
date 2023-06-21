@@ -26,6 +26,7 @@ class VisualComparison:
 
     visual_regression_path = ''
     test_item = None
+    attach_diff_image_path = False
     skip_screenshot_comparison = False
     visual_reference_generation = False
     hard_visual_reference_generation = False
@@ -184,9 +185,9 @@ class VisualComparison:
         try:
             check_shape_equality(reference_image, output_image)
         except ValueError:
-            # TODO: Actual file can be added to allure report
-            raise AssertionError(f'Image size (width, height) is not same for {reference_file}: '
-                                 f'Expected: {reference_image.shape}; Actual: {output_image.shape}')
+            self._attach_allure_diff(actual_file, reference_file)
+            raise AssertionError(f'Image size (width, height) is not same for {reference_file}:\n'
+                                 f'Expected: {reference_image.shape[0:2]}; Actual: {output_image.shape[0:2]}')
 
         diff, actual_threshold = self._get_difference(reference_image, output_image)
         is_different = actual_threshold > threshold
@@ -195,9 +196,12 @@ class VisualComparison:
             cv2.imwrite(diff_file, diff)
             self._attach_allure_diff(actual_file, reference_file, diff_file)
 
+        diff_data = ""
+        if self.attach_diff_image_path:
+            diff_data = f"\nDiff image {urljoin('file:', diff_file)}."
+
         base_error = f"New screenshot '{actual_file}' did not match the\n" \
-                     f"Reference screenshot '{reference_file}'.\n" \
-                     f"Diff image {urljoin('file:', diff_file)}.\n"
+                     f"Reference screenshot '{reference_file}'.{diff_data}"
 
         if is_different:
             raise AssertionError(f"{base_error}Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
@@ -316,7 +320,7 @@ class VisualComparison:
         return diff_image, percent_diff
 
     @staticmethod
-    def _attach_allure_diff(actual_path: str, expected_path: str, diff_path: str) -> None:
+    def _attach_allure_diff(actual_path: str, expected_path: str, diff_path: str = None) -> None:
         """
         Attach screenshots to allure screen diff plugin
         https://github.com/allure-framework/allure2/blob/master/plugins/screen-diff-plugin/README.md
@@ -334,9 +338,13 @@ class VisualComparison:
             autolog('Skip screenshot attaching due to allure module not found')
 
         if allure:
-
+            data = [('actual', actual_path), ('expected', expected_path)]
             diff_dict = {}
-            for name, path in (('actual', actual_path), ('expected', expected_path), ('diff', diff_path)):
+
+            if diff_path:
+                data.append(('diff', diff_path))
+
+            for name, path in data:
                 with open(path, 'rb') as image:
                     diff_dict.update({name: f'data:image/png;base64,{base64.b64encode(image.read()).decode("ascii")}'})
 

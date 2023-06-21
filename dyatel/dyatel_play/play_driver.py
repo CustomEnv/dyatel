@@ -30,14 +30,17 @@ class PlayDriver(Logging):
             PlayDriver.driver = self.driver
             PlayDriver.driver_wrapper = self
 
-    def get(self, url: str) -> PlayDriver:
+    def get(self, url: str, silent: bool = False) -> PlayDriver:
         """
         Navigate to given url
 
         :param url: url for navigation
+        :param silent: erase log
         :return: self
         """
-        self.log(f'Navigating to url {url}')
+        if not silent:
+            self.log(f'Navigating to url {url}')
+
         self.driver.goto(url)
         return self
 
@@ -96,16 +99,12 @@ class PlayDriver(Logging):
         self.driver.go_back()
         return self
 
-    def quit(self, silent: bool = True) -> None:
+    def quit(self) -> None:
         """
         Quit the driver instance
 
-        :param: silent:
         :return: None
         """
-        if silent:
-            self.log('Quit driver instance')
-
         self.driver.close()
 
         if self.driver == PlayDriver.driver:  # Clear only if original driver closed

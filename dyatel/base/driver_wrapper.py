@@ -59,8 +59,17 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         self.__set_base_class()
         super(self.__class__, self).__init__(driver=self.driver)
 
-    def quit(self, silent: bool = True):
-        super(self.__class__, self).quit(silent=silent)
+    def quit(self, silent: bool = False):
+        """
+        Quit the driver instance
+
+        :param: silent:
+        :return: None
+        """
+        if not silent:
+            self.log('Quit driver instance')
+
+        super(self.__class__, self).quit()
         self.all_drivers.remove(self.driver)
         DriverWrapper._init_count -= 1
 

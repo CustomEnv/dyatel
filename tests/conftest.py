@@ -74,7 +74,7 @@ def driver_wrapper(platform, driver_name, driver_init):
     print()
     yield driver_init
     print()
-    driver_init.get('data:,')
+    driver_init.get('data:,', silent=True)
 
 
 @pytest.fixture
@@ -88,7 +88,7 @@ def second_driver_wrapper(request, driver_name, platform, chrome_options, firefo
 def driver_init(request, driver_name, platform, chrome_options, firefox_options):
     driver = driver_func(request, driver_name, platform, chrome_options, firefox_options)
     yield driver
-    driver.quit()
+    driver.quit(silent=True)
 
 
 def driver_func(request, driver_name, platform, chrome_options, firefox_options):

@@ -34,19 +34,21 @@ class CoreDriver(Logging):
             CoreDriver.driver = driver
             CoreDriver.driver_wrapper = self
 
-    def get(self, url: str) -> CoreDriver:
+    def get(self, url: str, silent: bool = False) -> CoreDriver:
         """
         Navigate to given url
 
         :param url: url for navigation
+        :param silent: erase log
         :return: self
         """
-        self.log(f'Navigating to url {url}')
+        if not silent:
+            self.log(f'Navigating to url {url}')
 
         try:
             self.driver.get(url)
-        except SeleniumWebDriverException:
-            raise DriverWrapperException(f'Can\'t proceed to {url}')
+        except SeleniumWebDriverException as exc:
+            raise DriverWrapperException(f'Can\'t proceed to {url}. Original error: {exc.msg}')
 
         return self
 
@@ -105,16 +107,12 @@ class CoreDriver(Logging):
         self.driver.back()
         return self
 
-    def quit(self, silent: bool = True) -> None:
+    def quit(self) -> None:
         """
         Quit the driver instance
 
-        :param: silent:
         :return: None
         """
-        if silent:
-            self.log('Quit driver instance')
-
         self.driver.quit()
 
         if self.driver == CoreDriver.driver:  # Clear only if original driver closed
