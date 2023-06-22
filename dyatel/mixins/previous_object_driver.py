@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from typing import Any, Union
 
 from dyatel.base.driver_wrapper import DriverWrapper
@@ -69,24 +70,21 @@ class PreviousObjectDriver:
         """
         timeout = 15
         frame = get_frame(index)
-        prev_object = frame.f_locals.get('self', None)
+        prev_object = self._get_self_object(frame)
         unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)
 
-        def get_driver(obj):
-            return getattr(obj, 'driver', False)
+        while (unexpected_previous_obj or self._get_driver(prev_object) == DriverWrapper.driver) and index < timeout:
 
-        while (unexpected_previous_obj or get_driver(prev_object) == DriverWrapper.driver) and index < timeout:
-            index += 1
+            if index == timeout or self._is_test_function(frame):
+                return None
 
             if current_obj and prev_object:
                 if str(current_obj) in str(vars(prev_object)) and current_obj != prev_object:
                     return None
 
-            if index == timeout:
-                return None
-
+            index += 1
             frame = get_frame(index)
-            prev_object = frame.f_locals.get('self', None)
+            prev_object = self._get_self_object(frame)
             unexpected_previous_obj = self.previous_object_is_not_group_or_page(prev_object)
 
         if frame.f_code.co_name == '__init__':
@@ -101,10 +99,21 @@ class PreviousObjectDriver:
         :param index: frame index to start
         :return: None or object with driver_wrapper
         """
-        frame = get_frame(index)
-        prev_object = frame.f_locals.get('self', None)
+        prev_object = self._get_self_object(get_frame(index))
 
         if is_group(prev_object):
             return prev_object
 
         return None
+
+    @staticmethod
+    def _get_driver(obj):
+        return getattr(obj, 'driver', False)
+
+    @staticmethod
+    def _is_test_function(frame):
+        return frame.f_code.co_name in os.environ['PYTEST_CURRENT_TEST']
+
+    @staticmethod
+    def _get_self_object(frame):
+        return frame.f_locals.get('self', None)
