@@ -79,6 +79,7 @@ class Element(WebElement, MobileElement, PlayElement):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
+        self._validate_inheritance()
         check_kwargs(kwargs)
 
         if locator_type:
@@ -421,3 +422,13 @@ class Element(WebElement, MobileElement, PlayElement):
         prev_object_manager.set_driver_from_previous_object_for_element(self, 6)
         if not self._initialized and self.parent is None:
             prev_object_manager.set_parent_from_previous_object_for_element(self, 6)
+
+    def _validate_inheritance(self):
+        from dyatel.base.page import Page
+
+        cls = self.__class__
+        mro = cls.__mro__
+
+        if Page in mro:
+            raise TypeError(
+                f"You cannot make an inheritance for {cls.__name__} from both Element/Group and Page objects")

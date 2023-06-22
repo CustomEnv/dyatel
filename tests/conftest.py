@@ -81,7 +81,7 @@ def driver_wrapper(platform, driver_name, driver_init):
 def second_driver_wrapper(request, driver_name, platform, chrome_options, firefox_options):
     driver = driver_func(request, driver_name, platform, chrome_options, firefox_options)
     yield driver
-    driver.quit()
+    driver.quit(silent=True)
 
 
 @pytest.fixture(scope='session')

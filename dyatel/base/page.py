@@ -58,6 +58,7 @@ class Page(WebPage, MobilePage, PlayPage):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
+        self._validate_inheritance()
         check_kwargs(kwargs)
 
         self.locator = locator
@@ -194,3 +195,14 @@ class Page(WebPage, MobilePage, PlayPage):
         - set driver from previous object if previous driver different.
         """
         PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)
+
+    def _validate_inheritance(self):
+        from dyatel.base.element import Element
+        from dyatel.base.group import Group
+
+        cls = self.__class__
+        mro = cls.__mro__
+
+        if Element in mro or Group in mro:
+            raise TypeError(
+                f"You cannot make an inheritance for {cls.__name__} from both Page and Group/Element objects")

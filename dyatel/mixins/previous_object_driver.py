@@ -112,7 +112,7 @@ class PreviousObjectDriver:
 
     @staticmethod
     def _is_test_function(frame):
-        return frame.f_code.co_name in os.environ['PYTEST_CURRENT_TEST']
+        return frame.f_code.co_name in os.environ.get('PYTEST_CURRENT_TEST', '')
 
     @staticmethod
     def _get_self_object(frame):
