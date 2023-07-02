@@ -16,14 +16,6 @@ all_tags = {'h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'b
             'li', 'form', 'footer', 'frame', 'area', 'span'}
 
 
-available_kwarg_keys = ('desktop', 'mobile', 'ios', 'android')
-
-
-def check_kwargs(kwargs):
-    assert all(item in available_kwarg_keys for item in kwargs), \
-        f'The given kwargs is not available. Please provide them according to available keys: {available_kwarg_keys}'
-
-
 @cache
 def get_timeout_in_ms(timeout: int):
     """
@@ -35,17 +27,7 @@ def get_timeout_in_ms(timeout: int):
     return timeout * 1000
 
 
-@cache
-def get_static(cls: Any):
-    return get_child_elements_with_names(cls).items()
-
-
-def safe_setter(obj: Any, var: str, value: Any):
-    if not hasattr(obj, var):
-        setattr(obj, var, value)
-
-
-def safe_getter(obj, item):
+def safe_getattribute(obj, item):
     return object.__getattribute__(obj, item)
 
 
@@ -74,20 +56,6 @@ def is_group(obj: Any) -> bool:
 
 def is_page(obj: Any) -> bool:
     return getattr(obj, '_object', None) == 'page'
-
-
-def set_static(obj: Any) -> None:
-    """
-    Set static attributes for given object from base class
-
-    :param obj: object to set static attributes
-    :return: None
-    """
-    cls = obj._base_cls  # noqa
-    scls = obj._scls  # noqa
-
-    for name, item in {name: value for name, value in get_static(cls) if name not in scls.__dict__.keys()}.items():
-        setattr(obj.__class__, name, item)
 
 
 def initialize_objects(current_object, objects: dict):
@@ -276,24 +244,3 @@ def all_mid_level_elements() -> tuple:
 
     return WebElement, MobileElement, PlayElement
 
-
-def repr_builder(instance):
-    class_name = instance.__class__.__name__
-    obj_id = hex(id(instance))
-
-    try:
-        driver_title = instance.driver.label
-        parent_class = instance.parent.__class__.__name__ if getattr(instance, 'parent', False) else None
-        locator_holder = getattr(instance, 'anchor', instance)
-
-        locator = f'locator="{locator_holder.locator}"'
-        locator_type = f'locator_type="{locator_holder.locator_type}"'
-        name = f'name="{instance.name}"'
-        parent = f'parent={parent_class}'
-        driver = f'{driver_title}={instance.driver}'
-
-        base = f'{class_name}({locator}, {locator_type}, {name}, {parent}) at {obj_id}'
-        additional_info = driver
-        return f'{base}, {additional_info}'
-    except AttributeError:
-        return f'{class_name} object at {obj_id}'

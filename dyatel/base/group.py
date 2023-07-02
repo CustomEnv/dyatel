@@ -11,7 +11,7 @@ from dyatel.utils.internal_utils import (
     set_parent_for_attr,
     get_child_elements,
     initialize_objects,
-    get_child_elements_with_names, repr_builder,
+    get_child_elements_with_names
 )
 
 
@@ -21,7 +21,7 @@ class Group(Element):
     _object = 'group'
 
     def __repr__(self):
-        return repr_builder(self)
+        return self._repr_builder()
 
     def __init__(  # noqa
             self,

@@ -1,9 +1,9 @@
-from dyatel.utils.internal_utils import check_kwargs, available_kwarg_keys
+from dyatel.mixins.internal_mixin import InternalMixin, available_kwarg_keys
 
 
 def test_check_kwargs_negative():
     try:
-        check_kwargs({'tester': None})
+        InternalMixin._check_kwargs({'tester': None})
     except AssertionError:
         pass
     else:
@@ -11,4 +11,4 @@ def test_check_kwargs_negative():
 
 
 def test_check_kwargs_positive():
-    check_kwargs(dict(zip(available_kwarg_keys, range(len(available_kwarg_keys)))))
+    InternalMixin._check_kwargs(dict(zip(available_kwarg_keys, range(len(available_kwarg_keys)))))

@@ -13,6 +13,7 @@ from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
+from dyatel.mixins.internal_mixin import InternalMixin
 from dyatel.mixins.previous_object_driver import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
@@ -23,22 +24,18 @@ from dyatel.utils.internal_utils import (
     all_mid_level_elements,
     initialize_objects,
     get_child_elements_with_names,
-    set_static,
-    repr_builder,
     is_group,
-    safe_setter,
-    safe_getter,
-    check_kwargs,
+    safe_getattribute,
 )
 
 
-class Element(WebElement, MobileElement, PlayElement):
+class Element(WebElement, MobileElement, PlayElement, InternalMixin):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
     _object = 'element'
 
     def __repr__(self):
-        return repr_builder(self)
+        return self._repr_builder()
 
     def __call__(self, driver_wrapper=None):
         if self.driver or driver_wrapper:
@@ -47,13 +44,13 @@ class Element(WebElement, MobileElement, PlayElement):
         return self
 
     def __getattribute__(self, item):
-        if 'element' in item and not safe_getter(self, '_initialized'):
+        if 'element' in item and not safe_getattribute(self, '_initialized'):
             raise NotInitializedException(
                 f'The element is not initialized for {self.__class__.__name__} '
                 'Try to initialize base object first or call it directly as a method'
             )
 
-        return safe_getter(self, item)
+        return safe_getattribute(self, item)
 
     def __init__(  # noqa
             self,
@@ -80,7 +77,7 @@ class Element(WebElement, MobileElement, PlayElement):
           - android: str = locator that will be used for android platform
         """
         self._validate_inheritance()
-        check_kwargs(kwargs)
+        self._check_kwargs(kwargs)
 
         if locator_type:
             assert locator_type in all_locator_types, \
@@ -98,10 +95,9 @@ class Element(WebElement, MobileElement, PlayElement):
 
         self._initialized = False
         # Taking from Group first if available
-        self._scls = getattr(self, '_scls', Element)
         self._init_locals = getattr(self, '_init_locals', locals())
         self._driver_instance = getattr(self, '_driver_instance', DriverWrapper)
-        safe_setter(self, '__base_obj_id', id(self))
+        self._safe_setter('__base_obj_id', id(self))
 
         if self.driver:
             self.__full_init__(self.driver_wrapper if is_group(self) else None)
@@ -113,7 +109,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
         if not self._initialized:
             self._base_cls = self._get_base_class()
-            set_static(self)
+            self._set_static(getattr(self, '_scls', Element))
             self._base_cls.__init__(
                 self,
                 locator=self.locator,

@@ -13,6 +13,7 @@ from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
+from dyatel.mixins.internal_mixin import InternalMixin
 from dyatel.mixins.previous_object_driver import PreviousObjectDriver
 from dyatel.utils.internal_utils import (
     WAIT_PAGE,
@@ -20,19 +21,16 @@ from dyatel.utils.internal_utils import (
     get_child_elements_with_names,
     all_mid_level_elements,
     get_child_elements,
-    set_static,
-    repr_builder,
-    safe_setter, check_kwargs,
 )
 
 
-class Page(WebPage, MobilePage, PlayPage):
+class Page(WebPage, MobilePage, PlayPage, InternalMixin):
     """ Page object crossroad. Should be defined as class """
 
     _object = 'page'
 
     def __repr__(self):
-        return repr_builder(self)
+        return self._repr_builder()
 
     def __call__(self, *arg, **kwargs):
         return self
@@ -59,7 +57,7 @@ class Page(WebPage, MobilePage, PlayPage):
           - android: str = locator that will be used for android platform
         """
         self._validate_inheritance()
-        check_kwargs(kwargs)
+        self._check_kwargs(kwargs)
 
         self.locator = locator
         self.locator_type = locator_type
@@ -72,13 +70,12 @@ class Page(WebPage, MobilePage, PlayPage):
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
         self._modify_object()
         self._modify_children()
-        safe_setter(self, '__base_obj_id', id(self))
+        self._safe_setter('__base_obj_id', id(self))
 
         self.page_elements: List[Element] = get_child_elements(self, Element)
 
-        self._scls = Page
         self._base_cls = self._get_base_class()
-        set_static(self)
+        self._set_static(Page)
         self._base_cls.__init__(self)
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
