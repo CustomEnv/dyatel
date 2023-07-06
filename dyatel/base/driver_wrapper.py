@@ -90,6 +90,10 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
             scls.mobile = True
             bcls = MobileDriver,
         elif isinstance(self.driver, SeleniumDriver):
+            if self.get_inner_window_size()['width'] < 425:
+                scls.mobile = True
+            else:
+                scls.desktop = True
             scls.desktop = True
             scls.selenium = True
             bcls = WebDriver,
