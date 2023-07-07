@@ -94,7 +94,6 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
                 scls.mobile = True
             else:
                 scls.desktop = True
-            scls.desktop = True
             scls.selenium = True
             bcls = WebDriver,
         else:
