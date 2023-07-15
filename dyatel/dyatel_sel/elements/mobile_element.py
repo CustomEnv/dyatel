@@ -44,13 +44,12 @@ class MobileElement(CoreElement):
         appium_elements = self._find_elements(self._get_base())
         return self._get_all_elements(appium_elements, MobileElement)
 
-    def click_outside(self, x: int = 0, y: int = -5, calculate_top_bar=True) -> MobileElement:
+    def click_outside(self, x: int = 0, y: int = -5) -> MobileElement:
         """
         Click outside of element. By default, 5px above  of element
 
         :param x: x offset of element to tap
         :param y: y offset of element to tap
-        :param calculate_top_bar: iOS only - attach top bar height to calculation
         :return: self
         """
         if self.driver_wrapper.is_web_context:
@@ -59,7 +58,7 @@ class MobileElement(CoreElement):
 
         x, y = calculate_coordinate_to_click(self, x, y)
 
-        if calculate_top_bar and self.driver_wrapper.is_ios:
+        if self.driver_wrapper.is_ios:
             y += self.driver_wrapper.get_top_bar_height()
 
         self.log(f'Tap outside from "{self.name}" with coordinates (x: {x}, y: {y})')
@@ -67,11 +66,10 @@ class MobileElement(CoreElement):
         self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
         return self
 
-    def click_into_center(self, calculate_top_bar: bool = True, silent: bool = True) -> MobileElement:
+    def click_into_center(self, silent: bool = True) -> MobileElement:
         """
         Click into the center of element
 
-        :param calculate_top_bar: iOS only - attach top bar height to calculation
         :param silent: erase log message
         :return: self
         """
@@ -81,7 +79,7 @@ class MobileElement(CoreElement):
 
         x, y = calculate_coordinate_to_click(self, 0, 0)
 
-        if calculate_top_bar and self.driver_wrapper.is_ios:
+        if self.driver_wrapper.is_ios:
             y += self.driver_wrapper.get_top_bar_height()
 
         if not silent:
@@ -91,30 +89,28 @@ class MobileElement(CoreElement):
 
         return self
 
-    def hover(self, calculate_top_bar: bool = True, silent: bool = False) -> MobileElement:
+    def hover(self, silent: bool = False) -> MobileElement:
         """
         Hover over current element
 
-        :param calculate_top_bar: iOS only - attach top bar height to calculation
         :param silent: erase log
         :return: self
         """
         if not silent:
             self.log(f'Hover over "{self.name}"')
 
-        self.click_into_center(calculate_top_bar=calculate_top_bar)
+        self.click_into_center()
         return self
 
-    def hover_outside(self, x: int = 0, y: int = -5, calculate_top_bar=True) -> MobileElement:
+    def hover_outside(self, x: int = 0, y: int = -5) -> MobileElement:
         """
         Hover outside from current element. By default, 5px above  of element
 
         :param x: x-offset of element to hover(tap)
         :param y: y-offset of element to hover(tap)
-        :param calculate_top_bar: iOS only - attach top bar height to calculation
         :return: self
         """
-        return self.click_outside(x=x, y=y, calculate_top_bar=calculate_top_bar)
+        return self.click_outside(x=x, y=y)
 
     def click_in_alert(self) -> MobileElement:
         """

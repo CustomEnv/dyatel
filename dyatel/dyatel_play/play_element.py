@@ -64,16 +64,16 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
         return element
 
     @element.setter
-    def element(self, play_element: Union[Locator, None]):
+    def element(self, base_element: Union[Locator, None]):
         """
-        Core element setter. Try to avoid usage of this function
+        Element object setter. Try to avoid usage of this function
 
         :param: play_element: playwright Locator object
         """
-        self._element = play_element
+        self._element = base_element
     
     @property
-    def all_elements(self) -> Union[None, List[Any]]:
+    def all_elements(self) -> Union[list, List[Any]]:
         """
         Get all wrapped elements with playwright bases
 
@@ -83,15 +83,20 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
 
     # Element interaction
 
-    def click(self, *args, **kwargs) -> PlayElement:
+    def click(self, with_wait: bool = True, *args, **kwargs) -> PlayElement:
         """
         Click to current element
 
+        :param with_wait: wait for element before click
         :param: args: https://playwright.dev/python/docs/api/class-locator#locator-click
         :param: kwargs: https://playwright.dev/python/docs/api/class-locator#locator-click
         :return: self
         """
         self.log(f'Click into "{self.name}"')
+
+        if with_wait:
+            self.wait_element(silent=True)
+
         self._first_element.click(*args, **kwargs)
         return self
 
@@ -99,8 +104,8 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
         """
         Click outside of element. By default, 5px above and 5px left of element
 
-        :param: x: x offset
-        :param: y: y offset
+        :param x: x offset of element to click
+        :param y: y offset of element to click
         :return: self
         """
         self.log(f'Click outside from "{self.name}"')
@@ -265,14 +270,25 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
 
     # Element state
 
-    def scroll_into_view(self, sleep: Union[int, float] = 0, **kwargs) -> PlayElement:  # noqa
+    def scroll_into_view(
+            self,
+            sleep: Union[int, float] = 0,
+            silent: bool = False,
+            *args,  # noqa
+            **kwargs,  # noqa
+    ) -> PlayElement:
         """
         Scroll element into view
 
-        :param sleep: delay after scroll
+        :param: sleep: delay after scroll
+        :param: silent: erase log
+        :param: args: compatibility arg
+        :param: kwargs: compatibility arg
         :return: self
         """
-        self.log(f'Scroll element "{self.name}" into view')
+        if not silent:
+            self.log(f'Scroll element "{self.name}" into view')
+
         self._first_element.scroll_into_view_if_needed()
 
         if sleep:

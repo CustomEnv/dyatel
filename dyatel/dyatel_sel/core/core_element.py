@@ -19,7 +19,7 @@ from selenium.common.exceptions import (
 )
 
 from dyatel.dyatel_sel.sel_utils import ActionChains
-from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js
+from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js, scroll_into_view_blocks
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.utils.logs import Logging
 from dyatel.shared_utils import cut_log_data
@@ -63,26 +63,28 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
         """
         Get selenium WebElement object
 
-        :return: Locator
+        :return: SeleniumWebElement
         """
         return self._get_element(wait=True)
 
     @element.setter
-    def element(self, selenium_element: Union[SeleniumWebElement, AppiumWebElement]):
+    def element(self, base_element: Union[SeleniumWebElement, AppiumWebElement]):
         """
         Core element setter. Try to avoid usage of this function
 
         :param: selenium_element: selenium WebElement or appium WebElement
         """
-        self._element = selenium_element
+        self._element = base_element
 
     # Element interaction
 
-    def click(self, with_wait=True) -> CoreElement:
+    def click(self, with_wait: bool = True, *args, **kwargs) -> CoreElement:
         """
         Click to current element
 
         :param with_wait: wait for element before click
+        :param: args: compatibility arg
+        :param: kwargs: compatibility arg
         :return: self
         """
         self.log(f'Click into "{self.name}"')
@@ -255,19 +257,26 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
 
     # Element state
 
-    def scroll_into_view(self, block: str = 'center', behavior: str = 'instant',
-                         sleep: Union[int, float] = 0) -> CoreElement:
+    def scroll_into_view(
+            self,
+            block: str = 'center',
+            behavior: str = 'instant',
+            sleep: Union[int, float] = 0,
+            silent: bool = False,
+    ) -> CoreElement:
         """
         Scroll element into view by js script
 
         :param: block: start - element on the top; end - element at the bottom. All: start, center, end, nearest
         :param: behavior: scroll type: smooth or instant
         :param: sleep: delay after scroll
+        :param: silent: erase log
         :return: self
         """
-        self.log(f'Scroll element "{self.name}" into view')
+        if not silent:
+            self.log(f'Scroll element "{self.name}" into view')
 
-        assert block in ('start', 'center', 'end', 'nearest')
+        assert block in scroll_into_view_blocks, f'Provide one of {scroll_into_view_blocks} option in `block` argument'
 
         self.driver.execute_script(
             f'arguments[0].scrollIntoView({{block: "{block}", behavior: "{behavior}"}});', self.element

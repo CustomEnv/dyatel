@@ -124,7 +124,7 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
 
     # Elements interaction
 
-    def set_text(self, text, silent=False) -> Element:
+    def set_text(self, text: str, silent: bool = False) -> Element:
         """
         Set (clear and type) text in current element
 
@@ -154,7 +154,12 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
 
     # Elements waits
 
-    def wait_elements_count(self, expected_count, timeout=WAIT_EL, silent=False) -> Element:
+    def wait_elements_count(
+            self,
+            expected_count: int,
+            timeout: Union[int, float] = WAIT_EL,
+            silent: bool = False
+    ) -> Element:
         """
         Wait until elements count will be equal to expected value
 
@@ -178,7 +183,7 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
 
         return self
 
-    def wait_element_text(self, timeout=WAIT_EL, silent=False):
+    def wait_element_text(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait non empty text in element
 
@@ -199,7 +204,7 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
 
         return self
 
-    def wait_element_value(self, timeout=WAIT_EL, silent=False):
+    def wait_element_value(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait non empty value in element
 
@@ -220,7 +225,7 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
 
         return self
 
-    def wait_element_without_error(self, timeout: int = WAIT_EL, silent: bool = False) -> Element:
+    def wait_element_without_error(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element visibility without error
 
@@ -238,7 +243,7 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
                 self.log(f'Ignored exception: "{exception.msg}"')
         return self
 
-    def wait_element_hidden_without_error(self, timeout: int = WAIT_EL, silent: bool = False) -> Element:
+    def wait_element_hidden_without_error(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element hidden without error
 
@@ -256,7 +261,7 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
                 self.log(f'Ignored exception: "{exception.msg}"')
         return self
 
-    def wait_enabled(self, timeout: int = WAIT_EL, silent: bool = False) -> Element:
+    def wait_enabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element clickable
 
@@ -279,7 +284,7 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
 
         return self
 
-    def wait_disabled(self, timeout: int = WAIT_EL, silent: bool = False) -> Element:
+    def wait_disabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element clickable
 

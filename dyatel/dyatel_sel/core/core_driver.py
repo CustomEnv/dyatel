@@ -210,17 +210,6 @@ class CoreDriver(Logging):
         self.driver.set_page_load_timeout(timeout)
         return self
 
-    def set_window_size(self, width: int, height: int) -> CoreDriver:
-        """
-        Sets the width and height of the current window
-
-        :param width: the width in pixels to set the window to
-        :param height: the height in pixels to set the window to
-        :return: self
-        """
-        self.driver.set_window_size(width, height)
-        return self
-
     def get_screenshot(self) -> bytes:
         """
         Gets the screenshot of the current window as a binary data.
