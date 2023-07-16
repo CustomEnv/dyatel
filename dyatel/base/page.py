@@ -12,19 +12,18 @@ from dyatel.dyatel_play.play_page import PlayPage
 from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
-from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
+from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
 from dyatel.mixins.internal_mixin import InternalMixin
-from dyatel.mixins.previous_object_driver import PreviousObjectDriver
+from dyatel.utils.previous_object_driver import PreviousObjectDriver
 from dyatel.utils.internal_utils import (
     WAIT_PAGE,
     initialize_objects,
     get_child_elements_with_names,
-    all_mid_level_elements,
     get_child_elements,
 )
 
 
-class Page(WebPage, MobilePage, PlayPage, InternalMixin):
+class Page(WebPage, MobilePage, PlayPage, InternalMixin, DriverMixin):
     """ Page object crossroad. Should be defined as class """
 
     _object = 'page'
@@ -75,7 +74,7 @@ class Page(WebPage, MobilePage, PlayPage, InternalMixin):
         self.page_elements: List[Element] = get_child_elements(self, Element)
 
         self._base_cls = self._get_base_class()
-        self._set_static(Page)
+        self._set_static(self._base_cls)
         self._base_cls.__init__(self)
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
@@ -184,7 +183,7 @@ class Page(WebPage, MobilePage, PlayPage, InternalMixin):
         Initializing of attributes with type == Element.
         Required for classes with base == Page.
         """
-        initialize_objects(self, get_child_elements_with_names(self, all_mid_level_elements()))
+        initialize_objects(self, get_child_elements_with_names(self, Element), Element)
 
     def _modify_object(self):
         """

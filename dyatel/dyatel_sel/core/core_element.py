@@ -18,13 +18,12 @@ from selenium.common.exceptions import (
     ElementClickInterceptedException as SeleniumElementClickInterceptedException,
 )
 
+from dyatel.abstraction.element_abs import ElementAbstraction
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js, scroll_into_view_blocks
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.utils.logs import Logging
 from dyatel.shared_utils import cut_log_data
-from dyatel.mixins.element_mixin import ElementMixin
-from dyatel.mixins.driver_mixin import DriverMixin
 from dyatel.utils.internal_utils import WAIT_EL, is_group, is_element
 from dyatel.exceptions import (
     TimeoutException,
@@ -35,26 +34,7 @@ from dyatel.exceptions import (
 )
 
 
-class CoreElement(ElementMixin, DriverMixin, Logging):
-
-    def __init__(self, locator: str, locator_type: str, name: str, parent: Any, wait: bool):
-        """
-        Initializing of core element with appium/selenium driver
-        Contain same methods/data for both WebElement and MobileElement classes
-
-        :param locator: anchor locator of page. Can be defined without locator_type
-        :param locator_type: specific locator type
-        :param name: name of element (will be attached to logs)
-        :param parent: parent of element. Can be Web/MobileElement, Web/MobilePage or Group objects
-        """
-        self._element: Union[SeleniumWebElement, None] = None
-        self.__element: Union[SeleniumWebElement, None] = None
-
-        self.locator = locator
-        self.locator_type = locator_type
-        self.name = name
-        self.parent: Any = parent
-        self.wait = wait
+class CoreElement(ElementAbstraction, Logging):
 
     # Element
 

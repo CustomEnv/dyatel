@@ -1,35 +1,36 @@
 from __future__ import annotations
 
 import time
+from copy import copy
 from typing import Any, Union, List, Type
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
+from dyatel.abstraction.element_abs import ElementAbstraction
 from dyatel.exceptions import *
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
-from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.internal_mixin import InternalMixin
-from dyatel.mixins.previous_object_driver import PreviousObjectDriver
+from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
+from dyatel.mixins.internal_mixin import InternalMixin, get_element_info, all_locator_types
+from dyatel.utils.previous_object_driver import PreviousObjectDriver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.mixins.element_mixin import all_locator_types
 from dyatel.utils.internal_utils import (
     WAIT_EL,
     is_target_on_screen,
-    all_mid_level_elements,
     initialize_objects,
     get_child_elements_with_names,
     is_group,
     safe_getattribute,
+    set_parent_for_attr,
 )
 
 
-class Element(WebElement, MobileElement, PlayElement, InternalMixin):
+class Element(DriverMixin, ElementAbstraction, InternalMixin):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
     _object = 'element'
@@ -52,7 +53,7 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
 
         return safe_getattribute(self, item)
 
-    def __init__(  # noqa
+    def __init__(
             self,
             locator: str = '',
             locator_type: str = '',
@@ -84,7 +85,7 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
                 f'Locator type "{locator_type}" is not supported. Choose from {all_locator_types}'
 
         if parent:
-            assert isinstance(parent, (bool, all_mid_level_elements())), \
+            assert isinstance(parent, (bool, Element)), \
                 f'The "parent" of "{self.name}" should take an Element/Group object or False for skip. Get {parent}'
 
         self.locator = locator
@@ -108,17 +109,7 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
         self._modify_children()
 
         if not self._initialized:
-            self._base_cls = self._get_base_class()
-            self._set_static(getattr(self, '_scls', Element))
-            self._base_cls.__init__(
-                self,
-                locator=self.locator,
-                locator_type=self.locator_type,
-                name=self.name,
-                parent=self.parent,
-                wait=self.wait
-            )
-        self._initialized = True
+            self.__init_base_class__()
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
 
@@ -389,13 +380,41 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
             scroll=scroll, remove=remove, fill_background=fill_background,
         )
 
-    def _get_base_class(self) -> Type[WebElement, MobileElement, PlayElement]:
+    def get_element_info(self, element: Any = None) -> str:
+        """
+        Get full loging data depends on parent element
+
+        :param element: element to collect log data
+        :return: log string
+        """
+        element = element if element else self
+        return get_element_info(element)
+
+    def _get_all_elements(self, sources: Union[tuple, list]) -> List[Any]:
+        """
+        Get all wrapped elements from sources
+
+        :param sources: list of elements: `all_elements` from selenium or `element_handles` from playwright
+        :return: list of wrapped elements
+        """
+        wrapped_elements = []
+
+        for element in sources:
+            wrapped_object: Any = copy(self)
+            wrapped_object.element = element
+            wrapped_object._wrapped = True
+            set_parent_for_attr(wrapped_object, Element, with_copy=True)
+            wrapped_elements.append(wrapped_object)
+
+        return wrapped_elements
+
+    def __init_base_class__(self) -> Type[WebElement, MobileElement, PlayElement]:
         """
         Get element class in according to current driver, and set him as base class
 
         :return: element class
         """
-        base_cls = None
+        base_cls: Type[PlayElement, MobileElement, WebElement] = None
         if isinstance(self.driver, PlaywrightDriver):
             base_cls = PlayElement
         elif isinstance(self.driver, AppiumDriver):
@@ -403,15 +422,16 @@ class Element(WebElement, MobileElement, PlayElement, InternalMixin):
         elif isinstance(self.driver, SeleniumDriver):
             base_cls = WebElement
 
-        # No exception due to delayed initialization
-        return base_cls
-
+        self._set_static(base_cls)
+        base_cls.__init__(self, locator=self.locator, locator_type=self.locator_type)
+        self._base_cls, self._initialized = base_cls, True
+        
     def _modify_children(self):
         """
         Initializing of attributes with  type == Element.
         Required for classes with base == Element.
         """
-        initialize_objects(self, get_child_elements_with_names(self, all_mid_level_elements()))
+        initialize_objects(self, get_child_elements_with_names(self, Element), Element)
 
     def _modify_object(self):
         """

@@ -1,10 +1,30 @@
+from __future__ import annotations
+
 from functools import cache
 from typing import Any
 
-from dyatel.utils.internal_utils import get_child_elements_with_names
+from appium.webdriver.common.appiumby import AppiumBy
+
+from dyatel.utils.internal_utils import get_child_elements_with_names, get_child_elements
 
 
+all_locator_types = get_child_elements(AppiumBy, str)
 available_kwarg_keys = ('desktop', 'mobile', 'ios', 'android')
+
+
+def get_element_info(element: Any) -> str:
+    """
+    Get element selector information with parent object selector if it exists
+
+    :param element: element to collect log data
+    :return: log string
+    """
+    parent = element.parent
+    current_data = f'Selector: ["{element.locator_type}": "{element.locator}"]'
+    if parent:
+        parent_data = f'Parent selector: ["{parent.locator_type}": "{parent.locator}"]'
+        current_data = f'{current_data}. {parent_data}'
+    return current_data
 
 
 class InternalMixin:
@@ -22,16 +42,17 @@ class InternalMixin:
         if not hasattr(self, var):
             setattr(self, var, value)
 
-    def _set_static(self: Any, scls) -> None:
+    def _set_static(self: Any, cls) -> None:
         """
         Set static attributes for given object from base class
 
-        :param scls: root class of object
         :return: None
         """
-        cls = self._base_cls
-
-        for name, item in {name: value for name, value in self.__get_static(cls) if name not in scls.__dict__.keys()}.items():
+        for name, item in \
+                {
+                    name: value for name, value in self.__get_static(cls)
+                    if (name not in cls.__dict__.keys() or 'Abstraction' in str(getattr(self.__class__, name, '')))
+                }.items():
             setattr(self.__class__, name, item)
 
     def _repr_builder(self: Any):

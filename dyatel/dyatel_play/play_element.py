@@ -7,11 +7,10 @@ from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
 from playwright.sync_api import Page as PlaywrightPage, ElementHandle
 from playwright.sync_api import Locator
 
+from dyatel.abstraction.element_abs import ElementAbstraction
 from dyatel.exceptions import TimeoutException
 from dyatel.utils.logs import Logging
 from dyatel.shared_utils import cut_log_data
-from dyatel.mixins.element_mixin import ElementMixin
-from dyatel.mixins.driver_mixin import DriverMixin
 from dyatel.utils.internal_utils import (
     WAIT_EL,
     get_timeout_in_ms,
@@ -22,25 +21,17 @@ from dyatel.utils.internal_utils import (
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_playwright_locator
 
 
-class PlayElement(ElementMixin, DriverMixin, Logging):
+class PlayElement(ElementAbstraction, Logging):
 
-    def __init__(self, locator: str, locator_type: str, name: str, parent: Union[PlayElement, Any], wait: bool):
+    def __init__(self, locator: str, locator_type: str):
         """
         Initializing of web element with playwright driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
         :param locator_type: compatibility arg - specific locator type
-        :param name: name of element (will be attached to logs)
-        :param parent: parent of element. Can be PlayElement, PlayPage, Group objects
-        :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self._element = None
-
         self.locator = get_playwright_locator(get_platform_locator(self, default_locator=locator))
         self.locator_type = f'{locator_type} - locator_type does not supported for playwright'
-        self.name = name if name else self.locator
-        self.parent = parent
-        self.wait = wait
 
     # Element
 
@@ -79,7 +70,7 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
 
         :return: list of wrapped objects
         """
-        return self._get_all_elements(self.element.element_handles(), PlayElement)
+        return self._get_all_elements(self.element.element_handles())
 
     # Element interaction
 

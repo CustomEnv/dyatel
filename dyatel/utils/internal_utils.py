@@ -58,20 +58,21 @@ def is_page(obj: Any) -> bool:
     return getattr(obj, '_object', None) == 'page'
 
 
-def initialize_objects(current_object, objects: dict):
+def initialize_objects(current_object, objects: dict, cls: Any):
     """
-    Copy objects ant initializing them with driver_wrapper from current object
+    Copy objects and initializing them with driver_wrapper from current object
 
     :param current_object: list of objects to initialize
     :param objects: list of objects to initialize
+    :param cls: class of initializing objects
     :return: None
     """
     for name, obj in objects.items():
         set_name_for_attr(obj, name)
         copied_obj = copy(obj)
-        promote_parent_element(copied_obj, current_object)
+        promote_parent_element(copied_obj, current_object, cls)
         setattr(current_object, name, copied_obj(driver_wrapper=current_object.driver_wrapper))
-        initialize_objects(copied_obj, get_child_elements_with_names(copied_obj, all_mid_level_elements()))
+        initialize_objects(copied_obj, get_child_elements_with_names(copied_obj, cls), cls)
 
 
 def set_parent_for_attr(base_obj: object, instance_class: Union[type, tuple], with_copy: bool = False):
@@ -100,12 +101,13 @@ def set_parent_for_attr(base_obj: object, instance_class: Union[type, tuple], wi
         set_parent_for_attr(child, instance_class, with_copy)
 
 
-def promote_parent_element(obj: Any, base_obj: Any):
+def promote_parent_element(obj: Any, base_obj: Any, cls: Any):
     """
     Promote parent object in Element if parent is another Element
 
     :param obj: any element
     :param base_obj: base object of element: Page/Group instance
+    :param cls: element class
     :return: None
     """
     initial_parent = getattr(obj, 'parent', None)
@@ -114,7 +116,7 @@ def promote_parent_element(obj: Any, base_obj: Any):
         return None
 
     if is_element(initial_parent) and initial_parent != base_obj:
-        for el in get_child_elements(base_obj, all_mid_level_elements()):
+        for el in get_child_elements(base_obj, cls):
             if obj.parent.__base_obj_id == el.__base_obj_id:
                 obj.parent = el
 
@@ -133,7 +135,7 @@ def get_child_elements_with_names(obj: Any, instance: Union[type, tuple] = None)
     Return all objects of given object or by instance
     Removing parent attribute from list to avoid infinite recursion and all dunder attributes
 
-    :returns: list of page elements and page objects
+    :returns: dict of page elements and page objects
     """
     elements = {}
 
@@ -163,9 +165,8 @@ def get_all_attributes_from_object(reference_obj: Any) -> dict:
     all_bases.remove(object)
 
     for parent_class in all_bases:
-        str_parent_class = str(parent_class)
 
-        if 'dyatel.base' not in str_parent_class and 'dyatel' in str_parent_class:
+        if 'Abstraction' in str(parent_class):
             continue
 
         items.update(dict(parent_class.__dict__))
@@ -230,17 +231,3 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
     y = emy + bool(y) * (y + meh * sy)
 
     return int(x), int(y)
-
-
-def all_mid_level_elements() -> tuple:
-    """
-    Get all mid level elements. Workaround for circular import
-
-    :return: tuple of mid level elements.
-    """
-    from dyatel.dyatel_play.play_element import PlayElement
-    from dyatel.dyatel_sel.elements.mobile_element import MobileElement
-    from dyatel.dyatel_sel.elements.web_element import WebElement
-
-    return WebElement, MobileElement, PlayElement
-

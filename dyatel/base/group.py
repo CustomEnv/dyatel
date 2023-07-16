@@ -5,9 +5,8 @@ from typing import Any, Union, List
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.previous_object_driver import PreviousObjectDriver
+from dyatel.utils.previous_object_driver import PreviousObjectDriver
 from dyatel.utils.internal_utils import (
-    all_mid_level_elements,
     set_parent_for_attr,
     get_child_elements,
     initialize_objects,
@@ -65,11 +64,9 @@ class Group(Element):
         Initializing of attributes with type == Group/Element.
         Required for classes with base == Group.
         """
-        elements_types = all_mid_level_elements()
-
-        initialize_objects(self, get_child_elements_with_names(self, elements_types))
-        set_parent_for_attr(self, elements_types)
-        self.child_elements: List[Element] = get_child_elements(self, elements_types)
+        initialize_objects(self, get_child_elements_with_names(self, Element), Element)
+        set_parent_for_attr(self, Element)
+        self.child_elements: List[Element] = get_child_elements(self, Element)
 
     def _modify_object(self):
         """

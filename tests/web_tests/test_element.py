@@ -2,9 +2,9 @@ import random
 
 import pytest
 
+from dyatel.mixins.internal_mixin import get_element_info
 from tests.adata.pages.expected_condition_page import WaitValueCardBroken
 from dyatel.exceptions import NoSuchElementException
-from dyatel.mixins.element_mixin import ElementMixin
 from tests.adata.pages.keyboard_page import KeyboardPage
 
 
@@ -17,7 +17,7 @@ def test_element_exception_without_parent(base_playground_page):
     try:
         el._get_element(wait=False)
     except NoSuchElementException as exc:
-        logs = ElementMixin().get_element_info(el)
+        logs = get_element_info(el)
         message = f'Cant find element "{el.name}". {logs}'
         assert exc.msg == message
     else:
@@ -33,7 +33,7 @@ def test_element_exception_with_broken_parent(base_playground_page):
     try:
         el._get_element(wait=False)
     except NoSuchElementException as exc:
-        logs = ElementMixin().get_element_info(el.parent)
+        logs = get_element_info(el.parent)
         message = f'Cant find parent element "{el.parent.name}". {logs}'
         assert exc.msg == message
     else:
@@ -135,6 +135,7 @@ def test_element_group_all_elements_child(second_playground_page):
 
     for index, element_object in enumerate(all_cards):
         if 0 < index < len(all_cards) - 1:
+            assert id(element_object.button) != id(all_cards[index - 1].button)
             assert element_object.button.element != all_cards[index - 1].button.element
             assert element_object.button.element != all_cards[index + 1].button.element
 

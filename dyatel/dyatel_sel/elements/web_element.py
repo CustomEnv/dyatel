@@ -8,27 +8,15 @@ from dyatel.utils.selector_synchronizer import get_platform_locator, get_seleniu
 
 
 class WebElement(CoreElement):
-    def __init__(self, locator: str, locator_type: str, name: str, parent: Union[WebElement, Any], wait: bool):
+    def __init__(self, locator: str, locator_type: str):
         """
         Initializing of web element with selenium driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
         :param locator_type: specific locator type
-        :param name: name of element (will be attached to logs)
-        :param parent: parent of element. Can be WebElement, WebPage, Group objects
-        :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        locator = get_platform_locator(self, default_locator=locator)
-        locator_type = locator_type if locator_type else get_selenium_locator_type(locator)
-
-        CoreElement.__init__(
-            self,
-            locator=locator,
-            locator_type=locator_type,
-            name=name,
-            parent=parent,
-            wait=wait
-        )
+        self.locator = get_platform_locator(self, default_locator=locator)
+        self.locator_type = locator_type if locator_type else get_selenium_locator_type(locator)
 
     @property
     def all_elements(self) -> Union[None, List[Any]]:
@@ -38,7 +26,7 @@ class WebElement(CoreElement):
         :return: list of wrapped objects
         """
         selenium_elements = self._find_elements(self._get_base())
-        return self._get_all_elements(selenium_elements, WebElement)
+        return self._get_all_elements(selenium_elements)
 
     def hover(self, silent: bool = False) -> WebElement:
         """
