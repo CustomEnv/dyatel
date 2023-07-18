@@ -48,11 +48,12 @@ class InternalMixin:
 
         :return: None
         """
-        for name, item in \
-                {
-                    name: value for name, value in self.__get_static(cls)
-                    if (name not in cls.__dict__.keys() or 'Abstraction' in str(getattr(self.__class__, name, '')))
-                }.items():
+        data = {
+            name: value for name, value in self.__get_static(cls)
+            if name not in self.__class__.__dict__.keys()
+        }.items()
+
+        for name, item in data:
             setattr(self.__class__, name, item)
 
     def _repr_builder(self: Any):

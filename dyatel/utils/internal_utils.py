@@ -165,8 +165,10 @@ def get_all_attributes_from_object(reference_obj: Any) -> dict:
     all_bases.remove(object)
 
     for parent_class in all_bases:
+        str_parent_class = str(parent_class)
 
-        if 'Abstraction' in str(parent_class):
+        if 'Abstraction' in str_parent_class or 'ABS' in str_parent_class:
+            print(str_parent_class)
             continue
 
         items.update(dict(parent_class.__dict__))

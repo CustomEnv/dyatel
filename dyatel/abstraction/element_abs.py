@@ -6,22 +6,17 @@ from PIL.Image import Image
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from appium.webdriver.webelement import WebElement as AppiumWebElement
 from playwright.sync_api import Locator as PlayWebElement
-from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
-from playwright.sync_api import Page as PlaywrightWebDriver
-from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
-from dyatel.base.driver_wrapper import DriverWrapper
+from dyatel.abstraction.mixin_abs import MixinABS
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.utils.internal_utils import WAIT_EL
 
 
-class ElementAbstraction:
+class ElementAbstraction(MixinABS):
 
     _element = None
     __element = None
 
-    driver: Union[SeleniumWebDriver, AppiumWebDriver, PlaywrightWebDriver] = None
-    driver_wrapper: DriverWrapper = None
     locator: str = None
     locator_type: str = None
     name: str = None
@@ -37,21 +32,21 @@ class ElementAbstraction:
         """
         raise NotImplementedError()
 
-    @property
-    def all_elements(self) -> Union[list, List[Any]]:
-        """
-        Get all wrapped elements with playwright bases
-
-        :return: list of wrapped objects
-        """
-        raise NotImplementedError()
-
     @element.setter
     def element(self, base_element: Union[SeleniumWebElement, AppiumWebElement, PlayWebElement]):
         """
         Element object setter. Try to avoid usage of this function
 
         :param: Union[SeleniumWebElement, AppiumWebElement, PlayWebElement]
+        """
+        raise NotImplementedError()
+
+    @property
+    def all_elements(self) -> Union[list, List[Any]]:
+        """
+        Get all wrapped elements with playwright bases
+
+        :return: list of wrapped objects
         """
         raise NotImplementedError()
 

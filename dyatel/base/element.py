@@ -30,7 +30,7 @@ from dyatel.utils.internal_utils import (
 )
 
 
-class Element(DriverMixin, ElementAbstraction, InternalMixin):
+class Element(DriverMixin, InternalMixin, ElementAbstraction):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
     _object = 'element'
@@ -111,7 +111,25 @@ class Element(DriverMixin, ElementAbstraction, InternalMixin):
         if not self._initialized:
             self.__init_base_class__()
 
-    # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
+    def __init_base_class__(self) -> Type[WebElement, MobileElement, PlayElement]:
+        """
+        Initialise base class according to current driver, and set his methods
+
+        :return: element class
+        """
+        base_cls: Type[PlayElement, MobileElement, WebElement] = None
+        if isinstance(self.driver, PlaywrightDriver):
+            base_cls = PlayElement
+        elif isinstance(self.driver, AppiumDriver):
+            base_cls = MobileElement
+        elif isinstance(self.driver, SeleniumDriver):
+            base_cls = WebElement
+
+        self._set_static(base_cls)
+        base_cls.__init__(self, locator=self.locator, locator_type=self.locator_type)
+        self._base_cls, self._initialized = base_cls, True
+
+    # Following methods works same for both Selenium/Appium and Playwright APIs using internal methods
 
     # Elements interaction
 
@@ -407,24 +425,6 @@ class Element(DriverMixin, ElementAbstraction, InternalMixin):
             wrapped_elements.append(wrapped_object)
 
         return wrapped_elements
-
-    def __init_base_class__(self) -> Type[WebElement, MobileElement, PlayElement]:
-        """
-        Get element class in according to current driver, and set him as base class
-
-        :return: element class
-        """
-        base_cls: Type[PlayElement, MobileElement, WebElement] = None
-        if isinstance(self.driver, PlaywrightDriver):
-            base_cls = PlayElement
-        elif isinstance(self.driver, AppiumDriver):
-            base_cls = MobileElement
-        elif isinstance(self.driver, SeleniumDriver):
-            base_cls = WebElement
-
-        self._set_static(base_cls)
-        base_cls.__init__(self, locator=self.locator, locator_type=self.locator_type)
-        self._base_cls, self._initialized = base_cls, True
         
     def _modify_children(self):
         """

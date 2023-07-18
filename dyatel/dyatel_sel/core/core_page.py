@@ -1,7 +1,5 @@
-from __future__ import annotations
-
-from dyatel.utils.logs import Logging
+from dyatel.abstraction.page_abs import PageAbstraction
 
 
-class CorePage(Logging):
+class CorePage(PageAbstraction):
     pass
