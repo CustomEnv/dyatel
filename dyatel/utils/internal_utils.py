@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 import inspect
 from copy import copy
-from functools import cache
+from functools import lru_cache
 from typing import Any, Union
 
 
@@ -16,7 +16,7 @@ all_tags = {'h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'b
             'li', 'form', 'footer', 'frame', 'area', 'span'}
 
 
-@cache
+@lru_cache(maxsize=None)
 def get_timeout_in_ms(timeout: int):
     """
     Get timeout in milliseconds for playwright
@@ -168,7 +168,6 @@ def get_all_attributes_from_object(reference_obj: Any) -> dict:
         str_parent_class = str(parent_class)
 
         if 'Abstraction' in str_parent_class or 'ABS' in str_parent_class:
-            print(str_parent_class)
             continue
 
         items.update(dict(parent_class.__dict__))

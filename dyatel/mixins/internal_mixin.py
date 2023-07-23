@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from functools import cache
+from functools import lru_cache
 from typing import Any
 
 from appium.webdriver.common.appiumby import AppiumBy
@@ -34,7 +34,7 @@ class InternalMixin:
         assert all(item in available_kwarg_keys for item in kwargs), \
             f'The given kwargs is not available. Please provide them according to available keys: {available_kwarg_keys}'
 
-    @cache
+    @lru_cache(maxsize=None)
     def __get_static(self, cls: Any):
         return get_child_elements_with_names(cls).items()
 
@@ -62,7 +62,6 @@ class InternalMixin:
         parent = getattr(self, 'parent', False)
 
         try:
-            driver_title = self.driver.label
             parent_class = self.parent.__class__.__name__ if parent else None
             locator_holder = getattr(self, 'anchor', self)
 
@@ -70,7 +69,7 @@ class InternalMixin:
             locator_type = f'locator_type="{locator_holder.locator_type}"'
             name = f'name="{self.name}"'
             parent = f'parent={parent_class}'
-            driver = f'{driver_title}={self.driver}'
+            driver = f'{self.driver.label}={self.driver}'
 
             base = f'{class_name}({locator}, {locator_type}, {name}, {parent}) at {obj_id}'
             additional_info = driver

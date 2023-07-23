@@ -111,11 +111,11 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
         if not self._initialized:
             self.__init_base_class__()
 
-    def __init_base_class__(self) -> Type[WebElement, MobileElement, PlayElement]:
+    def __init_base_class__(self) -> None:
         """
         Initialise base class according to current driver, and set his methods
 
-        :return: element class
+        :return: None
         """
         base_cls: Type[PlayElement, MobileElement, WebElement] = None
         if isinstance(self.driver, PlaywrightDriver):
@@ -381,7 +381,7 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
 
         :param filename: full screenshot name. Custom filename will be used if empty string given
         :param test_name: test name for custom filename. Will try to find it automatically if empty string given
-        :param name_suffix: filename suffix. Good to use for same element with positive/netagative case
+        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
         :param threshold: possible threshold
         :param delay: delay before taking screenshot
         :param scroll: scroll to element before taking the screenshot

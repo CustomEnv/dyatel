@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import sys
-from functools import cache
+from functools import lru_cache
 from os.path import basename
 from typing import Any
 
@@ -78,7 +78,7 @@ def _send_log_message(log_message: str, level: str) -> None:
     logger.log(_get_log_level(level), log_message)
 
 
-@cache
+@lru_cache(maxsize=None)
 def _get_log_level(level: str) -> int:
     """
     Get log level from string. Moved to a different function for using @cache

@@ -78,11 +78,11 @@ class Page(DriverMixin, InternalMixin, Logging, PageAbstraction):
 
         self.__init_base_class__()
 
-    def __init_base_class__(self) -> Type[PlayPage, MobilePage, WebPage]:
+    def __init_base_class__(self) -> None:
         """
         Initialise base class according to current driver, and set his methods
 
-        :return: page class
+        :return: None
         """
         if isinstance(self.driver, PlaywrightDriver):
             cls = PlayPage
