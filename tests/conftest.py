@@ -61,12 +61,14 @@ def firefox_options(request):
 
 
 @pytest.fixture(autouse=True)
-def redirect(driver_wrapper):
+def redirect(request):
     # Prints are required for better readability: https://github.com/pytest-dev/pytest/issues/8574
     print()
     yield
     print()
-    driver_wrapper.get('data:,', silent=True)
+    if DriverWrapper.session.sessions_count() > 0:
+        driver_wrapper = request.getfixturevalue('driver_wrapper')
+        driver_wrapper.get('data:,', silent=True)
 
 
 @pytest.fixture

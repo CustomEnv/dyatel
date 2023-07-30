@@ -75,7 +75,7 @@ class PreviousObjectDriver:
 
         while (unexpected_previous_obj or self._get_driver(prev_object) == DriverWrapper.driver) and index < timeout:
 
-            if index == timeout or self._is_test_function(frame):
+            if index == timeout or self._is_test_function(frame) or 'pytest' in str(frame):
                 return None
 
             if current_obj and prev_object:
