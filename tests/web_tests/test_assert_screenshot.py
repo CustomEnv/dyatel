@@ -29,7 +29,8 @@ def file(request):
     filename = 'reference_with_rerun'
     yield filename
     request.node.session.config.option.reruns = 0
-    os.remove(f'{os.getcwd()}/tests/adata/visual/reference/{filename}.png')
+    if not request.config.option.sv:
+        os.remove(f'{os.getcwd()}/tests/adata/visual/reference/{filename}.png')
 
 
 def test_screenshot_without_reference_and_rerun(base_playground_page, file, request):

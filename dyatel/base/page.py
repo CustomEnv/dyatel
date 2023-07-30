@@ -177,7 +177,6 @@ class Page(DriverMixin, InternalMixin, Logging, PageAbstraction):
         :return: Element object
         """
         anchor = Element(locator=self.locator, locator_type=self.locator_type, name=self.name)
-        anchor.driver_wrapper = self.driver_wrapper
         return anchor
 
     def _modify_children(self):

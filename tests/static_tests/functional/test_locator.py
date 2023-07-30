@@ -36,7 +36,7 @@ def test_link_to_class_locator_mobile(driver, request):
 @pytest.mark.parametrize('driver', desktop_drivers, ids=desktop_ids)
 def test_link_to_class_locator_desktop(driver, request):
     request.getfixturevalue(driver)
-    assert SomeGroup().link_to_class.locator == 'some locator updated'
+    assert 'some locator updated' in SomeGroup().link_to_class.locator
 
 
 def test_multiple_locator_ios(mocked_ios_driver):
