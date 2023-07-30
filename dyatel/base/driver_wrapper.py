@@ -1,21 +1,50 @@
-from typing import Union
+from __future__ import annotations
+
+from typing import Union, Type, List
 
 from playwright.sync_api import Browser as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
+from dyatel.abstraction.driver_wrapper_abs import DriverWrapperAbstraction
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.exceptions import DriverWrapperException
 from dyatel.js_scripts import get_inner_height_js, get_inner_width_js
+from dyatel.mixins.internal_mixin import InternalMixin
 from dyatel.utils.internal_utils import get_attributes_from_object, get_child_elements_with_names
+from dyatel.utils.logs import Logging
 
 
-class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
+class DriverWrapperSessions:
+
+    all_sessions: List[DriverWrapper] = []
+
+    @classmethod
+    def add_session(cls, driver_wrapper):
+        cls.all_sessions.append(driver_wrapper)
+
+    @classmethod
+    def remove_session(cls, driver_wrapper):
+        cls.all_sessions.remove(driver_wrapper)
+
+    @classmethod
+    def sessions_count(cls):
+        return len(cls.all_sessions)
+
+    @classmethod
+    def first_session(cls):
+        return cls.all_sessions[0] if cls.all_sessions else None
+
+
+class DriverWrapper(InternalMixin, Logging, DriverWrapperAbstraction):
     """ Driver object crossroad """
 
-    _init_count = 0
+    _base_cls: Type[PlayDriver, MobileDriver, WebDriver] = None
+
+    driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver] = None
+    session: DriverWrapperSessions = DriverWrapperSessions
 
     desktop = False
     selenium = False
@@ -27,13 +56,16 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
     is_simulator = False
     is_real_device = False
 
-    all_drivers = []
-
     def __new__(cls, *args, **kwargs):
-        if DriverWrapper._init_count == 0:
-            return super().__new__(cls)
+        if cls.session.sessions_count() == 0:
+            cls = super().__new__(cls)
+        else:
+            cls = super().__new__(type(f'ShadowDriverWrapper', (cls, ), get_attributes_from_object(cls)))  # noqa
 
-        return super().__new__(type(f'ShadowDriverWrapper', (cls, ), get_attributes_from_object(cls)))  # noqa
+        for name, _ in get_child_elements_with_names(cls, bool).items():
+            setattr(cls, name, False)
+
+        return cls
 
     def __repr__(self):
         cls = self.__class__
@@ -53,11 +85,10 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
 
         :param driver: appium or selenium or playwright driver to initialize
         """
-        self.driver = driver
-        self.all_drivers.append(driver)
-        self.driver.label = f'{self.all_drivers.index(driver) + 1}_driver'
-        self.__set_base_class()
-        super(self.__class__, self).__init__(driver=self.driver)
+        self.__class__.driver = driver
+        self.session.add_session(self)
+        self.driver.label = f'{self.session.all_sessions.index(self) + 1}_driver'
+        self.__init_base_class__()
 
     def quit(self, silent: bool = False):
         """
@@ -69,9 +100,8 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
         if not silent:
             self.log('Quit driver instance')
 
-        super(self.__class__, self).quit()
-        self.all_drivers.remove(self.driver)
-        DriverWrapper._init_count -= 1
+        self._base_cls.quit(self)
+        self.session.remove_session(self)
 
     def get_inner_window_size(self) -> dict:
         """
@@ -79,35 +109,33 @@ class DriverWrapper(WebDriver, MobileDriver, PlayDriver):
 
         :return: {'height': value, 'width': value}
         """
-        return {'height': self.execute_script(get_inner_height_js), 'width': self.execute_script(get_inner_width_js)}
+        return {
+            'height': self.execute_script(get_inner_height_js),
+            'width': self.execute_script(get_inner_width_js)
+        }
 
-    def __set_base_class(self):
+    def __init_base_class__(self) -> None:
         """
         Get driver wrapper class in according to given driver source, and set him as base class
 
-        :return: driver wrapper class
+        :return: None
         """
-        self.__reset_settings()
-        scls = self.__class__
         if isinstance(self.driver, PlaywrightDriver):
-            scls.playwright = True
-            scls.desktop = True
-            bcls = PlayDriver,
+            self.playwright = True
+            self.desktop = True
+            self._base_cls = PlayDriver
         elif isinstance(self.driver, AppiumDriver):
-            scls.mobile = True
-            bcls = MobileDriver,
+            self.mobile = True
+            self._base_cls = MobileDriver
         elif isinstance(self.driver, SeleniumDriver):
-            scls.desktop = True
-            scls.selenium = True
-            bcls = WebDriver,
+            self.desktop = True
+            self.selenium = True
+            self._base_cls = WebDriver
         else:
-            raise DriverWrapperException('Cant specify Driver')
+            raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')
 
-        scls.__bases__ = bcls
-        DriverWrapper._init_count += 1
-        return self.__class__
+        self._set_static(self._base_cls)
+        self._base_cls.__init__(self, driver=self.driver)
 
-    def __reset_settings(self):
-        for name, _ in get_child_elements_with_names(self, bool).items():
-            setattr(self.__class__, name, False)
-
+        for name, value in self.__dict__.items():
+            setattr(self.__class__, name, value)

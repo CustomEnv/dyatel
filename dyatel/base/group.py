@@ -50,6 +50,7 @@ class Group(Element):
         self._scls = Group
         self._init_locals = locals()
         self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
+        self._modify_object()
 
         super().__init__(
             locator=locator,

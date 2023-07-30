@@ -17,7 +17,7 @@ class PreviousObjectDriver:
         :param frame_index: frame start index
         :return: None
         """
-        if len(DriverWrapper.all_drivers) > 1:
+        if len(DriverWrapper.session.all_sessions) > 1:
             if current_obj.driver == DriverWrapper.driver:
                 previous_object = self._get_correct_previous_object_with_driver(frame_index, current_obj=current_obj)
                 if previous_object:
@@ -31,7 +31,7 @@ class PreviousObjectDriver:
         :param frame_index: frame start index
         :return: None
         """
-        if len(DriverWrapper.all_drivers) > 1:
+        if len(DriverWrapper.session.all_sessions) > 1:
             if current_obj.driver == DriverWrapper.driver:
                 if is_element(current_obj):
                     previous_object = self._get_correct_previous_object_with_driver(frame_index, current_obj=current_obj)

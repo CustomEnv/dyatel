@@ -8,15 +8,14 @@ from selenium.common.exceptions import WebDriverException as SeleniumWebDriverEx
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
+from dyatel.abstraction.driver_wrapper_abs import DriverWrapperAbstraction
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.exceptions import DriverWrapperException, TimeoutException
 from dyatel.utils.internal_utils import WAIT_EL
 from dyatel.utils.logs import Logging
 
 
-class CoreDriver(Logging):
-    driver: Union[AppiumDriver, SeleniumWebDriver] = None
-    driver_wrapper = None
+class CoreDriver(Logging, DriverWrapperAbstraction):
 
     def __init__(self, driver: Union[AppiumDriver, SeleniumWebDriver]):
         """
@@ -26,13 +25,6 @@ class CoreDriver(Logging):
         :param driver: appium or selenium driver to initialize
         """
         driver.implicitly_wait(0.001)  # reduce selenium wait
-        self.driver = driver
-        self.driver_wrapper: Any = self
-        self.original_tab = driver.current_window_handle
-
-        if not CoreDriver.driver:
-            CoreDriver.driver = driver
-            CoreDriver.driver_wrapper = self
 
     def get(self, url: str, silent: bool = False) -> CoreDriver:
         """
@@ -107,17 +99,13 @@ class CoreDriver(Logging):
         self.driver.back()
         return self
 
-    def quit(self) -> None:
+    def quit(self, *args) -> None:
         """
         Quit the driver instance
 
         :return: None
         """
         self.driver.quit()
-
-        if self.driver == CoreDriver.driver:  # Clear only if original driver closed
-            CoreDriver.driver = None
-            CoreDriver.driver_wrapper = None
 
     def set_cookie(self, cookies: List[dict]) -> CoreDriver:
         """
@@ -218,48 +206,7 @@ class CoreDriver(Logging):
         """
         return self.driver.get_screenshot_as_png()
 
-    def get_all_tabs(self) -> List[str]:
-        """
-        Get all opened tabs
-
-        :return: list of tabs
-        """
-        return self.driver.window_handles
-
-    def create_new_tab(self) -> CoreDriver:
-        """
-        Create new tab and switch into it
-
-        :return: self
-        """
-        self.driver.switch_to.new_window('tab')
-        return self
-
-    def switch_to_original_tab(self) -> CoreDriver:
-        """
-        Switch to original tab
-
-        :return: self
-        """
-        self.driver.switch_to.window(self.original_tab)
-        return self
-
-    def switch_to_tab(self, tab=-1) -> CoreDriver:
-        """
-        Switch to specific tab
-
-        :param tab: tab index. Start from 1. Default: latest tab
-        :return: self
-        """
-        if tab == -1:
-            tab = self.get_all_tabs()[tab]
-        else:
-            tab = self.get_all_tabs()[tab - 1]
-
-        self.driver.switch_to.window(tab)
-        return self
-
-    def switch_to_alert(self, timeout=WAIT_EL) -> Alert:
+    def switch_to_alert(self, timeout: Union[int, float] = WAIT_EL) -> Alert:
         """
         Wait for alert and switch to it
 
@@ -299,21 +246,6 @@ class CoreDriver(Logging):
         self.switch_to_alert().dismiss()
         self.switch_to_default_content()
         return self
-
-    def close_unused_tabs(self) -> CoreDriver:
-        """
-        Close all tabs except original
-
-        :return: self
-        """
-        tabs = self.get_all_tabs()
-        tabs.remove(self.original_tab)
-
-        for tab in tabs:
-            self.driver.switch_to.window(tab)
-            self.driver.close()
-
-        return self.switch_to_original_tab()
 
     def click_by_coordinates(self, x: int, y: int, silent: bool = False) -> CoreDriver:
         """

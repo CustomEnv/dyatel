@@ -54,7 +54,7 @@ class Logging:
         :param level: log level
         :return: None
         """
-        _send_log_message(f'[{self.driver_wrapper.driver.label}]{self._get_code_info()} {message}', level)  # noqa
+        _send_log_message(f'[{self.driver.label}]{self._get_code_info()} {message}', level)  # noqa
         return None
 
     def _get_code_info(self) -> str:
@@ -81,7 +81,7 @@ def _send_log_message(log_message: str, level: str) -> None:
 @lru_cache(maxsize=None)
 def _get_log_level(level: str) -> int:
     """
-    Get log level from string. Moved to a different function for using @cache
+    Get log level from string. Moved to a different function for using @lru_cache
 
     :param level: string level ~ INFO, DEBUG etc.
     :return: log level in int format

@@ -1,18 +1,16 @@
 from __future__ import annotations
 
-from typing import List, Union, Any
+from typing import List, Union
 
-from playwright.sync_api import Page as PlaywrightPage, Locator, Page
+from playwright.sync_api import Locator, Page
 from playwright.sync_api import Browser
 
+from dyatel.abstraction.driver_wrapper_abs import DriverWrapperAbstraction
 from dyatel.utils.internal_utils import get_timeout_in_ms
 from dyatel.utils.logs import Logging
 
 
-class PlayDriver(Logging):
-    instance: Browser = None
-    driver: PlaywrightPage = None
-    driver_wrapper: PlayDriver = None
+class PlayDriver(Logging, DriverWrapperAbstraction):
 
     def __init__(self, driver: Browser):
         """
@@ -20,15 +18,9 @@ class PlayDriver(Logging):
 
         :param driver: playwright driver to initialize
         """
-        self.driver_context = driver.new_context()
-        self.driver = self.driver_context.new_page()
-        self.driver_wrapper: Any = self
-        self.original_tab = self.driver
-
-        if not PlayDriver.driver:
-            PlayDriver.instance = driver
-            PlayDriver.driver = self.driver
-            PlayDriver.driver_wrapper = self
+        self.context = driver.new_context()
+        self.page = self.context.new_page()
+        self.original_tab = self.page
 
     def get(self, url: str, silent: bool = False) -> PlayDriver:
         """
@@ -41,7 +33,7 @@ class PlayDriver(Logging):
         if not silent:
             self.log(f'Navigating to url {url}')
 
-        self.driver.goto(url)
+        self.page.goto(url)
         return self
 
     def is_driver_opened(self) -> bool:
@@ -50,7 +42,7 @@ class PlayDriver(Logging):
 
         :return: True if driver opened
         """
-        return self.instance.is_connected()
+        return self.driver.is_connected()
 
     def is_driver_closed(self) -> bool:
         """
@@ -58,7 +50,7 @@ class PlayDriver(Logging):
 
         :return: True if driver closed
         """
-        return not self.instance.is_connected()
+        return not self.driver.is_connected()
 
     @property
     def current_url(self) -> str:
@@ -67,7 +59,7 @@ class PlayDriver(Logging):
 
         :return: url
         """
-        return self.driver.url
+        return self.page.url
 
     def refresh(self) -> PlayDriver:
         """
@@ -76,7 +68,7 @@ class PlayDriver(Logging):
         :return: self
         """
         self.log('Reload current page')
-        self.driver.reload()
+        self.page.reload()
         return self
 
     def go_forward(self) -> PlayDriver:
@@ -86,7 +78,7 @@ class PlayDriver(Logging):
         :return: self
         """
         self.log('Going forward')
-        self.driver.go_forward()
+        self.page.go_forward()
         return self
 
     def go_back(self) -> PlayDriver:
@@ -96,21 +88,16 @@ class PlayDriver(Logging):
         :return: self
         """
         self.log('Going back')
-        self.driver.go_back()
+        self.page.go_back()
         return self
 
-    def quit(self) -> None:
+    def quit(self, *args) -> None:
         """
         Quit the driver instance
 
         :return: None
         """
-        self.driver.close()
-
-        if self.driver == PlayDriver.driver:  # Clear only if original driver closed
-            PlayDriver.driver = None
-            PlayDriver.instance = None
-            PlayDriver.driver_wrapper = None
+        self.page.close()
 
     def set_cookie(self, cookies: List[dict]) -> PlayDriver:
         """
@@ -129,7 +116,7 @@ class PlayDriver(Logging):
             if 'domain' not in cookie:
                 cookie.update({'domain': f'.{self.current_url.split("://")[1].split("/")[0]}'})
 
-        self.driver_context.add_cookies(cookies)
+        self.context.add_cookies(cookies)
         return self
 
     def clear_cookies(self) -> PlayDriver:
@@ -138,18 +125,8 @@ class PlayDriver(Logging):
 
         :return: self
         """
-        self.driver_context.clear_cookies()
+        self.context.clear_cookies()
         return self
-
-    def delete_cookie(self, name) -> PlayDriver:
-        """
-        Delete cookie by name
-
-        :return: self
-        """
-        # Todo: workaround can be implemented https://stackoverflow.com/questions/2144386/how-to-delete-a-cookie
-        raise NotImplementedError('Playwright does not supported specific cookie removal: '
-                                  'https://github.com/microsoft/playwright/issues/10143')
 
     def get_cookies(self) -> List[dict]:
         """
@@ -157,32 +134,7 @@ class PlayDriver(Logging):
 
         :return: cookies dictionaries list
         """
-        return self.driver_context.cookies()
-
-    def switch_to_frame(self, frame: Any) -> PlayDriver:
-        """
-        Switch to frame
-
-        :param frame: frame Element
-        :return: self
-        """
-        raise NotImplementedError()
-
-    def switch_to_parent_frame(self) -> PlayDriver:
-        """
-        Switch to parent frame from child frame
-
-        :return: self
-        """
-        raise NotImplementedError()
-
-    def switch_to_default_content(self) -> PlayDriver:
-        """
-        Switch to default content from frame
-
-        :return: self
-        """
-        raise NotImplementedError()
+        return self.context.cookies()
 
     def execute_script(self, script: str, *args) -> Union[None, str]:
         """
@@ -204,7 +156,7 @@ class PlayDriver(Logging):
             if isinstance(arg, Locator):
                 script_args[index] = arg.element_handle()
 
-        return self.driver.evaluate(script, script_args)
+        return self.page.evaluate(script, script_args)
 
     def set_page_load_timeout(self, timeout: int = 30) -> PlayDriver:
         """
@@ -213,7 +165,7 @@ class PlayDriver(Logging):
         :param timeout: timeout to set in seconds
         :return: self
         """
-        self.driver.set_default_navigation_timeout(get_timeout_in_ms(timeout))
+        self.page.set_default_navigation_timeout(get_timeout_in_ms(timeout))
         return self
 
     def set_window_size(self, width: int, height: int) -> PlayDriver:
@@ -224,7 +176,7 @@ class PlayDriver(Logging):
         :param height: the height in pixels to set the window to
         :return: self
         """
-        self.driver.set_viewport_size({'width': width, 'height': height})
+        self.page.set_viewport_size({'width': width, 'height': height})
         return self
 
     def get_screenshot(self) -> bytes:
@@ -233,7 +185,7 @@ class PlayDriver(Logging):
 
         :return: screenshot binary
         """
-        return self.driver.screenshot()
+        return self.page.screenshot()
 
     def get_all_tabs(self) -> List[Page]:
         """
@@ -241,7 +193,7 @@ class PlayDriver(Logging):
 
         :return: list of tabs
         """
-        return self.driver_context.pages
+        return self.context.pages
 
     def create_new_tab(self) -> PlayDriver:
         """
@@ -249,10 +201,10 @@ class PlayDriver(Logging):
 
         :return: self
         """
-        with self.driver_context.expect_page() as new_page:
+        with self.context.expect_page() as new_page:
             self.execute_script("window.open(arguments[0], '_blank').focus();", self.current_url)
 
-        self.driver = new_page.value
+        self.page = new_page.value
         return self
 
     def switch_to_original_tab(self) -> PlayDriver:
@@ -261,8 +213,8 @@ class PlayDriver(Logging):
 
         :return: self
         """
-        self.driver = self.original_tab
-        self.driver.bring_to_front()
+        self.page = self.original_tab
+        self.page.bring_to_front()
         return self
 
     def switch_to_tab(self, tab: int = -1) -> PlayDriver:
@@ -277,8 +229,8 @@ class PlayDriver(Logging):
         else:
             tab = self.get_all_tabs()[tab - 1]
 
-        self.driver = tab
-        self.driver.bring_to_front()
+        self.page = tab
+        self.page.bring_to_front()
         return self
 
     def close_unused_tabs(self) -> PlayDriver:
@@ -307,5 +259,5 @@ class PlayDriver(Logging):
         if not silent:
             self.log(f'Click by given coordinates (x: {x}, y: {y})')
 
-        self.driver.mouse.click(x=x, y=y)
+        self.page.mouse.click(x=x, y=y)
         return self

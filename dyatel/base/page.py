@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Union, Any, List, Type
 
-from playwright.sync_api import Page as PlaywrightDriver
+from playwright.sync_api import Browser as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
