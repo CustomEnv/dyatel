@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Any, List, Type
+from typing import Union, Any, List
 
 from playwright.sync_api import Browser as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -64,12 +64,12 @@ class Page(DriverMixin, InternalMixin, Logging, PageAbstraction):
         self.locator = locator
         self.locator_type = locator_type
         self.name = name if name else locator
+        self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
         self.url = getattr(self, 'url', '')
 
         self._element = None
         self._init_locals = locals()
-        self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
         self._modify_object()
         self._modify_children()
         self._safe_setter('__base_obj_id', id(self))

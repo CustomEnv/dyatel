@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from copy import copy
-from typing import Any, Union, List
+from typing import Any, Union, List, Type
 
 from playwright.sync_api import Browser as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -34,6 +34,7 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
     _object = 'element'
+    _base_cls: Type[PlayElement, MobileElement, WebElement]
 
     def __repr__(self):
         return self._repr_builder()
@@ -93,21 +94,18 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
         self.name = name if name else locator
         self.parent = parent
         self.wait = wait
+        self.driver_wrapper = get_driver_wrapper_from_object(self.driver_wrapper)
 
         self._initialized = False
-        # Taking from Group first if available
         self._init_locals = getattr(self, '_init_locals', locals())
-        self._driver_instance = getattr(self, '_driver_instance', DriverWrapperSessions.first_session())
         self._safe_setter('__base_obj_id', id(self))
 
         if self.driver:
-            self.__full_init__(self.driver_wrapper if is_group(self) else None)
+            self.__full_init__(self.driver_wrapper)
 
     def __full_init__(self, driver_wrapper=None):
-        if driver_wrapper:
-            self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
-        else:
-            self._modify_object()
+        self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
+        self._modify_object()
 
         self._modify_children()
 
@@ -120,19 +118,18 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
 
         :return: None
         """
-        base_cls: Any[PlayElement, MobileElement, WebElement]
         if isinstance(self.driver, PlaywrightDriver):
-            base_cls = PlayElement
+            self._base_cls = PlayElement
         elif isinstance(self.driver, AppiumDriver):
-            base_cls = MobileElement
+            self._base_cls = MobileElement
         elif isinstance(self.driver, SeleniumDriver):
-            base_cls = WebElement
+            self._base_cls = WebElement
         else:
             raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')
 
-        self._set_static(base_cls)
-        base_cls.__init__(self, locator=self.locator, locator_type=self.locator_type)
-        self._base_cls, self._initialized = base_cls, True
+        self._set_static(self._base_cls)
+        self._base_cls.__init__(self, locator=self.locator, locator_type=self.locator_type)
+        self._initialized = True
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using internal methods
 

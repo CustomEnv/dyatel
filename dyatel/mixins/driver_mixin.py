@@ -35,6 +35,8 @@ def get_driver_wrapper_from_object(obj: Union[DriverWrapper, Any]):
 
 class DriverMixin:
 
+    _driver_wrapper = None
+
     @property
     def driver(self) -> Union[SeleniumWebDriver, AppiumWebDriver, PlaywrightWebDriver]:
         """
@@ -44,11 +46,6 @@ class DriverMixin:
         """
         return getattr(self.driver_wrapper, 'driver', None)
 
-    @driver.setter
-    def driver(self, driver: Union[SeleniumWebDriver, AppiumWebDriver, PlaywrightWebDriver]):
-        """ Set source driver instance """
-        setattr(self, '_driver_instance', driver)
-
     @property
     def driver_wrapper(self) -> Union[WebDriver, MobileDriver, PlayDriver, DriverWrapper]:
         """
@@ -56,10 +53,9 @@ class DriverMixin:
 
         :return: driver_wrapper
         """
-        driver_instance = getattr(self, '_driver_instance', DriverWrapperSessions.first_session())
-        return driver_instance
+        return self._driver_wrapper
 
     @driver_wrapper.setter
     def driver_wrapper(self, driver_wrapper: Union[WebDriver, MobileDriver, PlayDriver, DriverWrapper]):
         """ Set source driver wrapper instance """
-        setattr(self, '_driver_instance', driver_wrapper)
+        self._driver_wrapper = driver_wrapper
