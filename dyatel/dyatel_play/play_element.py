@@ -4,7 +4,7 @@ import time
 from typing import Union, List, Any
 
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
-from playwright.sync_api import Page as PlaywrightPage, ElementHandle
+from playwright.sync_api import Page as PlaywrightPage
 from playwright.sync_api import Locator
 
 from dyatel.abstraction.element_abs import ElementAbstraction
@@ -47,10 +47,7 @@ class PlayElement(ElementAbstraction, Logging):
         element = self._element
         if not element:
             driver = self._get_base()
-            if isinstance(driver, ElementHandle):
-                element = driver.query_selector(self.locator)
-            else:
-                element = driver.locator(self.locator)
+            element = driver.locator(self.locator)
 
         return element
 
@@ -70,7 +67,7 @@ class PlayElement(ElementAbstraction, Logging):
 
         :return: list of wrapped objects
         """
-        return self._get_all_elements(self.element.element_handles())
+        return self._get_all_elements(self.element.all())
 
     # Element interaction
 
@@ -435,7 +432,7 @@ class PlayElement(ElementAbstraction, Logging):
 
     # Mixin
 
-    def _get_base(self) -> Union[PlaywrightPage, Locator, ElementHandle]:
+    def _get_base(self) -> Union[PlaywrightPage, Locator]:
         """
         Get driver depends on parent element if available
 
@@ -457,4 +454,4 @@ class PlayElement(ElementAbstraction, Logging):
 
         :return: first element
         """
-        return self.element if isinstance(self.element, ElementHandle) else self.element.first
+        return self.element.first

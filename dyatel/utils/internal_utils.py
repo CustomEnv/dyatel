@@ -58,6 +58,10 @@ def is_page(obj: Any) -> bool:
     return getattr(obj, '_object', None) == 'page'
 
 
+def is_driver_wrapper(obj: Any) -> bool:
+    return getattr(obj, '_object', None) == 'driver_wrapper'
+
+
 def initialize_objects(current_object, objects: dict, cls: Any):
     """
     Copy objects and initializing them with driver_wrapper from current object

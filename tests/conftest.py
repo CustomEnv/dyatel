@@ -91,7 +91,7 @@ def driver_func(request, driver_name, platform, chrome_options, firefox_options)
 
     driver_wrapper = DriverWrapper(driver)
 
-    if driver_wrapper.desktop:
+    if driver_wrapper.is_desktop:
         driver_wrapper.set_window_size(1024, 900)
 
     return driver_wrapper

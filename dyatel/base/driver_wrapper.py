@@ -41,16 +41,17 @@ class DriverWrapperSessions:
 class DriverWrapper(InternalMixin, Logging, DriverWrapperAbstraction):
     """ Driver object crossroad """
 
+    _object = 'driver_wrapper'
     _base_cls: Type[PlayDriver, MobileDriver, WebDriver] = None
 
     driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver] = None
     session: DriverWrapperSessions = DriverWrapperSessions
 
-    desktop = False
-    selenium = False
-    playwright = False
+    is_desktop = False
+    is_selenium = False
+    is_playwright = False
 
-    mobile = False
+    is_mobile = False
     is_ios = False
     is_android = False
     is_simulator = False
@@ -76,8 +77,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperAbstraction):
         elif cls.is_ios:
             label = 'ios'
 
-        driver = self.instance if cls.playwright else self.driver
-        return f'{cls.__name__}({self.driver.label}={driver}) at {hex(id(self))}, platform={label}'  # noqa
+        return f'{cls.__name__}({self.label}={self.driver}) at {hex(id(self))}, platform={label}'
 
     def __init__(self, driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver]):
         """
@@ -87,7 +87,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperAbstraction):
         """
         self.__class__.driver = driver
         self.session.add_session(self)
-        self.driver.label = f'{self.session.all_sessions.index(self) + 1}_driver'
+        self.label = f'{self.session.all_sessions.index(self) + 1}_driver'
         self.__init_base_class__()
 
     def quit(self, silent: bool = False):
@@ -121,15 +121,15 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperAbstraction):
         :return: None
         """
         if isinstance(self.driver, PlaywrightDriver):
-            self.playwright = True
-            self.desktop = True
+            self.is_playwright = True
+            self.is_desktop = True
             self._base_cls = PlayDriver
         elif isinstance(self.driver, AppiumDriver):
-            self.mobile = True
+            self.is_mobile = True
             self._base_cls = MobileDriver
         elif isinstance(self.driver, SeleniumDriver):
-            self.desktop = True
-            self.selenium = True
+            self.is_desktop = True
+            self.is_selenium = True
             self._base_cls = WebDriver
         else:
             raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')

@@ -14,8 +14,11 @@ def skip_platform(item: pytest.Item, platform: str):
     :return: None
     """
     skip_platform_marker = item.get_closest_marker('skip_platform')
-    skip_platform_kwargs = getattr(skip_platform_marker, 'kwargs', {})
+    xfail_platform_marker = item.get_closest_marker('xfail_platform')
 
-    if platform in str(getattr(skip_platform_marker, 'args', [])):
-        skip_message = f"Skip platform {platform}. Reason={skip_platform_kwargs.get('reason')}"
+    except_marker = skip_platform_marker or xfail_platform_marker
+
+    if platform in str(getattr(except_marker, 'args', [])):
+        kwargs = getattr(except_marker, 'kwargs', {})
+        skip_message = f"Skip platform {platform}. Reason={kwargs.get('reason')}"
         item.add_marker(pytest.mark.skip(skip_message))

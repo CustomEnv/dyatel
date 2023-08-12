@@ -18,9 +18,11 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
 
         :param driver: playwright driver to initialize
         """
+        self.instance = driver
         self.context = driver.new_context()
-        self.page = self.context.new_page()
-        self.original_tab = self.page
+        self.driver = self.context.new_page()
+        self.original_tab = self.driver
+        self.driver.label = getattr(self.instance, 'label', '')
 
     def get(self, url: str, silent: bool = False) -> PlayDriver:
         """
@@ -33,7 +35,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
         if not silent:
             self.log(f'Navigating to url {url}')
 
-        self.page.goto(url)
+        self.driver.goto(url)
         return self
 
     def is_driver_opened(self) -> bool:
@@ -42,7 +44,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
 
         :return: True if driver opened
         """
-        return self.driver.is_connected()
+        return self.instance.is_connected()
 
     def is_driver_closed(self) -> bool:
         """
@@ -50,7 +52,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
 
         :return: True if driver closed
         """
-        return not self.driver.is_connected()
+        return not self.instance.is_connected()
 
     @property
     def current_url(self) -> str:
@@ -59,7 +61,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
 
         :return: url
         """
-        return self.page.url
+        return self.driver.url
 
     def refresh(self) -> PlayDriver:
         """
@@ -68,7 +70,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
         :return: self
         """
         self.log('Reload current page')
-        self.page.reload()
+        self.driver.reload()
         return self
 
     def go_forward(self) -> PlayDriver:
@@ -78,7 +80,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
         :return: self
         """
         self.log('Going forward')
-        self.page.go_forward()
+        self.driver.go_forward()
         return self
 
     def go_back(self) -> PlayDriver:
@@ -88,7 +90,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
         :return: self
         """
         self.log('Going back')
-        self.page.go_back()
+        self.driver.go_back()
         return self
 
     def quit(self, *args) -> None:
@@ -97,7 +99,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
 
         :return: None
         """
-        self.page.close()
+        self.driver.close()
 
     def set_cookie(self, cookies: List[dict]) -> PlayDriver:
         """
@@ -156,7 +158,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
             if isinstance(arg, Locator):
                 script_args[index] = arg.element_handle()
 
-        return self.page.evaluate(script, script_args)
+        return self.driver.evaluate(script, script_args)
 
     def set_page_load_timeout(self, timeout: int = 30) -> PlayDriver:
         """
@@ -165,7 +167,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
         :param timeout: timeout to set in seconds
         :return: self
         """
-        self.page.set_default_navigation_timeout(get_timeout_in_ms(timeout))
+        self.driver.set_default_navigation_timeout(get_timeout_in_ms(timeout))
         return self
 
     def set_window_size(self, width: int, height: int) -> PlayDriver:
@@ -176,7 +178,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
         :param height: the height in pixels to set the window to
         :return: self
         """
-        self.page.set_viewport_size({'width': width, 'height': height})
+        self.driver.set_viewport_size({'width': width, 'height': height})
         return self
 
     def get_screenshot(self) -> bytes:
@@ -185,7 +187,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
 
         :return: screenshot binary
         """
-        return self.page.screenshot()
+        return self.driver.screenshot()
 
     def get_all_tabs(self) -> List[Page]:
         """
@@ -204,7 +206,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
         with self.context.expect_page() as new_page:
             self.execute_script("window.open(arguments[0], '_blank').focus();", self.current_url)
 
-        self.page = new_page.value
+        self.driver = new_page.value
         return self
 
     def switch_to_original_tab(self) -> PlayDriver:
@@ -213,8 +215,8 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
 
         :return: self
         """
-        self.page = self.original_tab
-        self.page.bring_to_front()
+        self.driver = self.original_tab
+        self.driver.bring_to_front()
         return self
 
     def switch_to_tab(self, tab: int = -1) -> PlayDriver:
@@ -229,8 +231,8 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
         else:
             tab = self.get_all_tabs()[tab - 1]
 
-        self.page = tab
-        self.page.bring_to_front()
+        self.driver = tab
+        self.driver.bring_to_front()
         return self
 
     def close_unused_tabs(self) -> PlayDriver:
@@ -259,5 +261,5 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
         if not silent:
             self.log(f'Click by given coordinates (x: {x}, y: {y})')
 
-        self.page.mouse.click(x=x, y=y)
+        self.driver.mouse.click(x=x, y=y)
         return self

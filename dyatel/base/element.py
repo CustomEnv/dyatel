@@ -4,13 +4,12 @@ import time
 from copy import copy
 from typing import Any, Union, List, Type
 
-from playwright.sync_api import Browser as PlaywrightDriver
+from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
 from dyatel.abstraction.element_abs import ElementAbstraction
 from dyatel.exceptions import *
-from dyatel.base.driver_wrapper import DriverWrapperSessions
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
@@ -24,7 +23,6 @@ from dyatel.utils.internal_utils import (
     is_target_on_screen,
     initialize_objects,
     get_child_elements_with_names,
-    is_group,
     safe_getattribute,
     set_parent_for_attr,
 )
@@ -155,7 +153,7 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
         :param action: keyboard action
         :return: self
         """
-        if self.driver_wrapper.playwright:
+        if self.driver_wrapper.is_playwright:
             self.click()
             self.driver.keyboard.press(action)
         else:

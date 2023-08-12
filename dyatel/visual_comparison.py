@@ -237,7 +237,7 @@ class VisualComparison:
         else:
             test_function_name = test_function_name.replace('[', '_')  # required here for better separation
 
-        if self.driver_wrapper.mobile:
+        if self.driver_wrapper.is_mobile:
             caps = self.driver_wrapper.driver.caps
 
             device_name = caps.get('customDeviceName', '')
@@ -250,11 +250,11 @@ class VisualComparison:
             browser_name = caps['browserName']
             platform_version = caps['platformVersion']
             screenshot_name = f'{device_name}_v_{platform_version}_appium_{browser_name}'
-        elif self.driver_wrapper.selenium:
+        elif self.driver_wrapper.is_selenium:
             caps = self.driver_wrapper.driver.caps
             platform_name, browser_name = caps["platformName"], caps['browserName']
             screenshot_name = f'{platform_name}_selenium_{browser_name}'
-        elif self.driver_wrapper.playwright:
+        elif self.driver_wrapper.is_playwright:
             caps = self.driver_wrapper.driver
             screenshot_name = f'playwright_{caps.browser_type.name}'
         else:

@@ -69,7 +69,7 @@ class InternalMixin:
             locator_type = f'locator_type="{locator_holder.locator_type}"'
             name = f'name="{self.name}"'
             parent = f'parent={parent_class}'
-            driver = f'{self.driver.label}={self.driver}'
+            driver = f'{self.driver_wrapper.label}={self.driver}'
 
             base = f'{class_name}({locator}, {locator_type}, {name}, {parent}) at {obj_id}'
             additional_info = driver

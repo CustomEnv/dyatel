@@ -520,7 +520,7 @@ class CoreElement(ElementAbstraction, Logging):
         if not base:
             raise DriverWrapperException("Can't find driver")
 
-        if self.driver_wrapper.mobile:
+        if self.driver_wrapper.is_mobile:
             if self.driver_wrapper.is_native_context:
                 return base
 

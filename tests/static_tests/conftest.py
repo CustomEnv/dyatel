@@ -68,12 +68,12 @@ def mocked_play_driver():
 def base_teardown():
     yield
     DriverWrapper.is_multiplatform = False
-    DriverWrapper.mobile = False
-    DriverWrapper.desktop = False
+    DriverWrapper.is_mobile = False
+    DriverWrapper.is_desktop = False
     DriverWrapper.is_ios = False
     DriverWrapper.is_android = False
-    DriverWrapper.selenium = False
-    DriverWrapper.playwright = False
+    DriverWrapper.is_selenium = False
+    DriverWrapper.is_playwright = False
     PlayDriver.driver = None
     CoreDriver.driver = None
     DriverWrapperSessions.all_sessions = []

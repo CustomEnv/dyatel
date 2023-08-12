@@ -6,8 +6,7 @@ from functools import lru_cache
 from os.path import basename
 from typing import Any
 
-from dyatel.utils.internal_utils import get_frame
-
+from dyatel.utils.internal_utils import get_frame, is_driver_wrapper
 
 logger = logging.getLogger('dyatel')
 
@@ -44,7 +43,7 @@ def autolog(message: Any, level: str = 'info') -> None:
 
 class Logging:
 
-    def log(self, message: str, level: str = 'info') -> None:
+    def log(self: Any, message: str, level: str = 'info') -> None:
         """
         Log message in format:
           ~ [time][level][driver_index][module][function:line] <message>
@@ -54,7 +53,12 @@ class Logging:
         :param level: log level
         :return: None
         """
-        _send_log_message(f'[{self.driver.label}]{self._get_code_info()} {message}', level)  # noqa
+        if is_driver_wrapper(self):
+            label = self.label
+        else:
+            label = self.driver_wrapper.label
+
+        _send_log_message(f'[{label}]{self._get_code_info()} {message}', level)
         return None
 
     def _get_code_info(self) -> str:

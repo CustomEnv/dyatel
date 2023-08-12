@@ -82,7 +82,7 @@ class PlaywrightKeys:
 class Interceptor(type):
 
     def __getattribute__(self, item):
-        if DriverWrapper.selenium:
+        if DriverWrapper.is_selenium:
             return getattr(SeleniumKeys, item)
         else:
             return getattr(PlaywrightKeys, item, NotImplementedError('Key is not added to dyatel framework'))

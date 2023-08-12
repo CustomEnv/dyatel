@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Union, Any, List
+from typing import Union, Any, List, Type
 
-from playwright.sync_api import Browser as PlaywrightDriver
+from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
@@ -30,6 +30,7 @@ class Page(DriverMixin, InternalMixin, Logging, PageAbstraction):
     """ Page object crossroad. Should be defined as class """
 
     _object = 'page'
+    _base_cls: Type[PlayPage, MobilePage, WebPage]
 
     def __repr__(self):
         return self._repr_builder()
@@ -85,16 +86,16 @@ class Page(DriverMixin, InternalMixin, Logging, PageAbstraction):
         :return: None
         """
         if isinstance(self.driver, PlaywrightDriver):
-            cls = PlayPage
+            self._base_cls = PlayPage
         elif isinstance(self.driver, AppiumDriver):
-            cls = MobilePage
+            self._base_cls = MobilePage
         elif isinstance(self.driver, SeleniumDriver):
-            cls = WebPage
+            self._base_cls = WebPage
         else:
             raise DriverWrapperException(f'Cant specify {Page.__name__}')
 
-        self._set_static(cls)
-        cls.__init__(self)
+        self._set_static(self._base_cls)
+        self._base_cls.__init__(self)
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using internal methods
 
