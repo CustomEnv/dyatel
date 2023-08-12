@@ -46,7 +46,7 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
     def __getattribute__(self, item):
         if 'element' in item and not safe_getattribute(self, '_initialized'):
             raise NotInitializedException(
-                f'The element is not initialized for {self.__class__.__name__} '
+                f'{repr(self)} object is not initialized. '
                 'Try to initialize base object first or call it directly as a method'
             )
 

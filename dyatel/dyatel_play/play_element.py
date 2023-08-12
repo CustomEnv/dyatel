@@ -7,6 +7,7 @@ from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
 from playwright.sync_api import Page as PlaywrightPage
 from playwright.sync_api import Locator
 
+from dyatel.utils.selector_synchronizer import get_platform_locator, get_playwright_locator
 from dyatel.abstraction.element_abs import ElementAbstraction
 from dyatel.exceptions import TimeoutException
 from dyatel.utils.logs import Logging
@@ -18,7 +19,6 @@ from dyatel.utils.internal_utils import (
     is_group,
     is_element,
 )
-from dyatel.utils.selector_synchronizer import get_platform_locator, get_playwright_locator
 
 
 class PlayElement(ElementAbstraction, Logging):

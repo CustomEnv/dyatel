@@ -255,7 +255,7 @@ class VisualComparison:
             platform_name, browser_name = caps["platformName"], caps['browserName']
             screenshot_name = f'{platform_name}_selenium_{browser_name}'
         elif self.driver_wrapper.is_playwright:
-            caps = self.driver_wrapper.driver
+            caps = self.driver_wrapper.instance
             screenshot_name = f'playwright_{caps.browser_type.name}'
         else:
             raise DriverWrapperException('Cant find current platform')

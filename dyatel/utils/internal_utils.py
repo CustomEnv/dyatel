@@ -50,6 +50,10 @@ def is_element(obj: Any) -> bool:
     return getattr(obj, '_object', None) == 'element'
 
 
+def is_element_instance(obj: Any) -> bool:
+    return getattr(obj, '_object', None) in ('element', 'group')
+
+
 def is_group(obj: Any) -> bool:
     return getattr(obj, '_object', None) == 'group'
 
@@ -119,7 +123,7 @@ def promote_parent_element(obj: Any, base_obj: Any, cls: Any):
     if not initial_parent:
         return None
 
-    if is_element(initial_parent) and initial_parent != base_obj:
+    if is_element_instance(initial_parent) and initial_parent != base_obj:
         for el in get_child_elements(base_obj, cls):
             if obj.parent.__base_obj_id == el.__base_obj_id:
                 obj.parent = el
