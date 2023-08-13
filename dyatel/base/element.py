@@ -323,17 +323,21 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
 
         return self._base_cls.all_elements.fget(self)
 
-    def is_visible(self, silent: bool = False) -> bool:
+    def is_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
         Check is current element top left corner or bottom right corner visible on current screen
 
         :param silent: erase log
+        :param check_displaying: trigger is_displayed additionally
         :return: bool
         """
         if not silent:
             self.log(f'Check visibility of "{self.name}"')
 
-        is_visible = self.is_displayed()
+        is_visible = True
+
+        if check_displaying:
+            is_visible = self.is_displayed()
 
         if is_visible:
             rect, window_size = self.get_rect(), self.driver_wrapper.get_inner_window_size()
@@ -344,17 +348,21 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
 
         return is_visible
 
-    def is_fully_visible(self, silent: bool = False) -> bool:
+    def is_fully_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
         Check is current element top left corner and bottom right corner visible on current screen
 
         :param silent: erase log
+        :param check_displaying: trigger is_displayed additionally
         :return: bool
         """
         if not silent:
             self.log(f'Check fully visibility of "{self.name}"')
 
-        is_visible = self.is_displayed()
+        is_visible = True
+
+        if check_displaying:
+            is_visible = self.is_displayed()
 
         if is_visible:
             rect, window_size = self.get_rect(), self.driver_wrapper.get_inner_window_size()

@@ -29,7 +29,7 @@ def pytest_addoption(parser):
     parser.addoption('--gr', action='store_true', help='Generate reference images in visual tests')
     parser.addoption('--sv', action='store_true', help='Generate reference images in visual tests')
     parser.addoption('--hgr', action='store_true', help='Hard generate reference images in visual tests')
-    parser.addoption('--appium-port', default='1000')
+    parser.addoption('--appium-port', default='1111')
     parser.addoption('--appium-ip', default='0.0.0.0')
 
 

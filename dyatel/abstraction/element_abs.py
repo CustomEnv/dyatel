@@ -417,20 +417,22 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def is_visible(self, silent: bool = False) -> bool:
+    def is_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
         Check is current element top left corner or bottom right corner visible on current screen
 
         :param silent: erase log
+        :param check_displaying: trigger is_displayed additionally
         :return: bool
         """
         raise NotImplementedError()
 
-    def is_fully_visible(self, silent: bool = False) -> bool:
+    def is_fully_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
         Check is current element top left corner and bottom right corner visible on current screen
 
         :param silent: erase log
+        :param check_displaying: trigger is_displayed additionally
         :return: bool
         """
         raise NotImplementedError()

@@ -135,7 +135,7 @@ class MobileElement(CoreElement):
 
             image_binary.save(filename)
         else:
-            image_binary = super().get_screenshot(filename)
+            image_binary = CoreElement.get_screenshot(self, filename)
 
         return image_binary
 

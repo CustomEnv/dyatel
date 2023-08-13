@@ -258,6 +258,6 @@ class MobileDriver(CoreDriver):
         if self.is_ios:
             TouchAction(self.driver).tap(x=x, y=y).perform()
         elif self.is_android:
-            super().click_by_coordinates(x=x, y=y, silent=True)
+            CoreDriver.click_by_coordinates(self, x=x, y=y, silent=True)
 
         return self

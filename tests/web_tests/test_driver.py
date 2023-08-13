@@ -92,7 +92,7 @@ def test_second_driver_compatibility(driver_wrapper, second_driver_wrapper):
     assert second_driver_wrapper.get_inner_window_size()
 
 
-@pytest.mark.skip_platform('appium', reason='Appium doesnt support tabs creating')
+@pytest.mark.skip_platform('android', 'ios', reason='Appium doesnt support tabs creating')
 def test_driver_tabs(driver_wrapper, second_playground_page):
     driver_wrapper.create_new_tab()
     driver_wrapper.switch_to_original_tab()
