@@ -54,6 +54,7 @@ def mocked_selenium_driver():
     selenium_driver.command_executor = MagicMock()
     selenium_driver.error_handler = MagicMock()
 
+    selenium_driver.caps = {}
     driver_wrapper = DriverWrapper(selenium_driver())
     return driver_wrapper
 

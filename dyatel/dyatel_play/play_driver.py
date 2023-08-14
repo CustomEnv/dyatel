@@ -22,7 +22,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
         self.context = driver.new_context()
         self.driver = self.context.new_page()
         self.original_tab = self.driver
-        self.driver.label = getattr(self.instance, 'label', '')
+        self.browser_name = self.instance.browser_type.name
 
     def get(self, url: str, silent: bool = False) -> PlayDriver:
         """

@@ -9,10 +9,10 @@ from dyatel.utils.internal_utils import WAIT_EL
 
 class DriverWrapperAbstraction:
 
-    driver = None
     context = None
     page = None
     original_tab = None
+    browser_name = None
 
     def quit(self, silent: bool = False):
         """

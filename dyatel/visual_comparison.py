@@ -247,16 +247,13 @@ class VisualComparison:
             elif self.driver_wrapper.is_ios and not device_name:
                 device_name = caps['deviceName']
 
-            browser_name = caps['browserName']
             platform_version = caps['platformVersion']
-            screenshot_name = f'{device_name}_v_{platform_version}_appium_{browser_name}'
+            screenshot_name = f'{device_name}_v_{platform_version}_appium_{self.driver_wrapper.browser_name}'
         elif self.driver_wrapper.is_selenium:
-            caps = self.driver_wrapper.driver.caps
-            platform_name, browser_name = caps["platformName"], caps['browserName']
-            screenshot_name = f'{platform_name}_selenium_{browser_name}'
+            platform_name = self.driver_wrapper.driver.caps["platformName"]
+            screenshot_name = f'{platform_name}_selenium_{self.driver_wrapper.browser_name}'
         elif self.driver_wrapper.is_playwright:
-            caps = self.driver_wrapper.instance
-            screenshot_name = f'playwright_{caps.browser_type.name}'
+            screenshot_name = f'playwright_{self.driver_wrapper.browser_name}'
         else:
             raise DriverWrapperException('Cant find current platform')
 

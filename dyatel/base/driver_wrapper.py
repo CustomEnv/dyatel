@@ -37,6 +37,10 @@ class DriverWrapperSessions:
     def first_session(cls):
         return cls.all_sessions[0] if cls.all_sessions else None
 
+    @classmethod
+    def is_connected(cls):
+        return any(cls.all_sessions)
+
 
 class DriverWrapper(InternalMixin, Logging, DriverWrapperAbstraction):
     """ Driver object crossroad """
@@ -44,7 +48,6 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperAbstraction):
     _object = 'driver_wrapper'
     _base_cls: Type[PlayDriver, MobileDriver, WebDriver] = None
 
-    driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver] = None
     session: DriverWrapperSessions = DriverWrapperSessions
 
     is_desktop = False
@@ -56,6 +59,8 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperAbstraction):
     is_android = False
     is_simulator = False
     is_real_device = False
+
+    browser_name = None
 
     def __new__(cls, *args, **kwargs):
         if cls.session.sessions_count() == 0:
@@ -85,7 +90,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperAbstraction):
 
         :param driver: appium or selenium or playwright driver to initialize
         """
-        self.__class__.driver = driver
+        self.driver = driver
         self.session.add_session(self)
         self.label = f'{self.session.all_sessions.index(self) + 1}_driver'
         self.__init_base_class__()

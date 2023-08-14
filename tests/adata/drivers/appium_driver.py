@@ -1,6 +1,6 @@
 from appium.webdriver.webdriver import WebDriver as SourceAppiumDriver
 
-from dyatel.base.driver_wrapper import DriverWrapper
+from dyatel.base.driver_wrapper import DriverWrapperSessions
 from tests.adata.drivers.driver_entities import DriverEntities
 from tests.adata.drivers.selenium_driver import SeleniumDriver
 from tests.settings import android_desired_caps, ios_desired_caps
@@ -21,7 +21,7 @@ class AppiumDriver:
         if is_android:
             caps.update({'chromedriverArgs': ['--hide-scrollbars']})
 
-        if DriverWrapper.driver:
+        if DriverWrapperSessions.is_connected():
             return SeleniumDriver.create_selenium_driver(entities)
 
         return SourceAppiumDriver(command_executor=command_exc, desired_capabilities=caps)
