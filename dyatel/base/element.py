@@ -9,6 +9,7 @@ from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
 from dyatel.abstraction.element_abs import ElementAbstraction
+from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.exceptions import *
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
@@ -25,6 +26,7 @@ from dyatel.utils.internal_utils import (
     get_child_elements_with_names,
     safe_getattribute,
     set_parent_for_attr,
+    is_page,
 )
 
 
@@ -37,10 +39,8 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
     def __repr__(self):
         return self._repr_builder()
 
-    def __call__(self, driver_wrapper=None):
-        if self.driver or driver_wrapper:
-            self.__full_init__(driver_wrapper=driver_wrapper)
-
+    def __call__(self, driver_wrapper: DriverWrapper = None):
+        self.__full_init__(driver_wrapper=driver_wrapper)
         return self
 
     def __getattribute__(self, item):
@@ -453,11 +453,10 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
             prev_object_manager.set_parent_from_previous_object_for_element(self, 6)
 
     def _validate_inheritance(self):
-        from dyatel.base.page import Page
-
         cls = self.__class__
         mro = cls.__mro__
 
-        if Page in mro:
-            raise TypeError(
-                f"You cannot make an inheritance for {cls.__name__} from both Element/Group and Page objects")
+        for item in mro:
+            if is_page(item):
+                raise TypeError(
+                    f"You cannot make an inheritance for {cls.__name__} from both Element/Group and Page objects")

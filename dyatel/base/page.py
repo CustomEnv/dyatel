@@ -9,7 +9,6 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 from dyatel.abstraction.page_abs import PageAbstraction
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
-from dyatel.base.group import Group
 from dyatel.dyatel_play.play_page import PlayPage
 from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
@@ -23,6 +22,7 @@ from dyatel.utils.internal_utils import (
     initialize_objects,
     get_child_elements_with_names,
     get_child_elements,
+    is_element_instance,
 )
 
 
@@ -198,6 +198,7 @@ class Page(DriverMixin, InternalMixin, Logging, PageAbstraction):
         cls = self.__class__
         mro = cls.__mro__
 
-        if Element in mro or Group in mro:
-            raise TypeError(
-                f"You cannot make an inheritance for {cls.__name__} from both Page and Group/Element objects")
+        for item in mro:
+            if is_element_instance(item):
+                raise TypeError(
+                    f"You cannot make an inheritance for {cls.__name__} from both Page and Group/Element objects")
