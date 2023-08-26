@@ -8,11 +8,22 @@ from dyatel.utils.internal_utils import WAIT_EL
 
 
 class DriverWrapperAbstraction:
-
-    context = None
-    page = None
+    session = None
+    label = None
     original_tab = None
+
+    driver = None
     browser_name = None
+
+    is_desktop = False
+    is_selenium = False
+    is_playwright = False
+
+    is_mobile = False
+    is_ios = False
+    is_android = False
+    is_simulator = False
+    is_real_device = False
 
     def quit(self, silent: bool = False):
         """
@@ -56,6 +67,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
+    @property
     def current_url(self) -> str:
         """
         Get current page url
@@ -107,7 +119,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def delete_cookie(self, name) -> DriverWrapperAbstraction:
+    def delete_cookie(self, name: str) -> DriverWrapperAbstraction:
         """
         Appium/Selenium only: Delete cookie by name
 

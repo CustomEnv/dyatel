@@ -18,7 +18,6 @@ from dyatel.utils.logs import Logging
 
 
 class DriverWrapperSessions:
-
     all_sessions: List[DriverWrapper] = []
 
     @classmethod

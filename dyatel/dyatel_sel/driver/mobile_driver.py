@@ -212,7 +212,8 @@ class MobileDriver(CoreDriver):
 
             try:
                 self.switch_to_native()
-                top_bar = Element('//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther')
+                top_bar = Element('//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther'
+                                  '/XCUIElementTypeOther')
                 self.top_bar_height = top_bar.element.size['height']
             finally:
                 self.switch_to_web()

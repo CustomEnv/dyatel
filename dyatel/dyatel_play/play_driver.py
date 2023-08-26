@@ -93,7 +93,7 @@ class PlayDriver(Logging, DriverWrapperAbstraction):
         self.driver.go_back()
         return self
 
-    def quit(self, *args) -> None:
+    def quit(self) -> None:
         """
         Quit the driver instance
 

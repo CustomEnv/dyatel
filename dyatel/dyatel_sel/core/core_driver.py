@@ -99,7 +99,7 @@ class CoreDriver(Logging, DriverWrapperAbstraction):
         self.driver.back()
         return self
 
-    def quit(self, *args) -> None:
+    def quit(self) -> None:
         """
         Quit the driver instance
 

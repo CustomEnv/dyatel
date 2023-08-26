@@ -8,6 +8,7 @@ from dyatel.utils.selector_synchronizer import get_platform_locator, get_seleniu
 
 
 class WebElement(CoreElement):
+
     def __init__(self, locator: str, locator_type: str):
         """
         Initializing of web element with selenium driver

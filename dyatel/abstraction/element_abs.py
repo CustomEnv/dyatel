@@ -13,7 +13,6 @@ from dyatel.utils.internal_utils import WAIT_EL
 
 
 class ElementAbstraction(MixinABS):
-
     _element = None
     __element = None
 
@@ -456,15 +455,15 @@ class ElementAbstraction(MixinABS):
         raise NotImplementedError()
 
     def assert_screenshot(
-        self,
-        filename: str = '',
-        test_name: str = '',
-        name_suffix: str = '',
-        threshold: Union[int, float] = None,
-        delay: Union[int, float] = None,
-        scroll: bool = False,
-        remove: Union[Any, List[Any]] = None,
-        fill_background: Union[str, bool] = False
+            self,
+            filename: str = '',
+            test_name: str = '',
+            name_suffix: str = '',
+            threshold: Union[int, float] = None,
+            delay: Union[int, float] = None,
+            scroll: bool = False,
+            remove: Union[Any, List[Any]] = None,
+            fill_background: Union[str, bool] = False
     ) -> None:
         """
         Assert given (by name) and taken screenshot equals
