@@ -102,24 +102,26 @@ def test_mobile_and_desktop_group_repr(driver, request):
 def test_mobile_and_desktop_page_repr(driver, request):
     mobile_driver = request.getfixturevalue(driver)
     desktop_driver = request.getfixturevalue('mocked_selenium_driver')
-    mobile_page = Page('repr-page', driver_wrapper=mobile_driver)
-    desktop_page = Page('repr-page', driver_wrapper=desktop_driver)
+    mobile_locator = 'repr-page-mobile'
+    desktop_locator = 'repr-page-desktop'
+    mobile_page = Page(mobile_locator, driver_wrapper=mobile_driver)
+    desktop_page = Page(desktop_locator, driver_wrapper=desktop_driver)
     mobile_info = repr(mobile_page)
     desktop_info = repr(desktop_page)
 
     assert 'Page' in mobile_info
-    assert 'locator="[id="repr-page"]"' in mobile_info
+    assert f'locator="[id="{mobile_locator}"]"' in mobile_info
     assert 'locator_type="css selector"' in mobile_info
-    assert 'name="repr-page"' in mobile_info
+    assert f'name="{mobile_locator}"' in mobile_info
     assert 'parent=None' in mobile_info
     assert 'at 0x' in mobile_info
     assert '1_driver' in mobile_info
     assert 'appium.webdriver.webdriver.WebDriver' in mobile_info
 
     assert 'Page' in desktop_info
-    assert 'locator="repr-page"' in desktop_info
+    assert f'locator="{desktop_locator}"' in desktop_info
     assert 'locator_type="id"' in desktop_info
-    assert 'name="repr-page"' in desktop_info
+    assert f'name="{desktop_locator}"' in desktop_info
     assert 'parent=None' in desktop_info
     assert 'at 0x' in desktop_info
     assert '2_driver' in desktop_info

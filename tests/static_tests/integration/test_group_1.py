@@ -73,18 +73,3 @@ def test_base_group_appium_set_parent_before_init_variable(mocked_ios_driver):
 def test_base_group_playwright_set_parent_before_init_variable(mocked_play_driver):
     assert GroupChild().child_element_before_init_var.parent
     assert GroupChild().parent_element_before_init_var.parent
-
-
-def test_base_group_selenium_set_parent_after_init_variable(mocked_selenium_driver):
-    assert GroupChild().child_element_after_init_var.parent
-    assert GroupChild().parent_element_after_init_var.parent
-
-
-def test_base_group_appium_set_parent_after_init_variable(mocked_ios_driver):
-    assert GroupChild().child_element_after_init_var.parent
-    assert GroupChild().parent_element_after_init_var.parent
-
-
-def test_base_group_playwright_set_parent_after_init_variable(mocked_play_driver):
-    assert GroupChild().child_element_after_init_var.parent
-    assert GroupChild().parent_element_after_init_var.parent

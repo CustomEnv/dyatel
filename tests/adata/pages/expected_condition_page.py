@@ -35,7 +35,7 @@ class ExpectedConditionPage(Page):
 
 class WaitValueCard(Group):
     def __init__(self):
-        super().__init__('//*[contains(@class, "card") and contains(., "Wait for text")]', name='value card')
+        super().__init__('//*[contains(@class, "card") and contains(., "Wait for text")]', name='value card group')
 
     wait_for_text_button = Element('wait_for_text', name='wait for text button')
     wait_for_value_input = Element('wait_for_value', name='wait for value input')

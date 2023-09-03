@@ -16,7 +16,7 @@ from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
 from dyatel.mixins.internal_mixin import InternalMixin
 from dyatel.utils.logs import Logging
-from dyatel.utils.previous_object_driver import PreviousObjectDriver
+from dyatel.utils.previous_object_driver import PreviousObjectDriver, set_instance_frame
 from dyatel.utils.internal_utils import (
     WAIT_PAGE,
     initialize_objects,
@@ -31,6 +31,11 @@ class Page(DriverMixin, InternalMixin, Logging, PageAbstraction):
 
     _object = 'page'
     _base_cls: Type[PlayPage, MobilePage, WebPage]
+
+    def __new__(cls, *args, **kwargs):
+        instance = super(Page, cls).__new__(cls)
+        set_instance_frame(instance)
+        return instance
 
     def __repr__(self):
         return self._repr_builder()
@@ -62,16 +67,17 @@ class Page(DriverMixin, InternalMixin, Logging, PageAbstraction):
         self._validate_inheritance()
         self._check_kwargs(kwargs)
 
-        self.locator = locator
-        self.locator_type = locator_type
-        self.name = name if name else locator
         self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
+        
+        self.anchor = Element(locator=locator, locator_type=locator_type, name=name, driver_wrapper=self.driver_wrapper)
+        self.locator = self.anchor.locator
+        self.locator_type = self.anchor.locator_type
+        self.name = self.anchor.name
 
         self.url = getattr(self, 'url', '')
 
-        self._element = None
         self._init_locals = locals()
-        self._modify_object()
+        self._modify_page_driver_wrapper(driver_wrapper)
         self._modify_children()
         self._safe_setter('__base_obj_id', id(self))
 
@@ -170,16 +176,6 @@ class Page(DriverMixin, InternalMixin, Logging, PageAbstraction):
 
         return result
 
-    @property
-    def anchor(self) -> Element:
-        """
-        Get anchor element of the page
-
-        :return: Element object
-        """
-        anchor = Element(locator=self.locator, locator_type=self.locator_type, name=self.name)
-        return anchor
-
     def _modify_children(self):
         """
         Initializing of attributes with type == Element.
@@ -187,12 +183,13 @@ class Page(DriverMixin, InternalMixin, Logging, PageAbstraction):
         """
         initialize_objects(self, get_child_elements_with_names(self, Element), Element)
 
-    def _modify_object(self):
+    def _modify_page_driver_wrapper(self, driver_wrapper: Any):
         """
-        Modify current object. Required for Page that placed into functions:
-        - set driver from previous object if previous driver different.
+        Modify current object if driver_wrapper is not given. Required for Page that placed into functions:
+        - sets driver from previous object
         """
-        PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 5)
+        if not driver_wrapper:
+            PreviousObjectDriver().set_driver_from_previous_object(self)
 
     def _validate_inheritance(self):
         cls = self.__class__

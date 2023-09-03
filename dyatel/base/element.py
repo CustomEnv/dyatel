@@ -16,7 +16,7 @@ from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
 from dyatel.mixins.internal_mixin import InternalMixin, get_element_info, all_locator_types
-from dyatel.utils.previous_object_driver import PreviousObjectDriver
+from dyatel.utils.previous_object_driver import PreviousObjectDriver, set_instance_frame
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.utils.internal_utils import (
@@ -35,6 +35,11 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
 
     _object = 'element'
     _base_cls: Type[PlayElement, MobileElement, WebElement]
+
+    def __new__(cls, *args, **kwargs):
+        instance = super(Element, cls).__new__(cls)
+        set_instance_frame(instance)
+        return instance
 
     def __repr__(self):
         return self._repr_builder()
@@ -59,6 +64,7 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
             name: str = '',
             parent: Union[Any, False] = None,
             wait: bool = None,
+            driver_wrapper: Union[DriverWrapper, Any] = None,
             **kwargs
     ):
         """
@@ -92,22 +98,24 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
         self.name = name if name else locator
         self.parent = parent
         self.wait = wait
-        self.driver_wrapper = get_driver_wrapper_from_object(self.driver_wrapper)
+        self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
-        self._initialized = False
         self._init_locals = getattr(self, '_init_locals', locals())
         self._safe_setter('__base_obj_id', id(self))
+        self._initialized = False
 
-        if self.driver:
-            self.__full_init__(self.driver_wrapper)
+        if self.driver_wrapper:
+            self.__full_init__(driver_wrapper)
 
-    def __full_init__(self, driver_wrapper=None):
-        self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
-        self._modify_object()
+    def __full_init__(self, driver_wrapper: Any = None):
+        self._driver_wrapper_given = bool(driver_wrapper)
 
-        self._modify_children()
+        if self._driver_wrapper_given:
+            self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
         if not self._initialized:
+            self._modify_object()
+            self._modify_children()
             self.__init_base_class__()
 
     def __init_base_class__(self) -> None:
@@ -443,14 +451,11 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
 
     def _modify_object(self):
         """
-        Modify current object. Required for Element that placed into functions:
-        - set driver from previous object if previous driver different.
-        - set parent from previous object if previous is Group.
+        Modify current object if driver_wrapper is not given. Required for Page that placed into functions:
+        - sets driver from previous object
         """
-        prev_object_manager = PreviousObjectDriver()
-        prev_object_manager.set_driver_from_previous_object_for_element(self, 6)
-        if not self._initialized and self.parent is None:
-            prev_object_manager.set_parent_from_previous_object_for_element(self, 6)
+        if not self._driver_wrapper_given:
+            PreviousObjectDriver().set_driver_from_previous_object(self)
 
     def _validate_inheritance(self):
         cls = self.__class__

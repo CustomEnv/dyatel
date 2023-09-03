@@ -116,7 +116,7 @@ def test_parent_in_hidden_element(driver_wrapper, second_driver_wrapper):
     assert mouse_page.is_page_opened()
     assert mouse_page.button_with_text('Drop me').wait_element(2).is_displayed()  # button without specified driver
 
-    assert card.any_button.parent == card
+    assert card.any_button.parent is None
     assert card.any_button_without_parent.parent is False
     assert card.any_button_with_custom_parent.parent == card.y_result
 

@@ -4,8 +4,6 @@ from typing import Any, Union, List
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
-from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.utils.previous_object_driver import PreviousObjectDriver
 from dyatel.utils.internal_utils import (
     set_parent_for_attr,
     get_child_elements,
@@ -22,7 +20,7 @@ class Group(Element):
     def __repr__(self):
         return self._repr_builder()
 
-    def __init__(  # noqa
+    def __init__(
             self,
             locator: str = '',
             locator_type: str = '',
@@ -47,19 +45,17 @@ class Group(Element):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
-        self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
-
         self._init_locals = locals()
-
         super().__init__(
             locator=locator,
             locator_type=locator_type,
             name=name,
             parent=parent,
-            wait=wait
+            wait=wait,
+            driver_wrapper=driver_wrapper,
         )
 
-    def _modify_children(self):
+    def _modify_children(self) -> None:
         """
         Initializing of attributes with type == Group/Element.
         Required for classes with base == Group.
@@ -67,10 +63,3 @@ class Group(Element):
         initialize_objects(self, get_child_elements_with_names(self, Element), Element)
         set_parent_for_attr(self, Element)
         self.child_elements: List[Element] = get_child_elements(self, Element)
-
-    def _modify_object(self):
-        """
-        Modify current object. Required for Group that placed into functions:
-        - set driver from previous object if previous driver different.
-        """
-        PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)
