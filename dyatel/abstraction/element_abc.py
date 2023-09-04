@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import abstractmethod, ABC
 from typing import Union, Any, List
 
 from PIL.Image import Image
@@ -7,12 +8,12 @@ from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElemen
 from appium.webdriver.webelement import WebElement as AppiumWebElement
 from playwright.sync_api import Locator as PlayWebElement
 
-from dyatel.abstraction.mixin_abs import MixinABS
+from dyatel.abstraction.mixin_abc import MixinABS
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.utils.internal_utils import WAIT_EL
 
 
-class ElementAbstraction(MixinABS):
+class ElementABS(ABC, MixinABS):
     _element = None
     __element = None
 
@@ -41,6 +42,7 @@ class ElementAbstraction(MixinABS):
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def all_elements(self) -> Union[list, List[Any]]:
         """
         Get all wrapped elements with playwright bases
@@ -49,7 +51,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def click(self, with_wait: bool = True, *args, **kwargs) -> ElementAbstraction:
+    def click(self, with_wait: bool = True, *args, **kwargs) -> ElementABS:
         """
         Click to current element
 
@@ -67,7 +69,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def click_into_center(self, silent: bool = False) -> ElementAbstraction:
+    def click_into_center(self, silent: bool = False) -> ElementABS:
         """
         Click into the center of element
 
@@ -76,7 +78,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> ElementAbstraction:
+    def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> ElementABS:
         """
         Type text to current element
 
@@ -86,7 +88,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def type_slowly(self, text: str, sleep_gap: float = 0.05, silent: bool = False) -> ElementAbstraction:
+    def type_slowly(self, text: str, sleep_gap: float = 0.05, silent: bool = False) -> ElementABS:
         """
         Type text to current element slowly
 
@@ -97,7 +99,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def clear_text(self, silent: bool = False) -> ElementAbstraction:
+    def clear_text(self, silent: bool = False) -> ElementABS:
         """
         Clear text from current element
 
@@ -106,7 +108,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def check(self) -> ElementAbstraction:
+    def check(self) -> ElementABS:
         """
         Check current checkbox
 
@@ -114,7 +116,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def uncheck(self) -> ElementAbstraction:
+    def uncheck(self) -> ElementABS:
         """
         Uncheck current checkbox
 
@@ -122,7 +124,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementAbstraction:
+    def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABS:
         """
         Wait for current element available in page
 
@@ -132,7 +134,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementAbstraction:
+    def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABS:
         """
         Wait until current element hidden
 
@@ -142,7 +144,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementAbstraction:
+    def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABS:
         """
         Wait for current element available in DOM
 
@@ -268,7 +270,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def hover(self, silent: bool = False) -> ElementAbstraction:
+    def hover(self, silent: bool = False) -> ElementABS:
         """
         Hover over current element
 
@@ -277,7 +279,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def hover_outside(self, x: int = 0, y: int = -5) -> ElementAbstraction:
+    def hover_outside(self, x: int = 0, y: int = -5) -> ElementABS:
         """
         Hover outside from current element. By default, 5px above  of element
 
@@ -287,7 +289,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def click_outside(self, x: int = -1, y: int = -1) -> ElementAbstraction:
+    def click_outside(self, x: int = -1, y: int = -1) -> ElementABS:
         """
         Click outside of element. By default, 1px above and 1px left of element
 
@@ -297,7 +299,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def click_in_alert(self) -> ElementAbstraction:
+    def click_in_alert(self) -> ElementABS:
         """
         Mobile only:
         Click on element in alert with switch to native context
@@ -306,7 +308,8 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def set_text(self, text: str, silent: bool = False) -> ElementAbstraction:
+    @abstractmethod
+    def set_text(self, text: str, silent: bool = False) -> ElementABS:
         """
         Set (clear and type) text in current element
 
@@ -315,7 +318,8 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def send_keyboard_action(self, action: Union[str, KeyboardKeys]) -> ElementAbstraction:
+    @abstractmethod
+    def send_keyboard_action(self, action: Union[str, KeyboardKeys]) -> ElementABS:
         """
         Send keyboard action to current element
 
@@ -324,12 +328,13 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def wait_elements_count(
             self,
             expected_count: int,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
-    ) -> ElementAbstraction:
+    ) -> ElementABS:
         """
         Wait until elements count will be equal to expected value
 
@@ -340,11 +345,12 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def wait_element_text(
             self,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
-    ) -> ElementAbstraction:
+    ) -> ElementABS:
         """
         Wait non empty text in element
 
@@ -354,11 +360,12 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def wait_element_value(
             self,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
-    ) -> ElementAbstraction:
+    ) -> ElementABS:
         """
         Wait non empty value in element
 
@@ -368,11 +375,12 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def wait_element_without_error(
             self,
             timeout: [int, float] = WAIT_EL,
             silent: bool = False
-    ) -> ElementAbstraction:
+    ) -> ElementABS:
         """
         Wait until element visibility without error
 
@@ -382,11 +390,12 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def wait_element_hidden_without_error(
             self,
             timeout: [int, float] = WAIT_EL,
             silent: bool = False
-    ) -> ElementAbstraction:
+    ) -> ElementABS:
         """
         Wait until element hidden without error
 
@@ -396,7 +405,8 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def wait_enabled(self, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementAbstraction:
+    @abstractmethod
+    def wait_enabled(self, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementABS:
         """
         Wait until element clickable
 
@@ -406,7 +416,8 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def wait_disabled(self, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementAbstraction:
+    @abstractmethod
+    def wait_disabled(self, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementABS:
         """
         Wait until element clickable
 
@@ -416,6 +427,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def is_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
         Check is current element top left corner or bottom right corner visible on current screen
@@ -426,6 +438,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def is_fully_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
         Check is current element top left corner and bottom right corner visible on current screen
@@ -442,7 +455,7 @@ class ElementAbstraction(MixinABS):
             behavior: str = 'instant',
             sleep: Union[int, float] = 0,
             silent: bool = False,
-    ) -> ElementAbstraction:
+    ) -> ElementABS:
         """
         Scroll element into view by js script
 
@@ -454,6 +467,7 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def assert_screenshot(
             self,
             filename: str = '',
@@ -480,20 +494,21 @@ class ElementAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def _get_all_elements(self, sources: Union[tuple, list]) -> List[Any]:
-        """
-        Get all wrapped elements from sources
-
-        :param sources: list of elements: `all_elements` from selenium or `element_handles` from playwright
-        :return: list of wrapped elements
-        """
-        raise NotImplementedError()
-
+    @abstractmethod
     def get_element_info(self, element: Any = None) -> str:
         """
         Get full loging data depends on parent element
 
         :param element: element to collect log data
         :return: log string
+        """
+        raise NotImplementedError()
+
+    def _get_all_elements(self, sources: Union[tuple, list]) -> List[Any]:
+        """
+        Get all wrapped elements from sources
+
+        :param sources: list of elements: `all_elements` from selenium or `element_handles` from playwright
+        :return: list of wrapped elements
         """
         raise NotImplementedError()

@@ -8,14 +8,14 @@ from selenium.common.exceptions import WebDriverException as SeleniumWebDriverEx
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
-from dyatel.abstraction.driver_wrapper_abs import DriverWrapperAbstraction
+from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABS
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.exceptions import DriverWrapperException, TimeoutException
 from dyatel.utils.internal_utils import WAIT_EL
 from dyatel.utils.logs import Logging
 
 
-class CoreDriver(Logging, DriverWrapperAbstraction):
+class CoreDriver(Logging, DriverWrapperABS):
 
     def __init__(self, driver: Union[AppiumDriver, SeleniumWebDriver]):
         """

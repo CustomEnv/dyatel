@@ -8,7 +8,7 @@ from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
-from dyatel.abstraction.element_abs import ElementAbstraction
+from dyatel.abstraction.element_abc import ElementABS
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.exceptions import *
 from dyatel.dyatel_play.play_element import PlayElement
@@ -16,6 +16,7 @@ from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
 from dyatel.mixins.internal_mixin import InternalMixin, get_element_info, all_locator_types
+from dyatel.utils.logs import Logging
 from dyatel.utils.previous_object_driver import PreviousObjectDriver, set_instance_frame
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
@@ -30,7 +31,7 @@ from dyatel.utils.internal_utils import (
 )
 
 
-class Element(DriverMixin, InternalMixin, ElementAbstraction):
+class Element(DriverMixin, InternalMixin, Logging, ElementABS):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
     _object = 'element'
@@ -113,9 +114,10 @@ class Element(DriverMixin, InternalMixin, ElementAbstraction):
         if self._driver_wrapper_given:
             self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
+        self._modify_object()
+        self._modify_children()
+
         if not self._initialized:
-            self._modify_object()
-            self._modify_children()
             self.__init_base_class__()
 
     def __init_base_class__(self) -> None:

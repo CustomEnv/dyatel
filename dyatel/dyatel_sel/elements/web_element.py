@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC
 from typing import Union, List, Any
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
@@ -7,7 +8,7 @@ from dyatel.utils.internal_utils import calculate_coordinate_to_click
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type
 
 
-class WebElement(CoreElement):
+class WebElement(CoreElement, ABC):
 
     def __init__(self, locator: str, locator_type: str):
         """

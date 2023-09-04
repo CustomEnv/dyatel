@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from abc import ABC
 from typing import Union, List, BinaryIO, Any
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
@@ -9,7 +10,7 @@ from dyatel.js_scripts import get_element_position_on_screen_js
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type, get_appium_selector
 
 
-class MobileElement(CoreElement):
+class MobileElement(CoreElement, ABC):
 
     def __init__(self, locator: str, locator_type: str):
         """

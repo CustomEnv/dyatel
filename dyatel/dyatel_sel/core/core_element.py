@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from abc import ABC
 from io import BytesIO
 from typing import Union, List, Any
 
@@ -18,11 +19,10 @@ from selenium.common.exceptions import (
     ElementClickInterceptedException as SeleniumElementClickInterceptedException,
 )
 
-from dyatel.abstraction.element_abs import ElementAbstraction
+from dyatel.abstraction.element_abc import ElementABS
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js, scroll_into_view_blocks
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.utils.logs import Logging
 from dyatel.shared_utils import cut_log_data
 from dyatel.utils.internal_utils import WAIT_EL, is_group, is_element
 from dyatel.exceptions import (
@@ -34,7 +34,7 @@ from dyatel.exceptions import (
 )
 
 
-class CoreElement(ElementAbstraction, Logging):
+class CoreElement(ElementABS, ABC):
 
     # Element
 

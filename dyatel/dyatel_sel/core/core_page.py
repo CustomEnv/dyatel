@@ -1,5 +1,5 @@
-from dyatel.abstraction.page_abs import PageAbstraction
+from abc import ABC
 
 
-class CorePage(PageAbstraction):
+class CorePage(ABC):
     pass

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC
 from typing import List, Union, Any
 
 from selenium.webdriver.common.alert import Alert
@@ -7,7 +8,7 @@ from selenium.webdriver.common.alert import Alert
 from dyatel.utils.internal_utils import WAIT_EL
 
 
-class DriverWrapperAbstraction:
+class DriverWrapperABS(ABC):
     session = None
     label = None
     original_tab = None
@@ -41,7 +42,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def get(self, url: str, silent: bool = False) -> DriverWrapperAbstraction:
+    def get(self, url: str, silent: bool = False) -> DriverWrapperABS:
         """
         Navigate to given url
 
@@ -76,7 +77,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def refresh(self) -> DriverWrapperAbstraction:
+    def refresh(self) -> DriverWrapperABS:
         """
         Reload current page
 
@@ -84,7 +85,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def go_forward(self) -> DriverWrapperAbstraction:
+    def go_forward(self) -> DriverWrapperABS:
         """
          Go forward by driver
 
@@ -92,7 +93,7 @@ class DriverWrapperAbstraction:
          """
         raise NotImplementedError()
 
-    def go_back(self) -> DriverWrapperAbstraction:
+    def go_back(self) -> DriverWrapperABS:
         """
         Go back by driver
 
@@ -100,7 +101,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def set_cookie(self, cookies: List[dict]) -> DriverWrapperAbstraction:
+    def set_cookie(self, cookies: List[dict]) -> DriverWrapperABS:
         """
         Adds a list of cookie dictionaries to current session
 
@@ -111,7 +112,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def clear_cookies(self) -> DriverWrapperAbstraction:
+    def clear_cookies(self) -> DriverWrapperABS:
         """
         Delete all cookies in the scope of the session
 
@@ -119,7 +120,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def delete_cookie(self, name: str) -> DriverWrapperAbstraction:
+    def delete_cookie(self, name: str) -> DriverWrapperABS:
         """
         Appium/Selenium only: Delete cookie by name
 
@@ -140,7 +141,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def switch_to_frame(self, frame: Any) -> DriverWrapperAbstraction:
+    def switch_to_frame(self, frame: Any) -> DriverWrapperABS:
         """
         Appium/Selenium only: Switch to frame
 
@@ -149,7 +150,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def switch_to_parent_frame(self) -> DriverWrapperAbstraction:
+    def switch_to_parent_frame(self) -> DriverWrapperABS:
         """
         Appium/Selenium only: Switch to parent frame from child frame
 
@@ -157,7 +158,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def switch_to_default_content(self) -> DriverWrapperAbstraction:
+    def switch_to_default_content(self) -> DriverWrapperABS:
         """
         Appium/Selenium only: Switch to default content from frame
 
@@ -176,7 +177,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def set_page_load_timeout(self, timeout: int = 30) -> DriverWrapperAbstraction:
+    def set_page_load_timeout(self, timeout: int = 30) -> DriverWrapperABS:
         """
         Set the amount of time to wait for a page load to complete before throwing an error
 
@@ -185,7 +186,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def set_window_size(self, width: int, height: int) -> DriverWrapperAbstraction:
+    def set_window_size(self, width: int, height: int) -> DriverWrapperABS:
         """
         Sets the width and height of the current window
 
@@ -203,7 +204,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def get_all_tabs(self) -> List[DriverWrapperAbstraction]:
+    def get_all_tabs(self) -> List[DriverWrapperABS]:
         """
         Selenium/Playwright only: Get all opened tabs
 
@@ -211,7 +212,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def create_new_tab(self) -> DriverWrapperAbstraction:
+    def create_new_tab(self) -> DriverWrapperABS:
         """
         Selenium/Playwright only: Create new tab and switch into it
 
@@ -219,7 +220,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def switch_to_original_tab(self) -> DriverWrapperAbstraction:
+    def switch_to_original_tab(self) -> DriverWrapperABS:
         """
         Selenium/Playwright only: Switch to original tab
 
@@ -227,7 +228,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def switch_to_tab(self, tab: int = -1) -> DriverWrapperAbstraction:
+    def switch_to_tab(self, tab: int = -1) -> DriverWrapperABS:
         """
         Selenium/Playwright only: Switch to specific tab
 
@@ -236,7 +237,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def close_unused_tabs(self) -> DriverWrapperAbstraction:
+    def close_unused_tabs(self) -> DriverWrapperABS:
         """
         Selenium/Playwright only: Close all tabs except original
 
@@ -244,7 +245,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def click_by_coordinates(self, x: int, y: int, silent: bool = False) -> DriverWrapperAbstraction:
+    def click_by_coordinates(self, x: int, y: int, silent: bool = False) -> DriverWrapperABS:
         """
         Click by given coordinates
 
@@ -304,7 +305,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def switch_to_native(self) -> DriverWrapperAbstraction:
+    def switch_to_native(self) -> DriverWrapperABS:
         """
         Appium only: Switch to native app context
 
@@ -312,7 +313,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def switch_to_web(self) -> DriverWrapperAbstraction:
+    def switch_to_web(self) -> DriverWrapperABS:
         """
         Appium only: Switch to web app context
 
@@ -360,7 +361,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def hide_keyboard(self, **kwargs) -> DriverWrapperAbstraction:
+    def hide_keyboard(self, **kwargs) -> DriverWrapperABS:
         """
         Appium only: Hide keyboard for real device
 
@@ -395,7 +396,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def accept_alert(self) -> DriverWrapperAbstraction:
+    def accept_alert(self) -> DriverWrapperABS:
         """
         Appium/Selenium only: Wait for alert -> switch to it -> click accept
 
@@ -403,7 +404,7 @@ class DriverWrapperAbstraction:
         """
         raise NotImplementedError()
 
-    def dismiss_alert(self) -> DriverWrapperAbstraction:
+    def dismiss_alert(self) -> DriverWrapperABS:
         """
         Appium/Selenium only: Wait for alert -> switch to it -> click dismiss
 

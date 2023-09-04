@@ -6,7 +6,7 @@ from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
-from dyatel.abstraction.page_abs import PageAbstraction
+from dyatel.abstraction.page_abc import PageABS
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.dyatel_play.play_page import PlayPage
@@ -26,7 +26,7 @@ from dyatel.utils.internal_utils import (
 )
 
 
-class Page(DriverMixin, InternalMixin, Logging, PageAbstraction):
+class Page(DriverMixin, InternalMixin, Logging, PageABS):
     """ Page object crossroad. Should be defined as class """
 
     _object = 'page'

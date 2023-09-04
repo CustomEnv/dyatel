@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from abc import ABC
 from typing import Union, List, Any
 
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
@@ -8,7 +9,7 @@ from playwright.sync_api import Page as PlaywrightPage
 from playwright.sync_api import Locator
 
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_playwright_locator
-from dyatel.abstraction.element_abs import ElementAbstraction
+from dyatel.abstraction.element_abc import ElementABS
 from dyatel.exceptions import TimeoutException
 from dyatel.utils.logs import Logging
 from dyatel.shared_utils import cut_log_data
@@ -21,7 +22,7 @@ from dyatel.utils.internal_utils import (
 )
 
 
-class PlayElement(ElementAbstraction, Logging):
+class PlayElement(ElementABS, Logging, ABC):
 
     def __init__(self, locator: str, locator_type: str):
         """

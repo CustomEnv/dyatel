@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+from abc import abstractmethod, ABC
 from typing import Union
 
-from dyatel.abstraction.mixin_abs import MixinABS
+from dyatel.abstraction.mixin_abc import MixinABS
 from dyatel.base.element import Element
 from dyatel.utils.internal_utils import WAIT_PAGE
 
 
-class PageAbstraction(MixinABS):
+class PageABS(ABC, MixinABS):
 
-    def reload_page(self, wait_page_load: bool = True) -> PageAbstraction:
+    @abstractmethod
+    def reload_page(self, wait_page_load: bool = True) -> PageABS:
         """
         Reload current page
 
@@ -18,7 +20,8 @@ class PageAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def open_page(self, url: str = '') -> PageAbstraction:
+    @abstractmethod
+    def open_page(self, url: str = '') -> PageABS:
         """
         Open page with given url or use url from page class f url isn't given
 
@@ -27,7 +30,8 @@ class PageAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def wait_page_loaded(self, silent: bool = False, timeout: Union[int, float] = WAIT_PAGE) -> PageAbstraction:
+    @abstractmethod
+    def wait_page_loaded(self, silent: bool = False, timeout: Union[int, float] = WAIT_PAGE) -> PageABS:
         """
         Wait until page loaded
 
@@ -37,6 +41,7 @@ class PageAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def is_page_opened(self, with_elements: bool = False, with_url: bool = False) -> bool:
         """
         Check is current page opened or not
@@ -63,7 +68,7 @@ class PageAbstraction(MixinABS):
             end_y: int,
             duration: int = 0,
             sleep: Union[int, float] = 0
-    ) -> PageAbstraction:
+    ) -> PageABS:
         """
         Swipe from one point to another point, for an optional duration
 
@@ -77,7 +82,7 @@ class PageAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def swipe_down(self) -> PageAbstraction:
+    def swipe_down(self) -> PageABS:
         """
         Swipe page down
 
@@ -85,7 +90,7 @@ class PageAbstraction(MixinABS):
         """
         raise NotImplementedError()
 
-    def swipe_up(self) -> PageAbstraction:
+    def swipe_up(self) -> PageABS:
         """
         Swipe page up
 
