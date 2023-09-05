@@ -46,7 +46,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABS):
         return self._repr_builder()
 
     def __call__(self, driver_wrapper: DriverWrapper = None):
-        self.__full_init__(driver_wrapper=driver_wrapper)
+        self.__full_init__(driver_wrapper=get_driver_wrapper_from_object(driver_wrapper))
         return self
 
     def __getattribute__(self, item):
@@ -111,7 +111,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABS):
     def __full_init__(self, driver_wrapper: Any = None):
         self._driver_wrapper_given = bool(driver_wrapper)
 
-        if self._driver_wrapper_given:
+        if self._driver_wrapper_given and driver_wrapper != self.driver_wrapper:
             self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
         self._modify_object()

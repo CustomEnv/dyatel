@@ -27,3 +27,9 @@ def test_initialize_objects(mocked_selenium_driver):
         pass
     else:
         raise AssertionError('NotInitializedException should be raised')
+
+
+def test_initialize_object_manually(mocked_selenium_driver):
+    """ covers __call__ of Element """
+    RootSection.section.el()
+
