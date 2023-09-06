@@ -1,15 +1,24 @@
 from __future__ import annotations
 
 import time
+from abc import ABC
 from typing import Union
 
+from dyatel.abstraction.page_abc import PageABC
 from dyatel.dyatel_sel.core.core_page import CorePage
 
 
-class MobilePage(CorePage):
+class MobilePage(CorePage, PageABC, ABC):
 
-    def swipe(self, start_x: int, start_y: int, end_x: int, end_y: int,
-              duration: int = 0, sleep: Union[int, float] = 0) -> MobilePage:
+    def swipe(
+            self,
+            start_x: int,
+            start_y: int,
+            end_x: int,
+            end_y: int,
+            duration: int = 0,
+            sleep: Union[int, float] = 0
+    ) -> MobilePage:
         """
         Swipe from one point to another point, for an optional duration
 
@@ -25,18 +34,20 @@ class MobilePage(CorePage):
         time.sleep(sleep)
         return self
 
-    def swipe_down(self):
+    def swipe_down(self) -> MobilePage:
         """
         Swipe page down
 
-        :return:
+        :return: self
         """
         self.swipe(0, 500, 0, 100, sleep=0.1)
+        return self
 
-    def swipe_up(self):
+    def swipe_up(self) -> MobilePage:
         """
         Swipe page up
 
-        :return:
+        :return: self
         """
         self.swipe(0, 100, 0, 500, sleep=0.1)
+        return self

@@ -1,46 +1,38 @@
 from __future__ import annotations
 
 import time
+from abc import ABC
 from typing import Union, List, Any
 
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
-from playwright.sync_api import Page as PlaywrightPage, ElementHandle
+from playwright.sync_api import Page as PlaywrightPage
 from playwright.sync_api import Locator
 
+from dyatel.utils.selector_synchronizer import get_platform_locator, get_playwright_locator
+from dyatel.abstraction.element_abc import ElementABC
 from dyatel.exceptions import TimeoutException
-from dyatel.mixins.logging import Logging
+from dyatel.utils.logs import Logging
 from dyatel.shared_utils import cut_log_data
-from dyatel.mixins.element_mixin import ElementMixin
-from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.core_mixin import (
+from dyatel.utils.internal_utils import (
     WAIT_EL,
     get_timeout_in_ms,
     calculate_coordinate_to_click,
     is_group,
     is_element,
 )
-from dyatel.mixins.selector_synchronizer import get_platform_locator, get_playwright_locator
 
 
-class PlayElement(ElementMixin, DriverMixin, Logging):
+class PlayElement(ElementABC, Logging, ABC):
 
-    def __init__(self, locator: str, locator_type: str, name: str, parent: Union[PlayElement, Any], wait: bool):
+    def __init__(self, locator: str, locator_type: str):
         """
         Initializing of web element with playwright driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
         :param locator_type: compatibility arg - specific locator type
-        :param name: name of element (will be attached to logs)
-        :param parent: parent of element. Can be PlayElement, PlayPage, Group objects
-        :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         """
-        self._element = None
-
         self.locator = get_playwright_locator(get_platform_locator(self, default_locator=locator))
         self.locator_type = f'{locator_type} - locator_type does not supported for playwright'
-        self.name = name if name else self.locator
-        self.parent = parent
-        self.wait = wait
 
     # Element
 
@@ -56,42 +48,44 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
         element = self._element
         if not element:
             driver = self._get_base()
-            if isinstance(driver, ElementHandle):
-                element = driver.query_selector(self.locator)
-            else:
-                element = driver.locator(self.locator)
+            element = driver.locator(self.locator)
 
         return element
 
     @element.setter
-    def element(self, play_element: Union[Locator, None]):
+    def element(self, base_element: Union[Locator, None]):
         """
-        Core element setter. Try to avoid usage of this function
+        Element object setter. Try to avoid usage of this function
 
         :param: play_element: playwright Locator object
         """
-        self._element = play_element
+        self._element = base_element
     
     @property
-    def all_elements(self) -> Union[None, List[Any]]:
+    def all_elements(self) -> Union[list, List[Any]]:
         """
         Get all wrapped elements with playwright bases
 
         :return: list of wrapped objects
         """
-        return self._get_all_elements(self.element.element_handles(), PlayElement)
+        return self._get_all_elements(self.element.all())
 
     # Element interaction
 
-    def click(self, *args, **kwargs) -> PlayElement:
+    def click(self, with_wait: bool = True, *args, **kwargs) -> PlayElement:
         """
         Click to current element
 
+        :param with_wait: wait for element before click
         :param: args: https://playwright.dev/python/docs/api/class-locator#locator-click
         :param: kwargs: https://playwright.dev/python/docs/api/class-locator#locator-click
         :return: self
         """
         self.log(f'Click into "{self.name}"')
+
+        if with_wait:
+            self.wait_element(silent=True)
+
         self._first_element.click(*args, **kwargs)
         return self
 
@@ -99,8 +93,8 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
         """
         Click outside of element. By default, 5px above and 5px left of element
 
-        :param: x: x offset
-        :param: y: y offset
+        :param x: x offset of element to click
+        :param y: y offset of element to click
         :return: self
         """
         self.log(f'Click outside from "{self.name}"')
@@ -265,14 +259,25 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
 
     # Element state
 
-    def scroll_into_view(self, sleep: Union[int, float] = 0) -> PlayElement:
+    def scroll_into_view(
+            self,
+            sleep: Union[int, float] = 0,
+            silent: bool = False,
+            *args,  # noqa
+            **kwargs,  # noqa
+    ) -> PlayElement:
         """
         Scroll element into view
 
-        :param sleep: delay after scroll
+        :param: sleep: delay after scroll
+        :param: silent: erase log
+        :param: args: compatibility arg
+        :param: kwargs: compatibility arg
         :return: self
         """
-        self.log(f'Scroll element "{self.name}" into view')
+        if not silent:
+            self.log(f'Scroll element "{self.name}" into view')
+
         self._first_element.scroll_into_view_if_needed()
 
         if sleep:
@@ -428,7 +433,7 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
 
     # Mixin
 
-    def _get_base(self) -> Union[PlaywrightPage, Locator, ElementHandle]:
+    def _get_base(self) -> Union[PlaywrightPage, Locator]:
         """
         Get driver depends on parent element if available
 
@@ -450,4 +455,4 @@ class PlayElement(ElementMixin, DriverMixin, Logging):
 
         :return: first element
         """
-        return self.element if isinstance(self.element, ElementHandle) else self.element.first
+        return self.element.first

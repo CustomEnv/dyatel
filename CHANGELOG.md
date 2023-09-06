@@ -2,14 +2,35 @@
 
 ---
 
-## v2.0.1
+## v2.1.1
+*Release date: in progress*
 
-*Release date: in development*
+---
+
+## v2.1.0
+*Release date: 2023-09-08*
+
+### Added
+- Abstract classes and methods
+- `DriverWrapperSessions` class
+- `DriverWrapper.browser_name` attribute
+- Inheritance validation
+- `Element.scroll_into_view` 'block' argument validation
+- Selenium/Appium only: additional warning for `element` errors 
+
+### Fixed
+- Type annotations for some methods
+
+### Changed
+- `Page.anchor` property now instance attribute
+- Some methods moved to subclasses
+- Internal `Logging` reworked
+- `DriverWrapper` from previous object reworked
 
 ---
 
 ## v2.0.0
-*Release date: in development*
+*Release date: 2023-04-06*
 
 ### Added
 - `element.wait_enabled` method

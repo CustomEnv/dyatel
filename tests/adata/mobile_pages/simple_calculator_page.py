@@ -11,7 +11,7 @@ class CalculatorPage(Page):
     def __init__(self):
         locator_type, locator = AppiumBy.XPATH, '//*[@text="TestingBotSample"]'  # Android locator
 
-        if CoreDriver.is_ios:
+        if self.driver_wrapper.is_ios:
             locator_type, locator = AppiumBy.ACCESSIBILITY_ID, 'Home'
 
         super(CalculatorPage, self).__init__(locator, locator_type, name='Calculator page')
@@ -21,5 +21,5 @@ class CalculatorPage(Page):
 
     @property
     def input_sum(self):
-        locator = 'total' if CoreDriver.is_ios else 'sum'
+        locator = 'total' if self.driver_wrapper.is_ios else 'sum'
         return Element(locator, AppiumBy.ACCESSIBILITY_ID, name='input summary')

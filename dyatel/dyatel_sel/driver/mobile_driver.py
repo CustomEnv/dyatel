@@ -19,18 +19,14 @@ class MobileDriver(CoreDriver):
         """
         self.caps = driver.capabilities
 
-        self.is_web = self.caps.get('browserName', False)
+        self.browser_name = self.caps.get('browserName', None)
+        self.is_web = bool(self.browser_name) or False
         self.is_app = self.caps.get('app', False)
 
         self.is_android = self.caps.get('platformName').lower() == 'android'
         self.is_ios = self.caps.get('platformName').lower() == 'ios'
         self.is_simulator = self.caps.get('useSimulator')
         self.is_real_device = not self.caps.get('useSimulator')
-
-        self.__class__.is_ios = self.is_ios
-        self.__class__.is_android = self.is_android
-        self.__class__.is_simulator = self.is_simulator
-        self.__class__.is_real_device = self.is_real_device
 
         self.native_context_name = 'NATIVE_APP'
         self.web_context_name = self.get_web_view_context() if self.is_ios else 'CHROMIUM'
@@ -40,6 +36,8 @@ class MobileDriver(CoreDriver):
         self.top_bar_height = None
         self.bottom_bar_height = None
 
+        self.original_tab = None
+
         if self.is_app:
             if self.is_ios:
                 self.bundle_id = self.caps.get('bundleId', 'undefined: bundleId')
@@ -48,7 +46,7 @@ class MobileDriver(CoreDriver):
             else:
                 raise Exception('Make sure that correct "platformName" capability specified')
 
-        super().__init__(driver=driver)
+        CoreDriver.__init__(self, driver=driver)
 
     def is_app_installed(self) -> bool:
         """
@@ -193,12 +191,12 @@ class MobileDriver(CoreDriver):
             from dyatel.base.element import Element
 
             try:
-                self.driver_wrapper.switch_to_native()
+                self.switch_to_native()
                 done_button = Element("//XCUIElementTypeButton[@name='Done']", name='Keyboard Done button')
                 if done_button.is_displayed():
                     done_button.click()
             finally:
-                self.driver_wrapper.switch_to_web()
+                self.switch_to_web()
 
         return self
 
@@ -214,7 +212,8 @@ class MobileDriver(CoreDriver):
 
             try:
                 self.switch_to_native()
-                top_bar = Element('//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther')
+                top_bar = Element('//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther'
+                                  '/XCUIElementTypeOther')
                 self.top_bar_height = top_bar.element.size['height']
             finally:
                 self.switch_to_web()
@@ -256,6 +255,6 @@ class MobileDriver(CoreDriver):
         if self.is_ios:
             TouchAction(self.driver).tap(x=x, y=y).perform()
         elif self.is_android:
-            super().click_by_coordinates(x=x, y=y, silent=True)
+            CoreDriver.click_by_coordinates(self, x=x, y=y, silent=True)
 
         return self

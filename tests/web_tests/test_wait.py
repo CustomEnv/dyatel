@@ -38,10 +38,11 @@ def test_wait_element_value(expected_condition_page):
 
 @pytest.mark.xfail_platform('playwright', 'safari', reason='Unexpected text')
 def test_wait_element_text(expected_condition_page):
+    btn = expected_condition_page.value_card.wait_for_text_button
+
     expected_condition_page.value_card.trigger_button.click()
-    value_without_wait = expected_condition_page.value_card.wait_for_text_button.text
-    expected_condition_page.value_card.wait_for_text_button.wait_element_text()
-    value_with_wait = expected_condition_page.value_card.wait_for_text_button.text == 'Submit'
+    value_without_wait = btn.text
+    value_with_wait = btn.wait_element_text().text == 'Submit'
     assert all((not value_without_wait, value_with_wait))
 
 

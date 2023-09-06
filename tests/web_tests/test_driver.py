@@ -33,7 +33,7 @@ def test_driver_execute_script_with_args(driver_wrapper, mouse_event_page):
 def test_second_driver_different_page(driver_wrapper, second_driver_wrapper):
     mouse_page = MouseEventPage(second_driver_wrapper)
     pizza_page = PizzaOrderPage(driver_wrapper)
-    assert len(DriverWrapper.all_drivers) == 2
+    assert len(DriverWrapper.session.all_sessions) == 2
 
     mouse_page.open_page()
     pizza_page.open_page()
@@ -53,7 +53,7 @@ def test_second_driver_different_page(driver_wrapper, second_driver_wrapper):
 def test_second_driver_same_page(driver_wrapper, second_driver_wrapper):
     mouse_page1 = MouseEventPage(driver_wrapper)
     mouse_page2 = MouseEventPage(second_driver_wrapper)
-    assert len(DriverWrapper.all_drivers) == 2
+    assert len(DriverWrapper.session.all_sessions) == 2
 
     mouse_page1.open_page()
     mouse_page2.open_page()
@@ -70,7 +70,7 @@ def test_second_driver_same_page(driver_wrapper, second_driver_wrapper):
 def test_second_driver_by_arg(driver_wrapper, second_driver_wrapper):
     pizza_page = PizzaOrderPage(driver_wrapper)
     mouse_page = MouseEventPage(second_driver_wrapper)
-    assert len(DriverWrapper.all_drivers) == 2
+    assert len(DriverWrapper.session.all_sessions) == 2
 
     mouse_page.open_page()
     pizza_page.open_page()
@@ -92,7 +92,7 @@ def test_second_driver_compatibility(driver_wrapper, second_driver_wrapper):
     assert second_driver_wrapper.get_inner_window_size()
 
 
-@pytest.mark.skip_platform('appium', reason='Appium doesnt support tabs creating')
+@pytest.mark.skip_platform('android', 'ios', reason='Appium doesnt support tabs creating')
 def test_driver_tabs(driver_wrapper, second_playground_page):
     driver_wrapper.create_new_tab()
     driver_wrapper.switch_to_original_tab()
@@ -111,10 +111,12 @@ def test_parent_in_hidden_element(driver_wrapper, second_driver_wrapper):
     mouse_page.open_page()
     pizza_page.open_page()
 
+    assert DriverWrapper.driver
+
     assert mouse_page.is_page_opened()
     assert mouse_page.button_with_text('Drop me').wait_element(2).is_displayed()  # button without specified driver
 
-    assert card.any_button.parent == card
+    assert card.any_button.parent is None
     assert card.any_button_without_parent.parent is False
     assert card.any_button_with_custom_parent.parent == card.y_result
 

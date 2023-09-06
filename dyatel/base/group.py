@@ -4,15 +4,11 @@ from typing import Any, Union, List
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
-from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.element_mixin import repr_builder
-from dyatel.mixins.previous_object_driver import PreviousObjectDriver
-from dyatel.mixins.core_mixin import (
-    all_mid_level_elements,
+from dyatel.utils.internal_utils import (
     set_parent_for_attr,
     get_child_elements,
     initialize_objects,
-    get_child_elements_with_names,
+    get_child_elements_with_names
 )
 
 
@@ -22,9 +18,9 @@ class Group(Element):
     _object = 'group'
 
     def __repr__(self):
-        return repr_builder(self)
+        return self._repr_builder()
 
-    def __init__(  # noqa
+    def __init__(
             self,
             locator: str = '',
             locator_type: str = '',
@@ -49,32 +45,21 @@ class Group(Element):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
-        self._scls = Group
         self._init_locals = locals()
-        self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
-
         super().__init__(
             locator=locator,
             locator_type=locator_type,
             name=name,
             parent=parent,
-            wait=wait
+            wait=wait,
+            driver_wrapper=driver_wrapper,
         )
 
-    def _modify_children(self):
+    def _modify_children(self) -> None:
         """
         Initializing of attributes with type == Group/Element.
         Required for classes with base == Group.
         """
-        elements_types = all_mid_level_elements()
-
-        initialize_objects(self, get_child_elements_with_names(self, elements_types))
-        set_parent_for_attr(self, elements_types)
-        self.child_elements: List[Element] = get_child_elements(self, elements_types)
-
-    def _modify_object(self):
-        """
-        Modify current object. Required for Group that placed into functions:
-        - set driver from previous object if previous driver different.
-        """
-        PreviousObjectDriver().set_driver_from_previous_object_for_page_or_group(self, 6)
+        initialize_objects(self, get_child_elements_with_names(self, Element), Element)
+        set_parent_for_attr(self, Element)
+        self.child_elements: List[Element] = get_child_elements(self, Element)

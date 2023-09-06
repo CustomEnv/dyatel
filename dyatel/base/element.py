@@ -1,61 +1,71 @@
 from __future__ import annotations
 
 import time
+from copy import copy
 from typing import Any, Union, List, Type
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
-from dyatel.exceptions import *
+from dyatel.abstraction.element_abc import ElementABC
 from dyatel.base.driver_wrapper import DriverWrapper
+from dyatel.exceptions import *
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
-from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object
-from dyatel.mixins.element_mixin import repr_builder
-from dyatel.mixins.previous_object_driver import PreviousObjectDriver
+from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
+from dyatel.mixins.internal_mixin import InternalMixin, get_element_info, all_locator_types
+from dyatel.utils.logs import Logging
+from dyatel.utils.previous_object_driver import PreviousObjectDriver, set_instance_frame
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.mixins.core_mixin import (
+from dyatel.utils.internal_utils import (
     WAIT_EL,
     is_target_on_screen,
-    all_mid_level_elements,
     initialize_objects,
     get_child_elements_with_names,
-    set_static,
-    is_group, all_locator_types,
+    safe_getattribute,
+    set_parent_for_attr,
+    is_page,
 )
 
 
-class Element(WebElement, MobileElement, PlayElement):
+class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
     _object = 'element'
+    _base_cls: Type[PlayElement, MobileElement, WebElement]
+
+    def __new__(cls, *args, **kwargs):
+        instance = super(Element, cls).__new__(cls)
+        set_instance_frame(instance)
+        return instance
 
     def __repr__(self):
-        return repr_builder(self)
+        return self._repr_builder()
 
-    def __call__(self, driver_wrapper=None):
-        if self.driver or driver_wrapper:
-            self.__full_init__(driver_wrapper=driver_wrapper)
-
+    def __call__(self, driver_wrapper: DriverWrapper = None):
+        self.__full_init__(driver_wrapper=get_driver_wrapper_from_object(driver_wrapper))
         return self
 
     def __getattribute__(self, item):
-        if 'element' in item and not object.__getattribute__(self, '_initialized'):
-            raise NotInitializedException(f'The element is not initialized for {self.__class__.__name__} '
-                                          'Try to initialize base object first or call it directly as a method')
+        if 'element' in item and not safe_getattribute(self, '_initialized'):
+            raise NotInitializedException(
+                f'{repr(self)} object is not initialized. '
+                'Try to initialize base object first or call it directly as a method'
+            )
 
-        return object.__getattribute__(self, item)
+        return safe_getattribute(self, item)
 
-    def __init__(  # noqa
+    def __init__(
             self,
             locator: str = '',
             locator_type: str = '',
             name: str = '',
             parent: Union[Any, False] = None,
             wait: bool = None,
+            driver_wrapper: Union[DriverWrapper, Any] = None,
             **kwargs
     ):
         """
@@ -73,12 +83,15 @@ class Element(WebElement, MobileElement, PlayElement):
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
+        self._validate_inheritance()
+        self._check_kwargs(kwargs)
+
         if locator_type:
-            assert locator_type in all_locator_types, f'Locator type "{locator_type}" is not supported. ' \
-                                                      f'Choose from {all_locator_types}'
+            assert locator_type in all_locator_types, \
+                f'Locator type "{locator_type}" is not supported. Choose from {all_locator_types}'
 
         if parent:
-            assert isinstance(parent, (bool, all_mid_level_elements())), \
+            assert isinstance(parent, (bool, Element)), \
                 f'The "parent" of "{self.name}" should take an Element/Group object or False for skip. Get {parent}'
 
         self.locator = locator
@@ -86,39 +99,51 @@ class Element(WebElement, MobileElement, PlayElement):
         self.name = name if name else locator
         self.parent = parent
         self.wait = wait
+        self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
-        self._initialized = False
-        # Taking from Group first if available
-        self._scls = getattr(self, 'scls', Element)
         self._init_locals = getattr(self, '_init_locals', locals())
-        self._driver_instance = getattr(self, '_driver_instance', DriverWrapper)
+        self._safe_setter('__base_obj_id', id(self))
+        self._initialized = False
 
-        if self.driver:
-            self.__full_init__(self.driver_wrapper if is_group(self) else None)
+        if self.driver_wrapper:
+            self.__full_init__(driver_wrapper)
 
-    def __full_init__(self, driver_wrapper=None):
-        self._driver_instance = get_driver_wrapper_from_object(driver_wrapper)
+    def __full_init__(self, driver_wrapper: Any = None):
+        self._driver_wrapper_given = bool(driver_wrapper)
+
+        if self._driver_wrapper_given and driver_wrapper != self.driver_wrapper:
+            self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
+
         self._modify_object()
         self._modify_children()
 
         if not self._initialized:
-            self._base_cls = self._get_base_class()
-            set_static(self)
-            self._base_cls.__init__(
-                self,
-                locator=self.locator,
-                locator_type=self.locator_type,
-                name=self.name,
-                parent=self.parent,
-                wait=self.wait
-            )
+            self.__init_base_class__()
+
+    def __init_base_class__(self) -> None:
+        """
+        Initialise base class according to current driver, and set his methods
+
+        :return: None
+        """
+        if isinstance(self.driver, PlaywrightDriver):
+            self._base_cls = PlayElement
+        elif isinstance(self.driver, AppiumDriver):
+            self._base_cls = MobileElement
+        elif isinstance(self.driver, SeleniumDriver):
+            self._base_cls = WebElement
+        else:
+            raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')
+
+        self._set_static(self._base_cls)
+        self._base_cls.__init__(self, locator=self.locator, locator_type=self.locator_type)
         self._initialized = True
 
-    # Following methods works same for both Selenium/Appium and Playwright APIs using dyatel methods
+    # Following methods works same for both Selenium/Appium and Playwright APIs using internal methods
 
     # Elements interaction
 
-    def set_text(self, text, silent=False) -> Element:
+    def set_text(self, text: str, silent: bool = False) -> Element:
         """
         Set (clear and type) text in current element
 
@@ -138,7 +163,7 @@ class Element(WebElement, MobileElement, PlayElement):
         :param action: keyboard action
         :return: self
         """
-        if self.driver_wrapper.playwright:
+        if self.driver_wrapper.is_playwright:
             self.click()
             self.driver.keyboard.press(action)
         else:
@@ -148,7 +173,12 @@ class Element(WebElement, MobileElement, PlayElement):
 
     # Elements waits
 
-    def wait_elements_count(self, expected_count, timeout=WAIT_EL, silent=False) -> Element:
+    def wait_elements_count(
+            self,
+            expected_count: int,
+            timeout: Union[int, float] = WAIT_EL,
+            silent: bool = False
+    ) -> Element:
         """
         Wait until elements count will be equal to expected value
 
@@ -172,7 +202,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
         return self
 
-    def wait_element_text(self, timeout=WAIT_EL, silent=False):
+    def wait_element_text(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait non empty text in element
 
@@ -193,7 +223,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
         return self
 
-    def wait_element_value(self, timeout=WAIT_EL, silent=False):
+    def wait_element_value(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait non empty value in element
 
@@ -214,7 +244,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
         return self
 
-    def wait_element_without_error(self, timeout: int = WAIT_EL, silent: bool = False) -> Element:
+    def wait_element_without_error(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element visibility without error
 
@@ -232,7 +262,7 @@ class Element(WebElement, MobileElement, PlayElement):
                 self.log(f'Ignored exception: "{exception.msg}"')
         return self
 
-    def wait_element_hidden_without_error(self, timeout: int = WAIT_EL, silent: bool = False) -> Element:
+    def wait_element_hidden_without_error(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element hidden without error
 
@@ -250,7 +280,7 @@ class Element(WebElement, MobileElement, PlayElement):
                 self.log(f'Ignored exception: "{exception.msg}"')
         return self
 
-    def wait_enabled(self, timeout: int = WAIT_EL, silent: bool = False) -> Element:
+    def wait_enabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element clickable
 
@@ -273,7 +303,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
         return self
 
-    def wait_disabled(self, timeout: int = WAIT_EL, silent: bool = False) -> Element:
+    def wait_disabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element clickable
 
@@ -303,17 +333,21 @@ class Element(WebElement, MobileElement, PlayElement):
 
         return self._base_cls.all_elements.fget(self)
 
-    def is_visible(self, silent: bool = False) -> bool:
+    def is_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
         Check is current element top left corner or bottom right corner visible on current screen
 
         :param silent: erase log
+        :param check_displaying: trigger is_displayed additionally
         :return: bool
         """
         if not silent:
             self.log(f'Check visibility of "{self.name}"')
 
-        is_visible = self.is_displayed()
+        is_visible = True
+
+        if check_displaying:
+            is_visible = self.is_displayed()
 
         if is_visible:
             rect, window_size = self.get_rect(), self.driver_wrapper.get_inner_window_size()
@@ -324,17 +358,21 @@ class Element(WebElement, MobileElement, PlayElement):
 
         return is_visible
 
-    def is_fully_visible(self, silent: bool = False) -> bool:
+    def is_fully_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
         Check is current element top left corner and bottom right corner visible on current screen
 
         :param silent: erase log
+        :param check_displaying: trigger is_displayed additionally
         :return: bool
         """
         if not silent:
             self.log(f'Check fully visibility of "{self.name}"')
 
-        is_visible = self.is_displayed()
+        is_visible = True
+
+        if check_displaying:
+            is_visible = self.is_displayed()
 
         if is_visible:
             rect, window_size = self.get_rect(), self.driver_wrapper.get_inner_window_size()
@@ -361,7 +399,7 @@ class Element(WebElement, MobileElement, PlayElement):
 
         :param filename: full screenshot name. Custom filename will be used if empty string given
         :param test_name: test name for custom filename. Will try to find it automatically if empty string given
-        :param name_suffix: filename suffix. Good to use for same element with positive/netagative case
+        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
         :param threshold: possible threshold
         :param delay: delay before taking screenshot
         :param scroll: scroll to element before taking the screenshot
@@ -378,37 +416,54 @@ class Element(WebElement, MobileElement, PlayElement):
             scroll=scroll, remove=remove, fill_background=fill_background,
         )
 
-    def _get_base_class(self) -> Type[WebElement, MobileElement, PlayElement]:
+    def get_element_info(self, element: Any = None) -> str:
         """
-        Get element class in according to current driver, and set him as base class
+        Get full loging data depends on parent element
 
-        :return: element class
+        :param element: element to collect log data
+        :return: log string
         """
-        base_cls = None
-        if isinstance(self.driver, PlaywrightDriver):
-            base_cls = PlayElement
-        elif isinstance(self.driver, AppiumDriver):
-            base_cls = MobileElement
-        elif isinstance(self.driver, SeleniumDriver):
-            base_cls = WebElement
+        element = element if element else self
+        return get_element_info(element)
 
-        # No exception due to delayed initialization
-        return base_cls
+    def _get_all_elements(self, sources: Union[tuple, list]) -> List[Any]:
+        """
+        Get all wrapped elements from sources
 
+        :param sources: list of elements: `all_elements` from selenium or `element_handles` from playwright
+        :return: list of wrapped elements
+        """
+        wrapped_elements = []
+
+        for element in sources:
+            wrapped_object: Any = copy(self)
+            wrapped_object.element = element
+            wrapped_object._wrapped = True
+            set_parent_for_attr(wrapped_object, Element, with_copy=True)
+            wrapped_elements.append(wrapped_object)
+
+        return wrapped_elements
+        
     def _modify_children(self):
         """
         Initializing of attributes with  type == Element.
         Required for classes with base == Element.
         """
-        initialize_objects(self, get_child_elements_with_names(self, all_mid_level_elements()))
+        initialize_objects(self, get_child_elements_with_names(self, Element), Element)
 
     def _modify_object(self):
         """
-        Modify current object. Required for Element that placed into functions:
-        - set driver from previous object if previous driver different.
-        - set parent from previous object if previous is Group.
+        Modify current object if driver_wrapper is not given. Required for Page that placed into functions:
+        - sets driver from previous object
         """
-        prev_object_manager = PreviousObjectDriver()
-        prev_object_manager.set_driver_from_previous_object_for_element(self, 6)
-        if not self._initialized and self.parent is None:
-            prev_object_manager.set_parent_from_previous_object_for_element(self, 6)
+        if not self._driver_wrapper_given:
+            PreviousObjectDriver().set_driver_from_previous_object(self)
+
+    def _validate_inheritance(self):
+        cls = self.__class__
+        mro = cls.__mro__
+
+        for item in mro:
+            if is_page(item):
+                raise TypeError(
+                    f"You cannot make an inheritance for {cls.__name__} from both Element/Group and Page objects")

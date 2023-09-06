@@ -1,19 +1,16 @@
 from __future__ import annotations
 
-from typing import List, Union, Any
+from typing import List, Union
 
-from playwright.sync_api import Page as PlaywrightPage, Locator, Page
+from playwright.sync_api import Locator, Page
 from playwright.sync_api import Browser
 
-from dyatel.mixins.core_mixin import get_timeout_in_ms
-from dyatel.mixins.logging import Logging
+from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
+from dyatel.utils.internal_utils import get_timeout_in_ms
+from dyatel.utils.logs import Logging
 
 
-class PlayDriver(Logging):
-    instance: Browser = None
-    driver: PlaywrightPage = None
-    all_drivers: List[PlaywrightPage] = []
-    driver_wrapper: PlayDriver = None
+class PlayDriver(Logging, DriverWrapperABC):
 
     def __init__(self, driver: Browser):
         """
@@ -21,25 +18,23 @@ class PlayDriver(Logging):
 
         :param driver: playwright driver to initialize
         """
-        self.driver_context = driver.new_context()
-        self.driver = self.driver_context.new_page()
-        self.driver_wrapper: Any = self
-        self.all_drivers.append(self.driver)
+        self.instance = driver
+        self.context = driver.new_context()
+        self.driver = self.context.new_page()
         self.original_tab = self.driver
+        self.browser_name = self.instance.browser_type.name
 
-        if not PlayDriver.driver:
-            PlayDriver.instance = driver
-            PlayDriver.driver = self.driver
-            PlayDriver.driver_wrapper = self
-
-    def get(self, url: str) -> PlayDriver:
+    def get(self, url: str, silent: bool = False) -> PlayDriver:
         """
         Navigate to given url
 
         :param url: url for navigation
+        :param silent: erase log
         :return: self
         """
-        self.log(f'Navigating to url {url}')
+        if not silent:
+            self.log(f'Navigating to url {url}')
+
         self.driver.goto(url)
         return self
 
@@ -98,24 +93,13 @@ class PlayDriver(Logging):
         self.driver.go_back()
         return self
 
-    def quit(self, silent: bool = True) -> None:
+    def quit(self) -> None:
         """
         Quit the driver instance
 
-        :param: silent:
         :return: None
         """
-        if silent:
-            self.log('Quit driver instance')
-
         self.driver.close()
-
-        self.all_drivers.remove(self.driver)
-
-        if self.driver == PlayDriver.driver:  # Clear only if original driver closed
-            PlayDriver.driver = None
-            PlayDriver.instance = None
-            PlayDriver.driver_wrapper = None
 
     def set_cookie(self, cookies: List[dict]) -> PlayDriver:
         """
@@ -134,7 +118,7 @@ class PlayDriver(Logging):
             if 'domain' not in cookie:
                 cookie.update({'domain': f'.{self.current_url.split("://")[1].split("/")[0]}'})
 
-        self.driver_context.add_cookies(cookies)
+        self.context.add_cookies(cookies)
         return self
 
     def clear_cookies(self) -> PlayDriver:
@@ -143,18 +127,8 @@ class PlayDriver(Logging):
 
         :return: self
         """
-        self.driver_context.clear_cookies()
+        self.context.clear_cookies()
         return self
-
-    def delete_cookie(self, name) -> PlayDriver:
-        """
-        Delete cookie by name
-
-        :return: self
-        """
-        # Todo: workaround can be implemented https://stackoverflow.com/questions/2144386/how-to-delete-a-cookie
-        raise NotImplementedError('Playwright does not supported specific cookie removal: '
-                                  'https://github.com/microsoft/playwright/issues/10143')
 
     def get_cookies(self) -> List[dict]:
         """
@@ -162,32 +136,7 @@ class PlayDriver(Logging):
 
         :return: cookies dictionaries list
         """
-        return self.driver_context.cookies()
-
-    def switch_to_frame(self, frame: Any) -> PlayDriver:
-        """
-        Switch to frame
-
-        :param frame: frame Element
-        :return: self
-        """
-        raise NotImplementedError()
-
-    def switch_to_parent_frame(self) -> PlayDriver:
-        """
-        Switch to parent frame from child frame
-
-        :return: self
-        """
-        raise NotImplementedError()
-
-    def switch_to_default_content(self) -> PlayDriver:
-        """
-        Switch to default content from frame
-
-        :return: self
-        """
-        raise NotImplementedError()
+        return self.context.cookies()
 
     def execute_script(self, script: str, *args) -> Union[None, str]:
         """
@@ -246,7 +195,7 @@ class PlayDriver(Logging):
 
         :return: list of tabs
         """
-        return self.driver_context.pages
+        return self.context.pages
 
     def create_new_tab(self) -> PlayDriver:
         """
@@ -254,7 +203,7 @@ class PlayDriver(Logging):
 
         :return: self
         """
-        with self.driver_context.expect_page() as new_page:
+        with self.context.expect_page() as new_page:
             self.execute_script("window.open(arguments[0], '_blank').focus();", self.current_url)
 
         self.driver = new_page.value

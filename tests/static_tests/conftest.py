@@ -1,11 +1,11 @@
 import pytest
 from mock.mock import MagicMock
 
-from playwright.sync_api import Page as PlaywrightDriver, Browser
+from playwright.sync_api import Browser, Page as PlaywrightSourcePage
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
-from dyatel.base.driver_wrapper import DriverWrapper
+from dyatel.base.driver_wrapper import DriverWrapper, DriverWrapperSessions
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 
@@ -30,7 +30,6 @@ def mocked_ios_driver(mocked_shared_mobile_driver):
         }
     )()
     driver_wrapper = DriverWrapper(mocked_shared_mobile_driver())
-    DriverWrapper.driver = driver_wrapper.driver
     return driver_wrapper
 
 
@@ -44,7 +43,6 @@ def mocked_android_driver(mocked_shared_mobile_driver):
         }
     )()
     driver_wrapper = DriverWrapper(mocked_shared_mobile_driver())
-    DriverWrapper.driver = driver_wrapper.driver
     return driver_wrapper
 
 
@@ -56,15 +54,15 @@ def mocked_selenium_driver():
     selenium_driver.command_executor = MagicMock()
     selenium_driver.error_handler = MagicMock()
 
+    selenium_driver.caps = {}
     driver_wrapper = DriverWrapper(selenium_driver())
-    DriverWrapper.driver = driver_wrapper.driver
     return driver_wrapper
 
 
 @pytest.fixture
 def mocked_play_driver():
     driver_wrapper = DriverWrapper(Browser(MagicMock()))
-    DriverWrapper.driver = PlaywrightDriver(MagicMock())
+    driver_wrapper.driver = PlaywrightSourcePage(MagicMock())
     return driver_wrapper
 
 
@@ -72,16 +70,15 @@ def mocked_play_driver():
 def base_teardown():
     yield
     DriverWrapper.is_multiplatform = False
-    DriverWrapper.all_drivers = []
-    DriverWrapper.mobile = False
-    DriverWrapper.desktop = False
+    DriverWrapper.is_mobile = False
+    DriverWrapper.is_desktop = False
     DriverWrapper.is_ios = False
     DriverWrapper.is_android = False
-    DriverWrapper.selenium = False
-    DriverWrapper.playwright = False
-    DriverWrapper._init_count = 0
+    DriverWrapper.is_selenium = False
+    DriverWrapper.is_playwright = False
     PlayDriver.driver = None
     CoreDriver.driver = None
+    DriverWrapperSessions.all_sessions = []
 
 
 mobile_drivers = [mocked_ios_driver.__name__, mocked_android_driver.__name__]

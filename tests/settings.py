@@ -4,8 +4,8 @@ repo_name = 'dyatel-playground'
 appium_logs_path = '.tox/.tmp/logs/android_appium.txt'
 android_device_start_timeout = 60
 android_desired_caps = {
-    'avd': 'Pixel5',
-    'deviceName': 'Pixel5',
+    'avd': 'Pixel4',
+    'deviceName': 'Pixel4',
     'platformName': 'Android',
     'platformVersion': '12.0',
     # Update following capabilities before driver init

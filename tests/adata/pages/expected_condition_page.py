@@ -35,7 +35,7 @@ class ExpectedConditionPage(Page):
 
 class WaitValueCard(Group):
     def __init__(self):
-        super().__init__('//*[contains(@class, "card") and contains(., "Wait for text")]', name='value card')
+        super().__init__('//*[contains(@class, "card") and contains(., "Wait for text")]', name='value card group')
 
     wait_for_text_button = Element('wait_for_text', name='wait for text button')
     wait_for_value_input = Element('wait_for_value', name='wait for value input')
@@ -58,3 +58,11 @@ class WaitFrameCard(Group):
 
     trigger_button = Element('wait_for_frame', name='trigger button')
     frame = Element('iframe', name='target iframe')
+
+
+class WaitValueCardBroken(Group):
+    def __init__(self):
+        super().__init__('.card', name='value card broken selector')
+
+    trigger_button = Element('text_value_trigger', name='trigger wait button1')
+    any_row = Element('.row', name='any row')

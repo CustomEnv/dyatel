@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from abc import ABC
 from io import BytesIO
 from typing import Union, List, Any
 
@@ -18,14 +19,12 @@ from selenium.common.exceptions import (
     ElementClickInterceptedException as SeleniumElementClickInterceptedException,
 )
 
+from dyatel.abstraction.element_abc import ElementABC
 from dyatel.dyatel_sel.sel_utils import ActionChains
-from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js
+from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js, scroll_into_view_blocks
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.mixins.logging import Logging
 from dyatel.shared_utils import cut_log_data
-from dyatel.mixins.element_mixin import ElementMixin
-from dyatel.mixins.driver_mixin import DriverMixin
-from dyatel.mixins.core_mixin import WAIT_EL, is_group, is_element
+from dyatel.utils.internal_utils import WAIT_EL, is_group, is_element
 from dyatel.exceptions import (
     TimeoutException,
     InvalidSelectorException,
@@ -35,26 +34,7 @@ from dyatel.exceptions import (
 )
 
 
-class CoreElement(ElementMixin, DriverMixin, Logging):
-
-    def __init__(self, locator: str, locator_type: str, name: str, parent: Any, wait: bool):
-        """
-        Initializing of core element with appium/selenium driver
-        Contain same methods/data for both WebElement and MobileElement classes
-
-        :param locator: anchor locator of page. Can be defined without locator_type
-        :param locator_type: specific locator type
-        :param name: name of element (will be attached to logs)
-        :param parent: parent of element. Can be Web/MobileElement, Web/MobilePage or Group objects
-        """
-        self._element: Union[SeleniumWebElement, None] = None
-        self.__element: Union[SeleniumWebElement, None] = None
-
-        self.locator = locator
-        self.locator_type = locator_type
-        self.name = name
-        self.parent: Any = parent
-        self.wait = wait
+class CoreElement(ElementABC, ABC):
 
     # Element
 
@@ -63,26 +43,28 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
         """
         Get selenium WebElement object
 
-        :return: Locator
+        :return: SeleniumWebElement
         """
         return self._get_element(wait=True)
 
     @element.setter
-    def element(self, selenium_element: Union[SeleniumWebElement, AppiumWebElement]):
+    def element(self, base_element: Union[SeleniumWebElement, AppiumWebElement]):
         """
         Core element setter. Try to avoid usage of this function
 
         :param: selenium_element: selenium WebElement or appium WebElement
         """
-        self._element = selenium_element
+        self._element = base_element
 
     # Element interaction
 
-    def click(self, with_wait=True) -> CoreElement:
+    def click(self, with_wait: bool = True, *args, **kwargs) -> CoreElement:
         """
         Click to current element
 
         :param with_wait: wait for element before click
+        :param: args: compatibility arg
+        :param: kwargs: compatibility arg
         :return: self
         """
         self.log(f'Click into "{self.name}"')
@@ -255,20 +237,29 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
 
     # Element state
 
-    def scroll_into_view(self, block: str = 'center', behavior: str = 'instant',
-                         sleep: Union[int, float] = 0) -> CoreElement:
+    def scroll_into_view(
+            self,
+            block: str = 'center',
+            behavior: str = 'instant',
+            sleep: Union[int, float] = 0,
+            silent: bool = False,
+    ) -> CoreElement:
         """
         Scroll element into view by js script
 
-        :param: block: start - element on the top; end - element at the bottom
+        :param: block: start - element on the top; end - element at the bottom. All: start, center, end, nearest
         :param: behavior: scroll type: smooth or instant
         :param: sleep: delay after scroll
+        :param: silent: erase log
         :return: self
         """
-        self.log(f'Scroll element "{self.name}" into view')
+        if not silent:
+            self.log(f'Scroll element "{self.name}" into view')
+
+        assert block in scroll_into_view_blocks, f'Provide one of {scroll_into_view_blocks} option in `block` argument'
 
         self.driver.execute_script(
-            'arguments[0].scrollIntoView({{block: "{}", behavior: "{}"}});'.format(block, behavior), self.element
+            f'arguments[0].scrollIntoView({{block: "{block}", behavior: "{behavior}"}});', self.element
         )
 
         if sleep:
@@ -503,10 +494,20 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
                     element = None
 
         if not element:
-            msg = f'Cant find element "{self.name}". {self.get_element_info()}'
+            msg = f'Cant find element "{self.name}". {self.get_element_info()}{self._ensure_unique_parent()}'
             raise NoSuchElementException(msg)
 
         return element
+
+    def _ensure_unique_parent(self):
+        info = ''
+        if is_group(self.parent) or is_element(self.parent):
+            parents_count = self.parent.get_elements_count(silent=True)
+            if parents_count > 1:
+                info = '\nWARNING: The parent object is not unique, ' \
+                       f'count of possible parent elements are: {parents_count}'
+
+        return info
 
     def _get_base(self, wait: bool = True) -> Union[SeleniumWebDriver, SeleniumWebElement]:
         """
@@ -519,7 +520,7 @@ class CoreElement(ElementMixin, DriverMixin, Logging):
         if not base:
             raise DriverWrapperException("Can't find driver")
 
-        if self.driver_wrapper.mobile:
+        if self.driver_wrapper.is_mobile:
             if self.driver_wrapper.is_native_context:
                 return base
 

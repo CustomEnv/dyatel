@@ -1,42 +1,35 @@
 import os
 
 import pytest
-from playwright.sync_api import sync_playwright
-from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
-from selenium.webdriver.firefox.webdriver import WebDriver as GeckoWebDriver
-from selenium.webdriver.safari.webdriver import WebDriver as SafariWebDriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from appium.webdriver.webdriver import WebDriver as AppiumDriver
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.firefox import GeckoDriverManager
 
 from dyatel.base.driver_wrapper import DriverWrapper
-from dyatel.dyatel_play.play_driver import PlayDriver
-from dyatel.mixins.logging import dyatel_logs_settings
+from dyatel.utils.logs import dyatel_logs_settings
 from dyatel.visual_comparison import VisualComparison
+from tests.adata.drivers.driver_entities import DriverEntities
+from tests.adata.drivers.driver_factory import DriverFactory
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
 from tests.adata.pages.frames_page import FramesPage
 from tests.adata.pages.keyboard_page import KeyboardPage
 from tests.adata.pages.progress_bar_page import ProgressBarPage
-from tests.settings import android_desired_caps, ios_desired_caps
 from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import PlaygroundMainPage, SecondPlaygroundMainPage
-
+from tests.adata.pytest_utils import skip_platform
 
 dyatel_logs_settings()
 
 
 def pytest_addoption(parser):
-    parser.addoption('--engine', default='selenium', help='Specify driver engine')
     parser.addoption('--headless', action='store_true', help='Run in headless mode')
     parser.addoption('--driver', default='chrome', help='Browser name')
-    parser.addoption('--platform', default='desktop', help='Platform name')
+    parser.addoption('--platform', default='selenium', help='Platform name')
     parser.addoption('--gr', action='store_true', help='Generate reference images in visual tests')
+    parser.addoption('--sv', action='store_true', help='Generate reference images in visual tests')
     parser.addoption('--hgr', action='store_true', help='Hard generate reference images in visual tests')
-    parser.addoption('--appium-port', default='1000')
+    parser.addoption('--appium-port', default='1111')
     parser.addoption('--appium-ip', default='0.0.0.0')
 
 
@@ -46,18 +39,8 @@ def driver_name(request):
 
 
 @pytest.fixture(scope='session')
-def driver_engine(request):
-    return request.config.getoption('engine').lower()
-
-
-@pytest.fixture(scope='session')
 def platform(request):
     return request.config.getoption('platform').lower()
-
-
-@pytest.fixture
-def markers(request):
-    return request.node.own_markers
 
 
 @pytest.fixture(scope='session')
@@ -65,6 +48,7 @@ def chrome_options(request):
     options = ChromeOptions()
     if request.config.getoption('headless'):
         options.headless = True
+    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     return options
 
 
@@ -76,102 +60,55 @@ def firefox_options(request):
     return options
 
 
-@pytest.fixture
-def driver_wrapper(platform, driver_name, driver_engine, request, driver_init):
+@pytest.fixture(autouse=True)
+def redirect(request):
     # Prints are required for better readability: https://github.com/pytest-dev/pytest/issues/8574
     print()
-    skip_marks_iterator = tuple(request.node.iter_markers(name='skip_platform'))
-    skip_platform = list(name for marker in skip_marks_iterator for name in marker.args)
-    xfail_marks_iterator = tuple(request.node.iter_markers(name='xfail_platform'))
-    xfail_platform = list(name for marker in xfail_marks_iterator for name in marker.args)
-
-    if platform in str(xfail_platform) or driver_engine in str(xfail_platform) or driver_name in str(xfail_platform):
-        xfail_reason = list(name for marker in xfail_marks_iterator for name in marker.kwargs.values())
-        pytest.xfail(f"Expected failed for {platform} with {driver_name}. Reason={xfail_reason}")
-
-    if platform in str(skip_platform) or driver_engine in str(skip_platform) or driver_name in str(skip_platform):
-        skip_reason = list(name for marker in skip_marks_iterator for name in marker.kwargs.values())
-        pytest.skip(f"Skip test {platform} with {driver_name}. Reason={skip_reason}")
-
-    yield driver_init
+    yield
     print()
-    driver_init.get('data:,')
+    if DriverWrapper.session.sessions_count() > 0:
+        driver_wrapper = request.getfixturevalue('driver_wrapper')
+        driver_wrapper.get('data:,', silent=True)
 
 
 @pytest.fixture
-def second_driver_wrapper(request, driver_name, driver_engine, chrome_options, firefox_options, platform):
-    driver = driver_func(request, driver_name, driver_engine, chrome_options, firefox_options, platform)
+def second_driver_wrapper(request, driver_name, platform, chrome_options, firefox_options):
+    driver = driver_func(**locals())
     yield driver
-    driver.quit()
+    driver.quit(silent=True)
 
 
 @pytest.fixture(scope='session')
-def driver_init(request, driver_name, driver_engine, chrome_options, firefox_options, platform):
-    driver = driver_func(request, driver_name, driver_engine, chrome_options, firefox_options, platform)
+def driver_wrapper(request, driver_name, platform, chrome_options, firefox_options):
+    driver = driver_func(**locals())
     yield driver
-    driver.quit()
+    driver.quit(silent=True)
 
 
-def driver_func(request, driver_name, driver_engine, chrome_options, firefox_options, platform):
-    driver, browser = None, None
-    is_headless = request.config.getoption('headless')
-
-    if 'appium' in driver_engine:
-        if not DriverWrapper.driver:
-            appium_ip = request.config.getoption('--appium-ip')
-            appium_port = request.config.getoption('--appium-port')
-            command_exc = f'http://{appium_ip}:{appium_port}/wd/hub'
-            is_android = platform == 'android'
-            caps = android_desired_caps if is_android else ios_desired_caps
-
-            caps.update({'browserName': driver_name.title()})
-
-            if is_android:
-                caps.update({'chromedriverArgs': ['--hide-scrollbars']})
-
-            driver = AppiumDriver(command_executor=command_exc, desired_capabilities=caps)
-        else:
-            driver = ChromeWebDriver(executable_path=ChromeDriverManager().install(), options=chrome_options)
-
-    elif 'selenium' in driver_engine:
-        if driver_name == 'chrome':
-            driver = ChromeWebDriver(executable_path=ChromeDriverManager().install(), options=chrome_options)
-        elif driver_name == 'firefox':
-            driver = GeckoWebDriver(executable_path=GeckoDriverManager().install(), options=firefox_options)
-        elif driver_name == 'safari':
-            if not DriverWrapper.driver:
-                driver = SafariWebDriver()
-            else:
-                driver = ChromeWebDriver(executable_path=ChromeDriverManager().install(), options=chrome_options)
-
-        driver.set_window_position(0, 0)  # FIXME
-
-    elif 'play' in driver_engine:
-        driver = PlayDriver.instance
-
-        if not driver:
-            playwright = sync_playwright().start()
-
-            if driver_name == 'chrome':
-                browser = playwright.chromium
-            elif driver_name == 'firefox':
-                browser = playwright.firefox
-            elif driver_name == 'safari':
-                browser = playwright.webkit
-
-            driver = browser.launch(headless=is_headless)
+def driver_func(request, driver_name, platform, chrome_options, firefox_options):
+    entities = DriverEntities(request, driver_name, platform, chrome_options, firefox_options)
+    driver = DriverFactory.create_driver(entities)
 
     driver_wrapper = DriverWrapper(driver)
 
-    VisualComparison.visual_regression_path = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
-    VisualComparison.visual_reference_generation = request.config.getoption('--gr')
-    VisualComparison.hard_visual_reference_generation = request.config.getoption('--hgr')
-    VisualComparison.default_threshold = 0.1
-
-    if 'appium' not in driver_engine:
+    if driver_wrapper.is_desktop:
         driver_wrapper.set_window_size(1024, 900)
 
     return driver_wrapper
+
+
+@pytest.fixture(autouse=True, scope='session')
+def visual_comparisons_settings(request):
+    VisualComparison.visual_regression_path = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
+    VisualComparison.visual_reference_generation = request.config.getoption('--gr')
+    VisualComparison.hard_visual_reference_generation = request.config.getoption('--hgr')
+    VisualComparison.skip_screenshot_comparison = request.config.getoption('--sv')
+    VisualComparison.default_threshold = 0.1
+
+
+def pytest_collection_modifyitems(items):
+    for item in items:
+        skip_platform(item=item, platform=item.session.config.getoption("--platform"))
 
 
 @pytest.fixture

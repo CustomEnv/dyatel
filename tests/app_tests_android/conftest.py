@@ -8,11 +8,8 @@ from appium.webdriver.appium_service import AppiumService
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 
-from dyatel.shared_utils import set_logging_settings, resize_image, shell_running_command, shell_command
+from dyatel.shared_utils import resize_image, shell_running_command, shell_command
 from tests.settings import android_desired_caps, android_device_start_timeout, appium_logs_path
-
-
-set_logging_settings()
 
 
 def pytest_addoption(parser):
@@ -92,7 +89,7 @@ def mobile_driver(request, emulator):
     request.node.node_driver = mobile_driver.driver
     yield mobile_driver
     if 'no_teardown' not in all_pytest_markers:
-        mobile_driver.terminate_app(mobile_driver.capabilities['appPackage'])  # TODO: fix issues
+        mobile_driver.terminate_app(mobile_driver.caps['appPackage'])  # TODO: fix issues
 
 
 @pytest.hookimpl(hookwrapper=True)
