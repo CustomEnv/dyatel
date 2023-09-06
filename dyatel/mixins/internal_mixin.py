@@ -5,7 +5,11 @@ from typing import Any
 
 from appium.webdriver.common.appiumby import AppiumBy
 
-from dyatel.utils.internal_utils import get_child_elements_with_names, get_child_elements
+from dyatel.utils.internal_utils import (
+    get_child_elements_with_names,
+    get_child_elements,
+    get_all_attributes_from_object,
+)
 
 
 all_locator_types = get_child_elements(AppiumBy, str)
@@ -44,13 +48,13 @@ class InternalMixin:
 
     def _set_static(self: Any, cls) -> None:
         """
-        Set static attributes for given object from base class
+        Set static from base cls (Web/Mobile/Play Element/Page etc.)
 
         :return: None
         """
         data = {
             name: value for name, value in self.__get_static(cls)
-            if name not in self.__class__.__dict__.keys()
+            if name not in get_all_attributes_from_object(self).keys()
         }.items()
 
         for name, item in data:

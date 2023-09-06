@@ -5,12 +5,12 @@ from typing import List, Union
 from playwright.sync_api import Locator, Page
 from playwright.sync_api import Browser
 
-from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABS
+from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
 from dyatel.utils.internal_utils import get_timeout_in_ms
 from dyatel.utils.logs import Logging
 
 
-class PlayDriver(Logging, DriverWrapperABS):
+class PlayDriver(Logging, DriverWrapperABC):
 
     def __init__(self, driver: Browser):
         """

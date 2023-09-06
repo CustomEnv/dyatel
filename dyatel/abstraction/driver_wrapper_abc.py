@@ -8,7 +8,7 @@ from selenium.webdriver.common.alert import Alert
 from dyatel.utils.internal_utils import WAIT_EL
 
 
-class DriverWrapperABS(ABC):
+class DriverWrapperABC(ABC):
     session = None
     label = None
     original_tab = None
@@ -42,7 +42,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def get(self, url: str, silent: bool = False) -> DriverWrapperABS:
+    def get(self, url: str, silent: bool = False) -> DriverWrapperABC:
         """
         Navigate to given url
 
@@ -77,7 +77,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def refresh(self) -> DriverWrapperABS:
+    def refresh(self) -> DriverWrapperABC:
         """
         Reload current page
 
@@ -85,7 +85,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def go_forward(self) -> DriverWrapperABS:
+    def go_forward(self) -> DriverWrapperABC:
         """
          Go forward by driver
 
@@ -93,7 +93,7 @@ class DriverWrapperABS(ABC):
          """
         raise NotImplementedError()
 
-    def go_back(self) -> DriverWrapperABS:
+    def go_back(self) -> DriverWrapperABC:
         """
         Go back by driver
 
@@ -101,7 +101,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def set_cookie(self, cookies: List[dict]) -> DriverWrapperABS:
+    def set_cookie(self, cookies: List[dict]) -> DriverWrapperABC:
         """
         Adds a list of cookie dictionaries to current session
 
@@ -112,7 +112,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def clear_cookies(self) -> DriverWrapperABS:
+    def clear_cookies(self) -> DriverWrapperABC:
         """
         Delete all cookies in the scope of the session
 
@@ -120,7 +120,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def delete_cookie(self, name: str) -> DriverWrapperABS:
+    def delete_cookie(self, name: str) -> DriverWrapperABC:
         """
         Appium/Selenium only: Delete cookie by name
 
@@ -141,7 +141,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def switch_to_frame(self, frame: Any) -> DriverWrapperABS:
+    def switch_to_frame(self, frame: Any) -> DriverWrapperABC:
         """
         Appium/Selenium only: Switch to frame
 
@@ -150,7 +150,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def switch_to_parent_frame(self) -> DriverWrapperABS:
+    def switch_to_parent_frame(self) -> DriverWrapperABC:
         """
         Appium/Selenium only: Switch to parent frame from child frame
 
@@ -158,7 +158,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def switch_to_default_content(self) -> DriverWrapperABS:
+    def switch_to_default_content(self) -> DriverWrapperABC:
         """
         Appium/Selenium only: Switch to default content from frame
 
@@ -177,7 +177,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def set_page_load_timeout(self, timeout: int = 30) -> DriverWrapperABS:
+    def set_page_load_timeout(self, timeout: int = 30) -> DriverWrapperABC:
         """
         Set the amount of time to wait for a page load to complete before throwing an error
 
@@ -186,7 +186,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def set_window_size(self, width: int, height: int) -> DriverWrapperABS:
+    def set_window_size(self, width: int, height: int) -> DriverWrapperABC:
         """
         Sets the width and height of the current window
 
@@ -204,7 +204,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def get_all_tabs(self) -> List[DriverWrapperABS]:
+    def get_all_tabs(self) -> List[DriverWrapperABC]:
         """
         Selenium/Playwright only: Get all opened tabs
 
@@ -212,7 +212,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def create_new_tab(self) -> DriverWrapperABS:
+    def create_new_tab(self) -> DriverWrapperABC:
         """
         Selenium/Playwright only: Create new tab and switch into it
 
@@ -220,7 +220,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def switch_to_original_tab(self) -> DriverWrapperABS:
+    def switch_to_original_tab(self) -> DriverWrapperABC:
         """
         Selenium/Playwright only: Switch to original tab
 
@@ -228,7 +228,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def switch_to_tab(self, tab: int = -1) -> DriverWrapperABS:
+    def switch_to_tab(self, tab: int = -1) -> DriverWrapperABC:
         """
         Selenium/Playwright only: Switch to specific tab
 
@@ -237,7 +237,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def close_unused_tabs(self) -> DriverWrapperABS:
+    def close_unused_tabs(self) -> DriverWrapperABC:
         """
         Selenium/Playwright only: Close all tabs except original
 
@@ -245,7 +245,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def click_by_coordinates(self, x: int, y: int, silent: bool = False) -> DriverWrapperABS:
+    def click_by_coordinates(self, x: int, y: int, silent: bool = False) -> DriverWrapperABC:
         """
         Click by given coordinates
 
@@ -305,7 +305,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def switch_to_native(self) -> DriverWrapperABS:
+    def switch_to_native(self) -> DriverWrapperABC:
         """
         Appium only: Switch to native app context
 
@@ -313,7 +313,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def switch_to_web(self) -> DriverWrapperABS:
+    def switch_to_web(self) -> DriverWrapperABC:
         """
         Appium only: Switch to web app context
 
@@ -361,7 +361,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def hide_keyboard(self, **kwargs) -> DriverWrapperABS:
+    def hide_keyboard(self, **kwargs) -> DriverWrapperABC:
         """
         Appium only: Hide keyboard for real device
 
@@ -396,7 +396,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def accept_alert(self) -> DriverWrapperABS:
+    def accept_alert(self) -> DriverWrapperABC:
         """
         Appium/Selenium only: Wait for alert -> switch to it -> click accept
 
@@ -404,7 +404,7 @@ class DriverWrapperABS(ABC):
         """
         raise NotImplementedError()
 
-    def dismiss_alert(self) -> DriverWrapperABS:
+    def dismiss_alert(self) -> DriverWrapperABC:
         """
         Appium/Selenium only: Wait for alert -> switch to it -> click dismiss
 

@@ -8,7 +8,7 @@ from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
-from dyatel.abstraction.element_abc import ElementABS
+from dyatel.abstraction.element_abc import ElementABC
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.exceptions import *
 from dyatel.dyatel_play.play_element import PlayElement
@@ -31,7 +31,7 @@ from dyatel.utils.internal_utils import (
 )
 
 
-class Element(DriverMixin, InternalMixin, Logging, ElementABS):
+class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
     _object = 'element'

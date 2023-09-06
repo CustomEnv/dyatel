@@ -9,7 +9,7 @@ from playwright.sync_api import Page as PlaywrightPage
 from playwright.sync_api import Locator
 
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_playwright_locator
-from dyatel.abstraction.element_abc import ElementABS
+from dyatel.abstraction.element_abc import ElementABC
 from dyatel.exceptions import TimeoutException
 from dyatel.utils.logs import Logging
 from dyatel.shared_utils import cut_log_data
@@ -22,7 +22,7 @@ from dyatel.utils.internal_utils import (
 )
 
 
-class PlayElement(ElementABS, Logging, ABC):
+class PlayElement(ElementABC, Logging, ABC):
 
     def __init__(self, locator: str, locator_type: str):
         """

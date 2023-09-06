@@ -8,12 +8,12 @@ from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElemen
 from appium.webdriver.webelement import WebElement as AppiumWebElement
 from playwright.sync_api import Locator as PlayWebElement
 
-from dyatel.abstraction.mixin_abc import MixinABS
+from dyatel.abstraction.mixin_abc import MixinABC
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.utils.internal_utils import WAIT_EL
 
 
-class ElementABS(ABC, MixinABS):
+class ElementABC(MixinABC, ABC):
     _element = None
     __element = None
 
@@ -51,7 +51,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def click(self, with_wait: bool = True, *args, **kwargs) -> ElementABS:
+    def click(self, with_wait: bool = True, *args, **kwargs) -> ElementABC:
         """
         Click to current element
 
@@ -69,7 +69,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def click_into_center(self, silent: bool = False) -> ElementABS:
+    def click_into_center(self, silent: bool = False) -> ElementABC:
         """
         Click into the center of element
 
@@ -78,7 +78,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> ElementABS:
+    def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> ElementABC:
         """
         Type text to current element
 
@@ -88,7 +88,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def type_slowly(self, text: str, sleep_gap: float = 0.05, silent: bool = False) -> ElementABS:
+    def type_slowly(self, text: str, sleep_gap: float = 0.05, silent: bool = False) -> ElementABC:
         """
         Type text to current element slowly
 
@@ -99,7 +99,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def clear_text(self, silent: bool = False) -> ElementABS:
+    def clear_text(self, silent: bool = False) -> ElementABC:
         """
         Clear text from current element
 
@@ -108,7 +108,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def check(self) -> ElementABS:
+    def check(self) -> ElementABC:
         """
         Check current checkbox
 
@@ -116,7 +116,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def uncheck(self) -> ElementABS:
+    def uncheck(self) -> ElementABC:
         """
         Uncheck current checkbox
 
@@ -124,7 +124,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABS:
+    def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait for current element available in page
 
@@ -134,7 +134,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABS:
+    def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait until current element hidden
 
@@ -144,7 +144,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABS:
+    def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait for current element available in DOM
 
@@ -270,7 +270,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def hover(self, silent: bool = False) -> ElementABS:
+    def hover(self, silent: bool = False) -> ElementABC:
         """
         Hover over current element
 
@@ -279,7 +279,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def hover_outside(self, x: int = 0, y: int = -5) -> ElementABS:
+    def hover_outside(self, x: int = 0, y: int = -5) -> ElementABC:
         """
         Hover outside from current element. By default, 5px above  of element
 
@@ -289,7 +289,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def click_outside(self, x: int = -1, y: int = -1) -> ElementABS:
+    def click_outside(self, x: int = -1, y: int = -1) -> ElementABC:
         """
         Click outside of element. By default, 1px above and 1px left of element
 
@@ -299,7 +299,7 @@ class ElementABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def click_in_alert(self) -> ElementABS:
+    def click_in_alert(self) -> ElementABC:
         """
         Mobile only:
         Click on element in alert with switch to native context
@@ -309,7 +309,7 @@ class ElementABS(ABC, MixinABS):
         raise NotImplementedError()
 
     @abstractmethod
-    def set_text(self, text: str, silent: bool = False) -> ElementABS:
+    def set_text(self, text: str, silent: bool = False) -> ElementABC:
         """
         Set (clear and type) text in current element
 
@@ -319,7 +319,7 @@ class ElementABS(ABC, MixinABS):
         raise NotImplementedError()
 
     @abstractmethod
-    def send_keyboard_action(self, action: Union[str, KeyboardKeys]) -> ElementABS:
+    def send_keyboard_action(self, action: Union[str, KeyboardKeys]) -> ElementABC:
         """
         Send keyboard action to current element
 
@@ -334,7 +334,7 @@ class ElementABS(ABC, MixinABS):
             expected_count: int,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
-    ) -> ElementABS:
+    ) -> ElementABC:
         """
         Wait until elements count will be equal to expected value
 
@@ -350,7 +350,7 @@ class ElementABS(ABC, MixinABS):
             self,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
-    ) -> ElementABS:
+    ) -> ElementABC:
         """
         Wait non empty text in element
 
@@ -365,7 +365,7 @@ class ElementABS(ABC, MixinABS):
             self,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
-    ) -> ElementABS:
+    ) -> ElementABC:
         """
         Wait non empty value in element
 
@@ -380,7 +380,7 @@ class ElementABS(ABC, MixinABS):
             self,
             timeout: [int, float] = WAIT_EL,
             silent: bool = False
-    ) -> ElementABS:
+    ) -> ElementABC:
         """
         Wait until element visibility without error
 
@@ -395,7 +395,7 @@ class ElementABS(ABC, MixinABS):
             self,
             timeout: [int, float] = WAIT_EL,
             silent: bool = False
-    ) -> ElementABS:
+    ) -> ElementABC:
         """
         Wait until element hidden without error
 
@@ -406,7 +406,7 @@ class ElementABS(ABC, MixinABS):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_enabled(self, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementABS:
+    def wait_enabled(self, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait until element clickable
 
@@ -417,7 +417,7 @@ class ElementABS(ABC, MixinABS):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_disabled(self, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementABS:
+    def wait_disabled(self, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait until element clickable
 
@@ -455,7 +455,7 @@ class ElementABS(ABC, MixinABS):
             behavior: str = 'instant',
             sleep: Union[int, float] = 0,
             silent: bool = False,
-    ) -> ElementABS:
+    ) -> ElementABC:
         """
         Scroll element into view by js script
 

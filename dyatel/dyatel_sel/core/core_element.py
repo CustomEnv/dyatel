@@ -19,7 +19,7 @@ from selenium.common.exceptions import (
     ElementClickInterceptedException as SeleniumElementClickInterceptedException,
 )
 
-from dyatel.abstraction.element_abc import ElementABS
+from dyatel.abstraction.element_abc import ElementABC
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js, scroll_into_view_blocks
 from dyatel.keyboard_keys import KeyboardKeys
@@ -34,7 +34,7 @@ from dyatel.exceptions import (
 )
 
 
-class CoreElement(ElementABS, ABC):
+class CoreElement(ElementABC, ABC):
 
     # Element
 

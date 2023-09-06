@@ -169,13 +169,11 @@ def get_all_attributes_from_object(reference_obj: Any) -> dict:
 
     reference_class = reference_obj if inspect.isclass(reference_obj) else reference_obj.__class__
     all_bases = list(inspect.getmro(reference_class))
-    all_bases.reverse()  # Reverse needed for getting child classes attributes first
-    all_bases.remove(object)
+    all_bases.reverse()  # Reverse needed for collect subclasses attributes as base one
 
     for parent_class in all_bases:
-        str_parent_class = str(parent_class)
 
-        if 'Abstraction' in str_parent_class or 'ABS' in str_parent_class:
+        if 'ABC' in str(parent_class) or parent_class == object:
             continue
 
         items.update(dict(parent_class.__dict__))

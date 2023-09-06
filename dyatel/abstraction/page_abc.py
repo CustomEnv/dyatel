@@ -3,15 +3,15 @@ from __future__ import annotations
 from abc import abstractmethod, ABC
 from typing import Union
 
-from dyatel.abstraction.mixin_abc import MixinABS
+from dyatel.abstraction.mixin_abc import MixinABC
 from dyatel.base.element import Element
 from dyatel.utils.internal_utils import WAIT_PAGE
 
 
-class PageABS(ABC, MixinABS):
+class PageABC(MixinABC, ABC):
 
     @abstractmethod
-    def reload_page(self, wait_page_load: bool = True) -> PageABS:
+    def reload_page(self, wait_page_load: bool = True) -> PageABC:
         """
         Reload current page
 
@@ -21,7 +21,7 @@ class PageABS(ABC, MixinABS):
         raise NotImplementedError()
 
     @abstractmethod
-    def open_page(self, url: str = '') -> PageABS:
+    def open_page(self, url: str = '') -> PageABC:
         """
         Open page with given url or use url from page class f url isn't given
 
@@ -31,7 +31,7 @@ class PageABS(ABC, MixinABS):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_page_loaded(self, silent: bool = False, timeout: Union[int, float] = WAIT_PAGE) -> PageABS:
+    def wait_page_loaded(self, silent: bool = False, timeout: Union[int, float] = WAIT_PAGE) -> PageABC:
         """
         Wait until page loaded
 
@@ -68,7 +68,7 @@ class PageABS(ABC, MixinABS):
             end_y: int,
             duration: int = 0,
             sleep: Union[int, float] = 0
-    ) -> PageABS:
+    ) -> PageABC:
         """
         Swipe from one point to another point, for an optional duration
 
@@ -82,7 +82,7 @@ class PageABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def swipe_down(self) -> PageABS:
+    def swipe_down(self) -> PageABC:
         """
         Swipe page down
 
@@ -90,7 +90,7 @@ class PageABS(ABC, MixinABS):
         """
         raise NotImplementedError()
 
-    def swipe_up(self) -> PageABS:
+    def swipe_up(self) -> PageABC:
         """
         Swipe page up
 

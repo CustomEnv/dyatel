@@ -6,7 +6,7 @@ from playwright.sync_api import Browser as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
-from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABS
+from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.dyatel_sel.driver.web_driver import WebDriver
@@ -41,7 +41,7 @@ class DriverWrapperSessions:
         return any(cls.all_sessions)
 
 
-class DriverWrapper(InternalMixin, Logging, DriverWrapperABS):
+class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     """ Driver object crossroad """
 
     _object = 'driver_wrapper'

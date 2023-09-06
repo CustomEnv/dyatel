@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Union
 
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
@@ -7,7 +8,7 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from dyatel.base.driver_wrapper import DriverWrapper
 
 
-class MixinABS:
+class MixinABC(ABC):
 
     @property
     def driver(self) -> Union[SeleniumWebDriver, AppiumWebDriver, PlaywrightSourcePage]:
