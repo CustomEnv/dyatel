@@ -3,12 +3,15 @@
 ---
 
 ## v2.1.1
-*Release date: in progress*
+*Release date: 2023-09-07*
+
+### Fixed
+- `setup.py` packages 
 
 ---
 
 ## v2.1.0
-*Release date: 2023-09-08*
+*Release date: 2023-09-07*
 
 ### Added
 - Abstract classes and methods

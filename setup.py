@@ -9,10 +9,12 @@ setup(
     url='https://github.com/EnvInc/dyatel',
     packages=[
         'dyatel',
+        'dyatel.abstraction',
         'dyatel.base',
-        'dyatel.mixins',
         'dyatel.dyatel_play',
         'dyatel.dyatel_sel',
+        'dyatel.mixins',
+        'dyatel.utils',
         'dyatel.dyatel_sel.core',
         'dyatel.dyatel_sel.driver',
         'dyatel.dyatel_sel.elements',
