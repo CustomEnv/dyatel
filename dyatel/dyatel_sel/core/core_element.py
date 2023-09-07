@@ -494,7 +494,7 @@ class CoreElement(ElementABC, ABC):
                     element = None
 
         if not element:
-            msg = f'Cant find element "{self.name}". {self.get_element_info()}{self._ensure_unique_parent()}'
+            msg = f'Cant find element "{self.name}". {self.get_element_info()}'  # todo: add _ensure_unique_parent
             raise NoSuchElementException(msg)
 
         return element

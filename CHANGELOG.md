@@ -2,6 +2,14 @@
 
 ---
 
+## v2.1.2
+*Release date: 2023-09-07*
+
+### Fixed
+- Additional logging for element disabled 
+
+---
+
 ## v2.1.1
 *Release date: 2023-09-07*
 
