@@ -21,7 +21,7 @@ def cleanup():
 
 
 def get_packages(root_dir):
-    all_dirs = []
+    all_dirs = [root_dir]
 
     for dirpath, dirnames, _ in os.walk(project_name):
         for dirname in dirnames:
