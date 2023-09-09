@@ -44,7 +44,7 @@ setup(
     url=f'https://github.com/EnvInc/{project_name}',
     packages=get_packages(project_name),
     install_requires=[
-        'Appium-Python-Client>=2.1.3',
+        'Appium-Python-Client>=2.1.2',
         'numpy>=1.18.1',
         'opencv-python==4.5.5.62',
         'Pillow>=6.2.2',
