@@ -56,6 +56,13 @@ class NoSuchElementException(DriverWrapperException):
     pass
 
 
+class NoSuchParentException(DriverWrapperException):
+    """
+    Thrown when parent could not be found
+    """
+    pass
+
+
 class ElementNotInteractableException(DriverWrapperException):
     """
     Thrown when element found and enabled but not interactable

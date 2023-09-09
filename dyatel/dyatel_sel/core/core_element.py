@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from abc import ABC
 from io import BytesIO
-from typing import Union, List, Any
+from typing import Union, List, Any, Callable
 
 from PIL import Image
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
@@ -11,7 +11,6 @@ from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElemen
 from appium.webdriver.webelement import WebElement as AppiumWebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import (
-    StaleElementReferenceException as SeleniumStaleElementReferenceException,
     InvalidArgumentException as SeleniumInvalidArgumentException,
     InvalidSelectorException as SeleniumInvalidSelectorException,
     NoSuchElementException as SeleniumNoSuchElementException,
@@ -24,17 +23,22 @@ from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js, scroll_into_view_blocks
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.shared_utils import cut_log_data
-from dyatel.utils.internal_utils import WAIT_EL, is_group, is_element
+from dyatel.utils.internal_utils import WAIT_EL, safe_call
 from dyatel.exceptions import (
     TimeoutException,
     InvalidSelectorException,
     DriverWrapperException,
     NoSuchElementException,
     ElementNotInteractableException,
+    NoSuchParentException,
 )
 
 
 class CoreElement(ElementABC, ABC):
+
+    parent: Union[ElementABC, CoreElement]
+    _element: Union[SeleniumWebElement, AppiumWebElement] = None
+    _cached_element: Union[SeleniumWebElement, AppiumWebElement] = None
 
     # Element
 
@@ -45,7 +49,7 @@ class CoreElement(ElementABC, ABC):
 
         :return: SeleniumWebElement
         """
-        return self._get_element(wait=True)
+        return self._get_element()
 
     @element.setter
     def element(self, base_element: Union[SeleniumWebElement, AppiumWebElement]):
@@ -56,26 +60,31 @@ class CoreElement(ElementABC, ABC):
         """
         self._element = base_element
 
+    @property
+    def all_elements(self) -> Union[None, List[Any]]:
+        """
+        Get all wrapped elements with selenium/appium bases
+
+        :return: list of wrapped objects
+        """
+        return self._get_all_elements(self._find_elements())
+
     # Element interaction
 
-    def click(self, with_wait: bool = True, *args, **kwargs) -> CoreElement:
+    def click(self, *args, **kwargs) -> CoreElement:
         """
         Click to current element
 
-        :param with_wait: wait for element before click
         :param: args: compatibility arg
         :param: kwargs: compatibility arg
         :return: self
         """
         self.log(f'Click into "{self.name}"')
 
-        self.element = self._get_element()
+        self.element = self._get_element(force_wait=True)
         exception_msg = f'Element "{self.name}" not interactable {self.get_element_info()}'
 
         try:
-            if with_wait:
-                self.wait_element(silent=True)
-
             self.wait_enabled(silent=True).element.click()
         except SeleniumElementNotInteractableException:
             raise ElementNotInteractableException(exception_msg)
@@ -141,7 +150,7 @@ class CoreElement(ElementABC, ABC):
 
         :return: self
         """
-        self.element = self._get_element(wait=True, from_dom=True)
+        self.element = self._get_element(wait=self.wait_availability)
 
         try:
             if not self.is_checked():
@@ -157,7 +166,7 @@ class CoreElement(ElementABC, ABC):
 
         :return: self
         """
-        self.element = self._get_element(wait=True, from_dom=True)
+        self.element = self._get_element(wait=self.wait_availability)
 
         try:
             if self.is_checked():
@@ -296,7 +305,7 @@ class CoreElement(ElementABC, ABC):
 
         :return: element text
         """
-        element = self._get_element(wait=True, from_dom=True)
+        element = self._get_element(wait=self.wait_availability)
         return element.text
 
     @property
@@ -323,13 +332,9 @@ class CoreElement(ElementABC, ABC):
 
         :return: True if present in DOM
         """
-        elements = self._find_elements(self._get_base(wait=False))
-        is_available = bool(len(elements))
+        element = safe_call(self._find_element, wait_parent=False)
 
-        if is_available:
-            self.__element = elements[0]
-
-        return is_available
+        return bool(element)
 
     def is_displayed(self, silent: bool = False) -> bool:
         """
@@ -341,11 +346,12 @@ class CoreElement(ElementABC, ABC):
         if not silent:
             self.log(f'Check displaying of "{self.name}"')
 
-        try:
-            self.__element = self._get_element(wait=False)
-            return self.__element.is_displayed()
-        except (NoSuchElementException, DriverWrapperException, SeleniumStaleElementReferenceException):
-            return False
+        is_displayed = self.is_available()
+
+        if is_displayed:
+            is_displayed = self._cached_element.is_displayed()
+
+        return is_displayed
 
     def is_hidden(self, silent: bool = False) -> bool:
         """
@@ -427,7 +433,7 @@ class CoreElement(ElementABC, ABC):
 
         :return: bool
         """
-        return self._get_element(wait=True, from_dom=True).is_selected()
+        return self._get_element(wait=self.wait_availability).is_selected()
 
     # Mixin
 
@@ -465,51 +471,42 @@ class CoreElement(ElementABC, ABC):
 
         return img_binary
 
-    def _get_element(self, wait: bool = True, from_dom: bool = False) -> SeleniumWebElement:
+    def _get_element(self, wait: Union[bool, Callable] = True, force_wait: bool = False) -> SeleniumWebElement:
         """
         Get selenium element from driver or parent element
 
-        :param wait: wait for element or element parent before grab
-        :param from_dom: check element presenting in dom while wait
+        :param wait: wait strategy for element and/or element parent before grab
+        :param force_wait: force wait for some element
         :return: SeleniumWebElement
         """
         element = self._element
 
-        if not element:
-            base = getattr(self.parent, '_element', None)
-
-            if not base:
-                base = self._get_base(wait=wait)
-
-            try:
-                element = self._find_element(base)
-            except (NoSuchElementException, SeleniumStaleElementReferenceException):
-                element = None
-
-            if not element and wait:
-                wait_func = self.wait_availability if from_dom else self.wait_element
-                try:
-                    element = wait_func(silent=True).__element
-                except TimeoutException:
-                    element = None
+        if wait is True:
+            wait = self.wait_element
 
         if not element:
-            msg = f'Cant find element "{self.name}". {self.get_element_info()}'  # todo: add _ensure_unique_parent
-            raise NoSuchElementException(msg)
+
+            # Try to get element instantly without wait. Skipped if force_wait given
+            if not force_wait:
+                element = safe_call(self._find_element, wait_parent=False)
+
+            # Wait for element if it is not found instantly
+            if (not element and wait) or force_wait:
+                element = self._get_cached_element(safe_call(wait, silent=True))
+
+        if not element:
+            if self.parent and not self._get_cached_element(self.parent):
+                raise NoSuchParentException(
+                    f'Cant find parent object "{self.parent.name}". {self.get_element_info(self.parent)}'
+                )
+
+            raise NoSuchElementException(
+                f'Cant find element "{self.name}". {self.get_element_info()}{self._ensure_unique_parent()}'
+            )
 
         return element
 
-    def _ensure_unique_parent(self):
-        info = ''
-        if is_group(self.parent) or is_element(self.parent):
-            parents_count = self.parent.get_elements_count(silent=True)
-            if parents_count > 1:
-                info = '\nWARNING: The parent object is not unique, ' \
-                       f'count of possible parent elements are: {parents_count}'
-
-        return info
-
-    def _get_base(self, wait: bool = True) -> Union[SeleniumWebDriver, SeleniumWebElement]:
+    def _get_base(self, wait: Union[bool, Callable] = True) -> Union[SeleniumWebDriver, SeleniumWebElement]:
         """
         Get driver with depends on parent element if available
 
@@ -525,38 +522,42 @@ class CoreElement(ElementABC, ABC):
                 return base
 
         if self.parent:
-            try:
-                if is_group(self.parent) or is_element(self.parent):
-                    base = self.parent._get_element(wait=wait)  # noqa
-            except NoSuchElementException:
-                message = f'Cant find parent element "{self.parent.name}". {self.get_element_info(self.parent)}'
-                raise NoSuchElementException(message)
+            base = self.parent._get_element(wait=wait)
 
         return base
 
-    def _find_element(self, base: Any) -> SeleniumWebElement:
+    def _find_element(self, wait_parent: bool = False) -> Union[SeleniumWebElement, AppiumWebElement]:
         """
         Find selenium/appium element
 
-        :param base: parent element/driver object
+        :param wait_parent: wait for base(parent) element
         :return: SeleniumWebElement or AppiumWebElement
         """
+        base = self._get_base(wait=wait_parent)
         try:
-            return base.find_element(self.locator_type, self.locator)
+            element = base.find_element(self.locator_type, self.locator)
+            self._cached_element = element
+            return element
         except (SeleniumInvalidArgumentException, SeleniumInvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
         except SeleniumNoSuchElementException as exc:
             raise NoSuchElementException(exc.msg)
 
-    def _find_elements(self, base: Any) -> List[Union[SeleniumWebElement, AppiumWebElement]]:
+    def _find_elements(self, wait_parent: bool = False) -> List[Union[SeleniumWebElement, AppiumWebElement]]:
         """
         Find all selenium/appium elements
 
-        :param base: parent element/driver object
+        :param wait_parent: wait for base(parent) element
         :return: list of SeleniumWebElement or AppiumWebElement
         """
+        base = self._get_base(wait=wait_parent)
         try:
-            return base.find_elements(self.locator_type, self.locator)
+            elements = base.find_elements(self.locator_type, self.locator)
+
+            if elements:
+                self._cached_element = elements[0]
+
+            return elements
         except (SeleniumInvalidArgumentException, InvalidSelectorException) as exc:
             self._raise_invalid_selector_exception(exc)
 
@@ -572,3 +573,26 @@ class CoreElement(ElementABC, ABC):
             raise InvalidSelectorException(msg)
         else:
             raise exc
+
+    def _ensure_unique_parent(self) -> str:
+        """
+        Ensure that parent is unique and give information if it isn't
+
+        :return: empty string or warning info
+        """
+        info = ''
+        if self.parent:
+            parents_count = len(self.parent._find_elements())
+            if parents_count > 1:
+                info = f'\nWARNING: The parent object is not unique, count of parent elements are: {parents_count}'
+
+        return info
+
+    def _get_cached_element(self, obj: CoreElement) -> Union[None, SeleniumWebElement, AppiumWebElement]:
+        """
+        Get cached element from given object
+
+        :param obj: CoreElement object
+        :return: None, SeleniumWebElement, AppiumWebElement
+        """
+        return obj._cached_element

@@ -20,16 +20,6 @@ class WebElement(CoreElement, ABC):
         self.locator = get_platform_locator(self, default_locator=locator)
         self.locator_type = locator_type if locator_type else get_selenium_locator_type(locator)
 
-    @property
-    def all_elements(self) -> Union[None, List[Any]]:
-        """
-        Get all wrapped elements with selenium bases
-
-        :return: list of wrapped objects
-        """
-        selenium_elements = self._find_elements(self._get_base())
-        return self._get_all_elements(selenium_elements)
-
     def hover(self, silent: bool = False) -> WebElement:
         """
         Hover over current element

@@ -14,13 +14,11 @@ from dyatel.utils.internal_utils import WAIT_EL
 
 
 class ElementABC(MixinABC, ABC):
-    _element = None
-    __element = None
 
     locator: str = None
     locator_type: str = None
     name: str = None
-    parent: Any = None
+    parent: ElementABC = None
     wait: bool = None
 
     @property
@@ -51,11 +49,9 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def click(self, with_wait: bool = True, *args, **kwargs) -> ElementABC:
+    def click(self, *args, **kwargs) -> ElementABC:
         """
         Click to current element
-
-        :param with_wait: wait for element before click
 
         Selenium/Appium:
         :param: args: compatibility arg
