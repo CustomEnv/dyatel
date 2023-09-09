@@ -6,6 +6,8 @@ from copy import copy
 from functools import lru_cache
 from typing import Any, Union, Callable
 
+from selenium.common.exceptions import StaleElementReferenceException as SeleniumStaleElementReferenceException
+
 from dyatel.exceptions import NoSuchElementException, InvalidSelectorException, TimeoutException, NoSuchParentException
 
 
@@ -27,9 +29,17 @@ def safe_call(func: Callable, *args, **kwargs) -> Union[Any, None]:
     :param kwargs: any kwargs for function
     :return: None or function return
     """
+    exceptions = (
+        NoSuchElementException,
+        InvalidSelectorException,
+        TimeoutException,
+        NoSuchParentException,
+        SeleniumStaleElementReferenceException,
+    )
+
     try:
         return func(*args, **kwargs)
-    except (NoSuchElementException, InvalidSelectorException, TimeoutException, NoSuchParentException):
+    except exceptions:
         pass
 
 

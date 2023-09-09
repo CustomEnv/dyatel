@@ -349,7 +349,7 @@ class CoreElement(ElementABC, ABC):
         is_displayed = self.is_available()
 
         if is_displayed:
-            is_displayed = self._cached_element.is_displayed()
+            is_displayed = safe_call(self._cached_element.is_displayed)
 
         return is_displayed
 
