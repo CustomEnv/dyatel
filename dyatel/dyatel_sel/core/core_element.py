@@ -37,8 +37,8 @@ from dyatel.exceptions import (
 class CoreElement(ElementABC, ABC):
 
     parent: Union[ElementABC, CoreElement]
-    _element: Union[SeleniumWebElement, AppiumWebElement] = None
-    _cached_element: Union[SeleniumWebElement, AppiumWebElement] = None
+    _element: Union[None, SeleniumWebElement, AppiumWebElement] = None
+    _cached_element: Union[None, SeleniumWebElement, AppiumWebElement] = None
 
     # Element
 
@@ -534,6 +534,8 @@ class CoreElement(ElementABC, ABC):
         :return: SeleniumWebElement or AppiumWebElement
         """
         base = self._get_base(wait=wait_parent)
+        self._cached_element = None
+
         try:
             element = base.find_element(self.locator_type, self.locator)
             self._cached_element = element
@@ -551,6 +553,8 @@ class CoreElement(ElementABC, ABC):
         :return: list of SeleniumWebElement or AppiumWebElement
         """
         base = self._get_base(wait=wait_parent)
+        self._cached_element = None
+
         try:
             elements = base.find_elements(self.locator_type, self.locator)
 
@@ -595,4 +599,4 @@ class CoreElement(ElementABC, ABC):
         :param obj: CoreElement object
         :return: None, SeleniumWebElement, AppiumWebElement
         """
-        return obj._cached_element
+        return getattr(obj, '_cached_element', None)
