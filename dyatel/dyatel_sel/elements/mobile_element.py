@@ -23,16 +23,6 @@ class MobileElement(CoreElement, ABC):
         locator_type = locator_type if locator_type else get_selenium_locator_type(locator)
         self.locator, self.locator_type = get_appium_selector(locator, locator_type)
 
-    @property
-    def all_elements(self) -> Union[None, List[Any]]:
-        """
-        Get all wrapped elements with appium bases
-
-        :return: list of wrapped objects
-        """
-        appium_elements = self._find_elements(self._get_base())
-        return self._get_all_elements(appium_elements)
-
     def click_outside(self, x: int = 0, y: int = -5) -> MobileElement:
         """
         Click outside of element. By default, 5px above  of element

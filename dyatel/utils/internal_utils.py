@@ -4,7 +4,11 @@ import sys
 import inspect
 from copy import copy
 from functools import lru_cache
-from typing import Any, Union
+from typing import Any, Union, Callable
+
+from selenium.common.exceptions import StaleElementReferenceException as SeleniumStaleElementReferenceException
+
+from dyatel.exceptions import NoSuchElementException, InvalidSelectorException, TimeoutException, NoSuchParentException
 
 
 WAIT_EL = 10
@@ -14,6 +18,29 @@ WAIT_PAGE = 15
 all_tags = {'h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
             'textarea', 'svg', 'circle', 'iframe', 'label', 'p', 'tr', 'th', 'table', 'tbody', 'td', 'select', 'nav',
             'li', 'form', 'footer', 'frame', 'area', 'span'}
+
+
+def safe_call(func: Callable, *args, **kwargs) -> Union[Any, None]:
+    """
+    Wrapper for any method that raises internal exceptions to prevent exceptions
+
+    :param func: any internal function
+    :param args: any args for function
+    :param kwargs: any kwargs for function
+    :return: None or function return
+    """
+    exceptions = (
+        NoSuchElementException,
+        InvalidSelectorException,
+        TimeoutException,
+        NoSuchParentException,
+        SeleniumStaleElementReferenceException,
+    )
+
+    try:
+        return func(*args, **kwargs)
+    except exceptions:
+        pass
 
 
 @lru_cache(maxsize=None)

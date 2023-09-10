@@ -24,6 +24,9 @@ from dyatel.utils.internal_utils import (
 
 class PlayElement(ElementABC, Logging, ABC):
 
+    parent: Union[ElementABC, PlayElement]
+    _element: Locator = None
+
     def __init__(self, locator: str, locator_type: str):
         """
         Initializing of web element with playwright driver
@@ -72,18 +75,19 @@ class PlayElement(ElementABC, Logging, ABC):
 
     # Element interaction
 
-    def click(self, with_wait: bool = True, *args, **kwargs) -> PlayElement:
+    def click(self, force_wait: bool = True, *args, **kwargs) -> ElementABC:
         """
         Click to current element
 
-        :param with_wait: wait for element before click
+        :param force_wait: wait for element visibility before click
+
         :param: args: https://playwright.dev/python/docs/api/class-locator#locator-click
         :param: kwargs: https://playwright.dev/python/docs/api/class-locator#locator-click
         :return: self
         """
         self.log(f'Click into "{self.name}"')
 
-        if with_wait:
+        if force_wait:
             self.wait_element(silent=True)
 
         self._first_element.click(*args, **kwargs)

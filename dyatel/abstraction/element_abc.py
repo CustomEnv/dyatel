@@ -14,13 +14,11 @@ from dyatel.utils.internal_utils import WAIT_EL
 
 
 class ElementABC(MixinABC, ABC):
-    _element = None
-    __element = None
 
     locator: str = None
     locator_type: str = None
     name: str = None
-    parent: Any = None
+    parent: ElementABC = None
     wait: bool = None
 
     @property
@@ -37,7 +35,7 @@ class ElementABC(MixinABC, ABC):
         """
         Element object setter. Try to avoid usage of this function
 
-        :param: Union[SeleniumWebElement, AppiumWebElement, PlayWebElement]
+        :param base_element: Union[SeleniumWebElement, AppiumWebElement, PlayWebElement]
         """
         raise NotImplementedError()
 
@@ -51,19 +49,19 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def click(self, with_wait: bool = True, *args, **kwargs) -> ElementABC:
+    def click(self, force_wait: bool = True, *args, **kwargs) -> ElementABC:
         """
         Click to current element
 
-        :param with_wait: wait for element before click
+        :param force_wait: wait for element visibility before click
 
         Selenium/Appium:
-        :param: args: compatibility arg
-        :param: kwargs: compatibility arg
+        :param args: compatibility arg
+        :param kwargs: compatibility arg
 
         Playwright:
-        :param: args: additional params https://playwright.dev/python/docs/api/class-locator#locator-click
-        :param: kwargs: additional params https://playwright.dev/python/docs/api/class-locator#locator-click
+        :param args: additional params https://playwright.dev/python/docs/api/class-locator#locator-click
+        :param kwargs: additional params https://playwright.dev/python/docs/api/class-locator#locator-click
 
         :return: self
         """
@@ -82,8 +80,8 @@ class ElementABC(MixinABC, ABC):
         """
         Type text to current element
 
-        :param: text: text to be typed
-        :param: silent: erase log
+        :param text: text to be typed
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -92,9 +90,9 @@ class ElementABC(MixinABC, ABC):
         """
         Type text to current element slowly
 
-        :param: text: text to be slowly typed
-        :param: sleep_gap: sleep gap before each key press
-        :param: silent: erase log
+        :param text: text to be slowly typed
+        :param sleep_gap: sleep gap before each key press
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -103,7 +101,7 @@ class ElementABC(MixinABC, ABC):
         """
         Clear text from current element
 
-        :param: silent: erase log
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -128,8 +126,8 @@ class ElementABC(MixinABC, ABC):
         """
         Wait for current element available in page
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -138,8 +136,8 @@ class ElementABC(MixinABC, ABC):
         """
         Wait until current element hidden
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -148,8 +146,8 @@ class ElementABC(MixinABC, ABC):
         """
         Wait for current element available in DOM
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -203,7 +201,7 @@ class ElementABC(MixinABC, ABC):
         """
         Check visibility of element
 
-        :param: silent: erase log
+        :param silent: erase log
         :return: True if element visible
         """
         raise NotImplementedError()
@@ -212,7 +210,7 @@ class ElementABC(MixinABC, ABC):
         """
         Check invisibility of current element
 
-        :param: silent: erase log
+        :param silent: erase log
         :return: True if element hidden
         """
         raise NotImplementedError()
@@ -221,8 +219,8 @@ class ElementABC(MixinABC, ABC):
         """
         Get custom attribute from current element
 
-        :param: attribute: custom attribute: value, innerText, textContent etc.
-        :param: silent: erase log
+        :param attribute: custom attribute: value, innerText, textContent etc.
+        :param silent: erase log
         :return: custom attribute value
         """
         raise NotImplementedError()
@@ -231,7 +229,7 @@ class ElementABC(MixinABC, ABC):
         """
         Get all texts from all matching elements
 
-        :param: silent: erase log
+        :param silent: erase log
         :return: list of texts
         """
         raise NotImplementedError()
@@ -240,7 +238,7 @@ class ElementABC(MixinABC, ABC):
         """
         Get elements count
 
-        :param: silent: erase log
+        :param silent: erase log
         :return: elements count
         """
         raise NotImplementedError()
@@ -274,7 +272,7 @@ class ElementABC(MixinABC, ABC):
         """
         Hover over current element
 
-        :param: silent: erase log
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -313,7 +311,8 @@ class ElementABC(MixinABC, ABC):
         """
         Set (clear and type) text in current element
 
-        :param: silent: erase log
+        :param text: text to be filled
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -338,9 +337,9 @@ class ElementABC(MixinABC, ABC):
         """
         Wait until elements count will be equal to expected value
 
-        :param: elements_count: expected elements count
-        :param: timeout: wait timeout
-        :param: silent: erase log
+        :param expected_count: expected elements count
+        :param timeout: wait timeout
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -384,8 +383,8 @@ class ElementABC(MixinABC, ABC):
         """
         Wait until element visibility without error
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -399,8 +398,8 @@ class ElementABC(MixinABC, ABC):
         """
         Wait until element hidden without error
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -410,8 +409,8 @@ class ElementABC(MixinABC, ABC):
         """
         Wait until element clickable
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -421,8 +420,8 @@ class ElementABC(MixinABC, ABC):
         """
         Wait until element clickable
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -459,10 +458,10 @@ class ElementABC(MixinABC, ABC):
         """
         Scroll element into view by js script
 
-        :param: block: start - element on the top; end - element at the bottom. All: start, center, end, nearest
-        :param: behavior: scroll type: smooth or instant
-        :param: sleep: delay after scroll
-        :param: silent: erase log
+        :param block: start - element on the top; end - element at the bottom. All: start, center, end, nearest
+        :param behavior: scroll type: smooth or instant
+        :param sleep: delay after scroll
+        :param silent: erase log
         :return: self
         """
         raise NotImplementedError()
@@ -484,7 +483,7 @@ class ElementABC(MixinABC, ABC):
 
         :param filename: full screenshot name. Custom filename will be used if empty string given
         :param test_name: test name for custom filename. Will try to find it automatically if empty string given
-        :param name_suffix: filename suffix. Good to use for same element with positive/netagative case
+        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
         :param threshold: possible threshold
         :param delay: delay before taking screenshot
         :param scroll: scroll to element before taking the screenshot

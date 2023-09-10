@@ -4,7 +4,7 @@ import pytest
 
 from dyatel.mixins.internal_mixin import get_element_info
 from tests.adata.pages.expected_condition_page import WaitValueCardBroken
-from dyatel.exceptions import NoSuchElementException
+from dyatel.exceptions import NoSuchElementException, NoSuchParentException
 from tests.adata.pages.keyboard_page import KeyboardPage
 
 
@@ -32,9 +32,9 @@ def test_element_exception_with_broken_parent(base_playground_page):
     el = base_playground_page.kube_broken_parent
     try:
         el._get_element(wait=False)
-    except NoSuchElementException as exc:
+    except NoSuchParentException as exc:
         logs = get_element_info(el.parent)
-        message = f'Cant find parent element "{el.parent.name}". {logs}'
+        message = f'Cant find parent object "{el.parent.name}". {logs}'
         assert exc.msg == message
     else:
         raise Exception('Unexpected behaviour')
@@ -49,7 +49,7 @@ def test_multiple_parents_found_negative(expected_condition_page):
     try:
         WaitValueCardBroken().trigger_button._get_element(wait=False)
     except NoSuchElementException as exc:
-        assert 'WARNING: The parent object is not unique, count of possible parent elements are: 8' in exc.msg
+        assert 'WARNING: The parent object is not unique, count of parent elements are: 8' in exc.msg
     else:
         raise Exception('Unexpected behaviour')
 

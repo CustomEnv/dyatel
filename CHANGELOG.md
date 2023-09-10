@@ -2,6 +2,15 @@
 
 ---
 
+## v2.1.3
+*Release date: 2023-09-10*
+
+### Changed
+- Selenium/Appium only: Additional logging for element enabled
+- Selenium/Appium element gathering and exceptions reworked
+
+---
+
 ## v2.1.2
 *Release date: 2023-09-07*
 

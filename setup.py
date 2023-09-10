@@ -1,25 +1,48 @@
+import os
+import shutil
+
 from setuptools import setup
 
 with open('README.md') as f:
     description = f.read()
 
+
+pypi_name = 'dyatel-wrapper'
+project_name = 'dyatel'
+egg_name = pypi_name.replace('-', '_')
+
+
+def cleanup():
+    home_dir = os.getcwd()
+    shutil.rmtree(f'{home_dir}/dist', ignore_errors=True)
+    shutil.rmtree(f'{home_dir}/{egg_name}.egg-info', ignore_errors=True)
+
+    print('Previous packages removed from local')
+
+
+def get_packages(root_dir):
+    all_dirs = [root_dir]
+
+    for dirpath, dirnames, _ in os.walk(project_name):
+        for dirname in dirnames:
+            relative_path = os.path.relpath(os.path.join(dirpath, dirname), project_name)
+            subdir = os.path.join(root_dir, relative_path).replace(os.path.sep, '.')
+            if '__' not in subdir:
+                all_dirs.append(subdir)
+
+    print(f'Packages are: {all_dirs}')
+
+    return all_dirs
+
+
+cleanup()
+
+
 setup(
-    name='dyatel-wrapper',
-    version='2.1.2',
-    url='https://github.com/EnvInc/dyatel',
-    packages=[
-        'dyatel',
-        'dyatel.abstraction',
-        'dyatel.base',
-        'dyatel.dyatel_play',
-        'dyatel.dyatel_sel',
-        'dyatel.mixins',
-        'dyatel.utils',
-        'dyatel.dyatel_sel.core',
-        'dyatel.dyatel_sel.driver',
-        'dyatel.dyatel_sel.elements',
-        'dyatel.dyatel_sel.pages',
-    ],
+    name=pypi_name,
+    version='2.1.3',
+    url=f'https://github.com/EnvInc/{project_name}',
+    packages=get_packages(project_name),
     install_requires=[
         'Appium-Python-Client>=2.1.2',
         'numpy>=1.18.1',
@@ -36,9 +59,9 @@ setup(
     author_email='vladimir.podolyan64@gmail.com',
     author='Podolian Vladimir',
     project_urls={
-        'Source': 'https://github.com/EnvInc/dyatel',
-        'Tracker': 'https://github.com/EnvInc/dyatel/issues',
-        'Changelog': 'https://github.com/EnvInc/dyatel/blob/master/CHANGELOG.md'
+        'Source': f'https://github.com/EnvInc/{project_name}',
+        'Tracker': f'https://github.com/EnvInc/{project_name}/issues',
+        'Changelog': f'https://github.com/EnvInc/{project_name}/blob/master/CHANGELOG.md'
     },
     classifiers=[
         'Development Status :: 4 - Beta',
