@@ -3,7 +3,7 @@
 ---
 
 ## v2.1.3
-*Release date: 2023-09-09*
+*Release date: 2023-09-10*
 
 ### Changed
 - Selenium/Appium only: Additional logging for element enabled
