@@ -56,7 +56,7 @@ class CoreElement(ElementABC, ABC):
         """
         Core element setter. Try to avoid usage of this function
 
-        :param: selenium_element: selenium WebElement or appium WebElement
+        :param base_element: selenium WebElement or appium WebElement
         """
         self._element = base_element
 
@@ -71,17 +71,18 @@ class CoreElement(ElementABC, ABC):
 
     # Element interaction
 
-    def click(self, *args, **kwargs) -> CoreElement:
+    def click(self, force_wait: bool = True, *args, **kwargs) -> CoreElement:
         """
         Click to current element
 
-        :param: args: compatibility arg
-        :param: kwargs: compatibility arg
+        :param force_wait: wait for element visibility before click
+        :param args: compatibility arg
+        :param kwargs: compatibility arg
         :return: self
         """
         self.log(f'Click into "{self.name}"')
 
-        self.element = self._get_element(force_wait=True)
+        self.element = self._get_element(force_wait=force_wait)
         exception_msg = f'Element "{self.name}" not interactable {self.get_element_info()}'
 
         try:
@@ -99,8 +100,8 @@ class CoreElement(ElementABC, ABC):
         """
         Type text to current element
 
-        :param: text: text to be typed
-        :param: silent: erase log
+        :param text: text to be typed
+        :param silent: erase log
         :return: self
         """
         text = str(text)
@@ -115,9 +116,9 @@ class CoreElement(ElementABC, ABC):
         """
         Type text to current element slowly
 
-        :param: text: text to be slowly typed
-        :param: sleep_gap: sleep gap before each key press
-        :param: silent: erase log
+        :param text: text to be slowly typed
+        :param sleep_gap: sleep gap before each key press
+        :param silent: erase log
         :return: self
         """
         text = str(text)
@@ -135,7 +136,7 @@ class CoreElement(ElementABC, ABC):
         """
         Clear text from current element
 
-        :param: silent: erase log
+        :param silent: erase log
         :return: self
         """
         if not silent:
@@ -182,8 +183,8 @@ class CoreElement(ElementABC, ABC):
         """
         Wait for current element available in page
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         if not silent:
@@ -204,8 +205,8 @@ class CoreElement(ElementABC, ABC):
         """
         Wait until element hidden
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         if not silent:
@@ -226,8 +227,8 @@ class CoreElement(ElementABC, ABC):
         """
         Wait for current element available in DOM
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         if not silent:
@@ -256,10 +257,10 @@ class CoreElement(ElementABC, ABC):
         """
         Scroll element into view by js script
 
-        :param: block: start - element on the top; end - element at the bottom. All: start, center, end, nearest
-        :param: behavior: scroll type: smooth or instant
-        :param: sleep: delay after scroll
-        :param: silent: erase log
+        :param block: start - element on the top; end - element at the bottom. All: start, center, end, nearest
+        :param behavior: scroll type: smooth or instant
+        :param sleep: delay after scroll
+        :param silent: erase log
         :return: self
         """
         if not silent:
@@ -340,7 +341,7 @@ class CoreElement(ElementABC, ABC):
         """
         Check visibility of element
 
-        :param: silent: erase log
+        :param silent: erase log
         :return: True if element visible
         """
         if not silent:
@@ -357,7 +358,7 @@ class CoreElement(ElementABC, ABC):
         """
         Check invisibility of current element
 
-        :param: silent: erase log
+        :param silent: erase log
         :return: True if element hidden
         """
         if not silent:
@@ -369,8 +370,8 @@ class CoreElement(ElementABC, ABC):
         """
         Get custom attribute from current element
 
-        :param: attribute: custom attribute: value, innerText, textContent etc.
-        :param: silent: erase log
+        :param attribute: custom attribute: value, innerText, textContent etc.
+        :param silent: erase log
         :return: custom attribute value
         """
         if not silent:
@@ -382,7 +383,7 @@ class CoreElement(ElementABC, ABC):
         """
         Get all texts from all matching elements
 
-        :param: silent: erase log
+        :param silent: erase log
         :return: list of texts
         """
         if not silent:
@@ -395,7 +396,7 @@ class CoreElement(ElementABC, ABC):
         """
         Get elements count
 
-        :param: silent: erase log
+        :param silent: erase log
         :return: elements count
         """
         if not silent:

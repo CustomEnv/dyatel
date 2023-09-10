@@ -75,15 +75,20 @@ class PlayElement(ElementABC, Logging, ABC):
 
     # Element interaction
 
-    def click(self, *args, **kwargs) -> PlayElement:
+    def click(self, force_wait: bool = True, *args, **kwargs) -> ElementABC:
         """
         Click to current element
+
+        :param force_wait: wait for element visibility before click
 
         :param: args: https://playwright.dev/python/docs/api/class-locator#locator-click
         :param: kwargs: https://playwright.dev/python/docs/api/class-locator#locator-click
         :return: self
         """
         self.log(f'Click into "{self.name}"')
+
+        if force_wait:
+            self.wait_element(silent=True)
 
         self._first_element.click(*args, **kwargs)
         return self

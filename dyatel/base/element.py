@@ -147,7 +147,8 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         Set (clear and type) text in current element
 
-        :param: silent: erase log
+        :param text: text to be filled
+        :param silent: erase log
         :return: self
         """
         if not silent:
@@ -182,9 +183,9 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         Wait until elements count will be equal to expected value
 
-        :param: elements_count: expected elements count
-        :param: timeout: wait timeout
-        :param: silent: erase log
+        :param expected_count: expected elements count
+        :param timeout: wait timeout
+        :param silent: erase log
         :return: self
         """
         if not silent:
@@ -248,8 +249,8 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         Wait until element visibility without error
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         if not silent:
@@ -266,8 +267,8 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         Wait until element hidden without error
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         if not silent:
@@ -284,8 +285,8 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         Wait until element clickable
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         if not silent:
@@ -307,8 +308,8 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         Wait until element clickable
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
+        :param timeout: time to stop waiting
+        :param silent: erase log
         :return: self
         """
         if not silent:
