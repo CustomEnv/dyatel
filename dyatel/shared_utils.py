@@ -39,6 +39,7 @@ def cut_log_data(data: str, length=50) -> str:
     :param length: length to cut given data ~ 20
     :return: edited data ~ 'Type text: "very long string for >>> 36 characters"'
     """
+    data = str(data)
     return f'{data[:length]} >>> {len(data[length:])} characters' if len(data) > length else data
 
 

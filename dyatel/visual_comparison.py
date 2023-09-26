@@ -30,6 +30,7 @@ class VisualComparison:
     skip_screenshot_comparison = False
     visual_reference_generation = False
     hard_visual_reference_generation = False
+    soft_visual_reference_generation = False
     default_delay = 0.75
     default_threshold = 0
     diff_color_scheme = (0, 255, 0)
@@ -62,8 +63,6 @@ class VisualComparison:
         :param fill_background: fill background with given color or black color by default
         :return: self
         """
-        remove = remove if remove else []
-
         if self.skip_screenshot_comparison:
             return self
 
@@ -95,6 +94,8 @@ class VisualComparison:
         if scroll:
             self.dyatel_element.scroll_into_view()
 
+        remove = remove if remove else []
+
         def save_screenshot(screenshot_name):
             time.sleep(delay)
             self._fill_background(fill_background)
@@ -122,7 +123,15 @@ class VisualComparison:
             return self
 
         save_screenshot(output_file)
-        self._assert_same_images(output_file, reference_file, diff_file, threshold)
+
+        try:
+            self._assert_same_images(output_file, reference_file, diff_file, threshold)
+        except AssertionError as exc:
+            if self.soft_visual_reference_generation:
+                save_screenshot(reference_file)
+            else:
+                raise exc
+
         return self
 
     def _appends_dummy_elements(self, remove_data: list) -> VisualComparison:

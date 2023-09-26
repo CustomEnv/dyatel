@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import Union, List, Any
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.utils.internal_utils import calculate_coordinate_to_click

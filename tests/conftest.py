@@ -29,6 +29,7 @@ def pytest_addoption(parser):
     parser.addoption('--gr', action='store_true', help='Generate reference images in visual tests')
     parser.addoption('--sv', action='store_true', help='Generate reference images in visual tests')
     parser.addoption('--hgr', action='store_true', help='Hard generate reference images in visual tests')
+    parser.addoption('--sgr', action='store_true', help='Soft generate reference images in visual tests')
     parser.addoption('--appium-port', default='1111')
     parser.addoption('--appium-ip', default='0.0.0.0')
 
@@ -102,6 +103,7 @@ def visual_comparisons_settings(request):
     VisualComparison.visual_regression_path = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
     VisualComparison.visual_reference_generation = request.config.getoption('--gr')
     VisualComparison.hard_visual_reference_generation = request.config.getoption('--hgr')
+    VisualComparison.hard_visual_reference_generation = request.config.getoption('--sgr')
     VisualComparison.skip_screenshot_comparison = request.config.getoption('--sv')
     VisualComparison.default_threshold = 0.1
 

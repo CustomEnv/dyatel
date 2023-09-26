@@ -41,7 +41,7 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
         pass
     else:
         options = request.config.option
-        if not (options.gr or options.hgr or options.sv):
+        if not any([options.gr, options.hgr, options.sv, options.sgr]):
             raise Exception('Unexpected behavior')
 
 

@@ -192,7 +192,11 @@ class MobileDriver(CoreDriver):
 
             try:
                 self.switch_to_native()
-                done_button = Element("//XCUIElementTypeButton[@name='Done']", name='Keyboard Done button')
+                done_button = Element(
+                    locator="//XCUIElementTypeButton[@name='Done']",
+                    name='keyboard Done button',
+                    driver_wrapper=self,
+                )
                 if done_button.is_displayed():
                     done_button.click()
             finally:
@@ -212,8 +216,11 @@ class MobileDriver(CoreDriver):
 
             try:
                 self.switch_to_native()
-                top_bar = Element('//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther'
-                                  '/XCUIElementTypeOther')
+                top_bar = Element(
+                    lcoator='//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther',
+                    name='safari top bar',
+                    driver_wrapper=self,
+                )
                 self.top_bar_height = top_bar.element.size['height']
             finally:
                 self.switch_to_web()
@@ -233,7 +240,11 @@ class MobileDriver(CoreDriver):
 
             try:
                 self.switch_to_native()
-                bottom_bar = Element('//*[@name="CapsuleViewController"]/XCUIElementTypeOther[1]')
+                bottom_bar = Element(
+                    locator='//*[@name="CapsuleViewController"]/XCUIElementTypeOther[1]',
+                    name='safari bottom bar',
+                    driver_wrapper=self,
+                )
                 self.bottom_bar_height = bottom_bar.element.size['height']
             finally:
                 self.switch_to_web()
