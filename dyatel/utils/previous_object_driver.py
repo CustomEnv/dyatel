@@ -30,7 +30,7 @@ class PreviousObjectDriver:
         if len(DriverWrapperSessions.all_sessions) >= 2:
             if current_obj.driver_wrapper == DriverWrapperSessions.first_session():
                 previous_object = self._get_prev_obj_instance(current_obj=current_obj)
-                if previous_object and previous_object.driver_wrapper:
+                if previous_object and getattr(previous_object, 'driver_wrapper', None):
                     current_obj.driver_wrapper = previous_object.driver_wrapper
 
     def _get_prev_obj_instance(self, current_obj: Any) -> Union[None, Any]:
