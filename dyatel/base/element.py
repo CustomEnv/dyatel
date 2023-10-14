@@ -417,6 +417,37 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             scroll=scroll, remove=remove, fill_background=fill_background,
         )
 
+    def soft_assert_screenshot(
+            self,
+            filename: str = '',
+            test_name: str = '',
+            name_suffix: str = '',
+            threshold: Union[int, float] = None,
+            delay: Union[int, float] = None,
+            scroll: bool = False,
+            remove: Union[Element, List[Element]] = None,
+            fill_background: Union[str, bool] = False
+    ) -> bool:
+        """
+        Soft assert given (by name) and taken screenshot equals
+
+        :param filename: full screenshot name. Custom filename will be used if empty string given
+        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
+        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
+        :param threshold: possible threshold
+        :param delay: delay before taking screenshot
+        :param scroll: scroll to element before taking the screenshot
+        :param remove: remove elements from screenshot
+        :param fill_background: fill background with given color or black color by default
+        :return: bool - True: screenshots equal; False: screenshots missmatch;
+        """
+        try:
+            self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, scroll, remove, fill_background)
+        except AssertionError:
+            return False
+
+        return True
+
     def get_element_info(self, element: Any = None) -> str:
         """
         Get full loging data depends on parent element

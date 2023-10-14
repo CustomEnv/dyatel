@@ -337,6 +337,7 @@ class VisualComparison:
         :return: None
         """
         allure = None
+        test_name = list(filter(None, expected_path.split('/')))[-1:]
 
         try:
             allure = importlib.import_module('allure')
@@ -354,7 +355,11 @@ class VisualComparison:
                 with open(path, 'rb') as image:
                     diff_dict.update({name: f'data:image/png;base64,{base64.b64encode(image.read()).decode("ascii")}'})
 
-            allure.attach(name='diff', body=json.dumps(diff_dict), attachment_type='application/vnd.allure.image.diff')
+            allure.attach(
+                name=f'diff_for_{test_name}',
+                body=json.dumps(diff_dict),
+                attachment_type='application/vnd.allure.image.diff'
+            )
 
     def _disable_reruns(self) -> None:
         """

@@ -475,7 +475,7 @@ class ElementABC(MixinABC, ABC):
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
             scroll: bool = False,
-            remove: Union[Any, List[Any]] = None,
+            remove: Union[ElementABC, List[ElementABC]] = None,
             fill_background: Union[str, bool] = False
     ) -> None:
         """
@@ -490,6 +490,33 @@ class ElementABC(MixinABC, ABC):
         :param remove: remove elements from screenshot
         :param fill_background: fill background with given color or black color by default
         :return: None
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def soft_assert_screenshot(
+            self,
+            filename: str = '',
+            test_name: str = '',
+            name_suffix: str = '',
+            threshold: Union[int, float] = None,
+            delay: Union[int, float] = None,
+            scroll: bool = False,
+            remove: Union[ElementABC, List[ElementABC]] = None,
+            fill_background: Union[str, bool] = False
+    ) -> bool:
+        """
+        Soft assert given (by name) and taken screenshot equals
+
+        :param filename: full screenshot name. Custom filename will be used if empty string given
+        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
+        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
+        :param threshold: possible threshold
+        :param delay: delay before taking screenshot
+        :param scroll: scroll to element before taking the screenshot
+        :param remove: remove elements from screenshot
+        :param fill_background: fill background with given color or black color by default
+        :return: bool - True: screenshots equal; False: screenshots missmatch;
         """
         raise NotImplementedError()
 
