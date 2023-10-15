@@ -38,6 +38,7 @@ class VisualComparison:
     def __init__(self, driver_wrapper, element):
         self.driver_wrapper = driver_wrapper
         self.dyatel_element = element
+        self.screenshot_name = 'default'
 
     def assert_screenshot(
             self,
@@ -276,9 +277,9 @@ class VisualComparison:
         for item in punctuation + ' ':
             screenshot_name = screenshot_name.replace(item, '_')
 
-        screenshot_name = self._remove_unexpected_underscores(screenshot_name)
+        self.screenshot_name = self._remove_unexpected_underscores(screenshot_name).lower()
 
-        return screenshot_name.lower()
+        return self.screenshot_name
 
     def _get_difference(self, reference_img: numpy.ndarray, actual_img: numpy.ndarray) -> tuple[numpy.ndarray, float]:
         """
@@ -325,8 +326,7 @@ class VisualComparison:
         diff_image, percent_diff = filled_after, 100 - score
         return diff_image, percent_diff
 
-    @staticmethod
-    def _attach_allure_diff(actual_path: str, expected_path: str, diff_path: str = None) -> None:
+    def _attach_allure_diff(self, actual_path: str, expected_path: str, diff_path: str = None) -> None:
         """
         Attach screenshots to allure screen diff plugin
         https://github.com/allure-framework/allure2/blob/master/plugins/screen-diff-plugin/README.md
@@ -337,7 +337,6 @@ class VisualComparison:
         :return: None
         """
         allure = None
-        test_name = list(filter(None, expected_path.split('/')))[-1:]
 
         try:
             allure = importlib.import_module('allure')
@@ -356,7 +355,7 @@ class VisualComparison:
                     diff_dict.update({name: f'data:image/png;base64,{base64.b64encode(image.read()).decode("ascii")}'})
 
             allure.attach(
-                name=f'diff_for_{test_name}',
+                name=f'diff_for_{self.screenshot_name}',
                 body=json.dumps(diff_dict),
                 attachment_type='application/vnd.allure.image.diff'
             )
