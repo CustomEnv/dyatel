@@ -19,6 +19,7 @@ from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import PlaygroundMainPage, SecondPlaygroundMainPage
 from tests.adata.pytest_utils import skip_platform
 
+
 dyatel_logs_settings()
 
 

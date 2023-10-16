@@ -8,7 +8,7 @@ from allure_commons.types import AttachmentType
 
 from tests.settings import ios_desired_caps
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
-from dyatel.shared_utils import resize_image, shell_running_command, shell_command
+from dyatel.shared_utils import rescale_image, shell_running_command, shell_command
 
 
 def pytest_addoption(parser):
@@ -95,4 +95,4 @@ def pytest_runtest_makereport(item, call):
         if not_setup_and_teardown:
             screenshot_name = f'screenshot_{item.name}'
             screenshot_binary = driver.get_screenshot_as_png()
-            allure.attach(resize_image(screenshot_binary), name=screenshot_name, attachment_type=AttachmentType.JPG)
+            allure.attach(rescale_image(screenshot_binary), name=screenshot_name, attachment_type=AttachmentType.JPG)

@@ -16,7 +16,7 @@ from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
 from dyatel.mixins.internal_mixin import InternalMixin, get_element_info, all_locator_types
-from dyatel.utils.logs import Logging
+from dyatel.utils.logs import Logging, LogLevel
 from dyatel.utils.previous_object_driver import PreviousObjectDriver, set_instance_frame
 from dyatel.visual_comparison import VisualComparison
 from dyatel.keyboard_keys import KeyboardKeys
@@ -443,7 +443,8 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         try:
             self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, scroll, remove, fill_background)
-        except AssertionError:
+        except AssertionError as exc:
+            self.log(exc, level=LogLevel.ERROR)
             return False
 
         return True

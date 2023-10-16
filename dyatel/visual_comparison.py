@@ -195,8 +195,8 @@ class VisualComparison:
         try:
             check_shape_equality(reference_image, output_image)
         except ValueError:
-            self._attach_allure_diff(actual_file, reference_file)
-            raise AssertionError(f'Image size (width, height) is not same for {reference_file}:\n'
+            self._attach_allure_diff(actual_file, reference_file, actual_file)
+            raise AssertionError(f'Image size (width, height) is not same for {self.screenshot_name}:\n'
                                  f'Expected: {reference_image.shape[0:2]}; Actual: {output_image.shape[0:2]}')
 
         diff, actual_threshold = self._get_difference(reference_image, output_image)
@@ -210,8 +210,7 @@ class VisualComparison:
         if self.attach_diff_image_path:
             diff_data = f"\nDiff image {urljoin('file:', diff_file)}."
 
-        base_error = f"New screenshot '{actual_file}' did not match the\n" \
-                     f"Reference screenshot '{reference_file}'.{diff_data}"
+        base_error = f"New screenshot of '{self.screenshot_name}' did not match the reference screenshot. {diff_data}"
 
         if is_different:
             raise AssertionError(f"{base_error}Threshold is: {actual_threshold}; Possible threshold is: {threshold}")

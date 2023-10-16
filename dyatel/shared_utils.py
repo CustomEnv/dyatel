@@ -5,10 +5,24 @@ from subprocess import Popen, PIPE, run
 from PIL import Image
 
 
-def resize_image(screenshot_binary, scale=3, img_format='JPEG'):
+def rescale_image(screenshot_binary: bytes, scale=3, img_format='JPEG') -> bytes:
     img = Image.open(io.BytesIO(screenshot_binary))
     img = img.resize((img.width // scale, img.height // scale), Image.Resampling.LANCZOS)
 
+    return save_image(img, img_format)
+
+
+def resize_image(image1: str, image2: str, img_format='JPEG') -> bytes:
+    img1 = Image.open(image1)
+    img2 = Image.open(image2)
+
+    width, height = img2.size
+    img1.resize((width, height), Image.Resampling.LANCZOS)
+
+    return save_image(img1, img_format)
+
+
+def save_image(img: Image, img_format='JPEG'):
     result_img_binary = io.BytesIO()
     img.convert('RGB').save(result_img_binary, format=img_format, optimize=True)
     return result_img_binary.getvalue()

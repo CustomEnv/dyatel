@@ -8,10 +8,19 @@ from typing import Any
 
 from dyatel.utils.internal_utils import get_frame, is_driver_wrapper
 
+
 logger = logging.getLogger('dyatel')
 
 
-def dyatel_logs_settings(level: int = logging.INFO) -> None:
+class LogLevel:
+    CRITICAL = 'critical'
+    ERROR = 'error'
+    WARNING = 'warning'
+    INFO = 'info'
+    DEBUG = 'debug'
+
+
+def dyatel_logs_settings(level: str = LogLevel.INFO) -> None:
     """
     Sets dyatel log format(unchangeable) and log level (can be changed)
 
@@ -19,6 +28,7 @@ def dyatel_logs_settings(level: int = logging.INFO) -> None:
     :return: None
     """
     handler = logging.StreamHandler(sys.stdout)
+    level = getattr(logging, level.upper())
     logger.setLevel(level)
     handler.setLevel(level)
     handler.setFormatter(logging.Formatter(
@@ -28,7 +38,7 @@ def dyatel_logs_settings(level: int = logging.INFO) -> None:
     logger.addHandler(handler)
 
 
-def autolog(message: Any, level: str = 'info') -> None:
+def autolog(message: Any, level: str = LogLevel.INFO) -> None:
     """
     Log message in format:
       ~ [time][level][module][function:line] <message>
@@ -43,7 +53,7 @@ def autolog(message: Any, level: str = 'info') -> None:
 
 class Logging:
 
-    def log(self: Any, message: str, level: str = 'info') -> None:
+    def log(self: Any, message: str, level: str = LogLevel.INFO) -> None:
         """
         Log message in format:
           ~ [time][level][driver_index][module][function:line] <message>

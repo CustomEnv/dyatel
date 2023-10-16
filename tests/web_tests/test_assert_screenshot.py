@@ -49,5 +49,12 @@ def test_screenshot_fill_background_default(base_playground_page):
     base_playground_page.kube.scroll_into_view().assert_screenshot(fill_background=True)
 
 
+def test_screenshot_soft_assert(base_playground_page):
+    base_playground_page.kube.scroll_into_view().soft_assert_screenshot(
+        test_name=test_screenshot_fill_background_default.__name__,
+        fill_background=True
+    )
+
+
 def test_screenshot_fill_background_blue(base_playground_page):
     base_playground_page.kube.scroll_into_view().assert_screenshot(fill_background='blue')
