@@ -2,6 +2,27 @@
 
 ---
 
+## v2.1.5
+*Release date: in progress*
+
+---
+
+## v2.1.4
+*Release date: 2023-10-16*
+
+### Fixed
+- Internal usage of Element class inside DriverWrapper
+
+### Changed
+- AssertionError output of visual comparison
+
+### Added
+- Soft visual reference generation
+- Soft assert screenshot
+- `LogLevel` class
+
+---
+
 ## v2.1.3
 *Release date: 2023-09-10*
 

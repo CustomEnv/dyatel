@@ -211,7 +211,7 @@ class VisualComparison:
         if self.attach_diff_image_path:
             diff_data = f"\nDiff image {urljoin('file:', diff_file)}"
 
-        base_error = f"↓\nVisual missmatch found for '{self.screenshot_name}'{diff_data}"
+        base_error = f"↓\nVisual mismatch found for '{self.screenshot_name}'{diff_data}"
 
         if is_different:
             raise AssertionError(f"{base_error}:"

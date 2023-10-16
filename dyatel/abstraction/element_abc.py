@@ -516,7 +516,7 @@ class ElementABC(MixinABC, ABC):
         :param scroll: scroll to element before taking the screenshot
         :param remove: remove elements from screenshot
         :param fill_background: fill background with given color or black color by default
-        :return: bool - True: screenshots equal; False: screenshots missmatch;
+        :return: bool - True: screenshots equal; False: screenshots mismatch;
         """
         raise NotImplementedError()
 

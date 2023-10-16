@@ -439,12 +439,12 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param scroll: scroll to element before taking the screenshot
         :param remove: remove elements from screenshot
         :param fill_background: fill background with given color or black color by default
-        :return: bool - True: screenshots equal; False: screenshots missmatch;
+        :return: bool - True: screenshots equal; False: screenshots mismatch;
         """
         try:
             self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, scroll, remove, fill_background)
         except AssertionError as exc:
-            self.log(exc, level=LogLevel.ERROR)
+            self.log(str(exc), level=LogLevel.ERROR)
             return False
 
         return True
