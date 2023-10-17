@@ -3,7 +3,10 @@
 ---
 
 ## v2.1.5
-*Release date: in progress*
+*Release date: 2023-10-17*
+
+### Fixed
+- Typo fix inside `MobileDriver`
 
 ---
 

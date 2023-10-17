@@ -217,7 +217,7 @@ class MobileDriver(CoreDriver):
             try:
                 self.switch_to_native()
                 top_bar = Element(
-                    lcoator='//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther',
+                    locator='//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther',
                     name='safari top bar',
                     driver_wrapper=self,
                 )
