@@ -30,6 +30,7 @@ class VisualComparison:
     skip_screenshot_comparison = False
     visual_reference_generation = False
     hard_visual_reference_generation = False
+    soft_visual_reference_generation = False
     default_delay = 0.75
     default_threshold = 0
     diff_color_scheme = (0, 255, 0)
@@ -37,6 +38,7 @@ class VisualComparison:
     def __init__(self, driver_wrapper, element):
         self.driver_wrapper = driver_wrapper
         self.dyatel_element = element
+        self.screenshot_name = 'default'
 
     def assert_screenshot(
             self,
@@ -62,8 +64,6 @@ class VisualComparison:
         :param fill_background: fill background with given color or black color by default
         :return: self
         """
-        remove = remove if remove else []
-
         if self.skip_screenshot_comparison:
             return self
 
@@ -95,6 +95,8 @@ class VisualComparison:
         if scroll:
             self.dyatel_element.scroll_into_view()
 
+        remove = remove if remove else []
+
         def save_screenshot(screenshot_name):
             time.sleep(delay)
             self._fill_background(fill_background)
@@ -122,7 +124,15 @@ class VisualComparison:
             return self
 
         save_screenshot(output_file)
-        self._assert_same_images(output_file, reference_file, diff_file, threshold)
+
+        try:
+            self._assert_same_images(output_file, reference_file, diff_file, threshold)
+        except AssertionError as exc:
+            if self.soft_visual_reference_generation:
+                save_screenshot(reference_file)
+            else:
+                raise exc
+
         return self
 
     def _appends_dummy_elements(self, remove_data: list) -> VisualComparison:
@@ -185,9 +195,10 @@ class VisualComparison:
         try:
             check_shape_equality(reference_image, output_image)
         except ValueError:
-            self._attach_allure_diff(actual_file, reference_file)
-            raise AssertionError(f'Image size (width, height) is not same for {reference_file}:\n'
-                                 f'Expected: {reference_image.shape[0:2]}; Actual: {output_image.shape[0:2]}')
+            self._attach_allure_diff(actual_file, reference_file, actual_file)
+            raise AssertionError(f"↓\nImage size (width, height) is not same for '{self.screenshot_name}':"
+                                 f"\nExpected: {reference_image.shape[0:2]};"
+                                 f"\nActual: {output_image.shape[0:2]}.")
 
         diff, actual_threshold = self._get_difference(reference_image, output_image)
         is_different = actual_threshold > threshold
@@ -198,13 +209,14 @@ class VisualComparison:
 
         diff_data = ""
         if self.attach_diff_image_path:
-            diff_data = f"\nDiff image {urljoin('file:', diff_file)}."
+            diff_data = f"\nDiff image {urljoin('file:', diff_file)}"
 
-        base_error = f"New screenshot '{actual_file}' did not match the\n" \
-                     f"Reference screenshot '{reference_file}'.{diff_data}"
+        base_error = f"↓\nVisual mismatch found for '{self.screenshot_name}'{diff_data}"
 
         if is_different:
-            raise AssertionError(f"{base_error}Threshold is: {actual_threshold}; Possible threshold is: {threshold}")
+            raise AssertionError(f"{base_error}:"
+                                 f"\nThreshold is: {actual_threshold};"
+                                 f"\nPossible threshold is: {threshold}")
 
         return self
 
@@ -267,9 +279,9 @@ class VisualComparison:
         for item in punctuation + ' ':
             screenshot_name = screenshot_name.replace(item, '_')
 
-        screenshot_name = self._remove_unexpected_underscores(screenshot_name)
+        self.screenshot_name = self._remove_unexpected_underscores(screenshot_name).lower()
 
-        return screenshot_name.lower()
+        return self.screenshot_name
 
     def _get_difference(self, reference_img: numpy.ndarray, actual_img: numpy.ndarray) -> tuple[numpy.ndarray, float]:
         """
@@ -316,8 +328,7 @@ class VisualComparison:
         diff_image, percent_diff = filled_after, 100 - score
         return diff_image, percent_diff
 
-    @staticmethod
-    def _attach_allure_diff(actual_path: str, expected_path: str, diff_path: str = None) -> None:
+    def _attach_allure_diff(self, actual_path: str, expected_path: str, diff_path: str = None) -> None:
         """
         Attach screenshots to allure screen diff plugin
         https://github.com/allure-framework/allure2/blob/master/plugins/screen-diff-plugin/README.md
@@ -345,7 +356,11 @@ class VisualComparison:
                 with open(path, 'rb') as image:
                     diff_dict.update({name: f'data:image/png;base64,{base64.b64encode(image.read()).decode("ascii")}'})
 
-            allure.attach(name='diff', body=json.dumps(diff_dict), attachment_type='application/vnd.allure.image.diff')
+            allure.attach(
+                name=f'diff_for_{self.screenshot_name}',
+                body=json.dumps(diff_dict),
+                attachment_type='application/vnd.allure.image.diff'
+            )
 
     def _disable_reruns(self) -> None:
         """

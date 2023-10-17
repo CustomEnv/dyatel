@@ -41,12 +41,18 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
         pass
     else:
         options = request.config.option
-        if not (options.gr or options.hgr or options.sv):
+        if not any([options.gr, options.hgr, options.sv, options.sgr]):
             raise Exception('Unexpected behavior')
 
 
 def test_screenshot_fill_background_default(base_playground_page):
     base_playground_page.kube.scroll_into_view().assert_screenshot(fill_background=True)
+
+
+def test_screenshot_soft_assert(base_playground_page):
+    base_playground_page.kube.scroll_into_view().soft_assert_screenshot(
+        test_name=test_screenshot_fill_background_default.__name__
+    )
 
 
 def test_screenshot_fill_background_blue(base_playground_page):

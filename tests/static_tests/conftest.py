@@ -10,6 +10,13 @@ from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
 
 
+class MockedDriverWrapper(DriverWrapper):
+
+    def dummy_element(self):
+        from dyatel.base.element import Element
+        return Element('dummy element', driver_wrapper=self)
+
+
 @pytest.fixture
 def mocked_shared_mobile_driver():
     appium_driver = AppiumDriver
@@ -29,7 +36,7 @@ def mocked_ios_driver(mocked_shared_mobile_driver):
             'automationName': 'safari'
         }
     )()
-    driver_wrapper = DriverWrapper(mocked_shared_mobile_driver())
+    driver_wrapper = MockedDriverWrapper(mocked_shared_mobile_driver())
     return driver_wrapper
 
 
@@ -42,7 +49,7 @@ def mocked_android_driver(mocked_shared_mobile_driver):
             'automationName': 'UiAutomator2'
         }
     )()
-    driver_wrapper = DriverWrapper(mocked_shared_mobile_driver())
+    driver_wrapper = MockedDriverWrapper(mocked_shared_mobile_driver())
     return driver_wrapper
 
 
@@ -55,13 +62,13 @@ def mocked_selenium_driver():
     selenium_driver.error_handler = MagicMock()
 
     selenium_driver.caps = {}
-    driver_wrapper = DriverWrapper(selenium_driver())
+    driver_wrapper = MockedDriverWrapper(selenium_driver())
     return driver_wrapper
 
 
 @pytest.fixture
 def mocked_play_driver():
-    driver_wrapper = DriverWrapper(Browser(MagicMock()))
+    driver_wrapper = MockedDriverWrapper(Browser(MagicMock()))
     driver_wrapper.driver = PlaywrightSourcePage(MagicMock())
     return driver_wrapper
 
