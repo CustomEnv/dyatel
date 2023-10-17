@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from copy import copy
-from typing import Any, Union, List, Type
+from typing import Any, Union, List, Type, Tuple
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -427,7 +427,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False
-    ) -> bool:
+    ) -> Tuple[bool, str]:
         """
         Soft assert given (by name) and taken screenshot equals
 
@@ -444,10 +444,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         try:
             self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, scroll, remove, fill_background)
         except AssertionError as exc:
-            self.log(str(exc), level=LogLevel.ERROR)
-            return False
+            exc = str(exc)
+            self.log(exc, level=LogLevel.ERROR)
+            return False, exc
 
-        return True
+        return True, f'No visual mismatch found for {self.name}'
 
     def get_element_info(self, element: Any = None) -> str:
         """

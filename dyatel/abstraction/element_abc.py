@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Union, Any, List
+from typing import Union, Any, List, Tuple
 
 from PIL.Image import Image
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
@@ -504,7 +504,7 @@ class ElementABC(MixinABC, ABC):
             scroll: bool = False,
             remove: Union[ElementABC, List[ElementABC]] = None,
             fill_background: Union[str, bool] = False
-    ) -> bool:
+    ) -> Tuple[bool, str]:
         """
         Soft assert given (by name) and taken screenshot equals
 
