@@ -50,11 +50,12 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return self
 
     def __getattribute__(self, item):
-        if 'element' in item and not safe_getattribute(self, '_initialized'):
-            raise NotInitializedException(
-                f'{repr(self)} object is not initialized. '
-                'Try to initialize base object first or call it directly as a method'
-            )
+        is_initialized = safe_getattribute(self, '_initialized')
+
+        if not item.startswith('_') and not is_initialized:
+            driver_wrapper = safe_getattribute(self, '_driver_wrapper')
+            if driver_wrapper:
+                self.__full_init__(driver_wrapper)
 
         return safe_getattribute(self, item)
 
@@ -96,29 +97,31 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         self.locator = locator
         self.locator_type = locator_type
+
+        self._locator = locator
+        self._locator_type = locator_type
         self.name = name if name else locator
         self.parent = parent
         self.wait = wait
         self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
-        self._init_locals = getattr(self, '_init_locals', locals())
-        self._safe_setter('__base_obj_id', id(self))
+        self._init_locals = locals()
+        self.__base_obj_id = id(self)
         self._initialized = False
-
-        if self.driver_wrapper:
-            self.__full_init__(driver_wrapper)
+        self._base_initialized = False
 
     def __full_init__(self, driver_wrapper: Any = None):
         self._driver_wrapper_given = bool(driver_wrapper)
 
-        if self._driver_wrapper_given and driver_wrapper != self.driver_wrapper:
-            self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
+        if self._driver_wrapper_given and driver_wrapper != self._driver_wrapper:
+            self._driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
         self._modify_object()
         self._modify_children()
 
-        if not self._initialized:
+        if not self._base_initialized:
             self.__init_base_class__()
+            self._base_initialized = True
 
     def __init_base_class__(self) -> None:
         """
@@ -126,17 +129,17 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         :return: None
         """
-        if isinstance(self.driver, PlaywrightDriver):
+        if isinstance(self._driver, PlaywrightDriver):
             self._base_cls = PlayElement
-        elif isinstance(self.driver, AppiumDriver):
+        elif isinstance(self._driver, AppiumDriver):
             self._base_cls = MobileElement
-        elif isinstance(self.driver, SeleniumDriver):
+        elif isinstance(self._driver, SeleniumDriver):
             self._base_cls = WebElement
         else:
             raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')
 
         self._set_static(self._base_cls)
-        self._base_cls.__init__(self, locator=self.locator, locator_type=self.locator_type)
+        self._base_cls.__init__(self, locator=self._locator, locator_type=self._locator_type)
         self._initialized = True
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using internal methods

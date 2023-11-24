@@ -35,6 +35,15 @@ class DriverMixin:
     _driver_wrapper = None
 
     @property
+    def _driver(self) -> Union[SeleniumWebDriver, AppiumWebDriver, PlaywrightSourcePage]:
+        """
+        Get source driver instance
+
+        :return: SeleniumWebDriver/AppiumWebDriver/PlaywrightSourcePage
+        """
+        return getattr(self._driver_wrapper, 'driver', None)
+
+    @property
     def driver(self) -> Union[SeleniumWebDriver, AppiumWebDriver, PlaywrightSourcePage]:
         """
         Get source driver instance

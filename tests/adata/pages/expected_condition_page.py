@@ -5,13 +5,13 @@ from tests.settings import domain_name, repo_name
 
 
 class ExpectedConditionPage(Page):
-    def __init__(self):
+    def __init__(self, dw=None):
         self.url = f'{domain_name}/{repo_name}/expected_conditions.html'
         self.value_card = WaitValueCard()
         self.element_card = WaitElementCard()
         self.frame_card = WaitFrameCard()
         self.test_driver = self.driver_wrapper
-        super().__init__('//*[contains(@class, "card") and contains(., "wait")]', name='Expected condition page')
+        super().__init__('//*[contains(@class, "card") and contains(., "wait")]', name='Expected condition page', driver_wrapper=dw)
         self.test_driver = self.driver_wrapper
 
     min_wait_input = Element('min_wait', name='min wait input')

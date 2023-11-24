@@ -55,7 +55,10 @@ def get_timeout_in_ms(timeout: int):
 
 
 def safe_getattribute(obj, item):
-    return object.__getattribute__(obj, item)
+    try:
+        return object.__getattribute__(obj, item)
+    except AttributeError:
+        return None
 
 
 def set_name_for_attr(attr, name):
