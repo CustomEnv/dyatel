@@ -1,6 +1,7 @@
 import time
 
 import pytest
+from dyatel.base.element import Element
 
 
 def test_click_and_wait(pizza_order_page, platform):

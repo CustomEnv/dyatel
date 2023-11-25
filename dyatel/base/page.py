@@ -19,10 +19,8 @@ from dyatel.utils.logs import Logging
 from dyatel.utils.previous_object_driver import PreviousObjectDriver, set_instance_frame
 from dyatel.utils.internal_utils import (
     WAIT_PAGE,
-    initialize_objects,
-    get_child_elements_with_names,
     get_child_elements,
-    is_element_instance,
+    is_element_instance, initialize_objects, get_child_elements_with_names,
 )
 
 
@@ -67,8 +65,6 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         self._validate_inheritance()
         self._check_kwargs(kwargs)
 
-        self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
-        
         self.anchor = Element(locator=locator, locator_type=locator_type, name=name, driver_wrapper=self.driver_wrapper)
         self.locator = self.anchor.locator
         self.locator_type = self.anchor.locator_type
@@ -188,8 +184,12 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         Modify current object if driver_wrapper is not given. Required for Page that placed into functions:
         - sets driver from previous object
         """
-        if not driver_wrapper:
+        if driver_wrapper:
+            self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
+        else:
             PreviousObjectDriver().set_driver_from_previous_object(self)
+            if not self.driver_wrapper:
+                self.driver_wrapper = get_driver_wrapper_from_object(None)
 
     def _validate_inheritance(self):
         cls = self.__class__

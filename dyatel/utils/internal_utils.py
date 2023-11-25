@@ -106,11 +106,13 @@ def initialize_objects(current_object, objects: dict, cls: Any):
     :return: None
     """
     for name, obj in objects.items():
-        set_name_for_attr(obj, name)
-        copied_obj = copy(obj)
-        promote_parent_element(copied_obj, current_object, cls)
-        setattr(current_object, name, copied_obj(driver_wrapper=current_object.driver_wrapper))
-        initialize_objects(copied_obj, get_child_elements_with_names(copied_obj, cls), cls)
+        if is_element(obj):
+            set_name_for_attr(obj, name)
+            obj._is_attr = True
+            copied_obj = obj(driver_wrapper=current_object.driver_wrapper)
+            promote_parent_element(copied_obj, current_object, cls)
+            setattr(current_object, name, copied_obj)
+            initialize_objects(copied_obj, get_child_elements_with_names(copied_obj, cls), cls)
 
 
 def set_parent_for_attr(base_obj: object, instance_class: Union[type, tuple], with_copy: bool = False):

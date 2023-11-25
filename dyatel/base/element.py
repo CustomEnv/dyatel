@@ -30,10 +30,19 @@ from dyatel.utils.internal_utils import (
     is_page,
 )
 
+exc = (
+    'locator',
+'locator_type',
+'name',
+'parent',
+'wait',
+'driver_wrapper',)
+
 
 class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     """ Element object crossroad. Should be defined as Page/Group class variable """
 
+    _is_attr = False
     _object = 'element'
     _base_cls: Type[PlayElement, MobileElement, WebElement]
 
@@ -50,11 +59,10 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return self
 
     def __getattribute__(self, item):
-        is_initialized = safe_getattribute(self, '_initialized')
-
-        if not item.startswith('_') and not is_initialized:
+        if not item.startswith('_') and item not in exc and not safe_getattribute(self, '_initialized'):
             driver_wrapper = safe_getattribute(self, '_driver_wrapper')
             if driver_wrapper:
+                print(item)
                 self.__full_init__(driver_wrapper)
 
         return safe_getattribute(self, item)
@@ -111,13 +119,10 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         self._base_initialized = False
 
     def __full_init__(self, driver_wrapper: Any = None):
-        self._driver_wrapper_given = bool(driver_wrapper)
-
-        if self._driver_wrapper_given and driver_wrapper != self._driver_wrapper:
-            self._driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
-
-        self._modify_object()
-        self._modify_children()
+        if not self._initialized:
+            self._modify_object(driver_wrapper)
+            self._modify_children()
+            self._initialized = True
 
         if not self._base_initialized:
             self.__init_base_class__()
@@ -140,7 +145,6 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         self._set_static(self._base_cls)
         self._base_cls.__init__(self, locator=self._locator, locator_type=self._locator_type)
-        self._initialized = True
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using internal methods
 
@@ -480,7 +484,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             wrapped_elements.append(wrapped_object)
 
         return wrapped_elements
-        
+
     def _modify_children(self):
         """
         Initializing of attributes with  type == Element.
@@ -488,12 +492,14 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         initialize_objects(self, get_child_elements_with_names(self, Element), Element)
 
-    def _modify_object(self):
+    def _modify_object(self, driver_wrapper):
         """
         Modify current object if driver_wrapper is not given. Required for Page that placed into functions:
         - sets driver from previous object
         """
-        if not self._driver_wrapper_given:
+        if driver_wrapper:
+            self._driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
+        else:
             PreviousObjectDriver().set_driver_from_previous_object(self)
 
     def _validate_inheritance(self):

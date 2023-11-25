@@ -63,20 +63,21 @@ class InternalMixin:
     def _repr_builder(self: Any):
         class_name = self.__class__.__name__
         obj_id = hex(id(self))
-        parent = getattr(self, 'parent', False)
+        parent = getattr(self, '_parent', False)
+        anchor = getattr(self, '_anchor', None)
 
         try:
-            parent_class = self.parent.__class__.__name__ if parent else None
-            locator_holder = getattr(self, 'anchor', self)
+            parent_class = self._parent.__class__.__name__ if parent else None
+            locator_holder = anchor if anchor else self
 
             locator = f'locator="{locator_holder.locator}"'
             locator_type = f'locator_type="{locator_holder.locator_type}"'
-            name = f'name="{self.name}"'
+            name = f'name="{self._name}"'
             parent = f'parent={parent_class}'
-            driver = f'{self.driver_wrapper.label}={self.driver}'
+            driver = f'{self._driver_wrapper.label}={self._driver}'
 
             base = f'{class_name}({locator}, {locator_type}, {name}, {parent}) at {obj_id}'
             additional_info = driver
             return f'{base}, {additional_info}'
-        except AttributeError:
+        except AttributeError as exc:
             return f'{class_name} object at {obj_id}'
