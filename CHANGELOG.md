@@ -1,5 +1,14 @@
 # Dyatel Changelog
 
+
+---
+
+## v2.1.6
+*Release date: 2023-11-26*
+
+### Fixed
+- Performance fixes for session with 2 or more browser windows
+
 ---
 
 ## v2.1.5

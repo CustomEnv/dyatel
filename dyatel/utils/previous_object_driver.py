@@ -14,8 +14,12 @@ def set_instance_frame(new_instance: Any) -> None:
     :return: None
     """
     if DriverWrapperSessions.sessions_count() >= 2:
-        stack = inspect.stack()
-        new_instance.frame = stack[2][0]
+
+        frame = inspect.currentframe()
+        while frame.f_code.co_name != '__new__':
+            frame = frame.f_back
+
+        new_instance.frame = frame.f_back
 
 
 class PreviousObjectDriver:
