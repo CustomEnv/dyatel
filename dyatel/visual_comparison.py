@@ -8,10 +8,10 @@ import json
 import base64
 import importlib
 from urllib.parse import urljoin
-from typing import Union, List, Any
+from typing import Union, List, Any, Tuple
 from string import punctuation
 
-import cv2.cv2 as cv2
+import cv2.cv2 as cv2  # noqa
 import numpy
 from skimage._shared.utils import check_shape_equality  # noqa
 from skimage.metrics import structural_similarity
@@ -141,13 +141,23 @@ class VisualComparison:
 
         return self
 
-    def calculate_threshold(self, reference_file: str):
-        img = Image.open(reference_file)
+    @staticmethod
+    def calculate_threshold(file: str, dynamic_threshold_factor: int = None) -> Tuple:
+        """
+        Calculate possible threshold, based on dynamic_threshold_factor
+
+        :param file: image file path for calculation
+        :param dynamic_threshold_factor: use provided threshold factor
+        :return: tuple of calculated threshold and additional data
+        """
+        factor = VisualComparison.dynamic_threshold_factor or dynamic_threshold_factor
+        img = Image.open(file)
         width, height = img.size
         pixels_grid = height * width
-        threshold = self.dynamic_threshold_factor / math.sqrt(pixels_grid)
-        pixels_allowed = int(pixels_grid / 100 * threshold)
-        return threshold, f'\n{width}x{height}; {threshold=}; {pixels_allowed=} from {pixels_grid}'
+        calculated_threshold = factor / math.sqrt(pixels_grid)
+        pixels_allowed = int(pixels_grid / 100 * calculated_threshold)
+        return calculated_threshold, \
+            f'\nAdditional info: {width}x{height}; {calculated_threshold=}; {pixels_allowed=} from {pixels_grid}'
 
     def _appends_dummy_elements(self, remove_data: list) -> VisualComparison:
         """
