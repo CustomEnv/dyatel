@@ -409,7 +409,6 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :return: None
         """
         delay = delay or VisualComparison.default_delay
-        threshold = threshold or VisualComparison.default_threshold
         remove = [remove] if type(remove) is not list and remove else remove
 
         VisualComparison(self.driver_wrapper, self).assert_screenshot(

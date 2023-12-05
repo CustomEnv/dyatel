@@ -3,17 +3,19 @@ from __future__ import annotations
 import os
 import re
 import time
-import importlib
+import math
 import json
 import base64
+import importlib
 from urllib.parse import urljoin
-from typing import Union, List, Any
+from typing import Union, List, Any, Tuple
 from string import punctuation
 
-import cv2.cv2 as cv2
+import cv2.cv2 as cv2  # noqa
 import numpy
 from skimage._shared.utils import check_shape_equality  # noqa
 from skimage.metrics import structural_similarity
+from PIL import Image
 
 from dyatel.exceptions import DriverWrapperException, TimeoutException
 from dyatel.js_scripts import add_element_over_js, delete_element_over_js
@@ -33,12 +35,16 @@ class VisualComparison:
     soft_visual_reference_generation = False
     default_delay = 0.75
     default_threshold = 0
+    dynamic_threshold_factor = 0
     diff_color_scheme = (0, 255, 0)
 
     def __init__(self, driver_wrapper, element):
         self.driver_wrapper = driver_wrapper
         self.dyatel_element = element
         self.screenshot_name = 'default'
+
+        if self.dynamic_threshold_factor and self.default_threshold:
+            raise Exception('Provide only one argument for threshold of visual comparison')
 
     def assert_screenshot(
             self,
@@ -120,7 +126,7 @@ class VisualComparison:
             raise AssertionError(f'Reference file "{reference_file}" not found, but its just saved. '
                                  f'If it CI run, then you need to commit reference files.')
 
-        if self.visual_reference_generation:
+        if self.visual_reference_generation and not self.soft_visual_reference_generation:
             return self
 
         save_screenshot(output_file)
@@ -134,6 +140,24 @@ class VisualComparison:
                 raise exc
 
         return self
+
+    @staticmethod
+    def calculate_threshold(file: str, dynamic_threshold_factor: int = None) -> Tuple:
+        """
+        Calculate possible threshold, based on dynamic_threshold_factor
+
+        :param file: image file path for calculation
+        :param dynamic_threshold_factor: use provided threshold factor
+        :return: tuple of calculated threshold and additional data
+        """
+        factor = VisualComparison.dynamic_threshold_factor or dynamic_threshold_factor
+        img = Image.open(file)
+        width, height = img.size
+        pixels_grid = height * width
+        calculated_threshold = factor / math.sqrt(pixels_grid)
+        pixels_allowed = int(pixels_grid / 100 * calculated_threshold)
+        return calculated_threshold, \
+            f'\nAdditional info: {width}x{height}; {calculated_threshold=}; {pixels_allowed=} from {pixels_grid}'
 
     def _appends_dummy_elements(self, remove_data: list) -> VisualComparison:
         """
@@ -191,6 +215,11 @@ class VisualComparison:
         """
         reference_image = cv2.imread(reference_file)
         output_image = cv2.imread(actual_file)
+        threshold = threshold if threshold else self.default_threshold
+
+        additional_data = ''
+        if not threshold:
+            threshold, additional_data = self.calculate_threshold(reference_file)
 
         try:
             check_shape_equality(reference_image, output_image)
@@ -216,7 +245,8 @@ class VisualComparison:
         if is_different:
             raise AssertionError(f"{base_error}:"
                                  f"\nThreshold is: {actual_threshold};"
-                                 f"\nPossible threshold is: {threshold}")
+                                 f"\nPossible threshold is: {threshold}"
+                                 + additional_data)
 
         return self
 
