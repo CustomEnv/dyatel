@@ -4,6 +4,14 @@
 ---
 
 ## v2.1.6
+*Release date: 2023-12-05*
+
+### Added
+- VisualComparison: Dynamic threshold calculation
+
+---
+
+## v2.1.6
 *Release date: 2023-11-26*
 
 ### Fixed

@@ -40,7 +40,7 @@ cleanup()
 
 setup(
     name=pypi_name,
-    version='2.1.6',
+    version='2.1.7',
     url=f'https://github.com/EnvInc/{project_name}',
     packages=get_packages(project_name),
     install_requires=[

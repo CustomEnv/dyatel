@@ -126,7 +126,7 @@ class VisualComparison:
             raise AssertionError(f'Reference file "{reference_file}" not found, but its just saved. '
                                  f'If it CI run, then you need to commit reference files.')
 
-        if self.visual_reference_generation:
+        if self.visual_reference_generation and not self.soft_visual_reference_generation:
             return self
 
         save_screenshot(output_file)
