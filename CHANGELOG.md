@@ -3,6 +3,14 @@
 
 ---
 
+## v2.1.8
+*Release date: 2024-01-04*
+
+### Added
+- Playwright `new_context` args supports
+
+---
+
 ## v2.1.7
 *Release date: 2023-12-05*
 

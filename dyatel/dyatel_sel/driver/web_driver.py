@@ -7,7 +7,7 @@ from dyatel.dyatel_sel.core.core_driver import CoreDriver
 
 class WebDriver(CoreDriver):
 
-    def __init__(self, driver: SeleniumWebDriver):
+    def __init__(self, driver: SeleniumWebDriver, *args, **kwargs):  # noqa
         """
         Initializing of desktop web driver with selenium
 

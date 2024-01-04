@@ -83,7 +83,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
         return f'{cls.__name__}({self.label}={self.driver}) at {hex(id(self))}, platform={label}'
 
-    def __init__(self, driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver]):
+    def __init__(self, driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver], *args, **kwargs):
         """
         Initializing of driver wrapper based on given driver source
 
@@ -92,7 +92,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         self.driver = driver
         self.session.add_session(self)
         self.label = f'{self.session.all_sessions.index(self) + 1}_driver'
-        self.__init_base_class__()
+        self.__init_base_class__(*args, **kwargs)
 
     def quit(self, silent: bool = False):
         """
@@ -118,7 +118,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             'width': self.execute_script(get_inner_width_js)
         }
 
-    def __init_base_class__(self) -> None:
+    def __init_base_class__(self, *args, **kwargs) -> None:
         """
         Get driver wrapper class in according to given driver source, and set him as base class
 
@@ -139,7 +139,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')
 
         self._set_static(self._base_cls)
-        self._base_cls.__init__(self, driver=self.driver)
+        self._base_cls.__init__(self, driver=self.driver, *args, **kwargs)
 
         for name, value in self.__dict__.items():
             setattr(self.__class__, name, value)

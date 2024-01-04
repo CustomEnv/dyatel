@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Union
+from typing import List, Union, Any
 
 from playwright.sync_api import Locator, Page
 from playwright.sync_api import Browser
@@ -12,14 +12,14 @@ from dyatel.utils.logs import Logging
 
 class PlayDriver(Logging, DriverWrapperABC):
 
-    def __init__(self, driver: Browser):
+    def __init__(self, driver: Browser, *args, **kwargs):
         """
         Initializing of desktop web driver with playwright
 
         :param driver: playwright driver to initialize
         """
         self.instance = driver
-        self.context = driver.new_context()
+        self.context = driver.new_context(*args, **kwargs)
         self.driver = self.context.new_page()
         self.original_tab = self.driver
         self.browser_name = self.instance.browser_type.name
@@ -159,6 +159,16 @@ class PlayDriver(Logging, DriverWrapperABC):
                 script_args[index] = arg.element_handle()
 
         return self.driver.evaluate(script, script_args)
+
+    def evaluate(self, expression: str, arg: Any = None) -> Any:
+        """
+        Synchronously Executes JavaScript in the current window/frame
+
+        :param expression: the JavaScript to execute
+        :param arg: any applicable arguments for your JavaScript
+        :return: execution return value
+        """
+        return self.driver.evaluate(expression=expression, arg=arg)
 
     def set_page_load_timeout(self, timeout: int = 30) -> PlayDriver:
         """
