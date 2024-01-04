@@ -11,7 +11,7 @@ from dyatel.dyatel_sel.core.core_driver import CoreDriver
 
 class MobileDriver(CoreDriver):
 
-    def __init__(self, driver: AppiumDriver):
+    def __init__(self, driver: AppiumDriver, *args, **kwargs):  # noqa
         """
         Initializing of mobile driver with appium
 

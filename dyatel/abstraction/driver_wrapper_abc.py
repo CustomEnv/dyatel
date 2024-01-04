@@ -177,6 +177,16 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
+    def evaluate(self, expression: str, arg: Any = None) -> Any:
+        """
+        Playwright only: Synchronously Executes JavaScript in the current window/frame
+
+        :param expression: the JavaScript to execute
+        :param arg: any applicable arguments for your JavaScript
+        :return: execution return value
+        """
+        raise NotImplementedError()
+
     def set_page_load_timeout(self, timeout: int = 30) -> DriverWrapperABC:
         """
         Set the amount of time to wait for a page load to complete before throwing an error
