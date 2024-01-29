@@ -5,6 +5,7 @@ from abc import ABC
 from typing import Union, List, BinaryIO, Any
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
+from dyatel.shared_utils import _scaled_screenshot
 from dyatel.utils.internal_utils import calculate_coordinate_to_click
 from dyatel.js_scripts import get_element_position_on_screen_js
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type, get_appium_selector
@@ -119,7 +120,7 @@ class MobileElement(CoreElement, ABC):
             element_box = self._element_box()
             window_width, window_height = self.driver.get_window_size().values()
             img_binary = self.driver_wrapper.get_screenshot()
-            image_binary = self._scaled_screenshot(img_binary, window_width)
+            image_binary = _scaled_screenshot(img_binary, window_width)
 
             if any(element_box) < 0 or window_height > self.element.size['height']:
                 image_binary = image_binary.crop(element_box)

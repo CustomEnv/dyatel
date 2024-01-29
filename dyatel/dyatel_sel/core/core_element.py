@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import time
 from abc import ABC
-from io import BytesIO
 from typing import Union, List, Any, Callable
 
 from PIL import Image
@@ -22,7 +21,7 @@ from dyatel.abstraction.element_abc import ElementABC
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js, scroll_into_view_blocks
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.shared_utils import cut_log_data
+from dyatel.shared_utils import cut_log_data, _scaled_screenshot
 from dyatel.utils.internal_utils import WAIT_EL, safe_call
 from dyatel.exceptions import (
     TimeoutException,
@@ -297,7 +296,7 @@ class CoreElement(ElementABC, ABC):
         :return: screenshot binary
         """
         element = self.element
-        return self._scaled_screenshot(element.screenshot_as_png, element.size['width'])
+        return _scaled_screenshot(element.screenshot_as_png, element.size['width'])
 
     @property
     def text(self) -> str:
@@ -454,23 +453,6 @@ class CoreElement(ElementABC, ABC):
         :return: ActionChains
         """
         return ActionChains(self.driver)
-
-    def _scaled_screenshot(self, screenshot_binary: bin, width: int) -> Image:
-        """
-        Get scaled screenshot to fit driver window / element size
-
-        :param screenshot_binary: original screenshot binary
-        :param width: driver or element width
-        :return: scaled image binary
-        """
-        img_binary = Image.open(BytesIO(screenshot_binary))
-        scale = img_binary.size[0] / width
-
-        if scale != 1:
-            new_image_size = (int(img_binary.size[0] / scale), int(img_binary.size[1] / scale))
-            img_binary = img_binary.resize(new_image_size, Image.Resampling.LANCZOS)
-
-        return img_binary
 
     def _get_element(self, wait: Union[bool, Callable] = True, force_wait: bool = False) -> SeleniumWebElement:
         """

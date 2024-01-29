@@ -4,6 +4,7 @@ from abc import ABC
 from typing import List, Union, Any
 
 from selenium.webdriver.common.alert import Alert
+from PIL import Image
 
 from dyatel.utils.internal_utils import WAIT_EL
 
@@ -206,11 +207,12 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
-    def get_screenshot(self) -> bytes:
+    def get_screenshot(self, filename: str) -> Image:
         """
-        Gets the screenshot of the current window as a binary data.
+        Taking element screenshot and saving with given path/filename
 
-        :return: screenshot binary
+        :param filename: path/filename
+        :return: image binary
         """
         raise NotImplementedError()
 

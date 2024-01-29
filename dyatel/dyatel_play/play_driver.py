@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import io
 from typing import List, Union, Any
 
-from playwright.sync_api import Locator, Page
-from playwright.sync_api import Browser
+from PIL import Image
+from playwright.sync_api import Locator, Page, Browser, BrowserContext
 
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
 from dyatel.utils.internal_utils import get_timeout_in_ms
@@ -11,6 +12,10 @@ from dyatel.utils.logs import Logging
 
 
 class PlayDriver(Logging, DriverWrapperABC):
+
+    instance: Browser
+    context: BrowserContext
+    driver: Page
 
     def __init__(self, driver: Browser, *args, **kwargs):
         """
@@ -93,7 +98,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         self.driver.go_back()
         return self
 
-    def quit(self) -> None:
+    def quit(self, *args) -> None:
         """
         Quit the driver instance
 
@@ -191,13 +196,26 @@ class PlayDriver(Logging, DriverWrapperABC):
         self.driver.set_viewport_size({'width': width, 'height': height})
         return self
 
-    def get_screenshot(self) -> bytes:
+    def get_screenshot(self, filename: str) -> Image:
         """
-        Gets the screenshot of the current window as a binary data.
+        Taking element screenshot and saving with given path/filename
+
+        :param filename: path/filename
+        :return: image binary
+        """
+        self.log(f'Get screenshot of entire screen')
+        image_binary = self.screenshot_base
+        image_binary.save(filename)
+        return image_binary
+
+    @property
+    def screenshot_base(self) -> Image:
+        """
+        Get driver width scaled screenshot binary of element without saving
 
         :return: screenshot binary
         """
-        return self.driver.screenshot()
+        return Image.open(io.BytesIO(self.driver.screenshot()))
 
     def get_all_tabs(self) -> List[Page]:
         """

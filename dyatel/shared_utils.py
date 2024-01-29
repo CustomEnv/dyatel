@@ -5,6 +5,24 @@ from subprocess import Popen, PIPE, run
 from PIL import Image
 
 
+def _scaled_screenshot(screenshot_binary: bin, width: int) -> Image:
+    """
+    Get scaled screenshot to fit driver window / element size
+
+    :param screenshot_binary: original screenshot binary
+    :param width: driver or element width
+    :return: scaled image binary
+    """
+    img_binary = Image.open(io.BytesIO(screenshot_binary))
+    scale = img_binary.size[0] / width
+
+    if scale != 1:
+        new_image_size = (int(img_binary.size[0] / scale), int(img_binary.size[1] / scale))
+        img_binary = img_binary.resize(new_image_size, Image.Resampling.LANCZOS)
+
+    return img_binary
+
+
 def rescale_image(screenshot_binary: bytes, scale=3, img_format='JPEG') -> bytes:
     img = Image.open(io.BytesIO(screenshot_binary))
     img = img.resize((img.width // scale, img.height // scale), Image.Resampling.LANCZOS)

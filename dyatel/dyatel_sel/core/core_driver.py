@@ -3,7 +3,9 @@ from __future__ import annotations
 import time
 from typing import Union, List, Any
 
+from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
+from dyatel.shared_utils import _scaled_screenshot
 from selenium.common.exceptions import WebDriverException as SeleniumWebDriverException, NoAlertPresentException
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
@@ -16,6 +18,8 @@ from dyatel.utils.logs import Logging
 
 
 class CoreDriver(Logging, DriverWrapperABC):
+
+    driver: Union[AppiumDriver, SeleniumWebDriver]
 
     def __init__(self, driver: Union[AppiumDriver, SeleniumWebDriver]):
         """
@@ -43,6 +47,27 @@ class CoreDriver(Logging, DriverWrapperABC):
             raise DriverWrapperException(f'Can\'t proceed to {url}. Original error: {exc.msg}')
 
         return self
+
+    def get_screenshot(self, filename: str) -> Image:
+        """
+        Taking element screenshot and saving with given path/filename
+
+        :param filename: path/filename
+        :return: image binary
+        """
+        self.log(f'Get screenshot of entire screen')
+        image_binary = self.screenshot_base
+        image_binary.save(filename)
+        return image_binary
+
+    @property
+    def screenshot_base(self) -> Image:
+        """
+        Get driver width scaled screenshot binary of element without saving
+
+        :return: screenshot binary
+        """
+        return _scaled_screenshot(self.driver.get_screenshot_as_png(), self.get_inner_window_size()['width'])
 
     def is_driver_opened(self) -> bool:
         """
@@ -99,7 +124,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         self.driver.back()
         return self
 
-    def quit(self) -> None:
+    def quit(self, *args) -> None:
         """
         Quit the driver instance
 
@@ -197,14 +222,6 @@ class CoreDriver(Logging, DriverWrapperABC):
         """
         self.driver.set_page_load_timeout(timeout)
         return self
-
-    def get_screenshot(self) -> bytes:
-        """
-        Gets the screenshot of the current window as a binary data.
-
-        :return: screenshot binary
-        """
-        return self.driver.get_screenshot_as_png()
 
     def switch_to_alert(self, timeout: Union[int, float] = WAIT_EL) -> Alert:
         """

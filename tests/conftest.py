@@ -104,9 +104,10 @@ def visual_comparisons_settings(request):
     VisualComparison.visual_regression_path = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
     VisualComparison.visual_reference_generation = request.config.getoption('--gr')
     VisualComparison.hard_visual_reference_generation = request.config.getoption('--hgr')
-    VisualComparison.hard_visual_reference_generation = request.config.getoption('--sgr')
+    VisualComparison.soft_visual_reference_generation = request.config.getoption('--sgr')
     VisualComparison.skip_screenshot_comparison = request.config.getoption('--sv')
     VisualComparison.default_threshold = 0.1
+    VisualComparison.test_item = request.node
 
 
 def pytest_collection_modifyitems(items):
