@@ -63,6 +63,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     is_android = False
     is_simulator = False
     is_real_device = False
+    mobile_resolution = False
 
     browser_name = None
 
@@ -152,7 +153,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
         VisualComparison(self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
-            scroll=False, remove=remove,
+            scroll=False, remove=remove, fill_background=False,
         )
 
     def soft_assert_screenshot(

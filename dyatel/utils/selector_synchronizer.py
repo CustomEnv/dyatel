@@ -25,7 +25,7 @@ def get_platform_locator(obj: Any, default_locator: str = ''):
     if not data or not obj.driver_wrapper:
         return locator
 
-    if obj.driver_wrapper.is_desktop:
+    if obj.driver_wrapper.is_desktop and not obj.driver_wrapper.mobile_resolution:
         locator = data.get('desktop', locator)
 
     elif obj.driver_wrapper.is_mobile:
@@ -36,6 +36,9 @@ def get_platform_locator(obj: Any, default_locator: str = ''):
             locator = data.get('ios', locator)
         elif obj.driver_wrapper.is_android:
             locator = data.get('android', locator)
+
+    elif obj.driver_wrapper.mobile_resolution:
+        locator = data.get('mobile', locator)
 
     return locator
 

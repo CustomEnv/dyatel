@@ -79,7 +79,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         :param kwargs:
           - desktop: str = locator that will be used for desktop platform
-          - mobile: str = locator that will be used for all mobile platforms
+          - mobile: str = locator that will be used for all mobile platforms and mobile_resolution
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
