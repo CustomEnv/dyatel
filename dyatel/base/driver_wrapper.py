@@ -63,7 +63,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     is_android = False
     is_simulator = False
     is_real_device = False
-    mobile_resolution = False
+    is_mobile_resolution = False
 
     browser_name = None
 
@@ -197,6 +197,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             self._base_cls = PlayDriver
         elif isinstance(self.driver, AppiumDriver):
             self.is_mobile = True
+            self.is_mobile_resolution = True
             self._base_cls = MobileDriver
         elif isinstance(self.driver, SeleniumDriver):
             self.is_desktop = True

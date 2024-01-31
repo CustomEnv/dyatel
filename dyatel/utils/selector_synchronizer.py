@@ -25,20 +25,14 @@ def get_platform_locator(obj: Any, default_locator: str = ''):
     if not data or not obj.driver_wrapper:
         return locator
 
-    if obj.driver_wrapper.is_desktop and not obj.driver_wrapper.mobile_resolution:
+    if obj.driver_wrapper.is_android:
+        locator = data.get('android', locator)
+    elif obj.driver_wrapper.is_ios:
+        locator = data.get('ios', locator)
+    elif obj.driver_wrapper.is_mobile or obj.driver_wrapper.is_mobile_resolution:
+        locator = data.get('mobile', locator)
+    elif obj.driver_wrapper.is_desktop:
         locator = data.get('desktop', locator)
-
-    elif obj.driver_wrapper.is_mobile:
-        locator = data.get('mobile', locator)
-        if data.get('mobile', False) and (data.get('android', False) or data.get('ios', False)):
-            raise UnsuitableArgumentsException('Dont use mobile and android/ios locators together')
-        elif obj.driver_wrapper.is_ios:
-            locator = data.get('ios', locator)
-        elif obj.driver_wrapper.is_android:
-            locator = data.get('android', locator)
-
-    elif obj.driver_wrapper.mobile_resolution:
-        locator = data.get('mobile', locator)
 
     return locator
 

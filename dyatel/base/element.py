@@ -36,6 +36,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     _object = 'element'
     _base_cls: Type[PlayElement, MobileElement, WebElement]
+    driver_wrapper: DriverWrapper
 
     def __new__(cls, *args, **kwargs):
         instance = super(Element, cls).__new__(cls)
