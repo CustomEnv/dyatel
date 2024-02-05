@@ -216,6 +216,15 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
+    @property
+    def screenshot_base(self) -> Image:
+        """
+        Get driver width scaled screenshot binary of element without saving
+
+        :return: screenshot binary
+        """
+        raise NotImplementedError()
+
     def get_all_tabs(self) -> List[DriverWrapperABC]:
         """
         Selenium/Playwright only: Get all opened tabs

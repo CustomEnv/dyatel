@@ -68,8 +68,8 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     browser_name = None
 
     driver: Union[SeleniumDriver, AppiumDriver, PlaywrightDriver]
-    instance: PlaywrightBrowser
-    context: PlaywrightContext
+    instance: PlaywrightBrowser  # Only for playwright instance
+    context: PlaywrightContext  # Only for playwright instance
 
     def __new__(cls, *args, **kwargs):
         if cls.session.sessions_count() == 0:
