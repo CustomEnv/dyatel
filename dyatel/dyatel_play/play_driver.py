@@ -7,7 +7,7 @@ from PIL import Image
 from playwright.sync_api import Locator, Page, Browser, BrowserContext
 
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
-from dyatel.utils.internal_utils import get_timeout_in_ms
+from dyatel.utils.internal_utils import get_timeout_in_ms, WAIT_UNIT
 from dyatel.utils.logs import Logging
 
 
@@ -28,6 +28,16 @@ class PlayDriver(Logging, DriverWrapperABC):
         self.driver = self.context.new_page()
         self.original_tab = self.driver
         self.browser_name = self.instance.browser_type.name
+
+    def wait(self, timeout: Union[int, float] = WAIT_UNIT) -> PlayDriver:
+        """
+        Sleep for some time in seconds
+
+        :param timeout: url for navigation
+        :return: self
+        """
+        self.driver.wait_for_timeout(get_timeout_in_ms(timeout))
+        return self
 
     def get(self, url: str, silent: bool = False) -> PlayDriver:
         """
@@ -196,26 +206,24 @@ class PlayDriver(Logging, DriverWrapperABC):
         self.driver.set_viewport_size({'width': width, 'height': height})
         return self
 
-    def get_screenshot(self, filename: str) -> Image:
-        """
-        Taking element screenshot and saving with given path/filename
-
-        :param filename: path/filename
-        :return: image binary
-        """
-        self.log(f'Get screenshot of entire screen')
-        image_binary = self.screenshot_base
-        image_binary.save(filename)
-        return image_binary
-
-    @property
-    def screenshot_base(self) -> Image:
+    def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
         Get driver width scaled screenshot binary of element without saving
 
+        :param screenshot_base: screenshot bytes
         :return: screenshot binary
         """
-        return Image.open(io.BytesIO(self.driver.screenshot()))
+        screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
+        return Image.open(io.BytesIO(screenshot_base))
+
+    @property
+    def screenshot_base(self) -> bytes:
+        """
+        Get screenshot base
+
+        :return: screenshot bytes
+        """
+        return self.driver.screenshot()
 
     def get_all_tabs(self) -> List[Page]:
         """

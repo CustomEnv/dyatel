@@ -289,7 +289,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
         return self
 
-    def get_screenshot(self, filename: str) -> bytes:
+    def save_screenshot(self, filename: str) -> bytes:
         """
         Taking element screenshot and saving with given path/filename
 

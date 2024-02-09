@@ -152,7 +152,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def get_screenshot(self, filename: str) -> Image:
+    def save_screenshot(self, filename: str) -> Image:
         """
         Taking element screenshot and saving with given path/filename
 

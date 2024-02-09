@@ -207,21 +207,31 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
-    def get_screenshot(self, filename: str) -> Image:
+    def save_screenshot(self, file_name: str, screenshot_base: bytes = None) -> Image:
         """
         Taking element screenshot and saving with given path/filename
 
-        :param filename: path/filename
+        :param file_name: path/filename
+        :param screenshot_base: screenshot bytes
         :return: image binary
         """
         raise NotImplementedError()
 
-    @property
-    def screenshot_base(self) -> Image:
+    def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
         Get driver width scaled screenshot binary of element without saving
 
+        :param screenshot_base: screenshot bytes
         :return: screenshot binary
+        """
+        raise NotImplementedError()
+
+    @property
+    def screenshot_base(self) -> bytes:
+        """
+        Get screenshot base
+
+        :return: screenshot bytes
         """
         raise NotImplementedError()
 

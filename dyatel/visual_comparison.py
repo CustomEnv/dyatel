@@ -83,7 +83,7 @@ class VisualComparison:
         self._appends_dummy_elements(remove)
 
         desired_obj = self.dyatel_element or self.driver_wrapper
-        desired_obj.get_screenshot(screenshot_name)
+        desired_obj.save_screenshot(screenshot_name)
 
         self._remove_dummy_elements()
 

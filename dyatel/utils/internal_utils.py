@@ -11,6 +11,7 @@ from selenium.common.exceptions import StaleElementReferenceException as Seleniu
 from dyatel.exceptions import NoSuchElementException, InvalidSelectorException, TimeoutException, NoSuchParentException
 
 
+WAIT_UNIT = 1
 WAIT_EL = 10
 WAIT_PAGE = 15
 

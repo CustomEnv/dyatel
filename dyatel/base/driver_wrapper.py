@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Union, Type, List, Tuple, Any
 
-from dyatel.visual_comparison import VisualComparison
+from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 from playwright.sync_api import (
@@ -11,6 +11,7 @@ from playwright.sync_api import (
     Page as PlaywrightDriver,
 )
 
+from dyatel.visual_comparison import VisualComparison
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
@@ -127,6 +128,19 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             'height': self.execute_script(get_inner_height_js),
             'width': self.execute_script(get_inner_width_js)
         }
+
+    def save_screenshot(self, file_name: str, screenshot_base: bytes = None) -> Image:
+        """
+        Taking element screenshot and saving with given path/filename
+
+        :param file_name: path/filename
+        :param screenshot_base: screenshot bytes
+        :return: image binary
+        """
+        self.log(f'Save screenshot')
+        image_object = self.screenshot_image(screenshot_base)
+        image_object.save(file_name)
+        return image_object
 
     def assert_screenshot(
             self,

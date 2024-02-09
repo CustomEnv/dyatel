@@ -13,7 +13,7 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.exceptions import DriverWrapperException, TimeoutException
-from dyatel.utils.internal_utils import WAIT_EL
+from dyatel.utils.internal_utils import WAIT_EL, WAIT_UNIT
 from dyatel.utils.logs import Logging
 
 
@@ -29,6 +29,16 @@ class CoreDriver(Logging, DriverWrapperABC):
         :param driver: appium or selenium driver to initialize
         """
         driver.implicitly_wait(0.001)  # reduce selenium wait
+
+    def wait(self, timeout: Union[int, float] = WAIT_UNIT) -> CoreDriver:
+        """
+        Sleep for some time in seconds
+
+        :param timeout: url for navigation
+        :return: self
+        """
+        time.sleep(timeout)
+        return self
 
     def get(self, url: str, silent: bool = False) -> CoreDriver:
         """
@@ -48,26 +58,24 @@ class CoreDriver(Logging, DriverWrapperABC):
 
         return self
 
-    def get_screenshot(self, filename: str) -> Image:
-        """
-        Taking element screenshot and saving with given path/filename
-
-        :param filename: path/filename
-        :return: image binary
-        """
-        self.log(f'Get screenshot of entire screen')
-        image_binary = self.screenshot_base
-        image_binary.save(filename)
-        return image_binary
-
-    @property
-    def screenshot_base(self) -> Image:
+    def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
         Get driver width scaled screenshot binary of element without saving
 
+        :param screenshot_base: screenshot bytes
         :return: screenshot binary
         """
-        return _scaled_screenshot(self.driver.get_screenshot_as_png(), self.get_inner_window_size()['width'])
+        screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
+        return _scaled_screenshot(screenshot_base, self.get_inner_window_size()['width'])
+
+    @property
+    def screenshot_base(self) -> bytes:
+        """
+        Get screenshot base
+
+        :return: screenshot bytes
+        """
+        return self.driver.get_screenshot_as_png()
 
     def is_driver_opened(self) -> bool:
         """
