@@ -129,17 +129,23 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             'width': self.execute_script(get_inner_width_js)
         }
 
-    def save_screenshot(self, file_name: str, screenshot_base: bytes = None) -> Image:
+    def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
         """
         Taking element screenshot and saving with given path/filename
 
         :param file_name: path/filename
         :param screenshot_base: screenshot bytes
+        :param convert_type: convert image type before save
         :return: image binary
         """
         self.log(f'Save screenshot')
         image_object = self.screenshot_image(screenshot_base)
+
+        if convert_type:
+            image_object = image_object.convert(convert_type)
+
         image_object.save(file_name)
+
         return image_object
 
     def assert_screenshot(

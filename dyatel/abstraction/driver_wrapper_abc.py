@@ -207,12 +207,13 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
-    def save_screenshot(self, file_name: str, screenshot_base: bytes = None) -> Image:
+    def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
         """
         Taking element screenshot and saving with given path/filename
 
         :param file_name: path/filename
         :param screenshot_base: screenshot bytes
+        :param convert_type: convert image type before save
         :return: image binary
         """
         raise NotImplementedError()
