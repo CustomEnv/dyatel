@@ -55,6 +55,8 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
     session: DriverWrapperSessions = DriverWrapperSessions
 
+    anchor = None
+
     is_desktop = False
     is_selenium = False
     is_playwright = False

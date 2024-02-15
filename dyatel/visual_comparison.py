@@ -42,7 +42,6 @@ class VisualComparison:
     def __init__(self, driver_wrapper, element=None):
         self.driver_wrapper = driver_wrapper
         self.dyatel_element = element
-        self.screenshot_name = 'default'
 
         if self.dynamic_threshold_factor and self.default_threshold:
             raise Exception('Provide only one argument for threshold of visual comparison')
@@ -52,6 +51,8 @@ class VisualComparison:
 
     def __init_session(self):
         root_path = self.visual_regression_path
+
+        self.screenshot_name = 'default'
 
         if not root_path:
             raise Exception('Provide visual regression path to environment. '
@@ -82,7 +83,7 @@ class VisualComparison:
 
         self._appends_dummy_elements(remove)
 
-        desired_obj = self.dyatel_element or self.driver_wrapper
+        desired_obj = self.dyatel_element or self.driver_wrapper.anchor or self.driver_wrapper
         desired_obj.save_screenshot(screenshot_name)
 
         self._remove_dummy_elements()

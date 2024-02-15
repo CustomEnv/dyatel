@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from abc import ABC
-from typing import Union, List, BinaryIO, Any
+from typing import BinaryIO
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.shared_utils import _scaled_screenshot
@@ -119,17 +119,17 @@ class MobileElement(CoreElement, ABC):
         if self.driver_wrapper.is_ios and legacy:
             element_box = self._element_box()
             window_width, window_height = self.driver.get_window_size().values()
-            img_binary = self.driver_wrapper.save_screenshot()
-            image_binary = _scaled_screenshot(img_binary, window_width)
+            img_binary = self.driver_wrapper.screenshot_base
+            image = _scaled_screenshot(img_binary, window_width)
 
-            if any(element_box) < 0 or window_height > self.element.size['height']:
-                image_binary = image_binary.crop(element_box)
+            if min(element_box) < 0 or window_height > self.element.size['height']:
+                image = image.crop(element_box)
 
-            image_binary.save(filename)
+            image.save(filename)
         else:
-            image_binary = CoreElement.save_screenshot(self, filename)
+            image = CoreElement.save_screenshot(self, filename)
 
-        return image_binary
+        return image
 
     def _element_box(self) -> tuple:
         """

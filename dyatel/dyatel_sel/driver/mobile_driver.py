@@ -37,6 +37,7 @@ class MobileDriver(CoreDriver):
         self.bottom_bar_height = None
 
         self.original_tab = None
+        self.page_box = None
 
         if self.is_app:
             if self.is_ios:
@@ -177,6 +178,26 @@ class MobileDriver(CoreDriver):
         """
         return self.driver.contexts
 
+    def screenshot_image(self, screenshot_base: bytes = None):
+        """
+        Get driver width scaled screenshot binary of element without saving
+
+        :param screenshot_base: screenshot bytes
+        :return: screenshot binary
+        """
+        image = CoreDriver.screenshot_image(self, screenshot_base)
+
+        if self.is_ios:
+            if not self.page_box:
+                top_bar_height = self.get_top_bar_height()
+                bottom_bar_height = self.get_bottom_bar_height()
+                width, height = image.size
+                self.page_box = 0, top_bar_height, width, height - bottom_bar_height
+
+            image = image.crop(self.page_box)
+
+        return image
+
     def hide_keyboard(self, **kwargs) -> MobileDriver:
         """
         Hide keyboard for real device
@@ -234,7 +255,7 @@ class MobileDriver(CoreDriver):
         :param force: get the new value forcibly
         :return: self
         """
-        if force or not self.top_bar_height:
+        if force or not self.bottom_bar_height:
 
             from dyatel.base.element import Element
 
@@ -249,7 +270,7 @@ class MobileDriver(CoreDriver):
             finally:
                 self.switch_to_web()
 
-        return self.top_bar_height
+        return self.bottom_bar_height
 
     def click_by_coordinates(self, x: int, y: int, silent: bool = False) -> MobileDriver:
         """

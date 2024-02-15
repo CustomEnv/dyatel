@@ -283,7 +283,7 @@ class CoreElement(ElementABC, ABC):
         :param filename: path/filename
         :return: image binary
         """
-        self.log(f'Get screenshot of "{self.name}"')
+        self.log(f'Save screenshot of "{self.name}"')
         image_binary = self.screenshot_base
         image_binary.save(filename)
         return image_binary
