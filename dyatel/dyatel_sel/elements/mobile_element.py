@@ -142,9 +142,4 @@ class MobileElement(CoreElement, ABC):
         start_x, start_y = el_location.values()
         h, w = element.size.values()
 
-        bar_size = self.driver_wrapper.get_top_bar_height()
-
-        if bar_size:
-            start_y += bar_size
-
         return start_x, start_y, start_x+w, start_y+h

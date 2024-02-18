@@ -187,7 +187,7 @@ class MobileDriver(CoreDriver):
         """
         image = CoreDriver.screenshot_image(self, screenshot_base)
 
-        if self.is_ios:
+        if self.is_ios and not screenshot_base:
             if not self.page_box:
                 top_bar_height = self.get_top_bar_height()
                 bottom_bar_height = self.get_bottom_bar_height()

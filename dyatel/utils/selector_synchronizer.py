@@ -25,11 +25,13 @@ def get_platform_locator(obj: Any, default_locator: str = ''):
     if not data or not obj.driver_wrapper:
         return locator
 
+    mobile_fallback_locator = data.get('mobile', locator)
+
     if obj.driver_wrapper.is_android:
-        locator = data.get('android', locator)
+        locator = data.get('android', mobile_fallback_locator)
     elif obj.driver_wrapper.is_ios:
-        locator = data.get('ios', locator)
-    elif obj.driver_wrapper.is_mobile or obj.driver_wrapper.is_mobile_resolution:
+        locator = data.get('ios', mobile_fallback_locator)
+    elif obj.driver_wrapper.is_mobile_resolution:
         locator = data.get('mobile', locator)
     elif obj.driver_wrapper.is_desktop:
         locator = data.get('desktop', locator)
