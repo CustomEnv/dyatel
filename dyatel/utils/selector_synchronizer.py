@@ -4,7 +4,7 @@ from typing import Any
 
 from selenium.webdriver.common.by import By
 
-from dyatel.exceptions import UnsuitableArgumentsException, InvalidSelectorException
+from dyatel.exceptions import InvalidSelectorException
 from dyatel.utils.internal_utils import get_child_elements, all_tags
 
 
@@ -32,7 +32,7 @@ def get_platform_locator(obj: Any, default_locator: str = ''):
     elif obj.driver_wrapper.is_ios:
         locator = data.get('ios', mobile_fallback_locator)
     elif obj.driver_wrapper.is_mobile_resolution:
-        locator = data.get('mobile', locator)
+        locator = mobile_fallback_locator
     elif obj.driver_wrapper.is_desktop:
         locator = data.get('desktop', locator)
 
@@ -53,7 +53,9 @@ def get_selenium_locator_type(locator: str):
       By.ID if there is no any match
     """
     if locator in selenium_locator_types:
-        raise InvalidSelectorException('Locator type given instead of locator')
+        raise InvalidSelectorException(
+            f'An locator_type given instead of locator. Ensure your locator is not one of {selenium_locator_types}'
+        )
 
     brackets = '[' in locator and ']' in locator
     is_only_tags = True

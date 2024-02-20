@@ -211,7 +211,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         self.driver.switch_to.default_content()
         return self
 
-    def execute_script(self, script: str, *args):
+    def execute_script(self, script: str, *args) -> Any:
         """
         Synchronously Executes JavaScript in the current window/frame
 

@@ -153,7 +153,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         """
         return self.context.cookies()
 
-    def execute_script(self, script: str, *args) -> Union[None, str]:
+    def execute_script(self, script: str, *args) -> Any:
         """
         Synchronously Executes JavaScript in the current window/frame.
         Completable with selenium `execute_script` method
