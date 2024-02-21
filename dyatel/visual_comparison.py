@@ -289,7 +289,7 @@ class VisualComparison:
 
         test_function_name = test_function_name.replace('[', '_')  # required here for better separation
 
-        if self.driver_wrapper.is_mobile:
+        if self.driver_wrapper.is_android or self.driver_wrapper.is_ios:
             caps = self.driver_wrapper.driver.caps
             device_name = caps.get('customDeviceName', '')
 
