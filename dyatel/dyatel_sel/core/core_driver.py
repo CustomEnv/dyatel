@@ -99,10 +99,12 @@ class CoreDriver(Logging, DriverWrapperABC):
         self.driver.back()
         return self
 
-    def quit(self) -> None:
+    def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """
         Quit the driver instance
 
+        :param silent: erase log
+        :param trace_path: Playwright only: path for the trace
         :return: None
         """
         self.driver.quit()

@@ -94,17 +94,18 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         self.label = f'{self.session.all_sessions.index(self) + 1}_driver'
         self.__init_base_class__(*args, **kwargs)
 
-    def quit(self, silent: bool = False):
+    def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """
         Quit the driver instance
 
-        :param: silent:
+        :param silent: erase log
+        :param trace_path: Playwright only: path for the trace
         :return: None
         """
         if not silent:
             self.log('Quit driver instance')
 
-        self._base_cls.quit(self)
+        self._base_cls.quit(self, trace_path)
         self.session.remove_session(self)
 
     def get_inner_window_size(self) -> dict:

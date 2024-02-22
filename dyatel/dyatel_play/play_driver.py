@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import List, Union, Any
 
+from dyatel.dyatel_play.helpers.Trace import Trace
 from playwright.sync_api import Locator, Page
 from playwright.sync_api import Browser
 
@@ -12,14 +13,19 @@ from dyatel.utils.logs import Logging
 
 class PlayDriver(Logging, DriverWrapperABC):
 
-    def __init__(self, driver: Browser, *args, **kwargs):
+    def __init__(self, driver: Browser, trace: Trace = None, *args, **kwargs):
         """
         Initializing of desktop web driver with playwright
 
         :param driver: playwright driver to initialize
         """
+        self.trace = trace
         self.instance = driver
         self.context = driver.new_context(*args, **kwargs)
+
+        if trace:
+            self.context.tracing.start(**trace.__dict__)
+
         self.driver = self.context.new_page()
         self.original_tab = self.driver
         self.browser_name = self.instance.browser_type.name
@@ -93,12 +99,17 @@ class PlayDriver(Logging, DriverWrapperABC):
         self.driver.go_back()
         return self
 
-    def quit(self) -> None:
+    def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """
         Quit the driver instance
 
+        :param silent: erase log
+        :param trace_path: Playwright only: path for the trace
         :return: None
         """
+        if self.trace and trace_path:
+            self.context.tracing.stop(path=trace_path)
+
         self.driver.close()
 
     def set_cookie(self, cookies: List[dict]) -> PlayDriver:
