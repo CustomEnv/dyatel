@@ -3,6 +3,14 @@
 
 ---
 
+## v2.1.9
+*Release date: 2024-02-22*
+
+### Added
+- Playwright `context.trace` support
+
+---
+
 ## v2.1.8
 *Release date: 2024-01-04*
 
