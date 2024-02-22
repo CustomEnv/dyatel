@@ -7,7 +7,7 @@
 *Release date: 2024-02-22*
 
 ### Added
-- Playwright `context.trace` support
+- Playwright `context.tracing` support
 
 ---
 
