@@ -21,8 +21,10 @@ from dyatel.abstraction.element_abc import ElementABC
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js, scroll_into_view_blocks
 from dyatel.keyboard_keys import KeyboardKeys
+from dyatel.mixins.objects.location import Location
+from dyatel.mixins.objects.size import Size
 from dyatel.shared_utils import cut_log_data, _scaled_screenshot
-from dyatel.utils.internal_utils import WAIT_EL, safe_call
+from dyatel.utils.internal_utils import WAIT_EL, safe_call, get_dict
 from dyatel.exceptions import (
     TimeoutException,
     InvalidSelectorException,
@@ -409,11 +411,26 @@ class CoreElement(ElementABC, ABC):
 
         :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
         """
-        element = self.element
-        size = self.driver.execute_script(get_element_size_js, element)
-        location = self.driver.execute_script(get_element_position_on_screen_js, element)
-        sorted_items: list = sorted({**size, **location}.items(), reverse=True)
+        sorted_items = sorted({**get_dict(self.size), **get_dict(self.location)}.items(), reverse=True)
         return dict(sorted_items)
+
+    @property
+    def size(self) -> Size:
+        """
+        Get Size object of current element
+
+        :return: Size(width/height) obj
+        """
+        return Size(**self.driver.execute_script(get_element_size_js, self.element))
+
+    @property
+    def location(self) -> Location:
+        """
+        Get Location object of current element
+
+        :return: Location(x/y) obj
+        """
+        return Location(**self.driver.execute_script(get_element_position_on_screen_js, self.element))
 
     def is_enabled(self, silent: bool = False) -> bool:
         """

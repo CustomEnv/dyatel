@@ -21,6 +21,10 @@ all_tags = {'h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'b
             'li', 'form', 'footer', 'frame', 'area', 'span'}
 
 
+def get_dict(obj: Any):
+    return obj.__dict__
+
+
 def safe_call(func: Callable, *args, **kwargs) -> Union[Any, None]:
     """
     Wrapper for any method that raises internal exceptions to prevent exceptions

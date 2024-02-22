@@ -4,12 +4,14 @@ from abc import abstractmethod, ABC
 from typing import Union, Any, List, Tuple
 
 from PIL.Image import Image
+from appium.webdriver.extensions.location import Location
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from appium.webdriver.webelement import WebElement as AppiumWebElement
 from playwright.sync_api import Locator as PlayWebElement
 
 from dyatel.abstraction.mixin_abc import MixinABC
 from dyatel.keyboard_keys import KeyboardKeys
+from dyatel.mixins.objects.size import Size
 from dyatel.utils.internal_utils import WAIT_EL
 
 
@@ -248,6 +250,24 @@ class ElementABC(MixinABC, ABC):
         A dictionary with the size and location of the element.
 
         :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
+        """
+        raise NotImplementedError()
+
+    @property
+    def size(self) -> Size:
+        """
+        Get Size object of current element
+
+        :return: Size(width/height) obj
+        """
+        raise NotImplementedError()
+
+    @property
+    def location(self) -> Location:
+        """
+        Get Location object of current element
+
+        :return: Location(x/y) obj
         """
         raise NotImplementedError()
 

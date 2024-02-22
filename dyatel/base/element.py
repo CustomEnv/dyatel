@@ -16,6 +16,7 @@ from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
 from dyatel.mixins.internal_mixin import InternalMixin, get_element_info, all_locator_types
+from dyatel.mixins.objects.size import Size
 from dyatel.utils.logs import Logging, LogLevel
 from dyatel.utils.previous_object_driver import PreviousObjectDriver, set_instance_frame
 from dyatel.visual_comparison import VisualComparison
@@ -325,6 +326,35 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         if not disabled:
             msg = f'"{self.name}" not disabled after {timeout} seconds. {self.get_element_info()}'
             raise TimeoutException(msg)
+
+        return self
+
+    def wait_element_size(self, expected_size: Size, timeout: Union[int, float] = WAIT_EL) -> Element:
+        """
+        Wait until element size will be equal to given Size object
+
+        :param expected_size: expected element size in Size object
+        :param timeout: time to stop waiting
+        :return: Element
+        """
+        is_equal = False
+        start_time = time.time()
+        actual_size = Size(None, None)
+        is_height_equal, is_width_equal = True, True
+
+        while time.time() - start_time < timeout and not is_equal:
+            actual_size = self.size
+
+            if expected_size.height is not None:
+                is_height_equal = actual_size.height == expected_size.height
+            if expected_size.width is not None:
+                is_width_equal = actual_size.width == expected_size.width
+
+            is_equal = is_height_equal == is_width_equal
+
+        if not is_equal:
+            raise TimeoutException(f'"{self.name}" size is not equal to {expected_size} after {timeout} seconds. '
+                                   f'Actual: {actual_size}. {self.get_element_info()}')
 
         return self
 
