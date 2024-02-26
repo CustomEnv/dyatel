@@ -118,11 +118,10 @@ class MobileElement(CoreElement, ABC):
         """
         if self.driver_wrapper.is_ios and legacy:
             element_box = self._element_box()
-            window_width, window_height = self.driver.get_window_size().values()
-            img_binary = self.driver_wrapper.screenshot_base
-            image = _scaled_screenshot(img_binary, window_width)
+            window_height = self.driver.get_window_size()['height']
+            image = self.driver_wrapper.screenshot_image()
 
-            if min(element_box) < 0 or window_height > self.element.size['height']:
+            if min(element_box) < 0 or window_height > self.size.height:
                 image = image.crop(element_box)
 
             image.save(filename)
@@ -137,9 +136,12 @@ class MobileElement(CoreElement, ABC):
 
         :return: element coordinates on screen (start_x, start_y, end_x, end_y)
         """
-        element = self.element
-        el_location = self.driver.execute_script(get_element_position_on_screen_js, element)
-        start_x, start_y = el_location.values()
-        h, w = element.size.values()
+        element_size = self.size
+        element_location = self.location
 
-        return start_x, start_y, start_x+w, start_y+h
+        return (
+            element_location.x,
+            element_location.y,
+            element_location.x + element_size.width,
+            element_location.y + element_size.height,
+        )
