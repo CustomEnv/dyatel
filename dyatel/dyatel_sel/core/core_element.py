@@ -517,7 +517,7 @@ class CoreElement(ElementABC, ABC):
         if not base:
             raise DriverWrapperException("Can't find driver")
 
-        if self.driver_wrapper.is_mobile:
+        if self.driver_wrapper.is_ios or self.driver_wrapper.is_android:
             if self.driver_wrapper.is_native_context:
                 return base
 
