@@ -99,7 +99,7 @@ def driver_func(request, driver_name, platform, chrome_options, firefox_options)
     return driver_wrapper
 
 
-@pytest.fixture(autouse=True, scope='session')
+@pytest.fixture(autouse=True)
 def visual_comparisons_settings(request):
     VisualComparison.visual_regression_path = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
     VisualComparison.visual_reference_generation = request.config.getoption('--gr')

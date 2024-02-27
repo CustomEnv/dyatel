@@ -72,15 +72,13 @@ class VisualComparison:
     def _save_screenshot(
             self,
             screenshot_name: str,
-            delay: int | float,
-            remove: list = None,
-            fill_background: bool = False
+            delay: Union[int, float],
+            remove: list,
+            fill_background: bool
     ):
         time.sleep(delay)
 
-        if fill_background:
-            self._fill_background(fill_background)
-
+        self._fill_background(fill_background)
         self._appends_dummy_elements(remove)
 
         desired_obj = self.dyatel_element or self.driver_wrapper.anchor or self.driver_wrapper
