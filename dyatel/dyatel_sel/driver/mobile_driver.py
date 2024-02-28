@@ -267,6 +267,9 @@ class MobileDriver(CoreDriver):
                     driver_wrapper=self,
                 )
                 self.bottom_bar_height = bottom_bar.element.size['height']
+                if self.bottom_bar_height > 350:
+                    bottom_bar.locator = '//*[@name="CapsuleViewController"]/XCUIElementTypeOther[3]'
+                    self.bottom_bar_height = bottom_bar.element.size['height']
             finally:
                 self.switch_to_web()
 

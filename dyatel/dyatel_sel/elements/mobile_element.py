@@ -5,9 +5,9 @@ from abc import ABC
 from typing import BinaryIO
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.shared_utils import _scaled_screenshot
+from dyatel.mixins.objects.location import Location
+from dyatel.mixins.objects.size import Size
 from dyatel.utils.internal_utils import calculate_coordinate_to_click
-from dyatel.js_scripts import get_element_position_on_screen_js
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type, get_appium_selector
 
 
@@ -129,6 +129,30 @@ class MobileElement(CoreElement, ABC):
             image = CoreElement.save_screenshot(self, filename)
 
         return image
+
+    @property
+    def size(self) -> Size:
+        """
+        Get Size object of current element
+
+        :return: Size(width/height) obj
+        """
+        if self.driver_wrapper.is_native_context:
+            return Size(**self.element.size)
+
+        return CoreElement.size.fget(self)
+
+    @property
+    def location(self) -> Location:
+        """
+        Get Location object of current element
+
+        :return: Location(x/y) obj
+        """
+        if self.driver_wrapper.is_native_context:
+            return Location(**self.element.location)
+
+        return CoreElement.location.fget(self)
 
     def _element_box(self) -> tuple:
         """
