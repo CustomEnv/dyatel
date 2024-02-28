@@ -6,7 +6,7 @@ from typing import List, Union, Any
 from selenium.webdriver.common.alert import Alert
 from PIL import Image
 
-from dyatel.utils.internal_utils import WAIT_EL
+from dyatel.utils.internal_utils import WAIT_EL, WAIT_UNIT
 
 
 class DriverWrapperABC(ABC):
@@ -40,6 +40,15 @@ class DriverWrapperABC(ABC):
         Get inner size of driver window
 
         :return: {'height': value, 'width': value}
+        """
+        raise NotImplementedError()
+
+    def wait(self, timeout: Union[int, float] = WAIT_UNIT) -> DriverWrapperABC:
+        """
+        Sleep for some time in seconds
+
+        :param timeout: url for navigation
+        :return: self
         """
         raise NotImplementedError()
 
