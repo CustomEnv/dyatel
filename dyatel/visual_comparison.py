@@ -211,11 +211,14 @@ class VisualComparison:
         :param fill_background_data: fill background with given color or black color by default
         :return: VisualComparison
         """
+        if not fill_background_data:
+            return self
+
         element = self.dyatel_element.element
 
         if fill_background_data is True:
             self.driver_wrapper.execute_script('arguments[0].style.background = "#000";', element)
-        if fill_background_data and type(fill_background_data) is str:
+        if type(fill_background_data) is str:
             self.driver_wrapper.execute_script(f'arguments[0].style.background = "{fill_background_data}";', element)
 
         return self
