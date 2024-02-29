@@ -121,7 +121,7 @@ class MobileElement(CoreElement, ABC):
             window_height = self.driver.get_window_size()['height']
             image = self.driver_wrapper.screenshot_image()
 
-            if min(element_box) < 0 or window_height > self.size.height:
+            if window_height > self.size.height:
                 image = image.crop(element_box)
 
             image.save(filename)

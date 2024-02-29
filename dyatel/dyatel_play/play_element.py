@@ -8,6 +8,8 @@ from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
 from playwright.sync_api import Page as PlaywrightPage
 from playwright.sync_api import Locator
 
+from dyatel.mixins.objects.size import Size
+from dyatel.mixins.objects.location import Location
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_playwright_locator
 from dyatel.abstraction.element_abc import ElementABC
 from dyatel.exceptions import TimeoutException
@@ -414,6 +416,26 @@ class PlayElement(ElementABC, Logging, ABC):
         """
         sorted_items: list = sorted(self.element.bounding_box().items(), reverse=True)
         return dict(sorted_items)
+
+    @property
+    def size(self) -> Size:
+        """
+        Get Size object of current element
+
+        :return: Size(width/height) obj
+        """
+        box = self.element.bounding_box()
+        return Size(width=box['width'], height=box['height'])
+
+    @property
+    def location(self) -> Location:
+        """
+        Get Location object of current element
+
+        :return: Location(x/y) obj
+        """
+        box = self.element.bounding_box()
+        return Location(x=box['x'], y=box['y'])
 
     def is_enabled(self, silent: bool = False) -> bool:
         """
