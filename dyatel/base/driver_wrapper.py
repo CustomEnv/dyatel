@@ -133,14 +133,14 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
     def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
         """
-        Taking element screenshot and saving with given path/filename
+        Takes full driver screenshot and saving with given path/filename
 
         :param file_name: path/filename
-        :param screenshot_base: screenshot bytes
+        :param screenshot_base: use given image binary instead of taking a new screenshot
         :param convert_type: convert image type before save
-        :return: image binary
+        :return: PIL Image object
         """
-        self.log(f'Save screenshot')
+        self.log(f'Save driver screenshot')
         image_object = self.screenshot_image(screenshot_base)
 
         if convert_type:

@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import time
 from abc import ABC
-from typing import BinaryIO
+
+from PIL.Image import Image
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.mixins.objects.location import Location
@@ -108,15 +109,14 @@ class MobileElement(CoreElement, ABC):
 
         return self
 
-    def save_screenshot(self, filename: str, legacy: bool = True) -> BinaryIO:
+    def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
-        Taking element screenshot and saving with given path/filename
+        Get Image object with scaled screenshot of current screenshot
+        iOS: Take driver screenshot and crop manually element from it
 
-        :param filename: path/filename
-        :param legacy: iOS only - crop element for page screenshot manually
-        :return: image binary
+        :return: PIL Image object
         """
-        if self.driver_wrapper.is_ios and legacy:
+        if self.driver_wrapper.is_ios:
             element_box = self._element_box()
             window_height = self.driver.get_window_size()['height']
             image = self.driver_wrapper.screenshot_image()
@@ -124,9 +124,8 @@ class MobileElement(CoreElement, ABC):
             if window_height > self.size.height:
                 image = image.crop(element_box)
 
-            image.save(filename)
         else:
-            image = CoreElement.save_screenshot(self, filename)
+            image = CoreElement.screenshot_image(self, screenshot_base)
 
         return image
 

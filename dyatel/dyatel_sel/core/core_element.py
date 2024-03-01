@@ -278,27 +278,24 @@ class CoreElement(ElementABC, ABC):
 
         return self
 
-    def save_screenshot(self, filename: str) -> Image:
+    def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
-        Taking element screenshot and saving with given path/filename
+        Get PIL Image object with scaled screenshot of current element
 
-        :param filename: path/filename
-        :return: image binary
+        :param screenshot_base: screenshot bytes
+        :return: PIL Image object
         """
-        self.log(f'Save screenshot of "{self.name}"')
-        image_binary = self.screenshot_base
-        image_binary.save(filename)
-        return image_binary
+        screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
+        return _scaled_screenshot(screenshot_base, self.size.width)
 
     @property
-    def screenshot_base(self) -> Image:
+    def screenshot_base(self) -> bytes:
         """
-        Get driver width scaled screenshot binary of element without saving
+        Get screenshot binary of current element
 
         :return: screenshot binary
         """
-        element = self.element
-        return _scaled_screenshot(element.screenshot_as_png, element.size['width'])
+        return self.element.screenshot_as_png
 
     @property
     def text(self) -> str:

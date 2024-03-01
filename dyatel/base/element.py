@@ -4,6 +4,7 @@ import time
 from copy import copy
 from typing import Any, Union, List, Type, Tuple
 
+from PIL.Image import Image
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
@@ -414,6 +415,25 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             is_visible = is_start_visible and is_end_visible
 
         return is_visible
+
+    def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
+        """
+        Takes element screenshot and saving with given path/filename
+
+        :param file_name: path/filename
+        :param screenshot_base: use given image binary instead of taking a new screenshot
+        :param convert_type: convert image type before save
+        :return: PIL Image object
+        """
+        self.log(f'Save screenshot of {self.name}')
+        image_object = self._base_cls.screenshot_image(self, screenshot_base)
+
+        if convert_type:
+            image_object = image_object.convert(convert_type)
+
+        image_object.save(file_name)
+
+        return image_object
 
     def assert_screenshot(
             self,

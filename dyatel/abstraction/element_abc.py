@@ -154,16 +154,33 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def save_screenshot(self, filename: str) -> Image:
+    def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
         """
-        Taking element screenshot and saving with given path/filename
+        Takes element screenshot and saving with given path/filename
 
-        :param filename: path/filename
-        :return: image binary
+        :param file_name: path/filename
+        :param screenshot_base: use given image binary instead of taking a new screenshot
+        :param convert_type: convert image type before save
+        :return: PIL Image object
         """
         raise NotImplementedError()
 
-    def screenshot_base(self) -> Image:
+    def screenshot_image(self, screenshot_base: bytes = None) -> Image:
+        """
+        Get PIL Image object with scaled screenshot of current element
+
+        :param screenshot_base: screenshot bytes
+        :return: PIL Image object
+        """
+        raise NotImplementedError()
+
+    @property
+    def screenshot_base(self) -> bytes:
+        """
+        Get screenshot binary of current element
+
+        :return: screenshot binary
+        """
         raise NotImplementedError()
 
     @property

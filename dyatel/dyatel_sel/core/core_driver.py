@@ -60,10 +60,10 @@ class CoreDriver(Logging, DriverWrapperABC):
 
     def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
-        Get driver width scaled screenshot binary of element without saving
+        Get PIL Image object with scaled screenshot of driver window
 
         :param screenshot_base: screenshot bytes
-        :return: screenshot binary
+        :return: PIL Image object
         """
         screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
         return _scaled_screenshot(screenshot_base, self.get_inner_window_size()['width'])
@@ -73,7 +73,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         """
         Get screenshot base
 
-        :return: screenshot bytes
+        :return: screenshot binary
         """
         return self.driver.get_screenshot_as_png()
 

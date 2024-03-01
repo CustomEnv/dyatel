@@ -181,6 +181,7 @@ class MobileDriver(CoreDriver):
     def screenshot_image(self, screenshot_base: bytes = None):
         """
         Get driver width scaled screenshot binary of element without saving
+        iOS: remove native controls from image manually
 
         :param screenshot_base: screenshot bytes
         :return: screenshot binary
