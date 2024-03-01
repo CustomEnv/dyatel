@@ -27,10 +27,12 @@ class DriverWrapperABC(ABC):
     is_simulator = False
     is_real_device = False
 
-    def quit(self, silent: bool = False):
+    def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """
         Quit the driver instance
 
+        :param silent: erase log
+        :param trace_path: Playwright only: path for the trace
         :return: None
         """
         raise NotImplementedError()

@@ -218,7 +218,7 @@ class VisualComparison:
 
         if fill_background_data is True:
             self.driver_wrapper.execute_script('arguments[0].style.background = "#000";', element)
-        if type(fill_background_data) is str:
+        elif type(fill_background_data) is str:
             self.driver_wrapper.execute_script(f'arguments[0].style.background = "{fill_background_data}";', element)
 
         return self
