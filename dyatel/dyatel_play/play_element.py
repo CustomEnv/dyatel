@@ -15,7 +15,7 @@ from dyatel.utils.selector_synchronizer import get_platform_locator, get_playwri
 from dyatel.abstraction.element_abc import ElementABC
 from dyatel.exceptions import TimeoutException
 from dyatel.utils.logs import Logging
-from dyatel.shared_utils import cut_log_data, _scaled_screenshot
+from dyatel.shared_utils import cut_log_data, get_image
 from dyatel.utils.internal_utils import (
     WAIT_EL,
     get_timeout_in_ms,
@@ -303,7 +303,7 @@ class PlayElement(ElementABC, Logging, ABC):
         :return: PIL Image object
         """
         screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
-        return _scaled_screenshot(screenshot_base, self.size.width)
+        return get_image(screenshot_base)
 
     @property
     def screenshot_base(self) -> bytes:

@@ -242,8 +242,8 @@ def is_target_on_screen(x: int, y: int, possible_range: dict):
     :param possible_range: possible range
     :return: bool
     """
-    is_x_on_screen = x in range(possible_range['width'])
-    is_y_on_screen = y in range(possible_range['height'])
+    is_x_on_screen = x in range(possible_range['width'] + 1)
+    is_y_on_screen = y in range(possible_range['height'] + 1)
     return is_x_on_screen and is_y_on_screen
 
 

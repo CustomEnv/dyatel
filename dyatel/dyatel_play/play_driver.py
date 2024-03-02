@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 from typing import List, Union, Any
 
 from PIL import Image
@@ -8,6 +7,7 @@ from playwright.sync_api import Locator, Page, Browser, BrowserContext
 from dyatel.dyatel_play.helpers.Trace import Trace
 
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
+from dyatel.shared_utils import get_image
 from dyatel.utils.internal_utils import get_timeout_in_ms, WAIT_UNIT
 from dyatel.utils.logs import Logging
 
@@ -225,7 +225,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         :return: PIL Image object
         """
         screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
-        return Image.open(io.BytesIO(screenshot_base))
+        return get_image(screenshot_base)
 
     @property
     def screenshot_base(self) -> bytes:
