@@ -7,6 +7,25 @@
 *Release date: 2024-02-22*
 
 ### Added
+- `Element.size` method
+- `Element.location` method
+- `DriverWrapper.assert_screenshot` method
+- `DriverWrapper.sofr_assert_screenshot` method
+- `Element.wait_element_size` method
+- `DriverWrapper.wait` method
+- `DriverWrapper/Element.screenshot_image` method
+
+### Changed 
+- `DriverWrapper/Element.screenshot_base` method now return image binary
+- `DriverWrapper/Element.save_screenshot` method now saves screenshot and moved to base class
+
+
+---
+
+## v2.1.9
+*Release date: 2024-02-22*
+
+### Added
 - Playwright `context.tracing` support
 
 ---
