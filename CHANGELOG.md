@@ -3,22 +3,29 @@
 
 ---
 
-## v2.1.9
-*Release date: 2024-02-22*
+## v2.2.0
+*Release date: 2024-03-04*
 
 ### Added
 - `Element.size` method
 - `Element.location` method
-- `DriverWrapper.assert_screenshot` method
-- `DriverWrapper.sofr_assert_screenshot` method
 - `Element.wait_element_size` method
+- `DriverWrapper.assert_screenshot` method
+- `DriverWrapper.soft_assert_screenshot` method
 - `DriverWrapper.wait` method
 - `DriverWrapper/Element.screenshot_image` method
 
 ### Changed 
 - `DriverWrapper/Element.screenshot_base` method now return image binary
 - `DriverWrapper/Element.save_screenshot` method now saves screenshot and moved to base class
+- iOS only: `DriverWrapper.screenshot_base` returns image binary without native controls
+- iOS only: `Element.screenshot_base` screenshot size for some elements could be changed
 
+
+### Fixed 
+- Type annotations
+- `Element.is_visible/is_fully_visible` calculation
+- iOS only: `Element.get_bottom_bar_height` calculation
 
 ---
 
