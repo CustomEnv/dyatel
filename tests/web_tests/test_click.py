@@ -8,7 +8,7 @@ def test_click_and_wait(pizza_order_page, platform):
     after_click_displayed = pizza_order_page.error_modal.wait_element().is_displayed()
     if 'play' in platform:
         time.sleep(1)
-    pizza_order_page.error_modal.click_outside()
+    pizza_order_page.error_modal.click_outside(-1, -10)
     after_click_outside_not_displayed = not pizza_order_page.error_modal.wait_element_hidden().is_displayed()
     assert all((after_click_displayed, after_click_outside_not_displayed))
 
