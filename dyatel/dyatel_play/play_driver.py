@@ -2,16 +2,21 @@ from __future__ import annotations
 
 from typing import List, Union, Any
 
+from PIL import Image
+from playwright.sync_api import Locator, Page, Browser, BrowserContext
 from dyatel.dyatel_play.helpers.Trace import Trace
-from playwright.sync_api import Locator, Page
-from playwright.sync_api import Browser
 
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
-from dyatel.utils.internal_utils import get_timeout_in_ms
+from dyatel.shared_utils import get_image
+from dyatel.utils.internal_utils import get_timeout_in_ms, WAIT_UNIT
 from dyatel.utils.logs import Logging
 
 
 class PlayDriver(Logging, DriverWrapperABC):
+
+    instance: Browser
+    context: BrowserContext
+    driver: Page
 
     def __init__(self, driver: Browser, trace: Trace = None, *args, **kwargs):
         """
@@ -29,6 +34,16 @@ class PlayDriver(Logging, DriverWrapperABC):
         self.driver = self.context.new_page()
         self.original_tab = self.driver
         self.browser_name = self.instance.browser_type.name
+
+    def wait(self, timeout: Union[int, float] = WAIT_UNIT) -> PlayDriver:
+        """
+        Sleep for some time in seconds
+
+        :param timeout: url for navigation
+        :return: self
+        """
+        self.driver.wait_for_timeout(get_timeout_in_ms(timeout))
+        return self
 
     def get(self, url: str, silent: bool = False) -> PlayDriver:
         """
@@ -149,7 +164,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         """
         return self.context.cookies()
 
-    def execute_script(self, script: str, *args) -> Union[None, str]:
+    def execute_script(self, script: str, *args) -> Any:
         """
         Synchronously Executes JavaScript in the current window/frame.
         Completable with selenium `execute_script` method
@@ -202,9 +217,20 @@ class PlayDriver(Logging, DriverWrapperABC):
         self.driver.set_viewport_size({'width': width, 'height': height})
         return self
 
-    def get_screenshot(self) -> bytes:
+    def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
-        Gets the screenshot of the current window as a binary data.
+        Get PIL Image object with scaled screenshot of driver window
+
+        :param screenshot_base: screenshot bytes
+        :return: PIL Image object
+        """
+        screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
+        return get_image(screenshot_base)
+
+    @property
+    def screenshot_base(self) -> bytes:
+        """
+        Get screenshot base
 
         :return: screenshot binary
         """

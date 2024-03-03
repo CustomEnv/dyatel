@@ -4,15 +4,18 @@ import time
 from abc import ABC
 from typing import Union, List, Any
 
+from PIL.Image import Image
 from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
 from playwright.sync_api import Page as PlaywrightPage
-from playwright.sync_api import Locator
+from playwright.sync_api import Locator, Page, Browser, BrowserContext
 
+from dyatel.mixins.objects.size import Size
+from dyatel.mixins.objects.location import Location
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_playwright_locator
 from dyatel.abstraction.element_abc import ElementABC
 from dyatel.exceptions import TimeoutException
 from dyatel.utils.logs import Logging
-from dyatel.shared_utils import cut_log_data
+from dyatel.shared_utils import cut_log_data, get_image
 from dyatel.utils.internal_utils import (
     WAIT_EL,
     get_timeout_in_ms,
@@ -24,6 +27,9 @@ from dyatel.utils.internal_utils import (
 
 class PlayElement(ElementABC, Logging, ABC):
 
+    instance: Browser
+    context: BrowserContext
+    driver: Page
     parent: Union[ElementABC, PlayElement]
     _element: Locator = None
 
@@ -289,20 +295,20 @@ class PlayElement(ElementABC, Logging, ABC):
 
         return self
 
-    def get_screenshot(self, filename: str) -> bytes:
+    def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
-        Taking element screenshot and saving with given path/filename
+        Get PIL Image object with scaled screenshot of current element
 
-        :param filename: path/filename
-        :return: image binary
+        :param screenshot_base: screenshot bytes
+        :return: PIL Image object
         """
-        self.log(f'Get screenshot of "{self.name}"')
-        return self._first_element.screenshot(path=filename)
+        screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
+        return get_image(screenshot_base)
 
     @property
     def screenshot_base(self) -> bytes:
         """
-        Get driver width scaled screenshot binary of element without saving
+        Get screenshot binary of current element
 
         :return: screenshot binary
         """
@@ -414,6 +420,26 @@ class PlayElement(ElementABC, Logging, ABC):
         """
         sorted_items: list = sorted(self.element.bounding_box().items(), reverse=True)
         return dict(sorted_items)
+
+    @property
+    def size(self) -> Size:
+        """
+        Get Size object of current element
+
+        :return: Size(width/height) obj
+        """
+        box = self.element.bounding_box()
+        return Size(width=box['width'], height=box['height'])
+
+    @property
+    def location(self) -> Location:
+        """
+        Get Location object of current element
+
+        :return: Location(x/y) obj
+        """
+        box = self.element.bounding_box()
+        return Location(x=box['x'], y=box['y'])
 
     def is_enabled(self, silent: bool = False) -> bool:
         """

@@ -3,7 +3,9 @@ from __future__ import annotations
 import time
 from typing import Union, List, Any
 
+from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
+from dyatel.shared_utils import _scaled_screenshot
 from selenium.common.exceptions import WebDriverException as SeleniumWebDriverException, NoAlertPresentException
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
@@ -11,11 +13,13 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.exceptions import DriverWrapperException, TimeoutException
-from dyatel.utils.internal_utils import WAIT_EL
+from dyatel.utils.internal_utils import WAIT_EL, WAIT_UNIT
 from dyatel.utils.logs import Logging
 
 
 class CoreDriver(Logging, DriverWrapperABC):
+
+    driver: Union[AppiumDriver, SeleniumWebDriver]
 
     def __init__(self, driver: Union[AppiumDriver, SeleniumWebDriver]):
         """
@@ -25,6 +29,16 @@ class CoreDriver(Logging, DriverWrapperABC):
         :param driver: appium or selenium driver to initialize
         """
         driver.implicitly_wait(0.001)  # reduce selenium wait
+
+    def wait(self, timeout: Union[int, float] = WAIT_UNIT) -> CoreDriver:
+        """
+        Sleep for some time in seconds
+
+        :param timeout: url for navigation
+        :return: self
+        """
+        time.sleep(timeout)
+        return self
 
     def get(self, url: str, silent: bool = False) -> CoreDriver:
         """
@@ -43,6 +57,25 @@ class CoreDriver(Logging, DriverWrapperABC):
             raise DriverWrapperException(f'Can\'t proceed to {url}. Original error: {exc.msg}')
 
         return self
+
+    def screenshot_image(self, screenshot_base: bytes = None) -> Image:
+        """
+        Get PIL Image object with scaled screenshot of driver window
+
+        :param screenshot_base: screenshot bytes
+        :return: PIL Image object
+        """
+        screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
+        return _scaled_screenshot(screenshot_base, self.get_inner_window_size()['width'])
+
+    @property
+    def screenshot_base(self) -> bytes:
+        """
+        Get screenshot base
+
+        :return: screenshot binary
+        """
+        return self.driver.get_screenshot_as_png()
 
     def is_driver_opened(self) -> bool:
         """
@@ -180,7 +213,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         self.driver.switch_to.default_content()
         return self
 
-    def execute_script(self, script: str, *args):
+    def execute_script(self, script: str, *args) -> Any:
         """
         Synchronously Executes JavaScript in the current window/frame
 
@@ -199,14 +232,6 @@ class CoreDriver(Logging, DriverWrapperABC):
         """
         self.driver.set_page_load_timeout(timeout)
         return self
-
-    def get_screenshot(self) -> bytes:
-        """
-        Gets the screenshot of the current window as a binary data.
-
-        :return: screenshot binary
-        """
-        return self.driver.get_screenshot_as_png()
 
     def switch_to_alert(self, timeout: Union[int, float] = WAIT_EL) -> Alert:
         """

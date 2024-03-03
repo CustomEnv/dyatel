@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import time
 from abc import ABC
-from typing import Union, List, BinaryIO, Any
+
+from PIL.Image import Image
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
+from dyatel.mixins.objects.location import Location
+from dyatel.mixins.objects.size import Size
 from dyatel.utils.internal_utils import calculate_coordinate_to_click
-from dyatel.js_scripts import get_element_position_on_screen_js
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type, get_appium_selector
 
 
@@ -107,28 +109,49 @@ class MobileElement(CoreElement, ABC):
 
         return self
 
-    def get_screenshot(self, filename: str, legacy: bool = True) -> BinaryIO:
+    def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
-        Taking element screenshot and saving with given path/filename
+        Get Image object with scaled screenshot of current screenshot
+        iOS: Take driver screenshot and crop manually element from it
 
-        :param filename: path/filename
-        :param legacy: iOS only - crop element for page screenshot manually
-        :return: image binary
+        :return: PIL Image object
         """
-        if self.driver_wrapper.is_ios and legacy:
+        if self.driver_wrapper.is_ios:
             element_box = self._element_box()
-            window_width, window_height = self.driver.get_window_size().values()
-            img_binary = self.driver_wrapper.get_screenshot()
-            image_binary = self._scaled_screenshot(img_binary, window_width)
+            window_height = self.driver.get_window_size()['height']
+            image = self.driver_wrapper.screenshot_image()
 
-            if any(element_box) < 0 or window_height > self.element.size['height']:
-                image_binary = image_binary.crop(element_box)
+            if window_height > self.size.height:
+                image = image.crop(element_box)
 
-            image_binary.save(filename)
         else:
-            image_binary = CoreElement.get_screenshot(self, filename)
+            image = CoreElement.screenshot_image(self, screenshot_base)
 
-        return image_binary
+        return image
+
+    @property
+    def size(self) -> Size:
+        """
+        Get Size object of current element
+
+        :return: Size(width/height) obj
+        """
+        if self.driver_wrapper.is_native_context:
+            return Size(**self.element.size)
+
+        return CoreElement.size.fget(self)
+
+    @property
+    def location(self) -> Location:
+        """
+        Get Location object of current element
+
+        :return: Location(x/y) obj
+        """
+        if self.driver_wrapper.is_native_context:
+            return Location(**self.element.location)
+
+        return CoreElement.location.fget(self)
 
     def _element_box(self) -> tuple:
         """
@@ -136,14 +159,12 @@ class MobileElement(CoreElement, ABC):
 
         :return: element coordinates on screen (start_x, start_y, end_x, end_y)
         """
-        element = self.element
-        el_location = self.driver.execute_script(get_element_position_on_screen_js, element)
-        start_x, start_y = el_location.values()
-        h, w = element.size.values()
+        element_size = self.size
+        element_location = self.location
 
-        bar_size = self.driver_wrapper.get_top_bar_height()
-
-        if bar_size:
-            start_y += bar_size
-
-        return start_x, start_y, start_x+w, start_y+h
+        return (
+            element_location.x,
+            element_location.y,
+            element_location.x + element_size.width,
+            element_location.y + element_size.height,
+        )

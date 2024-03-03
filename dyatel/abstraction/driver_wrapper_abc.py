@@ -4,8 +4,9 @@ from abc import ABC
 from typing import List, Union, Any
 
 from selenium.webdriver.common.alert import Alert
+from PIL import Image
 
-from dyatel.utils.internal_utils import WAIT_EL
+from dyatel.utils.internal_utils import WAIT_EL, WAIT_UNIT
 
 
 class DriverWrapperABC(ABC):
@@ -41,6 +42,15 @@ class DriverWrapperABC(ABC):
         Get inner size of driver window
 
         :return: {'height': value, 'width': value}
+        """
+        raise NotImplementedError()
+
+    def wait(self, timeout: Union[int, float] = WAIT_UNIT) -> DriverWrapperABC:
+        """
+        Sleep for some time in seconds
+
+        :param timeout: url for navigation
+        :return: self
         """
         raise NotImplementedError()
 
@@ -168,7 +178,7 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
-    def execute_script(self, script: str, *args) -> Union[None, str]:
+    def execute_script(self, script: str, *args) -> Any:
         """
         Synchronously Executes JavaScript in the current window/frame.
         Completable with selenium `execute_script` method
@@ -208,11 +218,32 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
-    def get_screenshot(self) -> bytes:
+    def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
         """
-        Gets the screenshot of the current window as a binary data.
+        Taking element screenshot and saving with given path/filename
 
+        :param file_name: path/filename
+        :param screenshot_base: screenshot bytes
+        :param convert_type: convert image type before save
+        :return: image binary
+        """
+        raise NotImplementedError()
+
+    def screenshot_image(self, screenshot_base: bytes = None) -> Image:
+        """
+        Get driver width scaled screenshot binary of element without saving
+
+        :param screenshot_base: screenshot bytes
         :return: screenshot binary
+        """
+        raise NotImplementedError()
+
+    @property
+    def screenshot_base(self) -> bytes:
+        """
+        Get screenshot base
+
+        :return: screenshot bytes
         """
         raise NotImplementedError()
 

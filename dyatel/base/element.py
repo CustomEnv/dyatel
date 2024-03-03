@@ -4,6 +4,7 @@ import time
 from copy import copy
 from typing import Any, Union, List, Type, Tuple
 
+from PIL.Image import Image
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
@@ -16,6 +17,7 @@ from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
 from dyatel.mixins.internal_mixin import InternalMixin, get_element_info, all_locator_types
+from dyatel.mixins.objects.size import Size
 from dyatel.utils.logs import Logging, LogLevel
 from dyatel.utils.previous_object_driver import PreviousObjectDriver, set_instance_frame
 from dyatel.visual_comparison import VisualComparison
@@ -36,6 +38,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     _object = 'element'
     _base_cls: Type[PlayElement, MobileElement, WebElement]
+    driver_wrapper: DriverWrapper
 
     def __new__(cls, *args, **kwargs):
         instance = super(Element, cls).__new__(cls)
@@ -79,7 +82,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
         :param kwargs:
           - desktop: str = locator that will be used for desktop platform
-          - mobile: str = locator that will be used for all mobile platforms
+          - mobile: str = locator that will be used for all mobile platforms and mobile_resolution
           - ios: str = locator that will be used for ios platform
           - android: str = locator that will be used for android platform
         """
@@ -327,6 +330,35 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return self
 
+    def wait_element_size(self, expected_size: Size, timeout: Union[int, float] = WAIT_EL) -> Element:
+        """
+        Wait until element size will be equal to given Size object
+
+        :param expected_size: expected element size in Size object
+        :param timeout: time to stop waiting
+        :return: Element
+        """
+        is_equal = False
+        start_time = time.time()
+        actual_size = Size(None, None)
+        is_height_equal, is_width_equal = True, True
+
+        while time.time() - start_time < timeout and not is_equal:
+            actual_size = self.size
+
+            if expected_size.height is not None:
+                is_height_equal = actual_size.height == expected_size.height
+            if expected_size.width is not None:
+                is_width_equal = actual_size.width == expected_size.width
+
+            is_equal = is_height_equal == is_width_equal
+
+        if not is_equal:
+            raise TimeoutException(f'"{self.name}" size is not equal to {expected_size} after {timeout} seconds. '
+                                   f'Actual: {actual_size}. {self.get_element_info()}')
+
+        return self
+
     @property
     def all_elements(self) -> Union[Any]:
         if getattr(self, '_wrapped', None):
@@ -383,6 +415,25 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             is_visible = is_start_visible and is_end_visible
 
         return is_visible
+
+    def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
+        """
+        Takes element screenshot and saving with given path/filename
+
+        :param file_name: path/filename
+        :param screenshot_base: use given image binary instead of taking a new screenshot
+        :param convert_type: convert image type before save
+        :return: PIL Image object
+        """
+        self.log(f'Save screenshot of {self.name}')
+        image_object = self._base_cls.screenshot_image(self, screenshot_base)
+
+        if convert_type:
+            image_object = image_object.convert(convert_type)
+
+        image_object.save(file_name)
+
+        return image_object
 
     def assert_screenshot(
             self,

@@ -1,11 +1,17 @@
 from __future__ import annotations
 
-from typing import Union, Type, List
+from typing import Union, Type, List, Tuple, Any
 
-from playwright.sync_api import Browser as PlaywrightDriver
+from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
+from playwright.sync_api import (
+    Browser as PlaywrightBrowser,
+    BrowserContext as PlaywrightContext,
+    Page as PlaywrightDriver,
+)
 
+from dyatel.visual_comparison import VisualComparison
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
 from dyatel.dyatel_play.play_driver import PlayDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
@@ -14,7 +20,7 @@ from dyatel.exceptions import DriverWrapperException
 from dyatel.js_scripts import get_inner_height_js, get_inner_width_js
 from dyatel.mixins.internal_mixin import InternalMixin
 from dyatel.utils.internal_utils import get_attributes_from_object, get_child_elements_with_names
-from dyatel.utils.logs import Logging
+from dyatel.utils.logs import Logging, LogLevel
 
 
 class DriverWrapperSessions:
@@ -49,6 +55,8 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
     session: DriverWrapperSessions = DriverWrapperSessions
 
+    anchor = None
+
     is_desktop = False
     is_selenium = False
     is_playwright = False
@@ -60,6 +68,10 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     is_real_device = False
 
     browser_name = None
+
+    driver: Union[SeleniumDriver, AppiumDriver, PlaywrightDriver]
+    instance: PlaywrightBrowser  # Only for playwright instance
+    context: PlaywrightContext  # Only for playwright instance
 
     def __new__(cls, *args, **kwargs):
         if cls.session.sessions_count() == 0:
@@ -83,7 +95,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
         return f'{cls.__name__}({self.label}={self.driver}) at {hex(id(self))}, platform={label}'
 
-    def __init__(self, driver: Union[PlaywrightDriver, AppiumDriver, SeleniumDriver], *args, **kwargs):
+    def __init__(self, driver: Union[PlaywrightBrowser, AppiumDriver, SeleniumDriver], *args, **kwargs):
         """
         Initializing of driver wrapper based on given driver source
 
@@ -119,13 +131,89 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             'width': self.execute_script(get_inner_width_js)
         }
 
+    def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
+        """
+        Takes full driver screenshot and saving with given path/filename
+
+        :param file_name: path/filename
+        :param screenshot_base: use given image binary instead of taking a new screenshot
+        :param convert_type: convert image type before save
+        :return: PIL Image object
+        """
+        self.log(f'Save driver screenshot')
+        image_object = self.screenshot_image(screenshot_base)
+
+        if convert_type:
+            image_object = image_object.convert(convert_type)
+
+        image_object.save(file_name)
+
+        return image_object
+
+    def assert_screenshot(
+            self,
+            filename: str = '',
+            test_name: str = '',
+            name_suffix: str = '',
+            threshold: Union[int, float] = None,
+            delay: Union[int, float] = None,
+            remove: Union[Any, List[Any]] = None,
+    ) -> None:
+        """
+        Assert given (by name) and taken screenshot equals
+
+        :param filename: full screenshot name. Custom filename will be used if empty string given
+        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
+        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
+        :param threshold: possible threshold
+        :param delay: delay before taking screenshot
+        :param remove: remove elements from screenshot
+        :return: None
+        """
+        delay = delay or VisualComparison.default_delay
+        remove = [remove] if type(remove) is not list and remove else remove
+
+        VisualComparison(self).assert_screenshot(
+            filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
+            scroll=False, remove=remove, fill_background=False,
+        )
+
+    def soft_assert_screenshot(
+            self,
+            filename: str = '',
+            test_name: str = '',
+            name_suffix: str = '',
+            threshold: Union[int, float] = None,
+            delay: Union[int, float] = None,
+            remove: Union[Any, List[Any]] = None,
+    ) -> Tuple[bool, str]:
+        """
+        Soft assert given (by name) and taken screenshot equals
+
+        :param filename: full screenshot name. Custom filename will be used if empty string given
+        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
+        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
+        :param threshold: possible threshold
+        :param delay: delay before taking screenshot
+        :param remove: remove elements from screenshot
+        :return: bool - True: screenshots equal; False: screenshots mismatch;
+        """
+        try:
+            self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, remove)
+        except AssertionError as exc:
+            exc = str(exc)
+            self.log(exc, level=LogLevel.ERROR)
+            return False, exc
+
+        return True, f'No visual mismatch found for entire screen'
+
     def __init_base_class__(self, *args, **kwargs) -> None:
         """
         Get driver wrapper class in according to given driver source, and set him as base class
 
         :return: None
         """
-        if isinstance(self.driver, PlaywrightDriver):
+        if isinstance(self.driver, PlaywrightBrowser):
             self.is_playwright = True
             self.is_desktop = True
             self._base_cls = PlayDriver

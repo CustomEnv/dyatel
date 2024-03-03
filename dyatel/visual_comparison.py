@@ -20,7 +20,6 @@ from PIL import Image
 from dyatel.exceptions import DriverWrapperException, TimeoutException
 from dyatel.js_scripts import add_element_over_js, delete_element_over_js
 from dyatel.utils.logs import autolog
-from dyatel.utils.internal_utils import get_frame
 from dyatel.mixins.internal_mixin import get_element_info
 
 
@@ -38,13 +37,54 @@ class VisualComparison:
     dynamic_threshold_factor = 0
     diff_color_scheme = (0, 255, 0)
 
-    def __init__(self, driver_wrapper, element):
+    __initialized = False
+
+    def __init__(self, driver_wrapper, element=None):
         self.driver_wrapper = driver_wrapper
         self.dyatel_element = element
-        self.screenshot_name = 'default'
 
         if self.dynamic_threshold_factor and self.default_threshold:
             raise Exception('Provide only one argument for threshold of visual comparison')
+
+        if not self.__initialized:
+            self.__init_session()
+
+    def __init_session(self):
+        root_path = self.visual_regression_path
+
+        self.screenshot_name = 'default'
+
+        if not root_path:
+            raise Exception('Provide visual regression path to environment. '
+                            f'Example: {self.__class__.__name__}.visual_regression_path = "src"')
+
+        root_path = root_path if root_path.endswith('/') else f'{root_path}/'
+        self.reference_directory = f'{root_path}reference/'
+        self.output_directory = f'{root_path}output/'
+        self.diff_directory = f'{root_path}difference/'
+
+        os.makedirs(os.path.dirname(self.reference_directory), exist_ok=True)
+        os.makedirs(os.path.dirname(self.output_directory), exist_ok=True)
+        os.makedirs(os.path.dirname(self.diff_directory), exist_ok=True)
+
+        self.__initialized = True
+
+    def _save_screenshot(
+            self,
+            screenshot_name: str,
+            delay: Union[int, float],
+            remove: list,
+            fill_background: bool
+    ):
+        time.sleep(delay)
+
+        self._fill_background(fill_background)
+        self._appends_dummy_elements(remove)
+
+        desired_obj = self.dyatel_element or self.driver_wrapper.anchor or self.driver_wrapper
+        desired_obj.save_screenshot(screenshot_name)
+
+        self._remove_dummy_elements()
 
     def assert_screenshot(
             self,
@@ -79,46 +119,24 @@ class VisualComparison:
         else:
             filename = self._get_screenshot_name(test_name, name_suffix)
 
-        root_path = self.visual_regression_path
-
-        if not root_path:
-            raise Exception('Provide visual regression path to environment. '
-                            f'Example: {self.__class__.__name__}.visual_regression_path = "src"')
-
-        root_path = root_path if root_path.endswith('/') else f'{root_path}/'
-        reference_directory = f'{root_path}reference/'
-        output_directory = f'{root_path}output/'
-        diff_directory = f'{root_path}difference/'
-
-        reference_file = f'{reference_directory}{filename}.png'
-        output_file = f'{output_directory}{filename}.png'
-        diff_file = f'{diff_directory}diff_{filename}.png'
-
-        os.makedirs(os.path.dirname(reference_directory), exist_ok=True)
-        os.makedirs(os.path.dirname(output_directory), exist_ok=True)
-        os.makedirs(os.path.dirname(diff_directory), exist_ok=True)
+        reference_file = f'{self.reference_directory}{filename}.png'
+        output_file = f'{self.output_directory}{filename}.png'
+        diff_file = f'{self.diff_directory}diff_{filename}.png'
 
         if scroll:
             self.dyatel_element.scroll_into_view()
 
         remove = remove if remove else []
 
-        def save_screenshot(screenshot_name):
-            time.sleep(delay)
-            self._fill_background(fill_background)
-            self._appends_dummy_elements(remove)
-            self.dyatel_element.get_screenshot(screenshot_name)
-            self._remove_dummy_elements()
-
         if self.hard_visual_reference_generation:
-            save_screenshot(reference_file)
+            self._save_screenshot(reference_file, delay=delay, remove=remove, fill_background=fill_background)
             return self
 
         image = cv2.imread(reference_file)
         if isinstance(image, type(None)):
-            save_screenshot(reference_file)
+            self._save_screenshot(reference_file, delay=delay, remove=remove, fill_background=fill_background)
 
-            if self.visual_reference_generation:
+            if self.visual_reference_generation or self.soft_visual_reference_generation:
                 return self
 
             self._disable_reruns()
@@ -129,13 +147,13 @@ class VisualComparison:
         if self.visual_reference_generation and not self.soft_visual_reference_generation:
             return self
 
-        save_screenshot(output_file)
+        self._save_screenshot(output_file, delay=delay, remove=remove, fill_background=fill_background)
 
         try:
             self._assert_same_images(output_file, reference_file, diff_file, threshold)
         except AssertionError as exc:
             if self.soft_visual_reference_generation:
-                save_screenshot(reference_file)
+                self._save_screenshot(reference_file, delay=delay, remove=remove, fill_background=fill_background)
             else:
                 raise exc
 
@@ -268,23 +286,12 @@ class VisualComparison:
         """
         test_function_name = test_function_name if test_function_name else getattr(self.test_item, 'name', '')
         if not test_function_name:
-            back_frame = get_frame().f_back
-            test_function_name = ''
-            try:
-                for _ in range(50):
-                    if 'test' not in test_function_name or 'test' not in back_frame.f_code.co_filename:
-                        back_frame = back_frame.f_back
-                        test_function_name = back_frame.f_code.co_name
-                    else:
-                        break
-            except AttributeError:
-                raise Exception("Can't find test name. Please pass the test_name as parameter to assert_screenshot")
-        else:
-            test_function_name = test_function_name.replace('[', '_')  # required here for better separation
+            raise Exception('Draft: provide test item self.test_item')
 
-        if self.driver_wrapper.is_mobile:
+        test_function_name = test_function_name.replace('[', '_')  # required here for better separation
+
+        if self.driver_wrapper.is_android or self.driver_wrapper.is_ios:
             caps = self.driver_wrapper.driver.caps
-
             device_name = caps.get('customDeviceName', '')
 
             if self.driver_wrapper.is_android and not device_name:
@@ -303,8 +310,8 @@ class VisualComparison:
             raise DriverWrapperException('Cant find current platform')
 
         name_suffix = f'_{name_suffix}_' if name_suffix else '_'
-
-        screenshot_name = f'{test_function_name}_{self.dyatel_element.name}{name_suffix}{screenshot_name}'
+        location_name = self.dyatel_element.name if self.dyatel_element else 'entire_screen'
+        screenshot_name = f'{test_function_name}_{location_name}{name_suffix}{screenshot_name}'
 
         for item in (']', '"', "'"):
             screenshot_name = screenshot_name.replace(item, '')

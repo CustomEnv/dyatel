@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import time
 from abc import ABC
-from io import BytesIO
 from typing import Union, List, Any, Callable
 
 from PIL import Image
@@ -22,8 +21,10 @@ from dyatel.abstraction.element_abc import ElementABC
 from dyatel.dyatel_sel.sel_utils import ActionChains
 from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js, scroll_into_view_blocks
 from dyatel.keyboard_keys import KeyboardKeys
-from dyatel.shared_utils import cut_log_data
-from dyatel.utils.internal_utils import WAIT_EL, safe_call
+from dyatel.mixins.objects.location import Location
+from dyatel.mixins.objects.size import Size
+from dyatel.shared_utils import cut_log_data, _scaled_screenshot
+from dyatel.utils.internal_utils import WAIT_EL, safe_call, get_dict
 from dyatel.exceptions import (
     TimeoutException,
     InvalidSelectorException,
@@ -277,27 +278,24 @@ class CoreElement(ElementABC, ABC):
 
         return self
 
-    def get_screenshot(self, filename: str) -> Image:
+    def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
-        Taking element screenshot and saving with given path/filename
+        Get PIL Image object with scaled screenshot of current element
 
-        :param filename: path/filename
-        :return: image binary
+        :param screenshot_base: screenshot bytes
+        :return: PIL Image object
         """
-        self.log(f'Get screenshot of "{self.name}"')
-        image_binary = self.screenshot_base
-        image_binary.save(filename)
-        return image_binary
+        screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
+        return _scaled_screenshot(screenshot_base, self.size.width)
 
     @property
-    def screenshot_base(self) -> Image:
+    def screenshot_base(self) -> bytes:
         """
-        Get driver width scaled screenshot binary of element without saving
+        Get screenshot binary of current element
 
         :return: screenshot binary
         """
-        element = self.element
-        return self._scaled_screenshot(element.screenshot_as_png, element.size['width'])
+        return self.element.screenshot_as_png
 
     @property
     def text(self) -> str:
@@ -410,11 +408,26 @@ class CoreElement(ElementABC, ABC):
 
         :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
         """
-        element = self.element
-        size = self.driver.execute_script(get_element_size_js, element)
-        location = self.driver.execute_script(get_element_position_on_screen_js, element)
-        sorted_items: list = sorted({**size, **location}.items(), reverse=True)
+        sorted_items = sorted({**get_dict(self.size), **get_dict(self.location)}.items(), reverse=True)
         return dict(sorted_items)
+
+    @property
+    def size(self) -> Size:
+        """
+        Get Size object of current element
+
+        :return: Size(width/height) obj
+        """
+        return Size(**self.driver.execute_script(get_element_size_js, self.element))
+
+    @property
+    def location(self) -> Location:
+        """
+        Get Location object of current element
+
+        :return: Location(x/y) obj
+        """
+        return Location(**self.driver.execute_script(get_element_position_on_screen_js, self.element))
 
     def is_enabled(self, silent: bool = False) -> bool:
         """
@@ -454,23 +467,6 @@ class CoreElement(ElementABC, ABC):
         :return: ActionChains
         """
         return ActionChains(self.driver)
-
-    def _scaled_screenshot(self, screenshot_binary: bin, width: int) -> Image:
-        """
-        Get scaled screenshot to fit driver window / element size
-
-        :param screenshot_binary: original screenshot binary
-        :param width: driver or element width
-        :return: scaled image binary
-        """
-        img_binary = Image.open(BytesIO(screenshot_binary))
-        scale = img_binary.size[0] / width
-
-        if scale != 1:
-            new_image_size = (int(img_binary.size[0] / scale), int(img_binary.size[1] / scale))
-            img_binary = img_binary.resize(new_image_size, Image.Resampling.LANCZOS)
-
-        return img_binary
 
     def _get_element(self, wait: Union[bool, Callable] = True, force_wait: bool = False) -> SeleniumWebElement:
         """
@@ -518,7 +514,7 @@ class CoreElement(ElementABC, ABC):
         if not base:
             raise DriverWrapperException("Can't find driver")
 
-        if self.driver_wrapper.is_mobile:
+        if self.driver_wrapper.is_ios or self.driver_wrapper.is_android:
             if self.driver_wrapper.is_native_context:
                 return base
 

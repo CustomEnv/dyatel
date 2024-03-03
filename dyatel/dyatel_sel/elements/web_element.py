@@ -17,7 +17,7 @@ class WebElement(CoreElement, ABC):
         :param locator_type: specific locator type
         """
         self.locator = get_platform_locator(self, default_locator=locator)
-        self.locator_type = locator_type if locator_type else get_selenium_locator_type(locator)
+        self.locator_type = locator_type if locator_type else get_selenium_locator_type(self.locator)
 
     def hover(self, silent: bool = False) -> WebElement:
         """

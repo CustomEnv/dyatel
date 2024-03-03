@@ -11,6 +11,7 @@ from selenium.common.exceptions import StaleElementReferenceException as Seleniu
 from dyatel.exceptions import NoSuchElementException, InvalidSelectorException, TimeoutException, NoSuchParentException
 
 
+WAIT_UNIT = 1
 WAIT_EL = 10
 WAIT_PAGE = 15
 
@@ -18,6 +19,10 @@ WAIT_PAGE = 15
 all_tags = {'h1', 'h2', 'h3', 'h4', 'h5', 'head', 'body', 'input', 'section', 'button', 'a', 'link', 'header', 'div',
             'textarea', 'svg', 'circle', 'iframe', 'label', 'p', 'tr', 'th', 'table', 'tbody', 'td', 'select', 'nav',
             'li', 'form', 'footer', 'frame', 'area', 'span'}
+
+
+def get_dict(obj: Any):
+    return obj.__dict__
 
 
 def safe_call(func: Callable, *args, **kwargs) -> Union[Any, None]:
@@ -237,8 +242,8 @@ def is_target_on_screen(x: int, y: int, possible_range: dict):
     :param possible_range: possible range
     :return: bool
     """
-    is_x_on_screen = x in range(possible_range['width'])
-    is_y_on_screen = y in range(possible_range['height'])
+    is_x_on_screen = x in range(possible_range['width'] + 1)
+    is_y_on_screen = y in range(possible_range['height'] + 1)
     return is_x_on_screen and is_y_on_screen
 
 

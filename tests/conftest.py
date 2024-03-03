@@ -31,7 +31,7 @@ def pytest_addoption(parser):
     parser.addoption('--sv', action='store_true', help='Generate reference images in visual tests')
     parser.addoption('--hgr', action='store_true', help='Hard generate reference images in visual tests')
     parser.addoption('--sgr', action='store_true', help='Soft generate reference images in visual tests')
-    parser.addoption('--appium-port', default='1111')
+    parser.addoption('--appium-port', default='1000')
     parser.addoption('--appium-ip', default='0.0.0.0')
 
 
@@ -99,14 +99,15 @@ def driver_func(request, driver_name, platform, chrome_options, firefox_options)
     return driver_wrapper
 
 
-@pytest.fixture(autouse=True, scope='session')
+@pytest.fixture(autouse=True)
 def visual_comparisons_settings(request):
     VisualComparison.visual_regression_path = os.path.dirname(os.path.abspath(__file__)) + '/adata/visual'
     VisualComparison.visual_reference_generation = request.config.getoption('--gr')
     VisualComparison.hard_visual_reference_generation = request.config.getoption('--hgr')
-    VisualComparison.hard_visual_reference_generation = request.config.getoption('--sgr')
+    VisualComparison.soft_visual_reference_generation = request.config.getoption('--sgr')
     VisualComparison.skip_screenshot_comparison = request.config.getoption('--sv')
     VisualComparison.default_threshold = 0.1
+    VisualComparison.test_item = request.node
 
 
 def pytest_collection_modifyitems(items):
