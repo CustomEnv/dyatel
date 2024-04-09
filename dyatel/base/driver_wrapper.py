@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Type, List, Tuple, Any
+from typing import Union, Type, List, Tuple, Any, Optional
 
 from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -61,9 +61,18 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     is_selenium = False
     is_playwright = False
 
+    is_appium = False
     is_mobile = False
+    is_tablet = False
+
     is_ios = False
+    is_ios_tablet = False
+    is_ios_mobile = False
+
     is_android = False
+    is_android_tablet = False
+    is_android_mobile = False
+
     is_simulator = False
     is_real_device = False
 
@@ -95,7 +104,13 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
         return f'{cls.__name__}({self.label}={self.driver}) at {hex(id(self))}, platform={label}'
 
-    def __init__(self, driver: Union[PlaywrightBrowser, AppiumDriver, SeleniumDriver], *args, **kwargs):
+    def __init__(
+            self,
+            driver: Union[PlaywrightBrowser, AppiumDriver, SeleniumDriver],
+            mobile_resolution: Optional[bool] = False,
+            *args,
+            **kwargs
+    ):
         """
         Initializing of driver wrapper based on given driver source
 
@@ -105,6 +120,9 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         self.session.add_session(self)
         self.label = f'{self.session.all_sessions.index(self) + 1}_driver'
         self.__init_base_class__(*args, **kwargs)
+        if mobile_resolution:
+            self.is_desktop = False
+            self.is_mobile = True
 
     def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """
@@ -215,13 +233,11 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         """
         if isinstance(self.driver, PlaywrightBrowser):
             self.is_playwright = True
-            self.is_desktop = True
             self._base_cls = PlayDriver
         elif isinstance(self.driver, AppiumDriver):
-            self.is_mobile = True
+            self.is_appium = True
             self._base_cls = MobileDriver
         elif isinstance(self.driver, SeleniumDriver):
-            self.is_desktop = True
             self.is_selenium = True
             self._base_cls = WebDriver
         else:

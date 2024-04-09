@@ -4,7 +4,12 @@ from dyatel.base.element import Element
 from dyatel.base.group import Group
 from dyatel.exceptions import UnsuitableArgumentsException
 from dyatel.utils.selector_synchronizer import get_platform_locator
-from tests.static_tests.conftest import mobile_ids, mobile_drivers, desktop_drivers, desktop_ids
+from tests.static_tests.conftest import mobile_ids, mobile_drivers, desktop_drivers, desktop_ids, mocked_ios_driver
+
+
+ios_locator = 'ios_locator'
+android_locator = 'android_locator'
+mobile_locator = 'mobile_locator'
 
 
 class ExtendedClass(Group):
@@ -18,11 +23,11 @@ class SomeGroup(Group):
 
     link_to_class = ExtendedClass('some locator', name='nested element')  # all elements initialised two times
 
-    multiple_element_partial = Element(desktop='desktop_locator', mobile='mobile_locator', name='multiple element all')
+    multiple_element_partial = Element(desktop='desktop_locator', mobile=mobile_locator, name='multiple element all')
     multiple_element_all = Element(
         desktop='desktop_locator',
-        ios='ios_locator',
-        android='android_locator',
+        ios=ios_locator,
+        android=android_locator,
         name='multiple element all'
     )
 
@@ -40,12 +45,12 @@ def test_link_to_class_locator_desktop(driver, request):
 
 
 def test_multiple_locator_ios(mocked_ios_driver):
-    assert 'ios_locator' in get_platform_locator(SomeGroup().multiple_element_all)
+    assert ios_locator in get_platform_locator(SomeGroup().multiple_element_all)
     assert 'mobile_group' in get_platform_locator(SomeGroup())
 
 
 def test_multiple_locator_android(mocked_android_driver):
-    assert 'android_locator' in get_platform_locator(SomeGroup().multiple_element_all)
+    assert android_locator in get_platform_locator(SomeGroup().multiple_element_all)
     assert 'mobile_group' in get_platform_locator(SomeGroup())
 
 
@@ -62,44 +67,32 @@ def test_multiple_locator_playwright(mocked_play_driver):
 @pytest.mark.parametrize('driver', mobile_drivers, ids=mobile_ids)
 def test_multiple_locator_mobile(driver, request):
     request.getfixturevalue(driver)
-    assert 'mobile_locator' in get_platform_locator(SomeGroup().multiple_element_partial)
+    assert mobile_locator in get_platform_locator(SomeGroup().multiple_element_partial)
 
 
 @pytest.mark.parametrize('driver', mobile_drivers, ids=mobile_ids)
-def test_multiple_locator_negative_all(driver, request):
+def test_multiple_locator_all_with_mobile_fallback(driver, request):
     request.getfixturevalue(driver)
-    try:
-        get_platform_locator(
-            Element(
-                android='android_locator',
-                ios='ios_locator',
-                mobile='mobile_locator',
-                name='multiple element broken all'
-            )
+    locator = get_platform_locator(
+        Element(
+            android=android_locator,
+            ios=ios_locator,
+            mobile=mobile_locator,
+            name='multiple element broken all'
         )
-    except UnsuitableArgumentsException:
-        pass
-    else:
-        raise AssertionError('Unexpected result')
+    )
+    expected_locator = ios_locator if driver == mocked_ios_driver.__name__ else android_locator
+
+    assert expected_locator == locator
 
 
-def test_multiple_locator_negative_ios(mocked_ios_driver):
-    try:
-        get_platform_locator(
-            Element(ios='ios_locator', mobile='mobile_locator', name='multiple element broken ios')
-        )
-    except UnsuitableArgumentsException:
-        pass
-    else:
-        raise AssertionError('Unexpected result')
+def test_multiple_locator_ios_with_mobile_fallback(mocked_ios_driver):
+    assert get_platform_locator(
+        Element(ios=ios_locator, mobile=mobile_locator, name='multiple element broken ios')
+    ) == ios_locator
 
 
-def test_multiple_locator_negative_android(mocked_android_driver):
-    try:
-        get_platform_locator(
-            Element(android='android_locator', mobile='mobile_locator', name='multiple element broken android')
-        )
-    except UnsuitableArgumentsException:
-        pass
-    else:
-        raise AssertionError('Unexpected result')
+def test_multiple_locator_android_with_mobile_fallback(mocked_android_driver):
+    assert get_platform_locator(
+        Element(android=android_locator, mobile=mobile_locator, name='multiple element broken android')
+    ) == android_locator

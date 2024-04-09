@@ -54,6 +54,34 @@ def mocked_android_driver(mocked_shared_mobile_driver):
 
 
 @pytest.fixture
+def mocked_ios_tablet_driver(mocked_shared_mobile_driver):
+    mocked_shared_mobile_driver.capabilities = MagicMock(
+        return_value={
+            'platformName': 'ios',
+            'browserName': 'safari',
+            'automationName': 'safari',
+            'is_tablet': True,
+        }
+    )()
+    driver_wrapper = MockedDriverWrapper(mocked_shared_mobile_driver())
+    return driver_wrapper
+
+
+@pytest.fixture
+def mocked_android_tablet_driver(mocked_shared_mobile_driver):
+    mocked_shared_mobile_driver.capabilities = MagicMock(
+        return_value={
+            'platformName': 'Android',
+            'browserName': 'chrome',
+            'automationName': 'UiAutomator2',
+            'is_tablet': True,
+        }
+    )()
+    driver_wrapper = MockedDriverWrapper(mocked_shared_mobile_driver())
+    return driver_wrapper
+
+
+@pytest.fixture
 def mocked_selenium_driver():
     selenium_driver = SeleniumDriver
     selenium_driver.__init__ = lambda *args, **kwargs: None

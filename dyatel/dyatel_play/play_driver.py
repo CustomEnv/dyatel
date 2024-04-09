@@ -24,6 +24,7 @@ class PlayDriver(Logging, DriverWrapperABC):
 
         :param driver: playwright driver to initialize
         """
+        self.is_desktop = True
         self.trace = trace
         self.instance = driver
         self.context = driver.new_context(*args, **kwargs)
