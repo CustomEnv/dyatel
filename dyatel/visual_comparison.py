@@ -416,7 +416,8 @@ class VisualComparison:
         if hasattr(self.test_item, 'execution_count'):
             self.test_item.execution_count = pytest_rerun.get_reruns_count(self.test_item) + 1
 
-    def _remove_unexpected_underscores(self, text) -> str:
+    @staticmethod
+    def _remove_unexpected_underscores(text) -> str:
         """
         Remove multiple underscores from given text
 

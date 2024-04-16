@@ -3,6 +3,23 @@
 
 ---
 
+## v2.2.1
+*Release date: 2024-04-16*
+
+### Added 
+- `DriverWrapper.is_tablet`
+- `DriverWrapper.is_appium` 
+- `DriverWrapper.is_ios_tablet` 
+- `DriverWrapper.is_ios_mobile` 
+- `DriverWrapper.is_android_tablet` 
+- `DriverWrapper.is_android_mobile` 
+
+### Fixed
+- `Element.is_fully_visible` calculation 
+- `Element.is_visible` calculation 
+
+---
+
 ## v2.2.0
 *Release date: 2024-03-04*
 

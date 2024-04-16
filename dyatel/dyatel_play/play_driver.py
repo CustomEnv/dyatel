@@ -24,6 +24,7 @@ class PlayDriver(Logging, DriverWrapperABC):
 
         :param driver: playwright driver to initialize
         """
+        self.is_desktop = True
         self.trace = trace
         self.instance = driver
         self.context = driver.new_context(*args, **kwargs)
@@ -117,6 +118,7 @@ class PlayDriver(Logging, DriverWrapperABC):
     def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """
         Quit the driver instance
+        Note: you should close browser instance by yourself
 
         :param silent: erase log
         :param trace_path: Playwright only: path for the trace
@@ -126,6 +128,7 @@ class PlayDriver(Logging, DriverWrapperABC):
             self.context.tracing.stop(path=trace_path)
 
         self.driver.close()
+        self.context.close()
 
     def set_cookie(self, cookies: List[dict]) -> PlayDriver:
         """

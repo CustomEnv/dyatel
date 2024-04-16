@@ -14,18 +14,28 @@ class DriverWrapperABC(ABC):
     label = None
     original_tab = None
 
-    driver = None
-    browser_name = None
+    anchor = None
 
     is_desktop = False
     is_selenium = False
     is_playwright = False
 
+    is_appium = False
     is_mobile = False
+    is_tablet = False
+
     is_ios = False
+    is_ios_tablet = False
+    is_ios_mobile = False
+
     is_android = False
+    is_android_tablet = False
+    is_android_mobile = False
+
     is_simulator = False
     is_real_device = False
+
+    browser_name = None
 
     def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """

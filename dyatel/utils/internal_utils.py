@@ -236,14 +236,18 @@ def get_attributes_from_object(reference_obj: Any) -> dict:
 def is_target_on_screen(x: int, y: int, possible_range: dict):
     """
     Check is given coordinates fit into given range
+    An safe value will be applied:
+      1 - Due to usage of range
+      2 - Due to rounding a number when get size/location of element
 
     :param x: x coordinate
     :param y: y coordinate
     :param possible_range: possible range
     :return: bool
     """
-    is_x_on_screen = x in range(possible_range['width'] + 1)
-    is_y_on_screen = y in range(possible_range['height'] + 1)
+    safe_value = 2
+    is_x_on_screen = x in range(possible_range['width'] + safe_value)
+    is_y_on_screen = y in range(possible_range['height'] + safe_value)
     return is_x_on_screen and is_y_on_screen
 
 

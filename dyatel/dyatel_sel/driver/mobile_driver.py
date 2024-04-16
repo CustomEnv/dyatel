@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, List
+from typing import Union, List, Optional
 
 from appium.webdriver.applicationstate import ApplicationState
 from appium.webdriver.common.touch_action import TouchAction
@@ -11,6 +11,8 @@ from dyatel.dyatel_sel.core.core_driver import CoreDriver
 
 class MobileDriver(CoreDriver):
 
+    bundle_id: Optional[str]
+
     def __init__(self, driver: AppiumDriver, *args, **kwargs):  # noqa
         """
         Initializing of mobile driver with appium
@@ -18,15 +20,11 @@ class MobileDriver(CoreDriver):
         :param driver: appium driver to initialize
         """
         self.caps = driver.capabilities
-
         self.browser_name = self.caps.get('browserName', None)
         self.is_web = bool(self.browser_name) or False
         self.is_app = self.caps.get('app', False)
 
-        self.is_android = self.caps.get('platformName').lower() == 'android'
-        self.is_ios = self.caps.get('platformName').lower() == 'ios'
-        self.is_simulator = self.caps.get('useSimulator')
-        self.is_real_device = not self.caps.get('useSimulator')
+        _set_static(self)
 
         self.native_context_name = 'NATIVE_APP'
         self.web_context_name = self.get_web_view_context() if self.is_ios else 'CHROMIUM'
@@ -38,14 +36,6 @@ class MobileDriver(CoreDriver):
 
         self.original_tab = None
         self.page_box = None
-
-        if self.is_app:
-            if self.is_ios:
-                self.bundle_id = self.caps.get('bundleId', 'undefined: bundleId')
-            elif self.is_android:
-                self.bundle_id = self.caps.get('appPackage', 'undefined: appPackage')
-            else:
-                raise Exception('Make sure that correct "platformName" capability specified')
 
         CoreDriver.__init__(self, driver=driver)
 
@@ -294,3 +284,32 @@ class MobileDriver(CoreDriver):
             CoreDriver.click_by_coordinates(self, x=x, y=y, silent=True)
 
         return self
+
+
+def _set_static(obj) -> None:
+    """
+    Set static attributes for Appium driver wrapper
+
+    :return: None
+    """
+    obj.is_tablet = obj.caps.get('is_tablet', False)
+    obj.is_mobile = not obj.is_tablet
+
+    obj.is_ios = obj.caps.get('platformName').lower() == 'ios'
+    obj.is_ios_tablet = obj.is_ios and obj.is_tablet
+    obj.is_ios_mobile = obj.is_ios and obj.is_mobile
+
+    obj.is_android = obj.caps.get('platformName').lower() == 'android'
+    obj.is_android_tablet = obj.is_android and obj.is_tablet
+    obj.is_android_mobile = obj.is_android and obj.is_mobile
+
+    obj.is_simulator = obj.caps.get('useSimulator', False)
+    obj.is_real_device = not obj.is_simulator
+
+    if obj.is_app:
+        if obj.is_ios:
+            obj.bundle_id = obj.caps.get('bundleId', 'undefined: bundleId')
+        elif obj.is_android:
+            obj.bundle_id = obj.caps.get('appPackage', 'undefined: appPackage')
+        else:
+            raise Exception('Make sure that correct "platformName" capability specified')

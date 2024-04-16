@@ -13,6 +13,7 @@ class WebDriver(CoreDriver):
 
         :param driver: selenium driver to initialize
         """
+        self.is_desktop = True
         self.original_tab = driver.current_window_handle
         self.browser_name = driver.caps.get('browserName', None)
 
