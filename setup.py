@@ -40,7 +40,7 @@ cleanup()
 
 setup(
     name=pypi_name,
-    version='2.2.1',
+    version='2.2.2',
     url=f'https://github.com/EnvInc/{project_name}',
     packages=get_packages(project_name),
     install_requires=[
@@ -48,7 +48,7 @@ setup(
         'numpy>=1.18.1',
         'opencv-python==4.5.5.62',
         'Pillow>=6.2.2',
-        'playwright>=1.30.0',
+        'playwright>=1.41.0',
         'selenium>=4.1.0',
         'scikit-image>=0.17.1',
     ],
