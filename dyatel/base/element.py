@@ -17,6 +17,7 @@ from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
 from dyatel.mixins.internal_mixin import InternalMixin, get_element_info, all_locator_types
+from dyatel.mixins.objects.cut_box import CutBox
 from dyatel.mixins.objects.size import Size
 from dyatel.utils.logs import Logging, LogLevel
 from dyatel.utils.previous_object_driver import PreviousObjectDriver, set_instance_frame
@@ -416,7 +417,12 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return is_visible
 
-    def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
+    def save_screenshot(
+            self,
+            file_name: str,
+            screenshot_base: Union[bytes, Image] = None,
+            convert_type: str = None
+    ) -> Image:
         """
         Takes element screenshot and saving with given path/filename
 
@@ -426,7 +432,10 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :return: PIL Image object
         """
         self.log(f'Save screenshot of {self.name}')
-        image_object = self._base_cls.screenshot_image(self, screenshot_base)
+
+        image_object = screenshot_base
+        if type(screenshot_base) is bytes:
+            image_object = self._base_cls.screenshot_image(self, screenshot_base)
 
         if convert_type:
             image_object = image_object.convert(convert_type)
@@ -444,7 +453,8 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             delay: Union[int, float] = None,
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
-            fill_background: Union[str, bool] = False
+            fill_background: Union[str, bool] = False,
+            cut_box: CutBox = None,
     ) -> None:
         """
         Assert given (by name) and taken screenshot equals
@@ -457,6 +467,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param scroll: scroll to element before taking the screenshot
         :param remove: remove elements from screenshot
         :param fill_background: fill background with given color or black color by default
+        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
         :return: None
         """
         delay = delay or VisualComparison.default_delay
@@ -464,7 +475,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         VisualComparison(self.driver_wrapper, self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
-            scroll=scroll, remove=remove, fill_background=fill_background,
+            scroll=scroll, remove=remove, fill_background=fill_background, cut_box=cut_box
         )
 
     def soft_assert_screenshot(

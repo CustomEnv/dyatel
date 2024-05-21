@@ -149,7 +149,13 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             'width': self.execute_script(get_inner_width_js)
         }
 
-    def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
+    def save_screenshot(
+            self,
+            file_name: str,
+            screenshot_base:
+            Union[bytes, Image] = None,
+            convert_type: str = None
+    ) -> Image:
         """
         Takes full driver screenshot and saving with given path/filename
 
@@ -159,7 +165,10 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         :return: PIL Image object
         """
         self.log(f'Save driver screenshot')
-        image_object = self.screenshot_image(screenshot_base)
+
+        image_object = screenshot_base
+        if type(screenshot_base) is bytes:
+            image_object = self.screenshot_image(screenshot_base)
 
         if convert_type:
             image_object = image_object.convert(convert_type)

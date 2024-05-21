@@ -8,7 +8,7 @@ import json
 import base64
 import importlib
 from urllib.parse import urljoin
-from typing import Union, List, Any, Tuple
+from typing import Union, List, Any, Tuple, Optional
 from string import punctuation
 
 import cv2.cv2 as cv2  # noqa
@@ -19,6 +19,7 @@ from PIL import Image
 
 from dyatel.exceptions import DriverWrapperException, TimeoutException
 from dyatel.js_scripts import add_element_over_js, delete_element_over_js
+from dyatel.mixins.objects.cut_box import CutBox
 from dyatel.utils.logs import autolog
 from dyatel.mixins.internal_mixin import get_element_info
 
@@ -74,7 +75,8 @@ class VisualComparison:
             screenshot_name: str,
             delay: Union[int, float],
             remove: list,
-            fill_background: bool
+            fill_background: bool,
+            cut_box: Optional[CutBox],
     ):
         time.sleep(delay)
 
@@ -82,7 +84,12 @@ class VisualComparison:
         self._appends_dummy_elements(remove)
 
         desired_obj = self.dyatel_element or self.driver_wrapper.anchor or self.driver_wrapper
-        desired_obj.save_screenshot(screenshot_name)
+        image = desired_obj.screenshot_image()
+
+        if cut_box:
+            image = image.crop(cut_box.get_box(image.size))
+
+        desired_obj.save_screenshot(screenshot_name, screenshot_base=image)
 
         self._remove_dummy_elements()
 
@@ -96,6 +103,7 @@ class VisualComparison:
             scroll: bool,
             remove: List[Any],
             fill_background: Union[str, bool],
+            cut_box: Optional[CutBox]
     ) -> VisualComparison:
         """
         Assert given (by name) and taken screenshot equals
@@ -108,8 +116,12 @@ class VisualComparison:
         :param scroll: scroll to element before taking the screenshot
         :param remove: remove elements from screenshot
         :param fill_background: fill background with given color or black color by default
+        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
         :return: self
         """
+        remove = remove if remove else []
+        screenshot_params = dict(delay=delay, remove=remove, fill_background=fill_background, cut_box=cut_box)
+
         if self.skip_screenshot_comparison:
             return self
 
@@ -126,15 +138,13 @@ class VisualComparison:
         if scroll:
             self.dyatel_element.scroll_into_view()
 
-        remove = remove if remove else []
-
         if self.hard_visual_reference_generation:
-            self._save_screenshot(reference_file, delay=delay, remove=remove, fill_background=fill_background)
+            self._save_screenshot(reference_file, **screenshot_params)
             return self
 
         image = cv2.imread(reference_file)
         if isinstance(image, type(None)):
-            self._save_screenshot(reference_file, delay=delay, remove=remove, fill_background=fill_background)
+            self._save_screenshot(reference_file, **screenshot_params)
 
             if self.visual_reference_generation or self.soft_visual_reference_generation:
                 return self
@@ -147,13 +157,13 @@ class VisualComparison:
         if self.visual_reference_generation and not self.soft_visual_reference_generation:
             return self
 
-        self._save_screenshot(output_file, delay=delay, remove=remove, fill_background=fill_background)
+        self._save_screenshot(output_file, **screenshot_params)
 
         try:
             self._assert_same_images(output_file, reference_file, diff_file, threshold)
         except AssertionError as exc:
             if self.soft_visual_reference_generation:
-                self._save_screenshot(reference_file, delay=delay, remove=remove, fill_background=fill_background)
+                self._save_screenshot(reference_file, **screenshot_params)
             else:
                 raise exc
 
