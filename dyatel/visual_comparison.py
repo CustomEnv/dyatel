@@ -260,7 +260,7 @@ class VisualComparison:
                                  f"\nExpected: {reference_image.shape[0:2]};"
                                  f"\nActual: {output_image.shape[0:2]}.")
 
-        diff, actual_threshold = self._get_difference(reference_image, output_image)
+        diff, actual_threshold = self._get_difference(reference_image, output_image, threshold)
         is_different = actual_threshold > threshold
 
         if is_different:
@@ -333,7 +333,12 @@ class VisualComparison:
 
         return self.screenshot_name
 
-    def _get_difference(self, reference_img: numpy.ndarray, actual_img: numpy.ndarray) -> tuple[numpy.ndarray, float]:
+    def _get_difference(
+            self,
+            reference_img: numpy.ndarray,
+            actual_img: numpy.ndarray,
+            possible_threshold: Union[int, float]
+    ) -> tuple[numpy.ndarray, float]:
         """
         Calculate difference between two images
 
@@ -364,10 +369,11 @@ class VisualComparison:
 
         mask = numpy.zeros(reference_img.shape, dtype='uint8')
         filled_after = actual_img.copy()
+        percent_diff = 100 - score
+        is_different_enough = percent_diff > possible_threshold
 
         for c in contours:
-            area = cv2.contourArea(c)
-            if area > 40:
+            if is_different_enough or cv2.contourArea(c) > 40:
                 x, y, w, h = cv2.boundingRect(c)
                 cv2.rectangle(reference_img, (x, y), (x + w, y + h), self.diff_color_scheme, 2)
                 cv2.rectangle(actual_img, (x, y), (x + w, y + h), self.diff_color_scheme, 2)
