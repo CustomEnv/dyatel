@@ -3,6 +3,14 @@
 
 ---
 
+## v2.2.11
+*Release date: 2024-05-29*
+
+### Changed 
+- Minimum playwright version is 1.41.0
+
+---
+
 ## v2.2.1
 *Release date: 2024-04-16*
 

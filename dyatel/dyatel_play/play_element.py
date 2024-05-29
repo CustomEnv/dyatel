@@ -5,7 +5,7 @@ from abc import ABC
 from typing import Union, List, Any
 
 from PIL.Image import Image
-from playwright._impl._api_types import TimeoutError as PlayTimeoutError  # noqa
+from playwright.sync_api import TimeoutError as PlayTimeoutError
 from playwright.sync_api import Page as PlaywrightPage
 from playwright.sync_api import Locator, Page, Browser, BrowserContext
 
