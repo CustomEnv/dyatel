@@ -3,11 +3,24 @@ import os
 import pytest
 import pytest_rerunfailures
 
+from dyatel.mixins.objects.cut_box import CutBox
+
 
 @pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])
 def test_screenshot(base_playground_page, driver_name, platform, with_name):
     filename = f'{driver_name}-{platform}-kube' if with_name else ''
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename)
+
+
+@pytest.mark.parametrize('left', [0, 35], ids=['left 0', 'left 35'])
+@pytest.mark.parametrize('top', [0, 35], ids=['top 0', 'top 35'])
+@pytest.mark.parametrize('right', [0, 35], ids=['right 0', 'right 35'])
+@pytest.mark.parametrize('bottom', [0, 35], ids=['bottom 0', 'bottom 35'])
+@pytest.mark.parametrize('is_percent', [True, False], ids=['percent value', 'digit value'])
+def test_screenshot_with_box(base_playground_page, driver_name, platform, left, top, right, bottom, is_percent):
+    custom_box = CutBox(left, top, right, bottom, is_percents=is_percent)
+    if any([left, top, right, bottom]):
+        base_playground_page.kube.scroll_into_view().assert_screenshot(cut_box=custom_box)
 
 
 @pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])

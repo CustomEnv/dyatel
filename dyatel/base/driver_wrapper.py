@@ -11,6 +11,7 @@ from playwright.sync_api import (
     Page as PlaywrightDriver,
 )
 
+from dyatel.mixins.objects.cut_box import CutBox
 from dyatel.visual_comparison import VisualComparison
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
 from dyatel.dyatel_play.play_driver import PlayDriver
@@ -149,7 +150,13 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             'width': self.execute_script(get_inner_width_js)
         }
 
-    def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
+    def save_screenshot(
+            self,
+            file_name: str,
+            screenshot_base:
+            Union[bytes, Image] = None,
+            convert_type: str = None
+    ) -> Image:
         """
         Takes full driver screenshot and saving with given path/filename
 
@@ -159,7 +166,10 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         :return: PIL Image object
         """
         self.log(f'Save driver screenshot')
-        image_object = self.screenshot_image(screenshot_base)
+
+        image_object = screenshot_base
+        if type(screenshot_base) is bytes:
+            image_object = self.screenshot_image(screenshot_base)
 
         if convert_type:
             image_object = image_object.convert(convert_type)
@@ -176,6 +186,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
             remove: Union[Any, List[Any]] = None,
+            cut_box: CutBox = None,
     ) -> None:
         """
         Assert given (by name) and taken screenshot equals
@@ -186,6 +197,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         :param threshold: possible threshold
         :param delay: delay before taking screenshot
         :param remove: remove elements from screenshot
+        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
         :return: None
         """
         delay = delay or VisualComparison.default_delay
@@ -193,7 +205,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
         VisualComparison(self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
-            scroll=False, remove=remove, fill_background=False,
+            scroll=False, remove=remove, fill_background=False, cut_box=cut_box
         )
 
     def soft_assert_screenshot(
@@ -204,6 +216,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
             remove: Union[Any, List[Any]] = None,
+            cut_box: CutBox = None,
     ) -> Tuple[bool, str]:
         """
         Soft assert given (by name) and taken screenshot equals
@@ -214,10 +227,11 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         :param threshold: possible threshold
         :param delay: delay before taking screenshot
         :param remove: remove elements from screenshot
+        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
         :return: bool - True: screenshots equal; False: screenshots mismatch;
         """
         try:
-            self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, remove)
+            self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, remove, cut_box)
         except AssertionError as exc:
             exc = str(exc)
             self.log(exc, level=LogLevel.ERROR)
