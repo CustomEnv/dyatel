@@ -487,7 +487,8 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             delay: Union[int, float] = None,
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
-            fill_background: Union[str, bool] = False
+            fill_background: Union[str, bool] = False,
+            cut_box: CutBox = None,
     ) -> Tuple[bool, str]:
         """
         Soft assert given (by name) and taken screenshot equals
@@ -500,10 +501,13 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param scroll: scroll to element before taking the screenshot
         :param remove: remove elements from screenshot
         :param fill_background: fill background with given color or black color by default
+        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
         :return: bool - True: screenshots equal; False: screenshots mismatch;
         """
         try:
-            self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, scroll, remove, fill_background)
+            self.assert_screenshot(
+                filename, test_name, name_suffix, threshold, delay, scroll, remove, fill_background, cut_box
+            )
         except AssertionError as exc:
             exc = str(exc)
             self.log(exc, level=LogLevel.ERROR)
