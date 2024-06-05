@@ -228,8 +228,12 @@ class MobileDriver(CoreDriver):
 
             try:
                 self.switch_to_native()
+                if self.is_ios_tablet or self.is_tablet:
+                    locator = '//XCUIElementTypeOther[@name="UnifiedBar?isStandaloneBar=true"]/XCUIElementTypeOther[1]'
+                else:
+                    locator = '//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther'
                 top_bar = Element(
-                    locator='//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther',
+                    locator=locator,
                     name='safari top bar',
                     driver_wrapper=self,
                 )
