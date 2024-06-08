@@ -4,6 +4,7 @@ from typing import Any, Union, List
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
+from dyatel.mixins.objects.locator import Locator
 from dyatel.utils.internal_utils import (
     set_parent_for_attr,
     get_child_elements,
@@ -22,8 +23,7 @@ class Group(Element):
 
     def __init__(
             self,
-            locator: str = '',
-            locator_type: str = '',
+            locator: Union[Locator, str] = '',
             name: str = '',
             parent: Union[Any, False] = None,
             wait: bool = None,
@@ -48,7 +48,6 @@ class Group(Element):
         self._init_locals = locals()
         super().__init__(
             locator=locator,
-            locator_type=locator_type,
             name=name,
             parent=parent,
             wait=wait,

@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import time
 from abc import ABC
+from typing import Union
 
 from PIL.Image import Image
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.mixins.objects.location import Location
+from dyatel.mixins.objects.locator import Locator, take_locator_type
 from dyatel.mixins.objects.size import Size
 from dyatel.utils.internal_utils import calculate_coordinate_to_click
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type, get_appium_selector
@@ -14,15 +16,14 @@ from dyatel.utils.selector_synchronizer import get_platform_locator, get_seleniu
 
 class MobileElement(CoreElement, ABC):
 
-    def __init__(self, locator: str, locator_type: str):
+    def __init__(self, locator: Union[Locator, str]):
         """
         Initializing of mobile element with appium driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
-        :param locator_type: specific locator type
         """
         locator = get_platform_locator(self, default_locator=locator)
-        locator_type = locator_type if locator_type else get_selenium_locator_type(locator)
+        locator_type = take_locator_type(locator) or get_selenium_locator_type(locator)
         self.locator, self.locator_type = get_appium_selector(locator, locator_type)
 
     def click_outside(self, x: int = 0, y: int = -5) -> MobileElement:

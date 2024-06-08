@@ -16,8 +16,9 @@ from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
-from dyatel.mixins.internal_mixin import InternalMixin, get_element_info, all_locator_types
+from dyatel.mixins.internal_mixin import InternalMixin, get_element_info
 from dyatel.mixins.objects.cut_box import CutBox
+from dyatel.mixins.objects.locator import Locator
 from dyatel.mixins.objects.size import Size
 from dyatel.utils.logs import Logging, LogLevel
 from dyatel.utils.previous_object_driver import PreviousObjectDriver, set_instance_frame
@@ -64,42 +65,28 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     def __init__(
             self,
-            locator: str = '',
-            locator_type: str = '',
+            locator: Union[Locator, str],
             name: str = '',
             parent: Union[Any, False] = None,
             wait: bool = None,
             driver_wrapper: Union[DriverWrapper, Any] = None,
-            **kwargs
     ):
         """
         Initializing of element based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group
 
         :param locator: locator of element. Can be defined without locator_type
-        :param locator_type: Selenium only: specific locator type
         :param name: name of element (will be attached to logs)
         :param parent: parent of element. Can be Group or other Element objects or False for skip
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
-        :param kwargs:
-          - desktop: str = locator that will be used for desktop platform
-          - mobile: str = locator that will be used for all mobile platforms and mobile_resolution
-          - ios: str = locator that will be used for ios platform
-          - android: str = locator that will be used for android platform
         """
         self._validate_inheritance()
-        self._check_kwargs(kwargs)
-
-        if locator_type:
-            assert locator_type in all_locator_types, \
-                f'Locator type "{locator_type}" is not supported. Choose from {all_locator_types}'
 
         if parent:
             assert isinstance(parent, (bool, Element)), \
                 f'The "parent" of "{self.name}" should take an Element/Group object or False for skip. Get {parent}'
 
         self.locator = locator
-        self.locator_type = locator_type
         self.name = name if name else locator
         self.parent = parent
         self.wait = wait
@@ -140,7 +127,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')
 
         self._set_static(self._base_cls)
-        self._base_cls.__init__(self, locator=self.locator, locator_type=self.locator_type)
+        self._base_cls.__init__(self, locator=self.locator)
         self._initialized = True
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using internal methods

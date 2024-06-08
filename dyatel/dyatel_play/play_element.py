@@ -33,15 +33,14 @@ class PlayElement(ElementABC, Logging, ABC):
     parent: Union[ElementABC, PlayElement]
     _element: Locator = None
 
-    def __init__(self, locator: str, locator_type: str):
+    def __init__(self, locator: str):
         """
         Initializing of web element with playwright driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
-        :param locator_type: compatibility arg - specific locator type
         """
         self.locator = get_playwright_locator(get_platform_locator(self, default_locator=locator))
-        self.locator_type = f'{locator_type} - locator_type does not supported for playwright'
+        self.locator_type = 'locator_type does not supported for playwright'
 
     # Element
 
