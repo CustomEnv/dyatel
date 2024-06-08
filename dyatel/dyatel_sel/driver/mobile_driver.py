@@ -253,7 +253,7 @@ class MobileDriver(CoreDriver):
         :return: self
         """
         if self.is_tablet:
-            self.bottom_bar_height = 0
+            return 0
 
         if force or not self.bottom_bar_height:
 
