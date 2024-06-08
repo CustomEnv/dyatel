@@ -3,6 +3,14 @@
 
 ---
 
+## v2.2.12
+*Release date: 2024-06-08*
+
+### Added  
+- iPad support 
+
+---
+
 ## v2.2.11
 *Release date: 2024-05-29*
 
