@@ -228,8 +228,12 @@ class MobileDriver(CoreDriver):
 
             try:
                 self.switch_to_native()
+                if self.is_ios_tablet or self.is_tablet:
+                    locator = '//XCUIElementTypeOther[@name="UnifiedBar?isStandaloneBar=true"]/XCUIElementTypeOther[1]'
+                else:
+                    locator = '//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther'
                 top_bar = Element(
-                    locator='//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther/XCUIElementTypeOther',
+                    locator=locator,
                     name='safari top bar',
                     driver_wrapper=self,
                 )
@@ -246,6 +250,10 @@ class MobileDriver(CoreDriver):
         :param force: get the new value forcibly
         :return: self
         """
+        if self.is_ios_tablet or self.is_tablet:
+            self.bottom_bar_height = 0
+            return self.bottom_bar_height
+
         if force or not self.bottom_bar_height:
 
             from dyatel.base.element import Element
