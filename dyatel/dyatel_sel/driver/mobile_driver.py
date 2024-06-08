@@ -7,6 +7,7 @@ from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from dyatel.mixins.native_context import NativeContext, NativeSafari
 
 
 class MobileDriver(CoreDriver):
@@ -31,11 +32,13 @@ class MobileDriver(CoreDriver):
         self.__is_native_context = None
         self.__is_web_context = None
 
-        self.top_bar_height = None
-        self.bottom_bar_height = None
+        self._top_bar_height = None
+        self._bottom_bar_height = None
 
         self.original_tab = None
         self.page_box = None
+
+        self.native_safari = NativeSafari(self)
 
         CoreDriver.__init__(self, driver=driver)
 
@@ -160,6 +163,33 @@ class MobileDriver(CoreDriver):
 
         return self.__is_web_context
 
+    @property
+    def top_bar_height(self) -> int:
+        """
+        iOS only: Get top bar height
+
+        :return: self
+        """
+        if self._top_bar_height is None:
+
+            with NativeContext(self):
+                self._top_bar_height = self.native_safari.top_bar.size.height
+
+        return self._top_bar_height
+
+    @property
+    def bottom_bar_height(self) -> int:
+        """
+        iOS only: Get bottom bar height
+
+        :return: self
+        """
+        if self._bottom_bar_height is None:
+            with NativeContext(self):
+                self._bottom_bar_height = self.native_safari.get_bottom_bar_height()
+
+        return self._bottom_bar_height
+
     def get_all_contexts(self) -> List[str]:
         """
         Get the contexts within the current session
@@ -180,10 +210,8 @@ class MobileDriver(CoreDriver):
 
         if self.is_ios and not screenshot_base:
             if not self.page_box:
-                top_bar_height = self.get_top_bar_height()
-                bottom_bar_height = self.get_bottom_bar_height()
                 width, height = image.size
-                self.page_box = 0, top_bar_height, width, height - bottom_bar_height
+                self.page_box = 0, self.get_top_bar_height, width, height - self.get_bottom_bar_height
 
             image = image.crop(self.page_box)
 
@@ -198,82 +226,13 @@ class MobileDriver(CoreDriver):
         """
         if self.is_real_device:
             self.driver.hide_keyboard(**kwargs)
+
         elif self.is_ios and self.is_simulator:
-
-            from dyatel.base.element import Element
-
-            try:
-                self.switch_to_native()
-                done_button = Element(
-                    locator="//XCUIElementTypeButton[@name='Done']",
-                    name='keyboard Done button',
-                    driver_wrapper=self,
-                )
-                if done_button.is_displayed():
-                    done_button.click()
-            finally:
-                self.switch_to_web()
+            with NativeContext(self):
+                if self.native_safari.keyboard_done_button.is_displayed():
+                    self.native_safari.keyboard_done_button.click()
 
         return self
-
-    def get_top_bar_height(self) -> int:
-        """
-        iOS only: Get top bar height
-
-        :return: self
-        """
-        if self.is_tablet:
-            locator = '//XCUIElementTypeOther[@name="UnifiedBar?isStandaloneBar=true"]/XCUIElementTypeOther[1]'
-        else:
-            locator = '//*[contains(@name, "SafariWindow")]/XCUIElementTypeOther[1]/XCUIElementTypeOther' \
-                      '/XCUIElementTypeOther'
-
-        if not self.top_bar_height:
-
-            from dyatel.base.element import Element
-
-            try:
-                self.switch_to_native()
-                top_bar = Element(
-                    locator=locator,
-                    name='safari top bar',
-                    driver_wrapper=self,
-                )
-                self.top_bar_height = top_bar.element.size['height']
-            finally:
-                self.switch_to_web()
-
-        return self.top_bar_height
-
-    def get_bottom_bar_height(self, force: bool = False) -> int:
-        """
-        iOS only: Get bottom bar height
-
-        :param force: get the new value forcibly
-        :return: self
-        """
-        if self.is_tablet:
-            self.bottom_bar_height = 0
-
-        if force or not self.bottom_bar_height:
-
-            from dyatel.base.element import Element
-
-            try:
-                self.switch_to_native()
-                bottom_bar = Element(
-                    locator='//*[@name="CapsuleViewController"]/XCUIElementTypeOther[1]',
-                    name='safari bottom bar',
-                    driver_wrapper=self,
-                )
-                self.bottom_bar_height = bottom_bar.element.size['height']
-                if self.bottom_bar_height > 350:
-                    bottom_bar.locator = '//*[@name="CapsuleViewController"]/XCUIElementTypeOther[3]'
-                    self.bottom_bar_height = bottom_bar.element.size['height']
-            finally:
-                self.switch_to_web()
-
-        return self.bottom_bar_height
 
     def click_by_coordinates(self, x: int, y: int, silent: bool = False) -> MobileDriver:
         """

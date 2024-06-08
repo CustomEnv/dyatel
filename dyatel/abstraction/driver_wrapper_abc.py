@@ -428,6 +428,7 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
+    @property
     def get_top_bar_height(self) -> int:
         """
         iOS only: Get top bar height
@@ -436,11 +437,11 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
-    def get_bottom_bar_height(self, force: bool = False) -> int:
+    @property
+    def get_bottom_bar_height(self) -> int:
         """
         iOS only: Get bottom bar height
 
-        :param force: get the new value forcibly
         :return: self
         """
         raise NotImplementedError()
