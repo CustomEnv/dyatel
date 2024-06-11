@@ -22,9 +22,9 @@ class MobileElement(CoreElement, ABC):
 
         :param locator: anchor locator of page. Can be defined without locator_type
         """
-        locator = get_platform_locator(self, default_locator=locator)
-        locator_type = take_locator_type(locator) or get_selenium_locator_type(locator)
-        self.locator, self.locator_type = get_appium_selector(locator, locator_type)
+        self.locator = get_platform_locator(self)
+        locator_type = take_locator_type(locator) or get_selenium_locator_type(self.locator)
+        self.locator, self.locator_type = get_appium_selector(self.locator, locator_type)
 
     def click_outside(self, x: int = 0, y: int = -5) -> MobileElement:
         """
@@ -41,7 +41,7 @@ class MobileElement(CoreElement, ABC):
         x, y = calculate_coordinate_to_click(self, x, y)
 
         if self.driver_wrapper.is_ios:
-            y += self.driver_wrapper.get_top_bar_height()
+            y += self.driver_wrapper.top_bar_height
 
         self.log(f'Tap outside from "{self.name}" with coordinates (x: {x}, y: {y})')
 
@@ -62,7 +62,7 @@ class MobileElement(CoreElement, ABC):
         x, y = calculate_coordinate_to_click(self, 0, 0)
 
         if self.driver_wrapper.is_ios:
-            y += self.driver_wrapper.get_top_bar_height()
+            y += self.driver_wrapper.top_bar_height
 
         if not silent:
             self.log(f'Tap into the center by coordinates (x: {x}, y: {y}) for "{self.name}"')

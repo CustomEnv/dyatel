@@ -17,7 +17,7 @@ class WebElement(CoreElement, ABC):
 
         :param locator: anchor locator of page. Can be defined without locator_type
         """
-        self.locator = get_platform_locator(self, default_locator=locator)
+        self.locator = get_platform_locator(self)
         self.locator_type = take_locator_type(locator) or get_selenium_locator_type(self.locator)
 
     def hover(self, silent: bool = False) -> WebElement:

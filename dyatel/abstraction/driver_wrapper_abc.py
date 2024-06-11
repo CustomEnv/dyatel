@@ -429,7 +429,7 @@ class DriverWrapperABC(ABC):
         raise NotImplementedError()
 
     @property
-    def get_top_bar_height(self) -> int:
+    def top_bar_height(self) -> int:
         """
         iOS only: Get top bar height
 
@@ -438,7 +438,7 @@ class DriverWrapperABC(ABC):
         raise NotImplementedError()
 
     @property
-    def get_bottom_bar_height(self) -> int:
+    def bottom_bar_height(self) -> int:
         """
         iOS only: Get bottom bar height
 

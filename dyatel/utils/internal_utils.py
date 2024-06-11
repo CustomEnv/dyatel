@@ -63,11 +63,6 @@ def safe_getattribute(obj, item):
     return object.__getattribute__(obj, item)
 
 
-def set_name_for_attr(attr, name):
-    if not attr.name or attr.name == attr.locator:
-        attr.name = name.replace('_', ' ')
-
-
 def get_frame(frame=1):
     """
     Get frame by given id
@@ -108,7 +103,6 @@ def initialize_objects(current_object, objects: dict, cls: Any):
     :return: None
     """
     for name, obj in objects.items():
-        set_name_for_attr(obj, name)
         copied_obj = copy(obj)
         promote_parent_element(copied_obj, current_object, cls)
         setattr(current_object, name, copied_obj(driver_wrapper=current_object.driver_wrapper))

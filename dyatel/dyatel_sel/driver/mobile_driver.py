@@ -211,7 +211,7 @@ class MobileDriver(CoreDriver):
         if self.is_ios and not screenshot_base:
             if not self.page_box:
                 width, height = image.size
-                self.page_box = 0, self.get_top_bar_height, width, height - self.get_bottom_bar_height
+                self.page_box = 0, self.top_bar_height, width, height - self.bottom_bar_height
 
             image = image.crop(self.page_box)
 

@@ -1,40 +1,39 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Union
 
 from selenium.webdriver.common.by import By
 
 from dyatel.exceptions import InvalidSelectorException
+from dyatel.mixins.objects.locator import Locator
 from dyatel.utils.internal_utils import get_child_elements, all_tags
 
 
 selenium_locator_types = get_child_elements(By, str)
 
 
-def get_platform_locator(obj: Any, default_locator: str = ''):
+def get_platform_locator(obj: Any):
     """
     Get locator for current platform from object
 
     :param obj: Page/Group/Element
-    :param default_locator: default locator for object
     :return: current platform locator
     """
-    locator = default_locator if default_locator else obj.locator
-    data = getattr(obj, '_init_locals').get('kwargs', {})
+    locator: Union[Locator, str] = obj.locator
 
-    if not data or not obj.driver_wrapper:
+    if type(locator) is str or not obj.driver_wrapper:
         return locator
 
-    mobile_fallback_locator = data.get('mobile', locator)
+    mobile_fallback_locator = locator.mobile or locator.default_locator
 
     if obj.driver_wrapper.is_android:
-        locator = data.get('android', mobile_fallback_locator)
+        locator = locator.android or mobile_fallback_locator
     elif obj.driver_wrapper.is_ios:
-        locator = data.get('ios', mobile_fallback_locator)
+        locator = locator.ios or mobile_fallback_locator
     elif obj.driver_wrapper.is_mobile or obj.driver_wrapper.is_appium:
         locator = mobile_fallback_locator
     elif obj.driver_wrapper.is_desktop:
-        locator = data.get('desktop', locator)
+        locator = locator.desktop or locator.default_locator
 
     return locator
 

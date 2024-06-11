@@ -20,7 +20,7 @@ def take_locator_type(locator: Any):
 
 @dataclass
 class Locator:
-    locator: str
+    default_locator: Optional[str] = None
     locator_type: Optional[str] = None
     desktop: Optional[str] = None
     mobile: Optional[str] = None
