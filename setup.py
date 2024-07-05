@@ -49,7 +49,7 @@ setup(
         'opencv-python==4.5.5.62',
         'Pillow>=6.2.2',
         'playwright>=1.41.0',
-        'selenium>=4.1.0',
+        'selenium>=4.0.0',
         'scikit-image>=0.17.1',
     ],
     keywords='selenium appium playwright web_automation mobile_automation',
