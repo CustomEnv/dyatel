@@ -12,6 +12,7 @@ def test_screenshot(base_playground_page, driver_name, platform, with_name):
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename)
 
 
+# TODO: mobile/ff/safari skip needed
 @pytest.mark.parametrize('left', [0, 35], ids=['left 0', 'left 35'])
 @pytest.mark.parametrize('top', [0, 35], ids=['top 0', 'top 35'])
 @pytest.mark.parametrize('right', [0, 35], ids=['right 0', 'right 35'])

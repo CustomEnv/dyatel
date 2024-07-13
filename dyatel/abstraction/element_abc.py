@@ -13,7 +13,7 @@ from playwright.sync_api import Locator as PlayWebElement
 from dyatel.abstraction.mixin_abc import MixinABC
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.objects.size import Size
-from dyatel.utils.internal_utils import WAIT_EL
+from dyatel.utils.internal_utils import WAIT_EL, QUARTER_WAIT_EL
 
 
 class ElementABC(MixinABC, ABC):
@@ -422,7 +422,7 @@ class ElementABC(MixinABC, ABC):
     @abstractmethod
     def wait_element_without_error(
             self,
-            timeout: [int, float] = WAIT_EL,
+            timeout: [int, float] = QUARTER_WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
         """
@@ -437,7 +437,7 @@ class ElementABC(MixinABC, ABC):
     @abstractmethod
     def wait_element_hidden_without_error(
             self,
-            timeout: [int, float] = WAIT_EL,
+            timeout: [int, float] = QUARTER_WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
         """

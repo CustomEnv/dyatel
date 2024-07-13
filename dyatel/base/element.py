@@ -32,6 +32,7 @@ from dyatel.utils.internal_utils import (
     safe_getattribute,
     set_parent_for_attr,
     is_page,
+    QUARTER_WAIT_EL,
 )
 
 
@@ -236,7 +237,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return self
 
-    def wait_element_without_error(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
+    def wait_element_without_error(self, timeout: Union[int, float] = QUARTER_WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element visibility without error
 
@@ -254,7 +255,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
                 self.log(f'Ignored exception: "{exception.msg}"')
         return self
 
-    def wait_element_hidden_without_error(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
+    def wait_element_hidden_without_error(
+            self,
+            timeout: Union[int, float] = QUARTER_WAIT_EL,
+            silent: bool = False
+    ) -> Element:
         """
         Wait until element hidden without error
 
