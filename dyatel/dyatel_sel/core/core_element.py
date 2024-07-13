@@ -19,9 +19,10 @@ from selenium.common.exceptions import (
 
 from dyatel.abstraction.element_abc import ElementABC
 from dyatel.dyatel_sel.sel_utils import ActionChains
-from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js, scroll_into_view_blocks
+from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.objects.location import Location
+from dyatel.mixins.objects.scrolls import ScrollTo, ScrollTypes, scroll_into_view_blocks
 from dyatel.mixins.objects.size import Size
 from dyatel.shared_utils import cut_log_data, _scaled_screenshot
 from dyatel.utils.internal_utils import WAIT_EL, safe_call, get_dict
@@ -250,16 +251,16 @@ class CoreElement(ElementABC, ABC):
 
     def scroll_into_view(
             self,
-            block: str = 'center',
-            behavior: str = 'instant',
+            block: ScrollTo = ScrollTo.CENTER,
+            behavior: ScrollTypes = ScrollTypes.INSTANT,
             sleep: Union[int, float] = 0,
             silent: bool = False,
     ) -> CoreElement:
         """
         Scroll element into view by js script
 
-        :param block: start - element on the top; end - element at the bottom. All: start, center, end, nearest
-        :param behavior: scroll type: smooth or instant
+        :param block: start - element on the top; end - element at the bottom. All types in ScrollTo object
+        :param behavior: scroll type: ScrollTypes.INSTANT or ScrollTypes.SMOOTH
         :param sleep: delay after scroll
         :param silent: erase log
         :return: self

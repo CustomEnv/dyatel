@@ -5,6 +5,7 @@ from typing import Union, Any, List, Tuple
 
 from PIL.Image import Image
 from appium.webdriver.extensions.location import Location
+from dyatel.mixins.objects.scrolls import ScrollTo, ScrollTypes
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from appium.webdriver.webelement import WebElement as AppiumWebElement
 from playwright.sync_api import Locator as PlayWebElement
@@ -197,6 +198,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
+    @property
     def inner_text(self) -> str:
         """
         Get current element inner text
@@ -205,6 +207,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
+    @property
     def value(self) -> str:
         """
         Get value from current element
@@ -492,8 +495,8 @@ class ElementABC(MixinABC, ABC):
 
     def scroll_into_view(
             self,
-            block: str = 'center',
-            behavior: str = 'instant',
+            block: ScrollTo = ScrollTo.CENTER,
+            behavior: ScrollTypes = ScrollTypes.INSTANT,
             sleep: Union[int, float] = 0,
             silent: bool = False,
     ) -> ElementABC:
