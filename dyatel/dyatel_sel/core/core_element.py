@@ -25,7 +25,7 @@ from dyatel.mixins.objects.location import Location
 from dyatel.mixins.objects.scrolls import ScrollTo, ScrollTypes, scroll_into_view_blocks
 from dyatel.mixins.objects.size import Size
 from dyatel.shared_utils import cut_log_data, _scaled_screenshot
-from dyatel.utils.internal_utils import WAIT_EL, safe_call, get_dict
+from dyatel.utils.internal_utils import WAIT_EL, safe_call, get_dict, HALF_WAIT_EL
 from dyatel.exceptions import (
     TimeoutException,
     InvalidSelectorException,
@@ -78,25 +78,29 @@ class CoreElement(ElementABC, ABC):
         Click to current element
 
         :param force_wait: wait for element visibility before click
-        :param args: compatibility arg
-        :param kwargs: compatibility arg
+        :param args: compatibility arg.
+        :param kwargs: compatibility arg.
         :return: self
         """
         self.log(f'Click into "{self.name}"')
 
         self.element = self._get_element(force_wait=force_wait)
-        exception_msg = f'Element "{self.name}" not interactable {self.get_element_info()}'
 
-        try:
-            self.wait_enabled(silent=True).element.click()
-        except SeleniumElementNotInteractableException:
-            raise ElementNotInteractableException(exception_msg)
-        except SeleniumElementClickInterceptedException as exc:
-            raise ElementNotInteractableException(f'{exception_msg}. Original error: {exc.msg}')
-        finally:
-            self.element = None
+        selenium_exc_msg = None
+        start_time = time.time()
+        while time.time() - start_time < HALF_WAIT_EL:
+            try:
+                self.wait_enabled(silent=True).element.click()
+                return self
+            except (SeleniumElementNotInteractableException, SeleniumElementClickInterceptedException) as exc:
+                selenium_exc_msg = exc.msg
+            finally:
+                self.element = None
 
-        return self
+        raise ElementNotInteractableException(
+            f'Element "{self.name}" not interactable after {HALF_WAIT_EL} seconds. {self.get_element_info()}. '
+            f'Original error: {selenium_exc_msg}'
+        )
 
     def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> CoreElement:
         """

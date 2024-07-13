@@ -13,6 +13,7 @@ from dyatel.exceptions import NoSuchElementException, InvalidSelectorException, 
 
 WAIT_UNIT = 1
 WAIT_EL = 10
+HALF_WAIT_EL = WAIT_EL / 2
 WAIT_PAGE = 15
 
 
