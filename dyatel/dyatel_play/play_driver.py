@@ -185,7 +185,7 @@ class PlayDriver(Logging, DriverWrapperABC):
 
         for index, arg in enumerate(args):
             if isinstance(arg, Locator):
-                script_args[index] = arg.element_handle()
+                script_args[index] = arg.first.element_handle()
 
         return self.driver.evaluate(script, script_args)
 

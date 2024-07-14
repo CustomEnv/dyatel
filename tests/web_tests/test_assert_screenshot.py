@@ -4,6 +4,8 @@ import pytest
 import pytest_rerunfailures
 
 from dyatel.mixins.objects.cut_box import CutBox
+from dyatel.visual_comparison import VisualComparison
+from tests.adata.pages.playground_main_page import Card
 
 
 @pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])
@@ -19,6 +21,7 @@ def test_screenshot(base_playground_page, driver_name, platform, with_name):
 @pytest.mark.parametrize('bottom', [0, 35], ids=['bottom 0', 'bottom 35'])
 @pytest.mark.parametrize('is_percent', [True, False], ids=['percent value', 'digit value'])
 def test_screenshot_with_box(base_playground_page, driver_name, platform, left, top, right, bottom, is_percent):
+    """ Task: 16053068 """
     custom_box = CutBox(left, top, right, bottom, is_percents=is_percent)
     if any([left, top, right, bottom]):
         base_playground_page.kube.scroll_into_view().assert_screenshot(cut_box=custom_box)
@@ -71,3 +74,8 @@ def test_screenshot_fill_background_blue(base_playground_page):
 
 def test_screenshot_fill_background_default(base_playground_page):
     base_playground_page.kube.scroll_into_view().assert_screenshot(fill_background=True)
+
+
+def test_append_dummy_elements_multiple_available(second_playground_page, driver_wrapper):
+    """ Case: 65765292 """
+    VisualComparison(driver_wrapper)._appends_dummy_elements([Card()])
