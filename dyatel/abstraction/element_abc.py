@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Union, Any, List, Tuple
+from typing import Union, Any, List, Tuple, Optional
 
 from PIL.Image import Image
 from appium.webdriver.extensions.location import Location
@@ -392,12 +392,14 @@ class ElementABC(MixinABC, ABC):
     @abstractmethod
     def wait_element_text(
             self,
+            expected_text: Optional[str] = None,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
         """
-        Wait non empty text in element
+        Wait given or non-empty text presence in element
 
+        :param expected_text: text to be waiting for. None or empty for any text
         :param timeout: wait timeout
         :param silent: erase log
         :return: self
@@ -407,12 +409,14 @@ class ElementABC(MixinABC, ABC):
     @abstractmethod
     def wait_element_value(
             self,
+            expected_value: Optional[str] = None,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
         """
-        Wait non empty value in element
+        Wait given or non-empty value presence in element
 
+        :param expected_value: value to be waiting for. None or empty for any value
         :param timeout: wait timeout
         :param silent: erase log
         :return: self
@@ -465,6 +469,23 @@ class ElementABC(MixinABC, ABC):
         """
         Wait until element clickable
 
+        :param timeout: time to stop waiting
+        :param silent: erase log
+        :return: self
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def wait_element_size(
+            self,
+            expected_size: Size,
+            timeout: [int, float] = WAIT_EL,
+            silent: bool = False
+    ) -> ElementABC:
+        """
+        Wait until element size will be equal to given Size object
+
+        :param expected_size: expected element size in Size object
         :param timeout: time to stop waiting
         :param silent: erase log
         :return: self

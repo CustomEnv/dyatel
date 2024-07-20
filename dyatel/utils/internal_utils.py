@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import sys
 import inspect
+import time
 from copy import copy
-from functools import lru_cache
+from functools import lru_cache, wraps
 from typing import Any, Union, Callable
 
 from selenium.common.exceptions import StaleElementReferenceException as SeleniumStaleElementReferenceException
@@ -270,3 +271,42 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
     y = emy + bool(y) * (y + meh * sy)
 
     return int(x), int(y)
+
+
+def wait_condition(method: Callable):
+
+    @wraps(method)
+    def wrapper(self, *args, timeout: Union[int, float] = WAIT_EL, silent: bool = False, **kwargs):
+        condition = method\
+            .__name__\
+            .replace('wait_', '')\
+            .replace('_', ' ')\
+            .replace('element_', '')\
+
+        if not silent:
+            if condition == 'element':
+                condition = 'visible'
+            elif condition == 'availability':
+                condition = 'available in DOM'
+
+            if condition in ('enabled', 'disabled', 'visible', 'hidden'):
+                msg = f'Wait until "{self.name}" becomes {condition}'
+            else:
+                msg = f'Wait for {condition} in "{self.name}"'
+
+            self.log(msg)
+
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            result = method(self, *args, **kwargs)
+            if result.execution_result:
+                return self
+            time.sleep(0.1)
+
+        if result.error:  # noqa
+            result.error._timeout = timeout
+            raise result.error
+
+        raise TimeoutException(f'"{self.name}" not {condition}', timeout=timeout, info=self)
+
+    return wrapper

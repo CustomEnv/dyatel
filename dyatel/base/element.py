@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-import time
 from copy import copy
-from typing import Any, Union, List, Type, Tuple
+from typing import Union, List, Type, Tuple, Optional
 
 from PIL.Image import Image
+from dyatel.mixins.objects.wait_result import Result
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
+from selenium.common import WebDriverException
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
 from dyatel.abstraction.element_abc import ElementABC
@@ -33,6 +34,7 @@ from dyatel.utils.internal_utils import (
     set_parent_for_attr,
     is_page,
     QUARTER_WAIT_EL,
+    wait_condition,
 )
 
 
@@ -166,77 +168,6 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     # Elements waits
 
-    def wait_elements_count(
-            self,
-            expected_count: int,
-            timeout: Union[int, float] = WAIT_EL,
-            silent: bool = False
-    ) -> Element:
-        """
-        Wait until elements count will be equal to expected value
-
-        :param expected_count: expected elements count
-        :param timeout: wait timeout
-        :param silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait until elements count will be equal to "{expected_count}"')
-
-        is_equal, actual_count = False, None
-        start_time = time.time()
-        while time.time() - start_time < timeout and not is_equal:
-            actual_count = self.get_elements_count(silent=True)
-            is_equal = actual_count == expected_count
-
-        if not is_equal:
-            msg = f'Unexpected elements count of "{self.name}". Actual: {actual_count}; Expected: {expected_count}'
-            raise UnexpectedElementsCountException(msg)
-
-        return self
-
-    def wait_element_text(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
-        """
-        Wait non empty text in element
-
-        :param timeout: wait timeout
-        :param silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait for any text is available in "{self.name}"')
-
-        text = None
-        start_time = time.time()
-        while time.time() - start_time < timeout and not text:
-            text = self.text
-
-        if not text:
-            raise UnexpectedTextException(f'Text of "{self.name}" is empty')
-
-        return self
-
-    def wait_element_value(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
-        """
-        Wait non empty value in element
-
-        :param timeout: wait timeout
-        :param silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait for any value is available in "{self.name}"')
-
-        value = None
-        start_time = time.time()
-        while time.time() - start_time < timeout and not value:
-            value = self.value
-
-        if not value:
-            raise UnexpectedValueException(f'Value of "{self.name}" is empty')
-
-        return self
-
     def wait_element_without_error(self, timeout: Union[int, float] = QUARTER_WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element visibility without error
@@ -246,11 +177,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :return: self
         """
         if not silent:
-            self.log(f'Wait until presence of "{self.name}" without error exception')
+            self.log(f'Wait until "{self.name}" becomes visible without error exception')
 
         try:
             self.wait_element(timeout=timeout, silent=True)
-        except TimeoutException as exception:
+        except (TimeoutException, WebDriverException) as exception:
             if not silent:
                 self.log(f'Ignored exception: "{exception.msg}"')
         return self
@@ -268,15 +199,56 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :return: self
         """
         if not silent:
-            self.log(f'Wait until invisibility of "{self.name}" without error exception')
+            self.log(f'Wait until "{self.name}" becomes hidden without error exception')
 
         try:
             self.wait_element_hidden(timeout=timeout, silent=True)
-        except TimeoutException as exception:
+        except (TimeoutException, WebDriverException) as exception:
             if not silent:
                 self.log(f'Ignored exception: "{exception.msg}"')
         return self
 
+    @wait_condition
+    def wait_element_text(
+            self,
+            expected_text: Optional[str] = None,
+            timeout: Union[int, float] = WAIT_EL,
+            silent: bool = False
+    ) -> Element:
+        """
+        Wait given or non-empty text presence in element
+
+        :param expected_text: text to be waiting for. None or empty for any text
+        :param timeout: wait timeout
+        :param silent: erase log
+        :return: self
+        """
+        actual_text = self.text
+        msg = f'Not expected text for "{self.name}"' if expected_text else f'Text of "{self.name}" is empty'
+        error = UnexpectedTextException(msg, actual_text, expected_text, timeout)
+        return Result(actual_text == expected_text if expected_text else actual_text, error)  # noqa
+
+    @wait_condition
+    def wait_element_value(
+            self,
+            expected_value: Optional[str] = None,
+            timeout: Union[int, float] = WAIT_EL,
+            silent: bool = False
+    ) -> Element:
+        """
+        Wait given or non-empty value presence in element
+
+        :param expected_value: value to be waiting for. None or empty for any value
+        :param timeout: wait timeout
+        :param silent: erase log
+        :return: self
+        """
+        actual_value = self.value
+        msg = f'Not expected value for "{self.name}"' if expected_value else f'Value of "{self.name}" is empty'
+        error = UnexpectedValueException(msg, actual_value, expected_value, timeout)
+        return Result(actual_value == expected_value if expected_value else actual_value, error)  # noqa
+
+    @wait_condition
     def wait_enabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element clickable
@@ -285,72 +257,59 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param silent: erase log
         :return: self
         """
-        if not silent:
-            self.log(f'Wait until "{self.name}" become enabled')
+        return Result(self.is_enabled())  # noqa
 
-        element = self.element
-        enabled = False
-        start_time = time.time()
-        while time.time() - start_time < timeout and not enabled:
-            enabled = element.is_enabled()
-
-        if not enabled:
-            msg = f'"{self.name}" not enabled after {timeout} seconds. {self.get_element_info()}'
-            raise TimeoutException(msg)
-
-        return self
-
+    @wait_condition
     def wait_disabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
-        Wait until element clickable
+        Wait until element disabled
 
         :param timeout: time to stop waiting
         :param silent: erase log
         :return: self
         """
-        if not silent:
-            self.log(f'Wait until "{self.name}" become disabled')
+        return Result(not self.is_enabled())  # noqa
 
-        element = self.element
-        disabled = False
-        start_time = time.time()
-        while time.time() - start_time < timeout and not disabled:
-            disabled = not element.is_enabled()
-
-        if not disabled:
-            msg = f'"{self.name}" not disabled after {timeout} seconds. {self.get_element_info()}'
-            raise TimeoutException(msg)
-
-        return self
-
-    def wait_element_size(self, expected_size: Size, timeout: Union[int, float] = WAIT_EL) -> Element:
+    @wait_condition
+    def wait_element_size(
+            self,
+            expected_size: Size,
+            timeout: Union[int, float] = WAIT_EL,
+            silent: bool = False
+    ) -> Element:
         """
         Wait until element size will be equal to given Size object
 
         :param expected_size: expected element size in Size object
         :param timeout: time to stop waiting
-        :return: Element
+        :param silent: erase log
+        :return: self
         """
-        is_equal = False
-        start_time = time.time()
-        actual_size = Size(None, None)
-        is_height_equal, is_width_equal = True, True
+        actual = self.size
+        error = UnexpectedElementSizeException(f'Unexpected size for "{self.name}"', actual, expected_size, timeout)
+        is_height_equal = actual.height == expected_size.height if expected_size.height is not None else True
+        is_width_equal = actual.width == expected_size.width if expected_size.width is not None else True
+        return Result(is_height_equal and is_width_equal, error)  # noqa
 
-        while time.time() - start_time < timeout and not is_equal:
-            actual_size = self.size
+    @wait_condition
+    def wait_elements_count(
+            self,
+            expected_count: int,
+            timeout: Union[int, float] = WAIT_EL,
+            silent: bool = False
+    ) -> Element:
+        """
+        Wait until elements count will be equal to expected value
 
-            if expected_size.height is not None:
-                is_height_equal = actual_size.height == expected_size.height
-            if expected_size.width is not None:
-                is_width_equal = actual_size.width == expected_size.width
-
-            is_equal = is_height_equal == is_width_equal
-
-        if not is_equal:
-            raise TimeoutException(f'"{self.name}" size is not equal to {expected_size} after {timeout} seconds. '
-                                   f'Actual: {actual_size}. {self.get_element_info()}')
-
-        return self
+        :param expected_count: expected elements count
+        :param timeout: wait timeout
+        :param silent: erase log
+        :return: self
+        """
+        actual_count = self.get_elements_count(silent=True)
+        msg = f'Unexpected elements count of "{self.name}"'
+        error = UnexpectedElementsCountException(msg, actual_count, expected_count, timeout)
+        return Result(actual_count == expected_count, error)  # noqa
 
     @property
     def all_elements(self) -> Union[Any]:

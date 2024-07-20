@@ -5,6 +5,7 @@ from abc import ABC
 from typing import Union, List, Any, Callable
 
 from PIL import Image
+from dyatel.mixins.objects.wait_result import Result
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from appium.webdriver.webelement import WebElement as AppiumWebElement
@@ -25,7 +26,7 @@ from dyatel.mixins.objects.location import Location
 from dyatel.mixins.objects.scrolls import ScrollTo, ScrollTypes, scroll_into_view_blocks
 from dyatel.mixins.objects.size import Size
 from dyatel.shared_utils import cut_log_data, _scaled_screenshot
-from dyatel.utils.internal_utils import WAIT_EL, safe_call, get_dict, HALF_WAIT_EL
+from dyatel.utils.internal_utils import WAIT_EL, safe_call, get_dict, HALF_WAIT_EL, wait_condition
 from dyatel.exceptions import (
     TimeoutException,
     InvalidSelectorException,
@@ -185,6 +186,7 @@ class CoreElement(ElementABC, ABC):
 
     # Element waits
 
+    @wait_condition
     def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
         """
         Wait for current element available in page
@@ -193,20 +195,10 @@ class CoreElement(ElementABC, ABC):
         :param silent: erase log
         :return: self
         """
-        if not silent:
-            self.log(f'Wait until presence of "{self.name}"')
+        error = TimeoutException(f'"{self.name}" not visible', timeout=timeout, info=self)
+        return Result(self.is_displayed(silent=True), error)  # noqa
 
-        is_displayed = False
-        start_time = time.time()
-        while time.time() - start_time < timeout and not is_displayed:
-            is_displayed = self.is_displayed(silent=True)
-
-        if not is_displayed:
-            base_exception_msg = f'Element "{self.name}" not visible after {timeout} seconds'
-            raise TimeoutException(f'{base_exception_msg} {self.get_element_info()}')
-
-        return self
-
+    @wait_condition
     def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
         """
         Wait until element hidden
@@ -215,20 +207,10 @@ class CoreElement(ElementABC, ABC):
         :param silent: erase log
         :return: self
         """
-        if not silent:
-            self.log(f'Wait hidden of "{self.name}"')
+        error = TimeoutException(f'"{self.name}" still visible', timeout=timeout, info=self)
+        return Result(self.is_hidden(silent=True), error)  # noqa
 
-        is_hidden = False
-        start_time = time.time()
-        while time.time() - start_time < timeout and not is_hidden:
-            is_hidden = self.is_hidden(silent=True)
-
-        if not is_hidden:
-            msg = f'"{self.name}" still visible after {timeout} seconds. {self.get_element_info()}'
-            raise TimeoutException(msg)
-
-        return self
-
+    @wait_condition
     def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
         """
         Wait for current element available in DOM
@@ -237,19 +219,8 @@ class CoreElement(ElementABC, ABC):
         :param silent: erase log
         :return: self
         """
-        if not silent:
-            self.log(f'Wait until "{self.name}" will be available in DOM')
-
-        is_available = False
-        start_time = time.time()
-        while time.time() - start_time < timeout and not is_available:
-            is_available = self.is_available()
-
-        if not is_available:
-            msg = f'"{self.name}" not available in DOM after {timeout} seconds. {self.get_element_info()}'
-            raise TimeoutException(msg)
-
-        return self
+        error = TimeoutException(f'"{self.name}" not available in DOM', timeout=timeout, info=self)
+        return Result(self.is_available(), error)  # noqa
 
     # Element state
 

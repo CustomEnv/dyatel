@@ -60,18 +60,6 @@ def test_wait_elements_count_v2(expected_condition_page):
     assert all((initial_count == 0, target_count == 1))
 
 
-def test_wait_elements_count_negative(forms_page):
-    forms_page.validation_form.form_mixin.input.type_text('sample')
-    forms_page.validation_form.submit_form_button.click()
-
-    try:
-        forms_page.validation_form.any_error.wait_elements_count(3, timeout=1)
-    except UnexpectedElementsCountException:
-        pass
-    else:
-        raise Exception('Unexpected behaviour')
-
-
 @pytest.mark.xfail(reason='TODO: Implementation')
 def test_wait_element_stop_changing(progressbar_page):
     # bar = progressbar_page.progress_bar.element

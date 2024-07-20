@@ -49,7 +49,7 @@ def platform(request):
 def chrome_options(request):
     options = ChromeOptions()
     if request.config.getoption('headless'):
-        options.headless = True
+        options.add_argument('--headless=new')
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     return options
 
@@ -58,7 +58,7 @@ def chrome_options(request):
 def firefox_options(request):
     options = FirefoxOptions()
     if request.config.getoption('headless'):
-        options.headless = True
+        options.add_argument('--headless=new')
     return options
 
 

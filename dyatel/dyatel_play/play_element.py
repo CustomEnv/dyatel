@@ -232,7 +232,7 @@ class PlayElement(ElementABC, Logging, ABC):
         try:
             self._first_element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
         except PlayTimeoutError:
-            raise TimeoutException(f'Element "{self.name}" not visible after {timeout} seconds')
+            raise TimeoutException(f'"{self.name}" not visible', timeout=timeout, info=self)
         return self
 
     def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
@@ -249,7 +249,7 @@ class PlayElement(ElementABC, Logging, ABC):
         try:
             self._first_element.wait_for(state='hidden', timeout=get_timeout_in_ms(timeout))
         except PlayTimeoutError:
-            raise TimeoutException(f'Element "{self.name}" still visible after {timeout} seconds')
+            raise TimeoutException(f'"{self.name}" still visible', timeout=timeout, info=self)
         return self
 
     def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
@@ -263,7 +263,10 @@ class PlayElement(ElementABC, Logging, ABC):
         if not silent:
             self.log(f'Wait until presence of "{self.name}"')
 
-        self._first_element.wait_for(state='attached', timeout=get_timeout_in_ms(timeout))
+        try:
+            self._first_element.wait_for(state='attached', timeout=get_timeout_in_ms(timeout))
+        except PlayTimeoutError:
+            raise TimeoutException(f'"{self.name}" not available in DOM', timeout=timeout, info=self)
         return self
 
     # Element state
@@ -427,7 +430,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
         :return: Size(width/height) obj
         """
-        box = self.element.bounding_box()
+        box = self.element.first.bounding_box()
         return Size(width=box['width'], height=box['height'])
 
     @property
@@ -437,7 +440,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
         :return: Location(x/y) obj
         """
-        box = self.element.bounding_box()
+        box = self.element.first.bounding_box()
         return Location(x=box['x'], y=box['y'])
 
     def is_enabled(self, silent: bool = False) -> bool:
