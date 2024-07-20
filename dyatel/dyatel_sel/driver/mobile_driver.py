@@ -171,7 +171,6 @@ class MobileDriver(CoreDriver):
         :return: self
         """
         if self._top_bar_height is None:
-
             with NativeContext(self):
                 self._top_bar_height = self.native_safari.top_bar.size.height
 
