@@ -142,6 +142,7 @@ class VisualComparison:
 
             self._disable_reruns()
 
+            self._attach_allure_diff(reference_file, reference_file, reference_file)
             raise AssertionError(f'Reference file "{reference_file}" not found, but its just saved. '
                                  f'If it CI run, then you need to commit reference files.')
 
@@ -317,7 +318,8 @@ class VisualComparison:
 
         name_suffix = f'_{name_suffix}_' if name_suffix else '_'
         location_name = self.dyatel_element.name if self.dyatel_element else 'entire_screen'
-        if 'mobile' not in screenshot_name and self.mobile_resolution:
+        base_name = f'{test_function_name}{location_name}{name_suffix}'
+        if 'mobile' not in base_name and self.mobile_resolution:
             location_name += '_mobile_'
         screenshot_name = f'{test_function_name}_{location_name}{name_suffix}{screenshot_name}'
 
