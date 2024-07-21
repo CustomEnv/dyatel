@@ -70,6 +70,7 @@ def test_assert_screenshot_hide_elements(second_playground_page, driver_wrapper)
     )
     driver_wrapper.refresh()
     second_playground_page.row_with_cards.scroll_into_view()
+    all_cards = second_playground_page.get_all_cards()
     second_playground_page.row_with_cards.assert_screenshot(
         hide=[all_cards[0], all_cards[2]],
         name_suffix='sides hidden'
@@ -85,6 +86,7 @@ def test_assert_screenshot_hide_driver_elements(second_playground_page, driver_w
     )
     driver_wrapper.refresh()
     second_playground_page.row_with_cards.scroll_into_view()
+    all_cards = second_playground_page.get_all_cards()
     driver_wrapper.assert_screenshot(
         hide=[all_cards[0], all_cards[2]],
         name_suffix='sides hidden'

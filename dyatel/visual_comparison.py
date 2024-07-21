@@ -32,6 +32,7 @@ class VisualComparison:
     visual_reference_generation = False
     hard_visual_reference_generation = False
     soft_visual_reference_generation = False
+    mobile_resolution = False
     default_delay = 0.75
     default_threshold = 0
     dynamic_threshold_factor = 0
@@ -316,6 +317,8 @@ class VisualComparison:
 
         name_suffix = f'_{name_suffix}_' if name_suffix else '_'
         location_name = self.dyatel_element.name if self.dyatel_element else 'entire_screen'
+        if 'mobile' not in screenshot_name and self.mobile_resolution:
+            location_name += '_mobile_'
         screenshot_name = f'{test_function_name}_{location_name}{name_suffix}{screenshot_name}'
 
         for item in (']', '"', "'"):
