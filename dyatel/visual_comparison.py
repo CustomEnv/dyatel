@@ -42,6 +42,7 @@ class VisualComparison:
     def __init__(self, driver_wrapper, element=None):
         self.driver_wrapper = driver_wrapper
         self.dyatel_element = element
+        self.screenshot_name = 'default'
 
         if self.dynamic_threshold_factor and self.default_threshold:
             raise Exception('Provide only one argument for threshold of visual comparison')
@@ -51,8 +52,6 @@ class VisualComparison:
 
     def __init_session(self):
         root_path = self.visual_regression_path
-
-        self.screenshot_name = 'default'
 
         if not root_path:
             raise Exception('Provide visual regression path to environment. '
@@ -116,12 +115,13 @@ class VisualComparison:
         if filename:
             if name_suffix:
                 filename = f'{filename}_{name_suffix}'
+            self.screenshot_name = filename
         else:
-            filename = self._get_screenshot_name(test_name, name_suffix)
+            self.screenshot_name = self._get_screenshot_name(test_name, name_suffix)
 
-        reference_file = f'{self.reference_directory}{filename}.png'
-        output_file = f'{self.output_directory}{filename}.png'
-        diff_file = f'{self.diff_directory}diff_{filename}.png'
+        reference_file = f'{self.reference_directory}{self.screenshot_name}.png'
+        output_file = f'{self.output_directory}{self.screenshot_name}.png'
+        diff_file = f'{self.diff_directory}diff_{self.screenshot_name}.png'
 
         if scroll:
             self.dyatel_element.scroll_into_view()
@@ -246,6 +246,11 @@ class VisualComparison:
             check_shape_equality(reference_image, output_image)
         except ValueError:
             self._attach_allure_diff(actual_file, reference_file, actual_file)
+            # todo: watermark / fill size difference with color on diff image is better, but need more time
+            # rescale output image to the size of reference image, and save it as diff image
+            height, width, _ = reference_image.shape
+            scaled_image = cv2.resize(output_image, (width, height))
+            cv2.imwrite(diff_file, scaled_image)
             raise AssertionError(f"↓\nImage size (width, height) is not same for '{self.screenshot_name}':"
                                  f"\nExpected: {reference_image.shape[0:2]};"
                                  f"\nActual: {output_image.shape[0:2]}.")
@@ -319,9 +324,7 @@ class VisualComparison:
         for item in punctuation + ' ':
             screenshot_name = screenshot_name.replace(item, '_')
 
-        self.screenshot_name = self._remove_unexpected_underscores(screenshot_name).lower()
-
-        return self.screenshot_name
+        return self._remove_unexpected_underscores(screenshot_name).lower()
 
     def _get_difference(self, reference_img: numpy.ndarray, actual_img: numpy.ndarray) -> tuple[numpy.ndarray, float]:
         """
