@@ -197,12 +197,12 @@ class VisualComparison:
         for obj in remove_data:
 
             try:
-                el = obj.element
+                obj.wait_element()
             except TimeoutException:
                 msg = f'Cannot find {obj.name} while removing background from screenshot. {get_element_info(obj)}'
                 raise TimeoutException(msg)
 
-            self.driver_wrapper.execute_script(add_element_over_js, el)
+            self.driver_wrapper.execute_script(add_element_over_js, obj)
         return self
 
     def _remove_dummy_elements(self) -> VisualComparison:
@@ -224,12 +224,12 @@ class VisualComparison:
         if not fill_background_data:
             return self
 
-        element = self.dyatel_element.element
+        dyatel_element = self.dyatel_element
 
         if fill_background_data is True:
-            self.driver_wrapper.execute_script('arguments[0].style.background = "#000";', element)
+            self.driver_wrapper.execute_script('arguments[0].style.background = "#000";', dyatel_element)
         elif type(fill_background_data) is str:
-            self.driver_wrapper.execute_script(f'arguments[0].style.background = "{fill_background_data}";', element)
+            self.driver_wrapper.execute_script(f'arguments[0].style.background = "{fill_background_data}";', dyatel_element)
 
         return self
 

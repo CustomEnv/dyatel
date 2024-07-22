@@ -26,8 +26,10 @@ def test_driver_execute_script_return_value(driver_wrapper, mouse_event_page):
 
 
 def test_driver_execute_script_with_args(driver_wrapper, mouse_event_page):
-    driver_wrapper.execute_script('arguments[0].click();', mouse_event_page.header_logo.element)
-    assert SecondPlaygroundMainPage().wait_page_loaded().is_page_opened()
+    main_page = SecondPlaygroundMainPage()
+    assert not main_page.is_page_opened()
+    driver_wrapper.execute_script('arguments[0].click();', mouse_event_page.header_logo)
+    assert main_page.wait_page_loaded().is_page_opened()
 
 
 def test_second_driver_different_page(driver_wrapper, second_driver_wrapper):

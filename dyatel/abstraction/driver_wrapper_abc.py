@@ -194,7 +194,7 @@ class DriverWrapperABC(ABC):
         Completable with selenium `execute_script` method
 
         :param script: the JavaScript to execute
-        :param args: any applicable arguments for your JavaScript
+        :param args: any applicable arguments for your JavaScript (Element object)
         :return: execution return value
         """
         raise NotImplementedError()
