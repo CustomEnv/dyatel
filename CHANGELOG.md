@@ -3,6 +3,20 @@
 
 ---
 
+## v2.2.14
+*Release date: 2024-07-24*
+
+### Added  
+- assert_screenshot: possibility to hide objects before taking screenshot
+- assert_screenshot: the diff image save on a different sized screenshots (reference/output)
+- assert_screenshot: allure attachments increased for some cases 
+- assert_screenshot: auto label `mobile` for mobile resolution screenshots
+
+### Fixed
+- assert_screenshot: bug with default.png for screenshots with given names fixed
+
+---
+
 ## v2.2.12 & v2.2.13
 *Release date: 2024-06-08*
 
