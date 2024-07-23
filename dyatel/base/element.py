@@ -436,6 +436,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return image_object
 
     def hide_element(self) -> Element:
+        """
+        Hide element from page
+
+        :return: Element
+        """
         self.driver_wrapper.execute_script('arguments[0].style.opacity = "0";', self.element)
         return self
 

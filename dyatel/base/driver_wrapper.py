@@ -120,9 +120,9 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         self.driver = driver
         self.session.add_session(self)
         self.label = f'{self.session.all_sessions.index(self) + 1}_driver'
-        self.is_mobile_resolution = mobile_resolution
         self.__init_base_class__(*args, **kwargs)
-        if self.is_mobile_resolution:
+        if mobile_resolution:
+            self.is_mobile_resolution = True
             self.is_desktop = False
             self.is_mobile = True
 
