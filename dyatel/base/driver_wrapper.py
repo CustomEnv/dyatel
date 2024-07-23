@@ -60,6 +60,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     is_desktop = False
     is_selenium = False
     is_playwright = False
+    is_mobile_resolution = False
 
     is_appium = False
     is_mobile = False
@@ -121,6 +122,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         self.label = f'{self.session.all_sessions.index(self) + 1}_driver'
         self.__init_base_class__(*args, **kwargs)
         if mobile_resolution:
+            self.is_mobile_resolution = True
             self.is_desktop = False
             self.is_mobile = True
 
@@ -176,6 +178,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
             remove: Union[Any, List[Any]] = None,
+            hide: Union[Any, List[Any]] = None,
     ) -> None:
         """
         Assert given (by name) and taken screenshot equals
@@ -186,10 +189,17 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         :param threshold: possible threshold
         :param delay: delay before taking screenshot
         :param remove: remove elements from screenshot
+        :param hide: hide elements from page before taking screenshot
         :return: None
         """
         delay = delay or VisualComparison.default_delay
         remove = [remove] if type(remove) is not list and remove else remove
+
+        if hide:
+            if not isinstance(hide, list):
+                hide = [hide]
+            for object_to_hide in hide:
+                object_to_hide.hide_element()
 
         VisualComparison(self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
@@ -204,6 +214,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
             remove: Union[Any, List[Any]] = None,
+            hide: Union[Any, List[Any]] = None,
     ) -> Tuple[bool, str]:
         """
         Soft assert given (by name) and taken screenshot equals
@@ -214,10 +225,11 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         :param threshold: possible threshold
         :param delay: delay before taking screenshot
         :param remove: remove elements from screenshot
+        :param hide: hide elements from page before taking screenshot
         :return: bool - True: screenshots equal; False: screenshots mismatch;
         """
         try:
-            self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, remove)
+            self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, remove, hide)
         except AssertionError as exc:
             exc = str(exc)
             self.log(exc, level=LogLevel.ERROR)

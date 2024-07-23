@@ -435,6 +435,15 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return image_object
 
+    def hide_element(self) -> Element:
+        """
+        Hide element from page
+
+        :return: Element
+        """
+        self.driver_wrapper.execute_script('arguments[0].style.opacity = "0";', self.element)
+        return self
+
     def assert_screenshot(
             self,
             filename: str = '',
@@ -444,6 +453,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             delay: Union[int, float] = None,
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
+            hide: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False
     ) -> None:
         """
@@ -456,15 +466,22 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param delay: delay before taking screenshot
         :param scroll: scroll to element before taking the screenshot
         :param remove: remove elements from screenshot
+        :param hide: hide elements from page before taking screenshot
         :param fill_background: fill background with given color or black color by default
         :return: None
         """
         delay = delay or VisualComparison.default_delay
         remove = [remove] if type(remove) is not list and remove else remove
 
+        if hide:
+            if not isinstance(hide, list):
+                hide = [hide]
+            for object_to_hide in hide:
+                object_to_hide.hide_element()
+
         VisualComparison(self.driver_wrapper, self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
-            scroll=scroll, remove=remove, fill_background=fill_background,
+            scroll=scroll, remove=remove, fill_background=fill_background
         )
 
     def soft_assert_screenshot(
@@ -476,6 +493,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             delay: Union[int, float] = None,
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
+            hide: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False
     ) -> Tuple[bool, str]:
         """
@@ -488,11 +506,14 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param delay: delay before taking screenshot
         :param scroll: scroll to element before taking the screenshot
         :param remove: remove elements from screenshot
+        :param hide: hide elements from page before taking screenshot
         :param fill_background: fill background with given color or black color by default
         :return: bool - True: screenshots equal; False: screenshots mismatch;
         """
         try:
-            self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, scroll, remove, fill_background)
+            self.assert_screenshot(
+                filename, test_name, name_suffix, threshold, delay, scroll, remove, hide, fill_background
+            )
         except AssertionError as exc:
             exc = str(exc)
             self.log(exc, level=LogLevel.ERROR)
