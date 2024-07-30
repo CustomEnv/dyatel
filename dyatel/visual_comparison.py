@@ -228,9 +228,9 @@ class VisualComparison:
         dyatel_element = self.dyatel_element
 
         if fill_background_data is True:
-            self.driver_wrapper.execute_script('arguments[0].style.background = "#000";', dyatel_element)
+            dyatel_element.execute_script('arguments[0].style.background = "#000";')
         elif type(fill_background_data) is str:
-            self.driver_wrapper.execute_script(f'arguments[0].style.background = "{fill_background_data}";', dyatel_element)
+            dyatel_element.execute_script(f'arguments[0].style.background = "{fill_background_data}";')
 
         return self
 

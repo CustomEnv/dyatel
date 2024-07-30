@@ -171,6 +171,23 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
+    def hide(self) -> ElementABC:
+        """
+        Hide current element from page
+
+        :return: self
+        """
+        raise NotImplementedError()
+
+    def execute_script(self, script: str) -> Any:
+        """
+        Execute script using current element
+
+        :param script: js script, that have `arguments[0]`
+        :return: Any
+        """
+        raise NotImplementedError()
+
     def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
         Get PIL Image object with scaled screenshot of current element

@@ -15,14 +15,15 @@ def take_locator_type(locator: Any):
     :param locator:
     :return:
     """
-    return locator.locator_type if type(locator) is Locator else None
+    return locator.loc_type if type(locator) is Locator else None
 
 
 @dataclass
 class Locator:
-    default_locator: Optional[str] = None
-    locator_type: Optional[str] = None
+    default: Optional[str] = None
+    loc_type: Optional[str] = None
     desktop: Optional[str] = None
     mobile: Optional[str] = None
+    tablet: Optional[str] = None
     ios: Optional[str] = None
     android: Optional[str] = None

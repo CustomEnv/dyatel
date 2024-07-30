@@ -24,16 +24,18 @@ def get_platform_locator(obj: Any):
     if type(locator) is str or not obj.driver_wrapper:
         return locator
 
-    mobile_fallback_locator = locator.mobile or locator.default_locator
+    mobile_fallback_locator = locator.mobile or locator.default
 
-    if obj.driver_wrapper.is_android:
+    if obj.driver_wrapper.is_tablet:
+        locator = locator.tablet or locator.default
+    elif obj.driver_wrapper.is_android:
         locator = locator.android or mobile_fallback_locator
     elif obj.driver_wrapper.is_ios:
         locator = locator.ios or mobile_fallback_locator
     elif obj.driver_wrapper.is_mobile or obj.driver_wrapper.is_appium:
         locator = mobile_fallback_locator
     elif obj.driver_wrapper.is_desktop:
-        locator = locator.desktop or locator.default_locator
+        locator = locator.desktop or locator.default
 
     return locator
 

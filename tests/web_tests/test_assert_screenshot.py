@@ -81,6 +81,7 @@ def test_append_dummy_elements_multiple_available(second_playground_page, driver
     """ Case: 65765292 """
     VisualComparison(driver_wrapper)._appends_dummy_elements([Card()])
 
+
 def test_assert_screenshot_hide_elements(second_playground_page, driver_wrapper):
     all_cards = second_playground_page.get_all_cards()
     for card in all_cards:
@@ -123,8 +124,9 @@ def test_assert_screenshot_negative_different_sizes(second_playground_page, driv
         delay=1,
         remove=[],
         fill_background=False,
+        cut_box=None,
     )
-    driver_wrapper.execute_script('arguments[0].style = "width: 600px"', first_card.element)
+    driver_wrapper.execute_script('arguments[0].style = "width: 600px"', first_card)
     try:
         first_card.scroll_into_view().assert_screenshot()
     except AssertionError as exc:
@@ -142,6 +144,7 @@ def test_assert_screenshot_negative_missmatch(second_playground_page, driver_wra
         delay=1,
         remove=[],
         fill_background=False,
+        cut_box=None,
     )
     try:
         first_card.scroll_into_view().assert_screenshot(fill_background=True)

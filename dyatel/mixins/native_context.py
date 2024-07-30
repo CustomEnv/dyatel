@@ -24,7 +24,8 @@ class NativeSafari:
         if driver_wrapper.is_tablet:
             top_bar_locator = ios_tablet_top_bar_locator
 
-        self.top_bar = Element(top_bar_locator, name='safari top bar', driver_wrapper=self)
+        self.top_bar = Element(Locator(top_bar_locator, tablet=ios_tablet_top_bar_locator), name='safari top bar',
+                               driver_wrapper=driver_wrapper)
         self.bottom_bar = Element(ios_mobile_small_bottom_bar_locator, name='safari bottom bar',
                                   driver_wrapper=driver_wrapper)
         self.keyboard_done_button = Element(locator=ios_keyboard_hide_button, name='keyboard Done button',

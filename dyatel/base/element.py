@@ -395,14 +395,23 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return image_object
 
-    def hide_element(self) -> Element:
+    def hide(self) -> Element:
         """
-        Hide element from page
+        Hide current element from page
 
-        :return: Element
+        :return: self
         """
-        self.driver_wrapper.execute_script('arguments[0].style.opacity = "0";', self.element)
+        self.execute_script('arguments[0].style.opacity = "0";')
         return self
+
+    def execute_script(self, script: str) -> Any:
+        """
+        Execute script using current element
+
+        :param script: js script, that have `arguments[0]`
+        :return: Any
+        """
+        return self.driver_wrapper.execute_script(script, self)
 
     def assert_screenshot(
             self,
@@ -439,7 +448,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             if not isinstance(hide, list):
                 hide = [hide]
             for object_to_hide in hide:
-                object_to_hide.hide_element()
+                object_to_hide.hide()
 
         VisualComparison(self.driver_wrapper, self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,

@@ -211,7 +211,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             if not isinstance(hide, list):
                 hide = [hide]
             for object_to_hide in hide:
-                object_to_hide.hide_element()
+                object_to_hide.hide()
 
         VisualComparison(self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,

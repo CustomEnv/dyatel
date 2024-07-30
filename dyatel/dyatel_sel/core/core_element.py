@@ -245,9 +245,7 @@ class CoreElement(ElementABC, ABC):
 
         assert block in scroll_into_view_blocks, f'Provide one of {scroll_into_view_blocks} option in `block` argument'
 
-        self.driver.execute_script(
-            f'arguments[0].scrollIntoView({{block: "{block}", behavior: "{behavior}"}});', self.element
-        )
+        self.execute_script(f'arguments[0].scrollIntoView({{block: "{block}", behavior: "{behavior}"}});')
 
         if sleep:
             time.sleep(sleep)
@@ -394,7 +392,7 @@ class CoreElement(ElementABC, ABC):
 
         :return: Size(width/height) obj
         """
-        return Size(**self.driver.execute_script(get_element_size_js, self.element))
+        return Size(**self.execute_script(get_element_size_js))
 
     @property
     def location(self) -> Location:
@@ -403,7 +401,7 @@ class CoreElement(ElementABC, ABC):
 
         :return: Location(x/y) obj
         """
-        return Location(**self.driver.execute_script(get_element_position_on_screen_js, self.element))
+        return Location(**self.execute_script(get_element_position_on_screen_js))
 
     def is_enabled(self, silent: bool = False) -> bool:
         """
