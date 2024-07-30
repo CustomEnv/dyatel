@@ -43,6 +43,8 @@ class SecondPlaygroundMainPage(Page):
         self.dw = driver_wrapper
         super().__init__('//h1[.="The Playground"]', name='Second playground main page', driver_wrapper=driver_wrapper)
 
+    row_with_cards = Element('.row', name='row with cards')
+
     def get_all_cards(self) -> List[Card]:
         return Card(self.dw).all_elements
 

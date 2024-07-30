@@ -61,6 +61,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     is_desktop = False
     is_selenium = False
     is_playwright = False
+    is_mobile_resolution = False
 
     is_appium = False
     is_mobile = False
@@ -122,6 +123,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         self.label = f'{self.session.all_sessions.index(self) + 1}_driver'
         self.__init_base_class__(*args, **kwargs)
         if mobile_resolution:
+            self.is_mobile_resolution = True
             self.is_desktop = False
             self.is_mobile = True
 
@@ -187,6 +189,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             delay: Union[int, float] = None,
             remove: Union[Any, List[Any]] = None,
             cut_box: CutBox = None,
+            hide: Union[Any, List[Any]] = None,
     ) -> None:
         """
         Assert given (by name) and taken screenshot equals
@@ -198,10 +201,17 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         :param delay: delay before taking screenshot
         :param remove: remove elements from screenshot
         :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
+        :param hide: hide elements from page before taking screenshot
         :return: None
         """
         delay = delay or VisualComparison.default_delay
         remove = [remove] if type(remove) is not list and remove else remove
+
+        if hide:
+            if not isinstance(hide, list):
+                hide = [hide]
+            for object_to_hide in hide:
+                object_to_hide.hide_element()
 
         VisualComparison(self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
@@ -217,6 +227,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             delay: Union[int, float] = None,
             remove: Union[Any, List[Any]] = None,
             cut_box: CutBox = None,
+            hide: Union[Any, List[Any]] = None,
     ) -> Tuple[bool, str]:
         """
         Soft assert given (by name) and taken screenshot equals
@@ -228,10 +239,11 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         :param delay: delay before taking screenshot
         :param remove: remove elements from screenshot
         :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
+        :param hide: hide elements from page before taking screenshot
         :return: bool - True: screenshots equal; False: screenshots mismatch;
         """
         try:
-            self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, remove, cut_box)
+            self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, remove, cut_box, hide)
         except AssertionError as exc:
             exc = str(exc)
             self.log(exc, level=LogLevel.ERROR)

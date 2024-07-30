@@ -183,6 +183,9 @@ class MobileDriver(CoreDriver):
 
         :return: self
         """
+        if self.is_tablet:
+            return 0
+
         if self._bottom_bar_height is None:
             with NativeContext(self):
                 self._bottom_bar_height = self.native_safari.get_bottom_bar_height()
