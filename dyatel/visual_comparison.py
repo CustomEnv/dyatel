@@ -198,7 +198,7 @@ class VisualComparison:
         for obj in remove_data:
 
             try:
-                obj.wait_element()
+                obj.wait_visibility()
             except TimeoutException:
                 msg = f'Cannot find {obj.name} while removing background from screenshot. {get_element_info(obj)}'
                 raise TimeoutException(msg)

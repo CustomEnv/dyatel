@@ -115,6 +115,7 @@ def test_assert_screenshot_hide_driver_elements(second_playground_page, driver_w
     )
 
 
+# todo: disable sgr/hgr flags for this test
 def test_assert_screenshot_negative_different_sizes(second_playground_page, driver_wrapper):
     first_card = second_playground_page.get_all_cards()[0]
     vc = VisualComparison(driver_wrapper, element=first_card)
@@ -135,6 +136,7 @@ def test_assert_screenshot_negative_different_sizes(second_playground_page, driv
         raise Exception('Unexpected behavior')
 
 
+# todo: disable sgr/hgr flags for this test
 def test_assert_screenshot_negative_missmatch(second_playground_page, driver_wrapper):
     first_card = second_playground_page.get_all_cards()[0]
     vc = VisualComparison(driver_wrapper, element=first_card)

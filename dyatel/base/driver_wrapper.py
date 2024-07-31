@@ -155,8 +155,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     def save_screenshot(
             self,
             file_name: str,
-            screenshot_base:
-            Union[bytes, Image] = None,
+            screenshot_base: Union[bytes, Image] = None,
             convert_type: str = None
     ) -> Image:
         """

@@ -187,7 +187,7 @@ class CoreElement(ElementABC, ABC):
     # Element waits
 
     @wait_condition
-    def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
+    def wait_visibility(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
         """
         Wait for current element available in page
 
@@ -199,7 +199,7 @@ class CoreElement(ElementABC, ABC):
         return Result(self.is_displayed(silent=True), error)  # noqa
 
     @wait_condition
-    def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
+    def wait_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
         """
         Wait until element hidden
 
@@ -351,7 +351,7 @@ class CoreElement(ElementABC, ABC):
 
         return self.element.get_attribute(attribute)
 
-    def get_elements_texts(self, silent: bool = False) -> List[str]:
+    def get_all_texts(self, silent: bool = False) -> List[str]:
         """
         Get all texts from all matching elements
 
@@ -361,10 +361,10 @@ class CoreElement(ElementABC, ABC):
         if not silent:
             self.log(f'Get all texts from "{self.name}"')
 
-        self.wait_element(silent=True)
+        self.wait_visibility(silent=True)
         return list(element_item.text for element_item in self.all_elements)
 
-    def get_elements_count(self, silent: bool = False) -> int:
+    def get_count(self, silent: bool = False) -> int:
         """
         Get elements count
 
@@ -453,7 +453,7 @@ class CoreElement(ElementABC, ABC):
         element = self._element
 
         if wait is True:
-            wait = self.wait_element
+            wait = self.wait_visibility
 
         if not element:
 

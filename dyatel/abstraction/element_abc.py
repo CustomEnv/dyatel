@@ -125,7 +125,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
+    def wait_visibility(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait for current element available in page
 
@@ -135,7 +135,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
+    def wait_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait until current element hidden
 
@@ -269,7 +269,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def get_elements_texts(self, silent: bool = False) -> List[str]:
+    def get_all_texts(self, silent: bool = False) -> List[str]:
         """
         Get all texts from all matching elements
 
@@ -278,7 +278,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def get_elements_count(self, silent: bool = False) -> int:
+    def get_count(self, silent: bool = False) -> int:
         """
         Get elements count
 
@@ -390,7 +390,7 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_elements_count(
+    def wait_count(
             self,
             expected_count: int,
             timeout: Union[int, float] = WAIT_EL,
@@ -407,7 +407,7 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_element_text(
+    def wait_text(
             self,
             expected_text: Optional[str] = None,
             timeout: Union[int, float] = WAIT_EL,
@@ -424,7 +424,7 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_element_value(
+    def wait_value(
             self,
             expected_value: Optional[str] = None,
             timeout: Union[int, float] = WAIT_EL,
@@ -441,7 +441,7 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_element_without_error(
+    def wait_without_error(
             self,
             timeout: [int, float] = QUARTER_WAIT_EL,
             silent: bool = False
@@ -456,7 +456,7 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_element_hidden_without_error(
+    def wait_hidden_without_error(
             self,
             timeout: [int, float] = QUARTER_WAIT_EL,
             silent: bool = False
@@ -493,7 +493,7 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_element_size(
+    def wait_size(
             self,
             expected_size: Size,
             timeout: [int, float] = WAIT_EL,

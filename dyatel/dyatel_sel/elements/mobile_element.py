@@ -103,7 +103,7 @@ class MobileElement(CoreElement, ABC):
         try:
             self.driver_wrapper.switch_to_native()
             time.sleep(1)
-            if self.wait_element_without_error(timeout=5, silent=True).is_displayed(silent=True):
+            if self.wait_without_error(timeout=5, silent=True).is_displayed(silent=True):
                 self.click()
         finally:
             self.driver_wrapper.switch_to_web()

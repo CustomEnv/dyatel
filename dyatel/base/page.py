@@ -143,13 +143,13 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         if not silent:
             self.log(f'Wait until page "{self.name}" loaded')
 
-        self.anchor.wait_element(timeout=timeout, silent=True)
+        self.anchor.wait_visibility(timeout=timeout, silent=True)
 
         for element in self.page_elements:
             if getattr(element, 'wait') is False:
-                element.wait_element_hidden(timeout=timeout, silent=True)
+                element.wait_hidden(timeout=timeout, silent=True)
             elif getattr(element, 'wait') is True:
-                element.wait_element(timeout=timeout, silent=True)
+                element.wait_visibility(timeout=timeout, silent=True)
         return self
 
     def is_page_opened(self, with_elements: bool = False, with_url: bool = False) -> bool:

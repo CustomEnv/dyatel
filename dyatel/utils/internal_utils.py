@@ -281,12 +281,9 @@ def wait_condition(method: Callable):
             .__name__\
             .replace('wait_', '')\
             .replace('_', ' ')\
-            .replace('element_', '')\
 
         if not silent:
-            if condition == 'element':
-                condition = 'visible'
-            elif condition == 'availability':
+            if condition == 'availability':
                 condition = 'available in DOM'
 
             if condition in ('enabled', 'disabled', 'visible', 'hidden'):

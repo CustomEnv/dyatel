@@ -168,7 +168,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     # Elements waits
 
-    def wait_element_without_error(self, timeout: Union[int, float] = QUARTER_WAIT_EL, silent: bool = False) -> Element:
+    def wait_without_error(self, timeout: Union[int, float] = QUARTER_WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element visibility without error
 
@@ -180,13 +180,13 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             self.log(f'Wait until "{self.name}" becomes visible without error exception')
 
         try:
-            self.wait_element(timeout=timeout, silent=True)
+            self.wait_visibility(timeout=timeout, silent=True)
         except (TimeoutException, WebDriverException) as exception:
             if not silent:
                 self.log(f'Ignored exception: "{exception.msg}"')
         return self
 
-    def wait_element_hidden_without_error(
+    def wait_hidden_without_error(
             self,
             timeout: Union[int, float] = QUARTER_WAIT_EL,
             silent: bool = False
@@ -202,14 +202,14 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             self.log(f'Wait until "{self.name}" becomes hidden without error exception')
 
         try:
-            self.wait_element_hidden(timeout=timeout, silent=True)
+            self.wait_hidden(timeout=timeout, silent=True)
         except (TimeoutException, WebDriverException) as exception:
             if not silent:
                 self.log(f'Ignored exception: "{exception.msg}"')
         return self
 
     @wait_condition
-    def wait_element_text(
+    def wait_text(
             self,
             expected_text: Optional[str] = None,
             timeout: Union[int, float] = WAIT_EL,
@@ -229,7 +229,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return Result(actual_text == expected_text if expected_text else actual_text, error)  # noqa
 
     @wait_condition
-    def wait_element_value(
+    def wait_value(
             self,
             expected_value: Optional[str] = None,
             timeout: Union[int, float] = WAIT_EL,
@@ -257,7 +257,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param silent: erase log
         :return: self
         """
-        return Result(self.is_enabled())  # noqa
+        return Result(self.is_enabled(silent=True))  # noqa
 
     @wait_condition
     def wait_disabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
@@ -268,10 +268,10 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param silent: erase log
         :return: self
         """
-        return Result(not self.is_enabled())  # noqa
+        return Result(not self.is_enabled(silent=True))  # noqa
 
     @wait_condition
-    def wait_element_size(
+    def wait_size(
             self,
             expected_size: Size,
             timeout: Union[int, float] = WAIT_EL,
@@ -292,7 +292,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return Result(is_height_equal and is_width_equal, error)  # noqa
 
     @wait_condition
-    def wait_elements_count(
+    def wait_count(
             self,
             expected_count: int,
             timeout: Union[int, float] = WAIT_EL,
@@ -306,7 +306,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param silent: erase log
         :return: self
         """
-        actual_count = self.get_elements_count(silent=True)
+        actual_count = self.get_count(silent=True)
         msg = f'Unexpected elements count of "{self.name}"'
         error = UnexpectedElementsCountException(msg, actual_count, expected_count, timeout)
         return Result(actual_count == expected_count, error)  # noqa

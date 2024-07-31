@@ -93,7 +93,7 @@ class PlayElement(ElementABC, Logging, ABC):
         self.log(f'Click into "{self.name}"')
 
         if force_wait:
-            self.wait_element(silent=True)
+            self.wait_visibility(silent=True)
 
         self._first_element.click(*args, **kwargs)
         return self
@@ -218,7 +218,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
     # Element waits
 
-    def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
+    def wait_visibility(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait for current element available in page
 
@@ -235,7 +235,7 @@ class PlayElement(ElementABC, Logging, ABC):
             raise TimeoutException(f'"{self.name}" not visible', timeout=timeout, info=self)
         return self
 
-    def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
+    def wait_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait until element hidden
 
@@ -390,7 +390,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
         return self._first_element.get_attribute(attribute)
 
-    def get_elements_texts(self, silent: bool = False) -> List:
+    def get_all_texts(self, silent: bool = False) -> List:
         """
         Get all texts from all matching elements
 
@@ -402,7 +402,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
         return self.element.all_text_contents()
 
-    def get_elements_count(self, silent: bool = False) -> int:
+    def get_count(self, silent: bool = False) -> int:
         """
         Get elements count
 

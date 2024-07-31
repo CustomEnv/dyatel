@@ -1,7 +1,9 @@
+import logging
+
 import pytest
 from dyatel.exceptions import *
 from dyatel.mixins.objects.size import Size
-
+from dyatel.utils.logs import dyatel_logs_settings
 
 timeout = 0.5
 
@@ -11,7 +13,7 @@ def test_wait_elements_count_error_msg(forms_page):
     forms_page.validation_form.form_mixin.input.type_text('sample')
     forms_page.validation_form.submit_form_button.click()
     try:
-        forms_page.validation_form.any_error.wait_elements_count(3, timeout=timeout)
+        forms_page.validation_form.any_error.wait_count(3, timeout=timeout)
     except UnexpectedElementsCountException as exc:
         assert exc.msg == f'Unexpected elements count of "any error" after {timeout} seconds. ' \
                           f'Actual: 4; Expected: 3.'
@@ -22,7 +24,7 @@ def test_wait_elements_count_error_msg(forms_page):
 @pytest.mark.medium
 def test_wait_element_size_error_msg(forms_page):
     try:
-        forms_page.validation_form.wait_element_size(Size(200, 400), timeout=timeout)
+        forms_page.validation_form.wait_size(Size(200, 400), timeout=timeout)
     except UnexpectedElementSizeException as exc:
         assert f'Unexpected size for "Validation form" after {timeout} seconds. ' in exc.msg
         assert 'Actual: Size' in exc.msg
@@ -57,7 +59,7 @@ def test_wait_element_enabled_error_msg(forms_page):
 @pytest.mark.medium
 def test_wait_element_non_empty_text_error_msg(forms_page):
     try:
-        forms_page.controls_form.salary_input.wait_element_text(timeout=timeout)
+        forms_page.controls_form.salary_input.wait_text(timeout=timeout)
     except UnexpectedTextException as exc:
         assert exc.msg == f'Text of "salary input" is empty after {timeout} seconds.'
     else:
@@ -67,7 +69,7 @@ def test_wait_element_non_empty_text_error_msg(forms_page):
 @pytest.mark.medium
 def test_wait_element_non_empty_value_error_msg(forms_page):
     try:
-        forms_page.controls_form.salary_input.wait_element_value(timeout=timeout)
+        forms_page.controls_form.salary_input.wait_value(timeout=timeout)
     except UnexpectedValueException as exc:
         assert exc.msg == f'Value of "salary input" is empty after {timeout} seconds.'
     else:
@@ -77,7 +79,7 @@ def test_wait_element_non_empty_value_error_msg(forms_page):
 @pytest.mark.medium
 def test_wait_element_non_specific_text_error_msg(forms_page):
     try:
-        forms_page.controls_form.salary_input.wait_element_text('some text', timeout=timeout)
+        forms_page.controls_form.salary_input.wait_text('some text', timeout=timeout)
     except UnexpectedTextException as exc:
         assert exc.msg == f'Not expected text for "salary input" after {timeout} seconds. ' \
                           f'Actual: ""; Expected: "some text".'
@@ -88,7 +90,7 @@ def test_wait_element_non_specific_text_error_msg(forms_page):
 @pytest.mark.medium
 def test_wait_element_non_specific_value_error_msg(forms_page):
     try:
-        forms_page.controls_form.salary_input.wait_element_value('some value', timeout=timeout)
+        forms_page.controls_form.salary_input.wait_value('some value', timeout=timeout)
     except UnexpectedValueException as exc:
         assert exc.msg == f'Not expected value for "salary input" after {timeout} seconds. ' \
                           f'Actual: ""; Expected: "some value".'
@@ -99,7 +101,7 @@ def test_wait_element_non_specific_value_error_msg(forms_page):
 @pytest.mark.medium
 def test_wait_element_visible_error_msg(forms_page):
     try:
-        forms_page.controls_form.broken_input.wait_element(timeout=timeout)
+        forms_page.controls_form.broken_input.wait_visibility(timeout=timeout)
     except TimeoutException as exc:
         assert f'"invalid element" not visible after {timeout} seconds.' in exc.msg
         assert 'Selector:' in exc.msg
@@ -111,7 +113,7 @@ def test_wait_element_visible_error_msg(forms_page):
 @pytest.mark.medium
 def test_wait_element_hidden_error_msg(forms_page):
     try:
-        forms_page.controls_form.salary_input.wait_element_hidden(timeout=timeout)
+        forms_page.controls_form.salary_input.wait_hidden(timeout=timeout)
     except TimeoutException as exc:
         assert f'"salary input" still visible after {timeout} seconds.' in exc.msg
         assert 'Selector:' in exc.msg
