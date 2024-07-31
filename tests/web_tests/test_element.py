@@ -72,11 +72,11 @@ def test_element_displayed_negative(base_playground_page):
 
 
 def test_all_elements_count_positive(base_playground_page):
-    assert base_playground_page.any_link.get_elements_count() > 1
+    assert base_playground_page.any_link.get_count() > 1
 
 
 def test_all_elements_count_negative(base_playground_page):
-    assert base_playground_page.kube_broken.get_elements_count() == 0
+    assert base_playground_page.kube_broken.get_count() == 0
 
 
 @pytest.mark.xfail_platform('android', 'ios', reason='Can not get text from that element. TODO: Rework test')
@@ -92,9 +92,9 @@ def test_type_clear_text_get_value(pizza_order_page):
 def test_hover(mouse_event_page):
     initial_not_displayed = not mouse_event_page.dropdown.is_displayed()
     mouse_event_page.choose_language_button.scroll_into_view(sleep=0.1).hover()
-    after_hover_displayed = mouse_event_page.dropdown.wait_element_without_error().is_displayed()
+    after_hover_displayed = mouse_event_page.dropdown.wait_without_error().is_displayed()
     mouse_event_page.choose_language_button.hover_outside()
-    after_outside_hover_displayed = not mouse_event_page.dropdown.wait_element_hidden().is_displayed()
+    after_outside_hover_displayed = not mouse_event_page.dropdown.wait_hidden().is_displayed()
     assert all((initial_not_displayed, after_hover_displayed, after_outside_hover_displayed))
 
 
@@ -110,11 +110,11 @@ def test_parent_element_negative(base_playground_page):
 
 
 def test_parent_element_wait_visible_positive(base_playground_page):
-    assert base_playground_page.kube_parent.wait_element()
+    assert base_playground_page.kube_parent.wait_visibility()
 
 
 def test_parent_element_wait_hidden_negative(base_playground_page):
-    assert base_playground_page.kube_wrong_parent.wait_element_hidden()
+    assert base_playground_page.kube_wrong_parent.wait_hidden()
 
 
 # All elements

@@ -1,4 +1,3 @@
-scroll_into_view_blocks = ('start', 'center', 'end', 'nearest')
 get_inner_height_js = 'return window.innerHeight'
 get_inner_width_js = 'return window.innerWidth'
 

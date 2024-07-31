@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Union, Any, List, Tuple
+from typing import Union, Any, List, Tuple, Optional
 
 from PIL.Image import Image
 from appium.webdriver.extensions.location import Location
+from dyatel.mixins.objects.scrolls import ScrollTo, ScrollTypes
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from appium.webdriver.webelement import WebElement as AppiumWebElement
 from playwright.sync_api import Locator as PlayWebElement
@@ -12,7 +13,7 @@ from playwright.sync_api import Locator as PlayWebElement
 from dyatel.abstraction.mixin_abc import MixinABC
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.objects.size import Size
-from dyatel.utils.internal_utils import WAIT_EL
+from dyatel.utils.internal_utils import WAIT_EL, QUARTER_WAIT_EL
 
 
 class ElementABC(MixinABC, ABC):
@@ -124,7 +125,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
+    def wait_visibility(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait for current element available in page
 
@@ -134,7 +135,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
+    def wait_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait until current element hidden
 
@@ -154,7 +155,12 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
+    def save_screenshot(
+            self,
+            file_name: str,
+            screenshot_base: Union[bytes, Image] = None,
+            convert_type: str = None
+    ) -> Image:
         """
         Takes element screenshot and saving with given path/filename
 
@@ -162,6 +168,23 @@ class ElementABC(MixinABC, ABC):
         :param screenshot_base: use given image binary instead of taking a new screenshot
         :param convert_type: convert image type before save
         :return: PIL Image object
+        """
+        raise NotImplementedError()
+
+    def hide(self) -> ElementABC:
+        """
+        Hide current element from page
+
+        :return: self
+        """
+        raise NotImplementedError()
+
+    def execute_script(self, script: str) -> Any:
+        """
+        Execute script using current element
+
+        :param script: js script, that have `arguments[0]`
+        :return: Any
         """
         raise NotImplementedError()
 
@@ -192,6 +215,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
+    @property
     def inner_text(self) -> str:
         """
         Get current element inner text
@@ -200,6 +224,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
+    @property
     def value(self) -> str:
         """
         Get value from current element
@@ -244,7 +269,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def get_elements_texts(self, silent: bool = False) -> List[str]:
+    def get_all_texts(self, silent: bool = False) -> List[str]:
         """
         Get all texts from all matching elements
 
@@ -253,7 +278,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def get_elements_count(self, silent: bool = False) -> int:
+    def get_count(self, silent: bool = False) -> int:
         """
         Get elements count
 
@@ -365,7 +390,7 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_elements_count(
+    def wait_count(
             self,
             expected_count: int,
             timeout: Union[int, float] = WAIT_EL,
@@ -382,14 +407,16 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_element_text(
+    def wait_text(
             self,
+            expected_text: Optional[str] = None,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
         """
-        Wait non empty text in element
+        Wait given or non-empty text presence in element
 
+        :param expected_text: text to be waiting for. None or empty for any text
         :param timeout: wait timeout
         :param silent: erase log
         :return: self
@@ -397,14 +424,16 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_element_value(
+    def wait_value(
             self,
+            expected_value: Optional[str] = None,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
         """
-        Wait non empty value in element
+        Wait given or non-empty value presence in element
 
+        :param expected_value: value to be waiting for. None or empty for any value
         :param timeout: wait timeout
         :param silent: erase log
         :return: self
@@ -412,9 +441,9 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_element_without_error(
+    def wait_without_error(
             self,
-            timeout: [int, float] = WAIT_EL,
+            timeout: [int, float] = QUARTER_WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
         """
@@ -427,9 +456,9 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def wait_element_hidden_without_error(
+    def wait_hidden_without_error(
             self,
-            timeout: [int, float] = WAIT_EL,
+            timeout: [int, float] = QUARTER_WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
         """
@@ -464,6 +493,23 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    def wait_size(
+            self,
+            expected_size: Size,
+            timeout: [int, float] = WAIT_EL,
+            silent: bool = False
+    ) -> ElementABC:
+        """
+        Wait until element size will be equal to given Size object
+
+        :param expected_size: expected element size in Size object
+        :param timeout: time to stop waiting
+        :param silent: erase log
+        :return: self
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
     def is_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
         Check is current element top left corner or bottom right corner visible on current screen
@@ -487,8 +533,8 @@ class ElementABC(MixinABC, ABC):
 
     def scroll_into_view(
             self,
-            block: str = 'center',
-            behavior: str = 'instant',
+            block: ScrollTo = ScrollTo.CENTER,
+            behavior: ScrollTypes = ScrollTypes.INSTANT,
             sleep: Union[int, float] = 0,
             silent: bool = False,
     ) -> ElementABC:

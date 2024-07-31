@@ -8,7 +8,7 @@ import json
 import base64
 import importlib
 from urllib.parse import urljoin
-from typing import Union, List, Any, Tuple
+from typing import Union, List, Any, Tuple, Optional
 from string import punctuation
 
 import cv2.cv2 as cv2  # noqa
@@ -19,6 +19,7 @@ from PIL import Image
 
 from dyatel.exceptions import DriverWrapperException, TimeoutException
 from dyatel.js_scripts import add_element_over_js, delete_element_over_js
+from dyatel.mixins.objects.cut_box import CutBox
 from dyatel.utils.logs import autolog
 from dyatel.mixins.internal_mixin import get_element_info
 
@@ -73,7 +74,8 @@ class VisualComparison:
             screenshot_name: str,
             delay: Union[int, float],
             remove: list,
-            fill_background: bool
+            fill_background: bool,
+            cut_box: Optional[CutBox],
     ):
         time.sleep(delay)
 
@@ -81,7 +83,12 @@ class VisualComparison:
         self._appends_dummy_elements(remove)
 
         desired_obj = self.dyatel_element or self.driver_wrapper.anchor or self.driver_wrapper
-        desired_obj.save_screenshot(screenshot_name)
+        image = desired_obj.screenshot_image()
+
+        if cut_box:
+            image = image.crop(cut_box.get_box(image.size))
+
+        desired_obj.save_screenshot(screenshot_name, screenshot_base=image)
 
         self._remove_dummy_elements()
 
@@ -95,6 +102,7 @@ class VisualComparison:
             scroll: bool,
             remove: List[Any],
             fill_background: Union[str, bool],
+            cut_box: Optional[CutBox]
     ) -> VisualComparison:
         """
         Assert given (by name) and taken screenshot equals
@@ -107,8 +115,12 @@ class VisualComparison:
         :param scroll: scroll to element before taking the screenshot
         :param remove: remove elements from screenshot
         :param fill_background: fill background with given color or black color by default
+        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
         :return: self
         """
+        remove = remove if remove else []
+        screenshot_params = dict(delay=delay, remove=remove, fill_background=fill_background, cut_box=cut_box)
+
         if self.skip_screenshot_comparison:
             return self
 
@@ -126,15 +138,13 @@ class VisualComparison:
         if scroll:
             self.dyatel_element.scroll_into_view()
 
-        remove = remove if remove else []
-
         if self.hard_visual_reference_generation:
-            self._save_screenshot(reference_file, delay=delay, remove=remove, fill_background=fill_background)
+            self._save_screenshot(reference_file, **screenshot_params)
             return self
 
         image = cv2.imread(reference_file)
         if isinstance(image, type(None)):
-            self._save_screenshot(reference_file, delay=delay, remove=remove, fill_background=fill_background)
+            self._save_screenshot(reference_file, **screenshot_params)
 
             if self.visual_reference_generation or self.soft_visual_reference_generation:
                 return self
@@ -148,13 +158,13 @@ class VisualComparison:
         if self.visual_reference_generation and not self.soft_visual_reference_generation:
             return self
 
-        self._save_screenshot(output_file, delay=delay, remove=remove, fill_background=fill_background)
+        self._save_screenshot(output_file, **screenshot_params)
 
         try:
             self._assert_same_images(output_file, reference_file, diff_file, threshold)
         except AssertionError as exc:
             if self.soft_visual_reference_generation:
-                self._save_screenshot(reference_file, delay=delay, remove=remove, fill_background=fill_background)
+                self._save_screenshot(reference_file, **screenshot_params)
             else:
                 raise exc
 
@@ -188,12 +198,12 @@ class VisualComparison:
         for obj in remove_data:
 
             try:
-                el = obj.element
+                obj.wait_visibility()
             except TimeoutException:
                 msg = f'Cannot find {obj.name} while removing background from screenshot. {get_element_info(obj)}'
                 raise TimeoutException(msg)
 
-            self.driver_wrapper.execute_script(add_element_over_js, el)
+            self.driver_wrapper.execute_script(add_element_over_js, obj)
         return self
 
     def _remove_dummy_elements(self) -> VisualComparison:
@@ -215,12 +225,12 @@ class VisualComparison:
         if not fill_background_data:
             return self
 
-        element = self.dyatel_element.element
+        dyatel_element = self.dyatel_element
 
         if fill_background_data is True:
-            self.driver_wrapper.execute_script('arguments[0].style.background = "#000";', element)
+            dyatel_element.execute_script('arguments[0].style.background = "#000";')
         elif type(fill_background_data) is str:
-            self.driver_wrapper.execute_script(f'arguments[0].style.background = "{fill_background_data}";', element)
+            dyatel_element.execute_script(f'arguments[0].style.background = "{fill_background_data}";')
 
         return self
 
@@ -256,7 +266,7 @@ class VisualComparison:
                                  f"\nExpected: {reference_image.shape[0:2]};"
                                  f"\nActual: {output_image.shape[0:2]}.")
 
-        diff, actual_threshold = self._get_difference(reference_image, output_image)
+        diff, actual_threshold = self._get_difference(reference_image, output_image, threshold)
         is_different = actual_threshold > threshold
 
         if is_different:
@@ -330,7 +340,12 @@ class VisualComparison:
 
         return self._remove_unexpected_underscores(screenshot_name).lower()
 
-    def _get_difference(self, reference_img: numpy.ndarray, actual_img: numpy.ndarray) -> tuple[numpy.ndarray, float]:
+    def _get_difference(
+            self,
+            reference_img: numpy.ndarray,
+            actual_img: numpy.ndarray,
+            possible_threshold: Union[int, float]
+    ) -> tuple[numpy.ndarray, float]:
         """
         Calculate difference between two images
 
@@ -361,10 +376,11 @@ class VisualComparison:
 
         mask = numpy.zeros(reference_img.shape, dtype='uint8')
         filled_after = actual_img.copy()
+        percent_diff = 100 - score
+        is_different_enough = percent_diff > possible_threshold
 
         for c in contours:
-            area = cv2.contourArea(c)
-            if area > 40:
+            if is_different_enough or cv2.contourArea(c) > 40:
                 x, y, w, h = cv2.boundingRect(c)
                 cv2.rectangle(reference_img, (x, y), (x + w, y + h), self.diff_color_scheme, 2)
                 cv2.rectangle(actual_img, (x, y), (x + w, y + h), self.diff_color_scheme, 2)

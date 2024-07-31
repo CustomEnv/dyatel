@@ -2,7 +2,7 @@ import pytest
 
 from dyatel.base.element import Element
 from dyatel.base.group import Group
-from dyatel.exceptions import UnsuitableArgumentsException
+from dyatel.mixins.objects.locator import Locator
 from dyatel.utils.selector_synchronizer import get_platform_locator
 from tests.static_tests.conftest import mobile_ids, mobile_drivers, desktop_drivers, desktop_ids, mocked_ios_driver
 
@@ -19,15 +19,16 @@ class ExtendedClass(Group):
 
 class SomeGroup(Group):
     def __init__(self):
-        super().__init__('default_group', mobile='mobile_group')
+        super().__init__(Locator('default_group', mobile='mobile_group'))
 
     link_to_class = ExtendedClass('some locator', name='nested element')  # all elements initialised two times
 
-    multiple_element_partial = Element(desktop='desktop_locator', mobile=mobile_locator, name='multiple element all')
+    multiple_element_partial = Element(
+        Locator(desktop='desktop_locator', mobile=mobile_locator),
+        name='multiple element all'
+    )
     multiple_element_all = Element(
-        desktop='desktop_locator',
-        ios=ios_locator,
-        android=android_locator,
+        Locator(desktop='desktop_locator', ios=ios_locator, android=android_locator),
         name='multiple element all'
     )
 
@@ -44,7 +45,7 @@ def test_link_to_class_locator_desktop(driver, request):
     assert 'some locator updated' in SomeGroup().link_to_class.locator
 
 
-def test_multiple_locator_ios(mocked_ios_driver):
+def test_multiple_locator_ios1(mocked_ios_driver):
     assert ios_locator in get_platform_locator(SomeGroup().multiple_element_all)
     assert 'mobile_group' in get_platform_locator(SomeGroup())
 
@@ -75,24 +76,26 @@ def test_multiple_locator_all_with_mobile_fallback(driver, request):
     request.getfixturevalue(driver)
     locator = get_platform_locator(
         Element(
-            android=android_locator,
-            ios=ios_locator,
-            mobile=mobile_locator,
+            Locator(
+                android=android_locator,
+                ios=ios_locator,
+                mobile=mobile_locator,
+            ),
             name='multiple element broken all'
         )
     )
     expected_locator = ios_locator if driver == mocked_ios_driver.__name__ else android_locator
 
-    assert expected_locator == locator
+    assert expected_locator in locator
 
 
 def test_multiple_locator_ios_with_mobile_fallback(mocked_ios_driver):
-    assert get_platform_locator(
-        Element(ios=ios_locator, mobile=mobile_locator, name='multiple element broken ios')
-    ) == ios_locator
+    assert ios_locator in  get_platform_locator(
+        Element(Locator(ios=ios_locator, mobile=mobile_locator), name='multiple element broken ios')
+    )
 
 
 def test_multiple_locator_android_with_mobile_fallback(mocked_android_driver):
-    assert get_platform_locator(
-        Element(android=android_locator, mobile=mobile_locator, name='multiple element broken android')
-    ) == android_locator
+    assert android_locator in get_platform_locator(
+        Element(Locator(android=android_locator, mobile=mobile_locator), name='multiple element broken android')
+    )

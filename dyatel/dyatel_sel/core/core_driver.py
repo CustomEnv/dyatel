@@ -218,9 +218,10 @@ class CoreDriver(Logging, DriverWrapperABC):
         Synchronously Executes JavaScript in the current window/frame
 
         :param script: the JavaScript to execute
-        :param args: any applicable arguments for your JavaScript
+        :param args: any applicable arguments for your JavaScript (Element object)
         :return: execution return value
         """
+        args = [arg.element for arg in args if hasattr(arg, 'element')]
         return self.driver.execute_script(script, *args)
 
     def set_page_load_timeout(self, timeout: int = 30) -> CoreDriver:

@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import sys
 import inspect
+import time
 from copy import copy
-from functools import lru_cache
+from functools import lru_cache, wraps
 from typing import Any, Union, Callable
 
 from selenium.common.exceptions import StaleElementReferenceException as SeleniumStaleElementReferenceException
@@ -13,6 +14,8 @@ from dyatel.exceptions import NoSuchElementException, InvalidSelectorException, 
 
 WAIT_UNIT = 1
 WAIT_EL = 10
+HALF_WAIT_EL = WAIT_EL / 2
+QUARTER_WAIT_EL = HALF_WAIT_EL / 2
 WAIT_PAGE = 15
 
 
@@ -63,11 +66,6 @@ def safe_getattribute(obj, item):
     return object.__getattribute__(obj, item)
 
 
-def set_name_for_attr(attr, name):
-    if not attr.name or attr.name == attr.locator:
-        attr.name = name.replace('_', ' ')
-
-
 def get_frame(frame=1):
     """
     Get frame by given id
@@ -108,7 +106,6 @@ def initialize_objects(current_object, objects: dict, cls: Any):
     :return: None
     """
     for name, obj in objects.items():
-        set_name_for_attr(obj, name)
         copied_obj = copy(obj)
         promote_parent_element(copied_obj, current_object, cls)
         setattr(current_object, name, copied_obj(driver_wrapper=current_object.driver_wrapper))
@@ -274,3 +271,39 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
     y = emy + bool(y) * (y + meh * sy)
 
     return int(x), int(y)
+
+
+def wait_condition(method: Callable):
+
+    @wraps(method)
+    def wrapper(self, *args, timeout: Union[int, float] = WAIT_EL, silent: bool = False, **kwargs):
+        condition = method\
+            .__name__\
+            .replace('wait_', '')\
+            .replace('_', ' ')\
+
+        if not silent:
+            if condition == 'availability':
+                condition = 'available in DOM'
+
+            if condition in ('enabled', 'disabled', 'visible', 'hidden'):
+                msg = f'Wait until "{self.name}" becomes {condition}'
+            else:
+                msg = f'Wait for {condition} in "{self.name}"'
+
+            self.log(msg)
+
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            result = method(self, *args, **kwargs)
+            if result.execution_result:
+                return self
+            time.sleep(0.1)
+
+        if result.error:  # noqa
+            result.error._timeout = timeout
+            raise result.error
+
+        raise TimeoutException(f'"{self.name}" not {condition}', timeout=timeout, info=self)
+
+    return wrapper
