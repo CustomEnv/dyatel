@@ -168,7 +168,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     # Elements waits
 
-    def wait_without_error(self, timeout: Union[int, float] = QUARTER_WAIT_EL, silent: bool = False) -> Element:
+    def wait_visibility_without_error(self, timeout: Union[int, float] = QUARTER_WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element visibility without error
 
@@ -209,7 +209,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return self
 
     @wait_condition
-    def wait_text(
+    def wait_for_text(
             self,
             expected_text: Optional[str] = None,
             timeout: Union[int, float] = WAIT_EL,
@@ -229,7 +229,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return Result(actual_text == expected_text if expected_text else actual_text, error)  # noqa
 
     @wait_condition
-    def wait_value(
+    def wait_for_value(
             self,
             expected_value: Optional[str] = None,
             timeout: Union[int, float] = WAIT_EL,
@@ -271,7 +271,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return Result(not self.is_enabled(silent=True))  # noqa
 
     @wait_condition
-    def wait_size(
+    def wait_for_size(
             self,
             expected_size: Size,
             timeout: Union[int, float] = WAIT_EL,
@@ -292,7 +292,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return Result(is_height_equal and is_width_equal, error)  # noqa
 
     @wait_condition
-    def wait_count(
+    def wait_elements_count(
             self,
             expected_count: int,
             timeout: Union[int, float] = WAIT_EL,

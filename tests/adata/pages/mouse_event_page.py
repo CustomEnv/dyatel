@@ -61,7 +61,7 @@ class MouseClickCard(Group):
         return Element('button', name='any button custom parent', parent=self.y_result)
 
     def get_result_coordinates(self):
-        return [int(element.wait_text().text.split(' ')[1]) for element in (self.x_result, self.y_result)]
+        return [int(element.wait_for_text().text.split(' ')[1]) for element in (self.x_result, self.y_result)]
 
     def get_click_area_middle(self):
         el_rect = self.click_area.get_rect()
