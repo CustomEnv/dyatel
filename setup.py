@@ -40,17 +40,17 @@ cleanup()
 
 setup(
     name=pypi_name,
-    version='2.2.14',
+    version='2.2.15',
     url=f'https://github.com/EnvInc/{project_name}',
     packages=get_packages(project_name),
     install_requires=[
         'Appium-Python-Client>=2.1.2',
         'numpy>=1.18.1',
-        'opencv-python==4.5.5.62',
+        'opencv-python>=4.5.5.62',
         'Pillow>=6.2.2',
         'playwright>=1.41.0',
         'selenium>=4.1.0',
-        'scikit-image>=0.17.1',
+        'scikit-image>=0.20.0',
     ],
     keywords='selenium appium playwright web_automation mobile_automation',
     description='Wrapper of Selenium, Appium and Playwright with single API',
@@ -65,9 +65,11 @@ setup(
     },
     classifiers=[
         'Development Status :: 4 - Beta',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Quality Assurance',
         'Topic :: Software Development :: Testing :: Acceptance',
