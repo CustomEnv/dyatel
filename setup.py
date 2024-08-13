@@ -40,7 +40,7 @@ cleanup()
 
 setup(
     name=pypi_name,
-    version='2.2.14',
+    version='2.2.15',
     url=f'https://github.com/EnvInc/{project_name}',
     packages=get_packages(project_name),
     install_requires=[
@@ -65,9 +65,11 @@ setup(
     },
     classifiers=[
         'Development Status :: 4 - Beta',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Quality Assurance',
         'Topic :: Software Development :: Testing :: Acceptance',

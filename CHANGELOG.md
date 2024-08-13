@@ -1,5 +1,13 @@
 # Dyatel Changelog
 
+---
+
+## v2.2.15
+*Release date: 2024-08-013*
+
+### Added  
+- Python 3.11 and 3.12 support
+
 
 ---
 
