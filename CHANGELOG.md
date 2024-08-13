@@ -8,7 +8,6 @@
 ### Added  
 - Python 3.11 and 3.12 support
 
-
 ---
 
 ## v2.2.14
