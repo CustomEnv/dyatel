@@ -11,7 +11,10 @@ from urllib.parse import urljoin
 from typing import Union, List, Any, Tuple, Optional
 from string import punctuation
 
-import cv2.cv2 as cv2  # noqa
+try:
+    import cv2.cv2 as cv2  # ~cv2@4.5.5.62 + python@3.8/9/10
+except ImportError:
+    import cv2  # ~cv2@4.10.0.84 + python@3.11/12
 import numpy
 from skimage._shared.utils import check_shape_equality  # noqa
 from skimage.metrics import structural_similarity
