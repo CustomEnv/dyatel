@@ -286,10 +286,12 @@ def wait_condition(method: Callable):
             if condition == 'availability':
                 condition = 'available in DOM'
 
-            if condition in ('enabled', 'disabled', 'visible', 'hidden'):
+            prefix = 'for ' if 'for' not in condition else ''
+
+            if condition in ('enabled', 'disabled', 'hidden'):
                 msg = f'Wait until "{self.name}" becomes {condition}'
             else:
-                msg = f'Wait for {condition} in "{self.name}"'
+                msg = f'Wait {prefix}{condition} of "{self.name}"'
 
             self.log(msg)
 
