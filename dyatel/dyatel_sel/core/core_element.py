@@ -195,8 +195,11 @@ class CoreElement(ElementABC, ABC):
         :param silent: erase log
         :return: self
         """
-        error = TimeoutException(f'"{self.name}" not visible', timeout=timeout, info=self)
-        return Result(self.is_displayed(silent=True), error)  # noqa
+        return Result(  # noqa
+            execution_result=self.is_displayed(silent=True),
+            log=f'Wait until "{self.name}" becomes visible',
+            exc=TimeoutException(f'"{self.name}" not visible', timeout=timeout, info=self)
+        )
 
     @wait_condition
     def wait_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
@@ -207,8 +210,11 @@ class CoreElement(ElementABC, ABC):
         :param silent: erase log
         :return: self
         """
-        error = TimeoutException(f'"{self.name}" still visible', timeout=timeout, info=self)
-        return Result(self.is_hidden(silent=True), error)  # noqa
+        return Result(  # noqa
+            execution_result=self.is_hidden(silent=True),
+            log=f'Wait until "{self.name}" becomes hidden',
+            exc=TimeoutException(f'"{self.name}" still visible', timeout=timeout, info=self),
+        )
 
     @wait_condition
     def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
@@ -219,8 +225,11 @@ class CoreElement(ElementABC, ABC):
         :param silent: erase log
         :return: self
         """
-        error = TimeoutException(f'"{self.name}" not available in DOM', timeout=timeout, info=self)
-        return Result(self.is_available(), error)  # noqa
+        return Result(  # noqa
+            execution_result=self.is_available(),
+            log=f'Wait until presence of "{self.name}"',
+            exc=TimeoutException(f'"{self.name}" not available in DOM', timeout=timeout, info=self),
+        )
 
     # Element state
 

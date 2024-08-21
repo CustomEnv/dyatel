@@ -36,7 +36,7 @@ def test_wait_element_disabled_error_msg(forms_page):
     try:
         forms_page.validation_form.wait_disabled(timeout=timeout)
     except TimeoutException as exc:
-        assert f'"Validation form" not disabled after {timeout} seconds.' in exc.msg
+        assert f'"Validation form" is not disabled after {timeout} seconds.' in exc.msg
         assert 'Selector:' in exc.msg
     else:
         raise Exception('Unexpected behaviour')
@@ -47,7 +47,7 @@ def test_wait_element_enabled_error_msg(forms_page):
     try:
         forms_page.controls_form.salary_input.wait_enabled(timeout=timeout)
     except TimeoutException as exc:
-        assert f'"salary input" not enabled after {timeout} seconds. ' in exc.msg
+        assert f'"salary input" is not enabled after {timeout} seconds. ' in exc.msg
         assert 'Selector:' in exc.msg
         assert 'Parent selector:' in exc.msg
     else:

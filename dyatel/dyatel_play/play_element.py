@@ -227,7 +227,7 @@ class PlayElement(ElementABC, Logging, ABC):
         :return: self
         """
         if not silent:
-            self.log(f'Wait until presence of "{self.name}"')
+            self.log(f'Wait until "{self.name}" becomes visible')
 
         try:
             self._first_element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
@@ -244,8 +244,7 @@ class PlayElement(ElementABC, Logging, ABC):
         :return: self
         """
         if not silent:
-            self.log(f'Wait hidden of "{self.name}"')
-
+            self.log(f'Wait until "{self.name}" becomes hidden')
         try:
             self._first_element.wait_for(state='hidden', timeout=get_timeout_in_ms(timeout))
         except PlayTimeoutError:
@@ -323,7 +322,6 @@ class PlayElement(ElementABC, Logging, ABC):
 
         :return: element text
         """
-        self.log(f'Get text from "{self.name}"')
         element = self._first_element
         return element.text_content() if element.text_content() else element.input_value()
 

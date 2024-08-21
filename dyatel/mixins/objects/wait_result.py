@@ -7,4 +7,5 @@ from dyatel.exceptions import DriverWrapperException
 @dataclass
 class Result:
     execution_result: Any
-    error: DriverWrapperException = None
+    log: str = None
+    exc: DriverWrapperException = None

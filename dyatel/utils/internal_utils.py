@@ -7,6 +7,7 @@ from copy import copy
 from functools import lru_cache, wraps
 from typing import Any, Union, Callable
 
+from dyatel.mixins.objects.wait_result import Result
 from selenium.common.exceptions import StaleElementReferenceException as SeleniumStaleElementReferenceException
 
 from dyatel.exceptions import NoSuchElementException, InvalidSelectorException, TimeoutException, NoSuchParentException
@@ -277,35 +278,20 @@ def wait_condition(method: Callable):
 
     @wraps(method)
     def wrapper(self, *args, timeout: Union[int, float] = WAIT_EL, silent: bool = False, **kwargs):
-        condition = method\
-            .__name__\
-            .replace('wait_', '')\
-            .replace('_', ' ')\
-
-        if not silent:
-            if condition == 'availability':
-                condition = 'available in DOM'
-
-            prefix = 'for ' if 'for' not in condition else ''
-
-            if condition in ('enabled', 'disabled', 'hidden'):
-                msg = f'Wait until "{self.name}" becomes {condition}'
-            else:
-                msg = f'Wait {prefix}{condition} of "{self.name}"'
-
-            self.log(msg)
-
-        start_time = time.time()
+        log_sent, start_time = False, time.time()
         while time.time() - start_time < timeout:
-            result = method(self, *args, **kwargs)
+            result: Result = method(self, *args, **kwargs)
+
+            if not (silent and log_sent):
+                self.log(result.log)
+                log_sent = True
+
             if result.execution_result:
                 return self
+
             time.sleep(0.1)
 
-        if result.error:  # noqa
-            result.error._timeout = timeout
-            raise result.error
-
-        raise TimeoutException(f'"{self.name}" not {condition}', timeout=timeout, info=self)
+        result.exc._timeout = timeout  # noqa
+        raise result.exc
 
     return wrapper

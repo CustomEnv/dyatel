@@ -224,9 +224,17 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :return: self
         """
         actual_text = self.text
-        msg = f'Not expected text for "{self.name}"' if expected_text else f'Text of "{self.name}" is empty'
-        error = UnexpectedTextException(msg, actual_text, expected_text, timeout)
-        return Result(actual_text == expected_text if expected_text else actual_text, error)  # noqa
+
+        if expected_text:
+            result = actual_text == expected_text
+            error = f'Not expected text for "{self.name}"'
+            log_msg = f'Wait until text of "{self.name}" will be equal to "{expected_text}"'
+        else:
+            result = actual_text
+            error = f'Text of "{self.name}" is empty'
+            log_msg = f'Wait for any text of "{self.name}"'
+
+        return Result(result, log_msg, UnexpectedTextException(error, actual_text, expected_text, timeout))  # noqa
 
     @wait_condition
     def wait_for_value(
@@ -244,9 +252,17 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :return: self
         """
         actual_value = self.value
-        msg = f'Not expected value for "{self.name}"' if expected_value else f'Value of "{self.name}" is empty'
-        error = UnexpectedValueException(msg, actual_value, expected_value, timeout)
-        return Result(actual_value == expected_value if expected_value else actual_value, error)  # noqa
+
+        if expected_value:
+            result = actual_value == expected_value
+            error = f'Not expected value for "{self.name}"'
+            log_msg = f'Wait until value of "{self.name}" will be equal to "{expected_value}"'
+        else:
+            result = actual_value
+            error = f'Value of "{self.name}" is empty'
+            log_msg = f'Wait for any value inside "{self.name}"'
+
+        return Result(result, log_msg, UnexpectedValueException(error, actual_value, expected_value, timeout))  # noqa
 
     @wait_condition
     def wait_enabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
@@ -257,7 +273,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param silent: erase log
         :return: self
         """
-        return Result(self.is_enabled(silent=True))  # noqa
+        return Result(  # noqa
+            execution_result=self.is_enabled(silent=True),
+            log=f'Wait until "{self.name}" becomes enabled',
+            exc=TimeoutException(f'"{self.name}" is not enabled', timeout=timeout, info=self),
+        )
 
     @wait_condition
     def wait_disabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
@@ -268,7 +288,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param silent: erase log
         :return: self
         """
-        return Result(not self.is_enabled(silent=True))  # noqa
+        return Result(  # noqa
+            execution_result=not self.is_enabled(silent=True),
+            log=f'Wait until "{self.name}" becomes disabled',
+            exc=TimeoutException(f'"{self.name}" is not disabled', timeout=timeout, info=self),
+        )
 
     @wait_condition
     def wait_for_size(
@@ -286,10 +310,13 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :return: self
         """
         actual = self.size
-        error = UnexpectedElementSizeException(f'Unexpected size for "{self.name}"', actual, expected_size, timeout)
         is_height_equal = actual.height == expected_size.height if expected_size.height is not None else True
         is_width_equal = actual.width == expected_size.width if expected_size.width is not None else True
-        return Result(is_height_equal and is_width_equal, error)  # noqa
+        return Result(  # noqa
+            execution_result=is_height_equal and is_width_equal,
+            log=f'Wait until "{self.name}" size will be equal to {expected_size}',
+            exc=UnexpectedElementSizeException(f'Unexpected size for "{self.name}"', actual, expected_size, timeout),
+        )
 
     @wait_condition
     def wait_elements_count(
@@ -307,9 +334,13 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :return: self
         """
         actual_count = self.get_count(silent=True)
-        msg = f'Unexpected elements count of "{self.name}"'
-        error = UnexpectedElementsCountException(msg, actual_count, expected_count, timeout)
-        return Result(actual_count == expected_count, error)  # noqa
+        error_msg = f'Unexpected elements count of "{self.name}"'
+        return Result(  # noqa
+            execution_result=actual_count == expected_count,
+            log=f'Wait until elements count of "{self.name}" will be equal to "{expected_count}"',
+            exc=UnexpectedElementsCountException(error_msg, actual_count, expected_count, timeout),
+        )
+
 
     @property
     def all_elements(self) -> Union[Any]:
@@ -521,7 +552,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             wrapped_elements.append(wrapped_object)
 
         return wrapped_elements
-        
+
     def _modify_children(self):
         """
         Initializing of attributes with  type == Element.
