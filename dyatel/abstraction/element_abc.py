@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import abstractmethod, ABC
+from abc import ABC
 from typing import Union, Any, List, Tuple, Optional
 
 from PIL.Image import Image
@@ -43,7 +43,6 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @property
-    @abstractmethod
     def all_elements(self) -> Union[list, List[Any]]:
         """
         Get all wrapped elements with playwright bases
@@ -368,7 +367,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def set_text(self, text: str, silent: bool = False) -> ElementABC:
         """
         Set (clear and type) text in current element
@@ -379,7 +377,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def send_keyboard_action(self, action: Union[str, KeyboardKeys]) -> ElementABC:
         """
         Send keyboard action to current element
@@ -389,7 +386,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def wait_elements_count(
             self,
             expected_count: int,
@@ -406,7 +402,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def wait_for_text(
             self,
             expected_text: Optional[str] = None,
@@ -423,7 +418,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def wait_for_value(
             self,
             expected_value: Optional[str] = None,
@@ -440,7 +434,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def wait_visibility_without_error(
             self,
             timeout: [int, float] = QUARTER_WAIT_EL,
@@ -455,7 +448,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def wait_hidden_without_error(
             self,
             timeout: [int, float] = QUARTER_WAIT_EL,
@@ -470,7 +462,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def wait_enabled(self, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait until element clickable
@@ -481,7 +472,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def wait_disabled(self, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait until element clickable
@@ -492,7 +482,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def wait_for_size(
             self,
             expected_size: Size,
@@ -509,7 +498,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def is_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
         Check is current element top left corner or bottom right corner visible on current screen
@@ -520,7 +508,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def is_fully_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
         Check is current element top left corner and bottom right corner visible on current screen
@@ -549,7 +536,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def assert_screenshot(
             self,
             filename: str = '',
@@ -576,7 +562,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def soft_assert_screenshot(
             self,
             filename: str = '',
@@ -603,7 +588,6 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def get_element_info(self, element: Any = None) -> str:
         """
         Get full loging data depends on parent element
