@@ -1,4 +1,13 @@
-# Dyatel Wrapper Documentation
+<h1 align="center">Dyatel Wrapper</h1>
+
+<h2 align="center">Automation Without Borders</h2>
+
+<p align="center">
+<a href="https://dyatel-wrapper.readthedocs.io/en/latest/?badge=latest"><img alt="Documentation Status" src="https://readthedocs.org/projects/dyatel-wrapper/badge/?version=latest"></a>
+<a href="https://github.com/psf/dyatel-wrapper/blob/main/LICENSE"><img alt="License: MIT" src="https://dyatel-wrapper.readthedocs.io/en/latest/_static/license.svg"></a>
+<a href="https://pypi.org/project/dyatel-wrapper/"><img alt="PyPI" src="https://img.shields.io/pypi/v/dyatel-wrapper"></a>
+</p>
+
 
 Dyatel Wrapper is a Python framework that seamlessly wraps over Selenium, Appium, and sync Playwright,
 providing a unified interface for browser and mobile automation. With Dyatel Wrapper, you can effortlessly switch 

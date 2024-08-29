@@ -41,6 +41,8 @@ By centralizing locators in a single `Locator` object, it simplifies the codebas
    
 ```
 
+<br>
+
 ## Usage
 
 The `Locator` class is designed to be flexible and adaptive, making it suitable for various automation scenarios. 
@@ -48,6 +50,8 @@ Here’s how the attributes work together:
 
 - **`loc_type`** is optional. If not specified, the system will attempt to automatically select the appropriate locator type based on the provided locator.
 - **`default`** will be used if no specific locator is provided for the current platform or device.
+
+<br>
 
 ### Example
 

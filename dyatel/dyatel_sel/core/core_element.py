@@ -114,7 +114,7 @@ class CoreElement(ElementABC, ABC):
         text = str(text)
 
         if not silent:
-            self.log(f'Type text {cut_log_data(text)} into "{self.name}"')
+            self.log(f'Type text "{cut_log_data(text)}" into "{self.name}"')
 
         self.element.send_keys(text)
         return self

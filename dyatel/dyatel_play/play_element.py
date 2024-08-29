@@ -140,7 +140,7 @@ class PlayElement(ElementABC, Logging, ABC):
         text = str(text)
 
         if not silent:
-            self.log(f'Type text {cut_log_data(text)} into "{self.name}"')
+            self.log(f'Type text "{cut_log_data(text)}" into "{self.name}"')
 
         self._first_element.type(text=text)
         return self
