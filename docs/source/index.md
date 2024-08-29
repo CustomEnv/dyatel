@@ -1,6 +1,6 @@
 # Dyatel Wrapper Documentation
 
-Dyatel Wrapper is a Python framework that seamlessly wraps over Selenium, Appium, and sync Playwright,
+Dyatel Wrapper is a powerful Python framework that seamlessly wraps over Selenium, Appium, and sync Playwright,
 providing a unified interface for browser and mobile automation. With Dyatel Wrapper, you can effortlessly switch 
 between these engines within the same test, allowing you to leverage the unique features of each framework without boundaries.
 
@@ -18,9 +18,8 @@ process, giving you the flexibility and power to automate complex testing scenar
 - **Automatic Locator Type Definition**: The locator type will be automatically determined based on the provided locator string or `Locator` object.
 
 
-## Installation and usage
-For information on installation and usage, please refer to our **[ReadTheDocs documentation](https://dyatel.readthedocs.io/en/latest/)**. Check it out for more details.
-
+## Documentation and Examples
+Explore the full documentation to learn more about advanced features, configurations, and best practices for using Dyatel Wrapper.
 
 ## Contributing
 
@@ -35,3 +34,7 @@ Dyatel Wrapper is licensed under the Apache License. See the [LICENSE](https://g
 If you encounter any issues or have questions, please feel free to reach out via our [GitHub Issues](https://github.com/CustomEnv/dyatel/issues) page.
 
 Thank you for choosing Dyatel Wrapper for your automation needs!
+
+
+```{include} toc.md
+```

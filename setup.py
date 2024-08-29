@@ -1,6 +1,7 @@
 import os
 import shutil
 
+from dyatel import dyatel_version
 from setuptools import setup
 
 with open('README.md') as f:
@@ -40,7 +41,7 @@ cleanup()
 
 setup(
     name=pypi_name,
-    version='2.2.2',
+    version=dyatel_version,
     url=f'https://github.com/EnvInc/{project_name}',
     packages=get_packages(project_name),
     install_requires=[
