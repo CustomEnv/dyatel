@@ -1,10 +1,10 @@
 <h1 align="center">Dyatel Wrapper</h1>
 
-<h2 align="center">Automation Without Borders</h2>
+<h2 align="center">Automation Beyond Limits</h2>
 
 <p align="center">
-<a href="https://dyatel-wrapper.readthedocs.io/en/latest/?badge=latest"><img alt="Documentation Status" src="https://readthedocs.org/projects/dyatel-wrapper/badge/?version=latest"></a>
-<a href="https://github.com/psf/dyatel-wrapper/blob/main/LICENSE"><img alt="License: MIT" src="https://dyatel-wrapper.readthedocs.io/en/latest/_static/license.svg"></a>
+<a href="https://dyatel-wrapper.readthedocs.io"><img alt="Documentation Status" src="https://readthedocs.org/projects/dyatel-wrapper/badge/?version=latest"></a>
+<a href="https://github.com/CustomEnv/dyatel/blob/master/LICENSE"><img alt="License: MIT" src="https://dyatel-wrapper.readthedocs.io/en/latest/_static/license.svg"></a>
 <a href="https://pypi.org/project/dyatel-wrapper/"><img alt="PyPI" src="https://img.shields.io/pypi/v/dyatel-wrapper"></a>
 </p>
 
@@ -28,7 +28,7 @@ process, giving you the flexibility and power to automate complex testing scenar
 
 
 ## Installation and usage
-For information on installation and usage, please refer to our **[ReadTheDocs documentation](https://dyatel.readthedocs.io/en/latest/)**. Check it out for more details.
+For information on installation and usage, please refer to our **[ReadTheDocs documentation](https://dyatel-wrapper.readthedocs.io)**. Check it out for more details.
 
 
 ## Contributing

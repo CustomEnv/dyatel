@@ -62,6 +62,7 @@ setup(
     project_urls={
         'Source': f'https://github.com/EnvInc/{project_name}',
         'Tracker': f'https://github.com/EnvInc/{project_name}/issues',
+        'Documentation': f'https://{pypi_name}.readthedocs.io',
         'Changelog': f'https://github.com/EnvInc/{project_name}/blob/master/CHANGELOG.md'
     },
     classifiers=[
