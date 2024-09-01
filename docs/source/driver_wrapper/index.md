@@ -33,6 +33,6 @@ experience for managing driver sessions, performing operations, and handling cro
 
 <br>
 
-This section covers features and behaviour of `Page` class detail:
+This section covers features and behaviour of `DriverWrapper` class detail:
 - {doc}`DriverWrapper Interface <./dw_interface>`
 - {doc}`DriverWrapperSessions Interface <./dws_interface>`

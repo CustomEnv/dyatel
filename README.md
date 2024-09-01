@@ -4,7 +4,7 @@
 
 <p align="center">
 <a href="https://dyatel-wrapper.readthedocs.io"><img alt="Documentation Status" src="https://readthedocs.org/projects/dyatel-wrapper/badge/?version=latest"></a>
-<a href="https://github.com/CustomEnv/dyatel/blob/master/LICENSE"><img alt="License: MIT" src="https://dyatel-wrapper.readthedocs.io/en/latest/_static/license.svg"></a>
+<a href="https://github.com/CustomEnv/dyatel/blob/master/LICENSE"><img alt="License: MIT" src="https://dyatel-wrapper.readthedocs.io/_static/license.svg"></a>
 <a href="https://pypi.org/project/dyatel-wrapper/"><img alt="PyPI" src="https://img.shields.io/pypi/v/dyatel-wrapper"></a>
 </p>
 
