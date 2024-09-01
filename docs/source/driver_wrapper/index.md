@@ -15,6 +15,8 @@ The `DriverWrapper` module provides a unified interface to interact with differe
 such as _Selenium_, _Appium_, and _Playwright_. It abstracts the complexities of these frameworks and offers a seamless 
 experience for managing driver sessions, performing operations, and handling cross-platform automation tasks.
 
+<br>
+
 ### Core Benefits & Rules
 
 1. **Centralized Session Management:**
@@ -27,7 +29,9 @@ experience for managing driver sessions, performing operations, and handling cro
    - `DriverWrapper` provides various status attributes (e.g., `is_mobile`, `is_selenium`, `is_playwright`) that help you tailor your test behavior based on the current driver environment, ensuring more precise control and adaptability in your tests.
 
 4. **Optimal Driver Setup:**
-  - The initialization of the source driver should be handled within your testing framework. This approach ensures that the browser or device starts with the most appropriate configuration, leading to more reliable and efficient test executions.
+   - The initialization of the source driver should be handled within your testing framework. This approach ensures that the browser or device starts with the most appropriate configuration, leading to more reliable and efficient test executions.
+
+<br>
 
 This section covers features and behaviour of `Page` class detail:
 - {doc}`DriverWrapper Interface <./dw_interface>`

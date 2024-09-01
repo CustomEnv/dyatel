@@ -178,11 +178,12 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def execute_script(self, script: str) -> Any:
+    def execute_script(self, script: str, *args) -> Any:
         """
         Execute script using current element
 
         :param script: js script, that have `arguments[0]`
+        :param args: any other args for `arguments[1]` `arguments[2]` etc.
         :return: Any
         """
         raise NotImplementedError()

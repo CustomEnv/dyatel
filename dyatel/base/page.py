@@ -55,14 +55,8 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         Initializing of page based on current driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
-        :param locator_type: Selenium only: specific locator type
         :param name: name of page (will be attached to logs)
         :param driver_wrapper: set custom driver for page and page elements
-        :param kwargs:
-          - desktop: str = locator that will be used for desktop platform
-          - mobile: str = locator that will be used for all mobile platforms
-          - ios: str = locator that will be used for ios platform
-          - android: str = locator that will be used for android platform
         """
         self._validate_inheritance()
         self._check_kwargs(kwargs)

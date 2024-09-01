@@ -28,23 +28,50 @@ class DriverWrapperSessions:
     all_sessions: List[DriverWrapper] = []
 
     @classmethod
-    def add_session(cls, driver_wrapper):
+    def add_session(cls, driver_wrapper: DriverWrapper) -> None:
+        """
+        Add DriverWrapper object to pool
+
+        :param driver_wrapper: DriverWrapper object
+        :return: None
+        """
         cls.all_sessions.append(driver_wrapper)
 
     @classmethod
-    def remove_session(cls, driver_wrapper):
+    def remove_session(cls, driver_wrapper: DriverWrapper) -> None:
+        """
+        Remove DriverWrapper object from pool
+
+        :param driver_wrapper: DriverWrapper object
+        :return: None
+        """
         cls.all_sessions.remove(driver_wrapper)
 
     @classmethod
-    def sessions_count(cls):
+    def sessions_count(cls) -> int:
+        """
+        Get initialised DriverWrapper objects count
+
+        :return: number of sessions
+        """
         return len(cls.all_sessions)
 
     @classmethod
-    def first_session(cls):
+    def first_session(cls) -> Union[DriverWrapper, None]:
+        """
+        Get first DriverWrapper object from pool
+
+        :return: first DriverWrapper object or None
+        """
         return cls.all_sessions[0] if cls.all_sessions else None
 
     @classmethod
-    def is_connected(cls):
+    def is_connected(cls) -> bool:
+        """
+        Get connection status with any DriverWrapper object in pool
+
+        :return: True if any DriverWrapper object is available
+        """
         return any(cls.all_sessions)
 
 
