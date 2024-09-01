@@ -6,7 +6,7 @@
 *Release date: 2024-09-0?*
 
 ### Added
-- [ReadTheDocs documentation](https://dyatel.readthedocs.io/en/latest/)
+- [ReadTheDocs documentation](https://dyatel-wrapper.readthedocs.io/)
 - `Locator` object
 - `CutBox` object
 - `tablet` locator support
