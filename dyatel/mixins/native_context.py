@@ -40,9 +40,9 @@ class NativeSafari:
         if self.driver_wrapper.is_tablet:
             return 0  # iPad does not have bottom bar
 
-        bottom_bar_height = self.bottom_bar.height
+        bottom_bar_height = self.bottom_bar.size.height
         if bottom_bar_height > 350:  # Large devices have different locator
             self.bottom_bar.locator = ios_mobile_large_bottom_bar_locator
-            bottom_bar_height = self.bottom_bar.height
+            bottom_bar_height = self.bottom_bar.size.height
 
         return bottom_bar_height
