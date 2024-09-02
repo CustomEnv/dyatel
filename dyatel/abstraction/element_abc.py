@@ -278,7 +278,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def get_count(self, silent: bool = False) -> int:
+    def get_elements_count(self, silent: bool = False) -> int:
         """
         Get elements count
 

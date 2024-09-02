@@ -72,11 +72,11 @@ def test_element_displayed_negative(base_playground_page):
 
 
 def test_all_elements_count_positive(base_playground_page):
-    assert base_playground_page.any_link.get_count() > 1
+    assert base_playground_page.any_link.get_elements_count() > 1
 
 
 def test_all_elements_count_negative(base_playground_page):
-    assert base_playground_page.kube_broken.get_count() == 0
+    assert base_playground_page.kube_broken.get_elements_count() == 0
 
 
 @pytest.mark.xfail_platform('android', 'ios', reason='Can not get text from that element. TODO: Rework test')
@@ -149,4 +149,10 @@ def test_all_elements_recursion(base_playground_page):
     except RecursionError:
         pass
     else:
-        raise AssertionError('RecursionError was not raised')
+        raise AssertionError('RecursionError was not raised')\
+
+
+def test_element_execute_script(forms_page, driver_wrapper):
+    new_text = 'dyatel wrapper automation'
+    forms_page.controls_form.german_slider.execute_script('arguments[0].textContent = arguments[1];', new_text)
+    assert forms_page.controls_form.german_slider.text == new_text

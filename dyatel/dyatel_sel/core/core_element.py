@@ -373,7 +373,7 @@ class CoreElement(ElementABC, ABC):
         self.wait_visibility(silent=True)
         return list(element_item.text for element_item in self.all_elements)
 
-    def get_count(self, silent: bool = False) -> int:
+    def get_elements_count(self, silent: bool = False) -> int:
         """
         Get elements count
 

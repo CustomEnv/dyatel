@@ -50,13 +50,13 @@ def test_wait_elements_count_v1(forms_page):
     forms_page.validation_form.form_mixin.input.type_text('sample')
     forms_page.validation_form.submit_form_button.click()
     forms_page.validation_form.any_error.wait_elements_count(4)
-    assert forms_page.validation_form.any_error.get_count() == 4
+    assert forms_page.validation_form.any_error.get_elements_count() == 4
 
 
 def test_wait_elements_count_v2(expected_condition_page):
-    initial_count = expected_condition_page.frame_card.frame.get_count()
+    initial_count = expected_condition_page.frame_card.frame.get_elements_count()
     expected_condition_page.frame_card.trigger_button.click()
-    target_count = expected_condition_page.frame_card.frame.wait_elements_count(1).get_count()
+    target_count = expected_condition_page.frame_card.frame.wait_elements_count(1).get_elements_count()
     assert all((initial_count == 0, target_count == 1))
 
 

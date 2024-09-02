@@ -221,7 +221,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         :param args: any applicable arguments for your JavaScript (Element object)
         :return: execution return value
         """
-        args = [arg.element for arg in args if hasattr(arg, 'element')]
+        args = [getattr(arg, 'element', arg) for arg in args]
         return self.driver.execute_script(script, *args)
 
     def set_page_load_timeout(self, timeout: int = 30) -> CoreDriver:

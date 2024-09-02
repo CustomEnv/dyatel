@@ -179,7 +179,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         script = script.replace('return ', '')
 
         if 'arguments[0]' in script:
-            args = [arg.element for arg in args if hasattr(arg, 'element')]
+            args = [getattr(arg, 'element', arg) for arg in args]
             script = f'arguments => {{{script}}}'
 
         for index, arg in enumerate(args):

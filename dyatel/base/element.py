@@ -333,7 +333,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param silent: erase log
         :return: self
         """
-        actual_count = self.get_count(silent=True)
+        actual_count = self.get_elements_count(silent=True)
         error_msg = f'Unexpected elements count of "{self.name}"'
         return Result(  # noqa
             execution_result=actual_count == expected_count,
@@ -443,7 +443,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param args: any other args for `arguments[1]` `arguments[2]` etc.
         :return: Any
         """
-        return self.driver_wrapper.execute_script(script, self, *args)
+        return self.driver_wrapper.execute_script(script, *[self, *[arg for arg in args]])
 
     def assert_screenshot(
             self,

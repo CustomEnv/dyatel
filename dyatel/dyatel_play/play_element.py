@@ -400,7 +400,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
         return self.element.all_text_contents()
 
-    def get_count(self, silent: bool = False) -> int:
+    def get_elements_count(self, silent: bool = False) -> int:
         """
         Get elements count
 
