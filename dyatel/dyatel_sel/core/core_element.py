@@ -198,7 +198,7 @@ class CoreElement(ElementABC, ABC):
         return Result(  # noqa
             execution_result=self.is_displayed(silent=True),
             log=f'Wait until "{self.name}" becomes visible',
-            exc=TimeoutException(f'"{self.name}" not visible', timeout=timeout, info=self)
+            exc=TimeoutException(f'"{self.name}" not visible', info=self)
         )
 
     @wait_condition
@@ -213,7 +213,7 @@ class CoreElement(ElementABC, ABC):
         return Result(  # noqa
             execution_result=self.is_hidden(silent=True),
             log=f'Wait until "{self.name}" becomes hidden',
-            exc=TimeoutException(f'"{self.name}" still visible', timeout=timeout, info=self),
+            exc=TimeoutException(f'"{self.name}" still visible', info=self),
         )
 
     @wait_condition
@@ -228,7 +228,7 @@ class CoreElement(ElementABC, ABC):
         return Result(  # noqa
             execution_result=self.is_available(),
             log=f'Wait until presence of "{self.name}"',
-            exc=TimeoutException(f'"{self.name}" not available in DOM', timeout=timeout, info=self),
+            exc=TimeoutException(f'"{self.name}" not available in DOM', info=self),
         )
 
     # Element state

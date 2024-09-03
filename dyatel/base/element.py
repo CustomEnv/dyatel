@@ -234,7 +234,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             error = f'Text of "{self.name}" is empty'
             log_msg = f'Wait for any text of "{self.name}"'
 
-        return Result(result, log_msg, UnexpectedTextException(error, actual_text, expected_text, timeout))  # noqa
+        return Result(result, log_msg, UnexpectedTextException(error, actual_text, expected_text))  # noqa
 
     @wait_condition
     def wait_for_value(
@@ -262,7 +262,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             error = f'Value of "{self.name}" is empty'
             log_msg = f'Wait for any value inside "{self.name}"'
 
-        return Result(result, log_msg, UnexpectedValueException(error, actual_value, expected_value, timeout))  # noqa
+        return Result(result, log_msg, UnexpectedValueException(error, actual_value, expected_value))  # noqa
 
     @wait_condition
     def wait_enabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
@@ -276,7 +276,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return Result(  # noqa
             execution_result=self.is_enabled(silent=True),
             log=f'Wait until "{self.name}" becomes enabled',
-            exc=TimeoutException(f'"{self.name}" is not enabled', timeout=timeout, info=self),
+            exc=TimeoutException(f'"{self.name}" is not enabled', info=self),
         )
 
     @wait_condition
@@ -291,7 +291,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return Result(  # noqa
             execution_result=not self.is_enabled(silent=True),
             log=f'Wait until "{self.name}" becomes disabled',
-            exc=TimeoutException(f'"{self.name}" is not disabled', timeout=timeout, info=self),
+            exc=TimeoutException(f'"{self.name}" is not disabled', info=self),
         )
 
     @wait_condition
@@ -315,7 +315,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return Result(  # noqa
             execution_result=is_height_equal and is_width_equal,
             log=f'Wait until "{self.name}" size will be equal to {expected_size}',
-            exc=UnexpectedElementSizeException(f'Unexpected size for "{self.name}"', actual, expected_size, timeout),
+            exc=UnexpectedElementSizeException(f'Unexpected size for "{self.name}"', actual, expected_size),
         )
 
     @wait_condition
@@ -338,7 +338,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return Result(  # noqa
             execution_result=actual_count == expected_count,
             log=f'Wait until elements count of "{self.name}" will be equal to "{expected_count}"',
-            exc=UnexpectedElementsCountException(error_msg, actual_count, expected_count, timeout),
+            exc=UnexpectedElementsCountException(error_msg, actual_count, expected_count),
         )
 
 

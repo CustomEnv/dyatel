@@ -2,7 +2,6 @@ import time
 from typing import Union
 
 import pytest
-
 from dyatel.exceptions import TimeoutException
 from dyatel.utils.internal_utils import wait_condition, WAIT_METHODS_DELAY
 from dyatel.utils.logs import autolog
@@ -31,11 +30,11 @@ class MockNamespace:
         return False
 
     @wait_condition
-    def wait_something(self, timeout: Union[int, float] = 1) -> bool:
+    def wait_something(self, timeout: Union[int, float] = 1, silent: bool = False) -> bool:  # noqa
         return Result(  # noqa
             execution_result=self.get_result(),
             log=self.log_msg,
-            exc=TimeoutException('wait some condition failed!', timeout=timeout),
+            exc=TimeoutException('wait some condition failed!'),
         )
 
 
@@ -70,3 +69,9 @@ def test_wait_condition_negative_with_wait(caplog):
     assert execution_time < WAIT_METHODS_DELAY * call_count,\
         'wait_something execution time for negative check somehow higher that given timeout'
     assert caplog.messages.count(namespace.log_msg) == 1, 'log message throttled'
+
+
+def test_wait_condition_silent(caplog):
+    namespace = MockNamespace('wait some condition', call_count=2)
+    namespace.wait_something(silent=True)
+    assert caplog.messages == [], 'unexpected log messages found'
