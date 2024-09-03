@@ -13,6 +13,7 @@ from selenium.common.exceptions import StaleElementReferenceException as Seleniu
 from dyatel.exceptions import NoSuchElementException, InvalidSelectorException, TimeoutException, NoSuchParentException
 
 
+WAIT_METHODS_DELAY = 0.1
 WAIT_UNIT = 1
 WAIT_EL = 10
 HALF_WAIT_EL = WAIT_EL / 2
@@ -278,18 +279,19 @@ def wait_condition(method: Callable):
 
     @wraps(method)
     def wrapper(self, *args, timeout: Union[int, float] = WAIT_EL, silent: bool = False, **kwargs):
-        log_sent, start_time = False, time.time()
+        start_time = time.time()
+
         while time.time() - start_time < timeout:
             result: Result = method(self, *args, **kwargs)
 
-            if not (silent and log_sent):
+            if not silent:
                 self.log(result.log)
-                log_sent = True
+                silent = True
 
             if result.execution_result:
                 return self
 
-            time.sleep(0.1)
+            time.sleep(WAIT_METHODS_DELAY)
 
         result.exc._timeout = timeout  # noqa
         raise result.exc
