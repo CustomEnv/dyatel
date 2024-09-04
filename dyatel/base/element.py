@@ -168,7 +168,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     # Elements waits
 
-    def wait_visibility_without_error(self, timeout: Union[int, float] = QUARTER_WAIT_EL, silent: bool = False) -> Element:
+    def wait_visibility_without_error(self, *, timeout: Union[int, float] = QUARTER_WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element visibility without error
 
@@ -188,6 +188,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     def wait_hidden_without_error(
             self,
+            *,
             timeout: Union[int, float] = QUARTER_WAIT_EL,
             silent: bool = False
     ) -> Element:
@@ -212,6 +213,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     def wait_for_text(
             self,
             expected_text: Optional[str] = None,
+            *,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
     ) -> Element:
@@ -240,6 +242,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     def wait_for_value(
             self,
             expected_value: Optional[str] = None,
+            *,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
     ) -> Element:
@@ -265,7 +268,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return Result(result, log_msg, UnexpectedValueException(error, actual_value, expected_value))  # noqa
 
     @wait_condition
-    def wait_enabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
+    def wait_enabled(self, *, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element clickable
 
@@ -280,7 +283,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         )
 
     @wait_condition
-    def wait_disabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
+    def wait_disabled(self, *, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait until element disabled
 
@@ -298,6 +301,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     def wait_for_size(
             self,
             expected_size: Size,
+            *,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
     ) -> Element:
@@ -322,6 +326,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     def wait_elements_count(
             self,
             expected_count: int,
+            *,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
     ) -> Element:

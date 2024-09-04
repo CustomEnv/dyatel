@@ -116,14 +116,14 @@ def test_parent_in_hidden_element(driver_wrapper, second_driver_wrapper):
     assert DriverWrapper.driver
 
     assert mouse_page.is_page_opened()
-    assert mouse_page.button_with_text('Drop me').wait_visibility(2).is_displayed()  # button without specified driver
+    assert mouse_page.button_with_text('Drop me').wait_visibility(timeout=2).is_displayed()  # button without specified driver
 
     assert card.any_button.parent is None
     assert card.any_button_without_parent.parent is False
     assert card.any_button_with_custom_parent.parent == card.y_result
 
     assert pizza_page.is_page_opened()
-    assert pizza_page.input_with_value('SMALL').wait_visibility(2).is_displayed()  # button without specified driver
+    assert pizza_page.input_with_value('SMALL').wait_visibility(timeout=2).is_displayed()  # button without specified driver
 
 
 def test_driver_in_hidden_group(driver_wrapper, second_driver_wrapper):
@@ -150,8 +150,8 @@ def test_driver_in_hidden_page(driver_wrapper, second_driver_wrapper):
     exp_cond_page = base_page1.navigate_to_expected_condition_page()  # page class without specified driver
     keyboard_page = base_page2.navigate_to_keyboard_page()  # page class without specified driver
 
-    assert exp_cond_page.max_wait_input.wait_visibility(2).is_displayed()
-    assert keyboard_page.input_area.wait_visibility(2).is_displayed()
+    assert exp_cond_page.max_wait_input.wait_visibility(timeout=2).is_displayed()
+    assert keyboard_page.input_area.wait_visibility(timeout=2).is_displayed()
 
 
 def test_second_driver_in_parent_element(driver_wrapper, second_driver_wrapper):

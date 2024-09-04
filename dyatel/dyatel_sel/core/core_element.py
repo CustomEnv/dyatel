@@ -187,7 +187,7 @@ class CoreElement(ElementABC, ABC):
     # Element waits
 
     @wait_condition
-    def wait_visibility(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
+    def wait_visibility(self, *, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
         """
         Wait for current element available in page
 
@@ -202,7 +202,7 @@ class CoreElement(ElementABC, ABC):
         )
 
     @wait_condition
-    def wait_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
+    def wait_hidden(self, *, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
         """
         Wait until element hidden
 
@@ -217,7 +217,7 @@ class CoreElement(ElementABC, ABC):
         )
 
     @wait_condition
-    def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
+    def wait_availability(self, *, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
         """
         Wait for current element available in DOM
 

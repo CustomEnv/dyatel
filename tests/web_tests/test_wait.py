@@ -1,7 +1,5 @@
 import pytest
 
-from dyatel.exceptions import UnexpectedElementsCountException
-
 
 # TODO: rework needed
 def test_wait_element(pizza_order_page):
@@ -49,7 +47,7 @@ def test_wait_element_text(expected_condition_page):
 def test_wait_elements_count_v1(forms_page):
     forms_page.validation_form.form_mixin.input.type_text('sample')
     forms_page.validation_form.submit_form_button.click()
-    forms_page.validation_form.any_error.wait_elements_count(4)
+    forms_page.validation_form.any_error.wait_elements_count(expected_count=4)
     assert forms_page.validation_form.any_error.get_elements_count() == 4
 
 

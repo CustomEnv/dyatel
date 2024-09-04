@@ -275,23 +275,41 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
     return int(x), int(y)
 
 
+@lru_cache(maxsize=None)
+def get_method_signature(method: Callable):
+    return inspect.signature(method)
+
+
+def get_method_arguments(method, *args, **kwargs):
+    method_signature = get_method_signature(method)
+    bound_args = method_signature.bind(*args, **kwargs)
+    bound_args.apply_defaults()
+    return bound_args.arguments
+
+
 def wait_condition(method: Callable):
 
     @wraps(method)
     def wrapper(self, *args, timeout: Union[int, float] = WAIT_EL, silent: bool = False, **kwargs):
+
+        assert type(timeout) in (int, float), \
+            f'The `timeout` argument must be either float or inf. Provided: {type(timeout)}.'
+
+        assert isinstance(silent, bool), \
+            f'The `silent` argument must be of type bool. Provided: {type(silent)}.'
+
         start_time = time.time()
+        result: Result = method(self, *args, **kwargs)
 
-        while time.time() - start_time < timeout:
+        if not silent:
+            self.log(result.log)
+
+        while time.time() - start_time < timeout and not result.execution_result:
             result: Result = method(self, *args, **kwargs)
-
-            if not silent:
-                self.log(result.log)
-                silent = True
-
-            if result.execution_result:
-                return self
-
             time.sleep(WAIT_METHODS_DELAY)
+
+        if result.execution_result:
+            return self
 
         result.exc._timeout = timeout  # noqa
         raise result.exc

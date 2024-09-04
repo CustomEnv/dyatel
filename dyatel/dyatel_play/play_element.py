@@ -218,7 +218,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
     # Element waits
 
-    def wait_visibility(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
+    def wait_visibility(self, *, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait for current element available in page
 
@@ -235,7 +235,7 @@ class PlayElement(ElementABC, Logging, ABC):
             raise TimeoutException(f'"{self.name}" not visible', timeout=timeout, info=self)
         return self
 
-    def wait_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
+    def wait_hidden(self, *, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait until element hidden
 
@@ -251,7 +251,7 @@ class PlayElement(ElementABC, Logging, ABC):
             raise TimeoutException(f'"{self.name}" still visible', timeout=timeout, info=self)
         return self
 
-    def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
+    def wait_availability(self, *, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait for current element available in DOM
 

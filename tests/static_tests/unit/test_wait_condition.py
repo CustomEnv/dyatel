@@ -30,7 +30,7 @@ class MockNamespace:
         return False
 
     @wait_condition
-    def wait_something(self, timeout: Union[int, float] = 1, silent: bool = False) -> bool:  # noqa
+    def wait_something(self, *, timeout: Union[int, float] = 1, silent: bool = False) -> bool:  # noqa
         return Result(  # noqa
             execution_result=self.get_result(),
             log=self.log_msg,
@@ -75,3 +75,36 @@ def test_wait_condition_silent(caplog):
     namespace = MockNamespace('wait some condition', call_count=2)
     namespace.wait_something(silent=True)
     assert caplog.messages == [], 'unexpected log messages found'
+
+
+def test_wait_condition_non_named_arg():
+    namespace = MockNamespace('wait some condition', call_count=1)
+    try:
+        namespace.wait_something(1)
+    except TypeError as exc:
+        assert 'wait_something() takes 1 positional argument but 2 were given' in str(exc)
+    else:
+        raise Exception('Unexpected behaviour')
+
+
+@pytest.mark.parametrize('timeout', [True, False], ids=['timeout=True', 'timeout=False'])
+def test_wait_condition_timeout_unexpected_value(timeout):
+    namespace = MockNamespace('wait some condition', call_count=1)
+    try:
+        namespace.wait_something(timeout=timeout)
+    except AssertionError as exc:
+        assert "The `timeout` argument must be either float or inf. Provided: <class 'bool'>" in str(exc)
+    else:
+        raise Exception('Unexpected behavior')
+
+
+
+@pytest.mark.parametrize('silent', [1, None], ids=['silent=1', 'silent=None'])
+def test_wait_condition_silent_unexpected_value(silent):
+    namespace = MockNamespace('wait some condition', call_count=1)
+    try:
+        namespace.wait_something(silent=silent)  # noqa
+    except AssertionError as exc:
+        assert f"The `silent` argument must be of type bool. Provided: {type(silent)}" in str(exc)
+    else:
+        raise Exception('Unexpected behavior')

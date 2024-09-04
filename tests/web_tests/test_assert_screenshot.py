@@ -2,7 +2,6 @@ import os
 
 import pytest
 import pytest_rerunfailures
-from dyatel.visual_comparison import VisualComparison
 
 from dyatel.mixins.objects.cut_box import CutBox
 from dyatel.visual_comparison import VisualComparison
@@ -115,9 +114,23 @@ def test_assert_screenshot_hide_driver_elements(second_playground_page, driver_w
     )
 
 
-# todo: disable sgr/hgr flags for this test
-def test_assert_screenshot_negative_different_sizes(second_playground_page, driver_wrapper):
-    first_card = second_playground_page.get_all_cards()[0]
+@pytest.fixture
+def edit_visual_config(request):
+    previous_sgr = VisualComparison.soft_visual_reference_generation
+    previous_hgr = VisualComparison.hard_visual_reference_generation
+    previous_sv = VisualComparison.skip_screenshot_comparison
+
+    VisualComparison.soft_visual_reference_generation = False
+    VisualComparison.hard_visual_reference_generation = False
+    VisualComparison.skip_screenshot_comparison = False
+    yield
+    VisualComparison.soft_visual_reference_generation = previous_sgr
+    VisualComparison.hard_visual_reference_generation = previous_hgr
+    VisualComparison.skip_screenshot_comparison = previous_sv
+
+
+def test_assert_screenshot_negative_different_sizes(second_playground_page, driver_wrapper, edit_visual_config):
+    first_card = second_playground_page.get_all_cards()[0].scroll_into_view()
     vc = VisualComparison(driver_wrapper, element=first_card)
     filename = vc._get_screenshot_name()
     vc._save_screenshot(
@@ -129,16 +142,15 @@ def test_assert_screenshot_negative_different_sizes(second_playground_page, driv
     )
     driver_wrapper.execute_script('arguments[0].style = "width: 600px"', first_card)
     try:
-        first_card.scroll_into_view().assert_screenshot()
+        first_card.assert_screenshot()
     except AssertionError as exc:
         assert f"Image size (width, height) is not same for '{filename}'" in str(exc)
     else:
         raise Exception('Unexpected behavior')
 
 
-# todo: disable sgr/hgr flags for this test
-def test_assert_screenshot_negative_missmatch(second_playground_page, driver_wrapper):
-    first_card = second_playground_page.get_all_cards()[0]
+def test_assert_screenshot_negative_missmatch(second_playground_page, driver_wrapper, edit_visual_config):
+    first_card = second_playground_page.get_all_cards()[0].scroll_into_view()
     vc = VisualComparison(driver_wrapper, element=first_card)
     filename = vc._get_screenshot_name()
     vc._save_screenshot(
@@ -149,7 +161,7 @@ def test_assert_screenshot_negative_missmatch(second_playground_page, driver_wra
         cut_box=None,
     )
     try:
-        first_card.scroll_into_view().assert_screenshot(fill_background=True)
+        first_card.assert_screenshot(fill_background=True)
     except AssertionError as exc:
         assert f"Visual mismatch found for '{filename}'" in str(exc)
     else:
