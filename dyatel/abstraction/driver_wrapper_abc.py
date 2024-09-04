@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import List, Union, Any
+from typing import List, Union, Any, Tuple
 
+from dyatel.mixins.objects.cut_box import CutBox
 from selenium.webdriver.common.alert import Alert
 from PIL import Image
 
@@ -241,6 +242,58 @@ class DriverWrapperABC(ABC):
         :param screenshot_base: screenshot bytes
         :param convert_type: convert image type before save
         :return: image binary
+        """
+        raise NotImplementedError()
+
+    def assert_screenshot(
+            self,
+            filename: str = '',
+            test_name: str = '',
+            name_suffix: str = '',
+            threshold: Union[int, float] = None,
+            delay: Union[int, float] = None,
+            remove: Union[Any, List[Any]] = None,
+            cut_box: CutBox = None,
+            hide: Union[Any, List[Any]] = None,
+    ) -> None:
+        """
+        Assert given (by name) and taken screenshot equals
+
+        :param filename: full screenshot name. Custom filename will be used if empty string given
+        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
+        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
+        :param threshold: possible threshold
+        :param delay: delay before taking screenshot
+        :param remove: remove elements from screenshot
+        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
+        :param hide: hide elements from page before taking screenshot
+        :return: None
+        """
+        raise NotImplementedError()
+
+    def soft_assert_screenshot(
+            self,
+            filename: str = '',
+            test_name: str = '',
+            name_suffix: str = '',
+            threshold: Union[int, float] = None,
+            delay: Union[int, float] = None,
+            remove: Union[Any, List[Any]] = None,
+            cut_box: CutBox = None,
+            hide: Union[Any, List[Any]] = None,
+    ) -> Tuple[bool, str]:
+        """
+        Soft assert given (by name) and taken screenshot equals
+
+        :param filename: full screenshot name. Custom filename will be used if empty string given
+        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
+        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
+        :param threshold: possible threshold
+        :param delay: delay before taking screenshot
+        :param remove: remove elements from screenshot
+        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
+        :param hide: hide elements from page before taking screenshot
+        :return: bool - True: screenshots equal; False: screenshots mismatch;
         """
         raise NotImplementedError()
 

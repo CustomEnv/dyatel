@@ -25,6 +25,7 @@
 - Default timeout for `Element.wait_hidden_without_error` reduced to 2.5 seconds since it's a negative wait
 - Default timeout for `Element.wait_visibility_without_error` reduced to 2.5 seconds since it's a negative wait
 - Selenium only: `Element.click` now retries on `InvalidArgumentException` & `InvalidSelectorException` exceptions
+- Automatically generated `name` argument, based on the attribute name, has been removed
 
 ### Fixed
 - Playwright: Appending of dummy elements inside `Element.assert_screenshot`

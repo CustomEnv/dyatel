@@ -54,7 +54,10 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = "furo"
 html_static_path = ['_static']
-html_logo = "_static/logo.png"
+html_theme_options = {
+    "light_logo": "dark_logo.png",
+    "dark_logo": "light_logo.png",
+}
 autodoc_member_order = 'groupwise'
 
 

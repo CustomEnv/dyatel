@@ -124,7 +124,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_visibility(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
+    def wait_visibility(self, *, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait for current element available in page
 
@@ -134,7 +134,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
+    def wait_hidden(self, *, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait until current element hidden
 
@@ -144,7 +144,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
+    def wait_availability(self, *, timeout: int = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait for current element available in DOM
 
@@ -390,6 +390,7 @@ class ElementABC(MixinABC, ABC):
     def wait_elements_count(
             self,
             expected_count: int,
+            *,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
@@ -406,6 +407,7 @@ class ElementABC(MixinABC, ABC):
     def wait_for_text(
             self,
             expected_text: Optional[str] = None,
+            *,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
@@ -422,6 +424,7 @@ class ElementABC(MixinABC, ABC):
     def wait_for_value(
             self,
             expected_value: Optional[str] = None,
+            *,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
@@ -437,6 +440,7 @@ class ElementABC(MixinABC, ABC):
 
     def wait_visibility_without_error(
             self,
+            *,
             timeout: [int, float] = QUARTER_WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
@@ -451,6 +455,7 @@ class ElementABC(MixinABC, ABC):
 
     def wait_hidden_without_error(
             self,
+            *,
             timeout: [int, float] = QUARTER_WAIT_EL,
             silent: bool = False
     ) -> ElementABC:
@@ -463,7 +468,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_enabled(self, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementABC:
+    def wait_enabled(self, *, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait until element clickable
 
@@ -473,7 +478,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_disabled(self, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementABC:
+    def wait_disabled(self, *, timeout: [int, float] = WAIT_EL, silent: bool = False) -> ElementABC:
         """
         Wait until element clickable
 
@@ -485,6 +490,7 @@ class ElementABC(MixinABC, ABC):
 
     def wait_for_size(
             self,
+            *,
             expected_size: Size,
             timeout: [int, float] = WAIT_EL,
             silent: bool = False
