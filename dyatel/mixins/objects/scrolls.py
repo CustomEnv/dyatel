@@ -1,3 +1,4 @@
+# TODO: next_version - inherit from Enum
 class ScrollTo:
     START = 'start'
     CENTER = 'center'
@@ -5,6 +6,7 @@ class ScrollTo:
     NEAREST = 'nearest'
 
 
+# TODO: next_version - inherit from Enum
 class ScrollTypes:
     SMOOTH = 'smooth'
     INSTANT = 'instant'

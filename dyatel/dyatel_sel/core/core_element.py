@@ -16,6 +16,7 @@ from selenium.common.exceptions import (
     NoSuchElementException as SeleniumNoSuchElementException,
     ElementNotInteractableException as SeleniumElementNotInteractableException,
     ElementClickInterceptedException as SeleniumElementClickInterceptedException,
+    StaleElementReferenceException as SeleniumStaleElementReferenceException,
 )
 
 from dyatel.abstraction.element_abc import ElementABC
@@ -93,7 +94,11 @@ class CoreElement(ElementABC, ABC):
             try:
                 self.wait_enabled(silent=True).element.click()
                 return self
-            except (SeleniumElementNotInteractableException, SeleniumElementClickInterceptedException) as exc:
+            except (
+                    SeleniumElementNotInteractableException,
+                    SeleniumElementClickInterceptedException,
+                    SeleniumStaleElementReferenceException,
+            ) as exc:
                 selenium_exc_msg = exc.msg
             finally:
                 self.element = None
@@ -477,7 +482,7 @@ class CoreElement(ElementABC, ABC):
         if not element:
             if self.parent and not self._get_cached_element(self.parent):
                 raise NoSuchParentException(
-                    f'Cant find parent object "{self.parent.name}". {self.get_element_info(self.parent)}'
+                    f'Cant find parent object "{self.parent.name}". {self.get_element_info(self.parent)}'  # noqa
                 )
 
             raise NoSuchElementException(
@@ -553,7 +558,7 @@ class CoreElement(ElementABC, ABC):
         :return: None
         """
         if 'invalid locator' in exc.msg or 'is not a valid' in exc.msg:
-            msg = f'Selector for "{self.name}" is invalid. {self.get_element_info(self)}'
+            msg = f'Selector for "{self.name}" is invalid. {self.get_element_info()}'
             raise InvalidSelectorException(msg)
         else:
             raise exc
