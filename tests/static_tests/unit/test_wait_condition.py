@@ -88,12 +88,23 @@ def test_wait_condition_non_named_arg():
 
 
 @pytest.mark.parametrize('timeout', [True, False], ids=['timeout=True', 'timeout=False'])
-def test_wait_condition_timeout_unexpected_value(timeout):
+def test_wait_condition_timeout_unexpected_bool_value(timeout):
     namespace = MockNamespace('wait some condition', call_count=1)
     try:
         namespace.wait_something(timeout=timeout)
-    except AssertionError as exc:
-        assert "The `timeout` argument must be either float or inf. Provided: <class 'bool'>" in str(exc)
+    except TypeError as exc:
+        assert "The type of `timeout` arg must be int or float" in str(exc)
+    else:
+        raise Exception('Unexpected behavior')
+
+
+@pytest.mark.parametrize('timeout', [0, -1], ids=['timeout=0', 'timeout=-1'])
+def test_wait_condition_timeout_unexpected_negative_value(timeout):
+    namespace = MockNamespace('wait some condition', call_count=1)
+    try:
+        namespace.wait_something(timeout=timeout)
+    except ValueError as exc:
+        assert "The `timeout` value must be a positive number" in str(exc)
     else:
         raise Exception('Unexpected behavior')
 
@@ -104,7 +115,7 @@ def test_wait_condition_silent_unexpected_value(silent):
     namespace = MockNamespace('wait some condition', call_count=1)
     try:
         namespace.wait_something(silent=silent)  # noqa
-    except AssertionError as exc:
-        assert f"The `silent` argument must be of type bool. Provided: {type(silent)}" in str(exc)
+    except TypeError as exc:
+        assert f"The type of `silent` arg must be bool" in str(exc)
     else:
         raise Exception('Unexpected behavior')

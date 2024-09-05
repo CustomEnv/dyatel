@@ -54,14 +54,14 @@ def safe_call(func: Callable, *args, **kwargs) -> Union[Any, None]:
 
 
 @lru_cache(maxsize=None)
-def get_timeout_in_ms(timeout: int):
+def get_timeout_in_ms(timeout: Union[int, float]):
     """
     Get timeout in milliseconds for playwright
 
     :param timeout: timeout in seconds
     :return: timeout in milliseconds
     """
-    return timeout * 1000
+    return validate_timeout(timeout) * 1000
 
 
 def safe_getattribute(obj, item):
@@ -275,6 +275,23 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
     return int(x), int(y)
 
 
+def validate_timeout(timeout) -> Union[float, int]:
+    if type(timeout) not in (int, float):
+        raise TypeError('The type of `timeout` arg must be int or float')
+
+    if timeout <= 0:
+        raise ValueError('The `timeout` value must be a positive number')
+
+    return timeout
+
+
+def validate_silent(silent) -> bool:
+    if not isinstance(silent, bool):
+        raise TypeError(f'The type of `silent` arg must be bool')
+
+    return silent
+
+
 @lru_cache(maxsize=None)
 def get_method_signature(method: Callable):
     return inspect.signature(method)
@@ -291,12 +308,8 @@ def wait_condition(method: Callable):
 
     @wraps(method)
     def wrapper(self, *args, timeout: Union[int, float] = WAIT_EL, silent: bool = False, **kwargs):
-
-        assert type(timeout) in (int, float), \
-            f'The `timeout` argument must be either float or inf. Provided: {type(timeout)}.'
-
-        assert isinstance(silent, bool), \
-            f'The `silent` argument must be of type bool. Provided: {type(silent)}.'
+        validate_timeout(timeout)
+        validate_silent(silent)
 
         start_time = time.time()
         result: Result = method(self, *args, **kwargs)
