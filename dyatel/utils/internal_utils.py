@@ -292,16 +292,10 @@ def validate_silent(silent) -> bool:
     return silent
 
 
-@lru_cache(maxsize=None)
-def get_method_signature(method: Callable):
-    return inspect.signature(method)
-
-
-def get_method_arguments(method, *args, **kwargs):
-    method_signature = get_method_signature(method)
-    bound_args = method_signature.bind(*args, **kwargs)
-    bound_args.apply_defaults()
-    return bound_args.arguments
+def increase_delay(delay, max_delay: Union[int, float] = 1.5) -> Union[int, float]:
+    if delay < max_delay:
+        return delay + delay
+    return delay
 
 
 def wait_condition(method: Callable):
@@ -317,9 +311,14 @@ def wait_condition(method: Callable):
         if not silent:
             self.log(result.log)
 
+        should_increase_delay = self.driver_wrapper.is_appium
+        delay = WAIT_METHODS_DELAY
+
         while time.time() - start_time < timeout and not result.execution_result:
+            time.sleep(delay)
             result: Result = method(self, *args, **kwargs)
-            time.sleep(WAIT_METHODS_DELAY)
+            if should_increase_delay:
+                delay = increase_delay(delay)
 
         if result.execution_result:
             return self

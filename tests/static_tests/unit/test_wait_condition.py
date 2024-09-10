@@ -1,4 +1,5 @@
 import time
+from types import SimpleNamespace
 from typing import Union
 
 import pytest
@@ -13,10 +14,12 @@ namespace_default_cals_count = 3
 
 class MockNamespace:
 
-    def __init__(self, log_msg: str, call_count: int):
+    def __init__(self, log_msg: str, call_count: int, is_mobile: bool = False):
         self.call_count = call_count
         self.actual_call_count = 0
         self.log_msg = log_msg
+        self.driver_wrapper = SimpleNamespace()
+        self.driver_wrapper.is_appium = is_mobile
 
     def log(self, *args, **kwargs):
         return autolog(*args, **kwargs)
@@ -119,3 +122,22 @@ def test_wait_condition_silent_unexpected_value(silent):
         assert f"The type of `silent` arg must be bool" in str(exc)
     else:
         raise Exception('Unexpected behavior')
+
+
+def test_wait_condition_mobile_delay_increasing():
+    namespace = MockNamespace('wait some condition', call_count=10, is_mobile=True)
+    start_time = time.time()
+    namespace.wait_something()
+    end_time = time.time() - start_time
+    assert end_time > 0.7
+    assert end_time < 0.8
+
+
+
+def test_wait_condition_desktop_default_delay():
+    namespace = MockNamespace('wait some condition', call_count=5, is_mobile=False)
+    start_time = time.time()
+    namespace.wait_something()
+    end_time = time.time() - start_time
+    assert end_time < 0.6
+    assert end_time > 0.5

@@ -249,10 +249,10 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         Wait given or non-empty value presence in element
 
-        :param expected_value: value to be waiting for. None or empty for any value
+        :param expected_value: value to be waiting for. :obj:`None` - any value; :class:`str` - expected value
         :param timeout: wait timeout
         :param silent: erase log
-        :return: self
+        :return: :class:`Element`
         """
         actual_value = self.value
 
@@ -348,7 +348,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
 
     @property
-    def all_elements(self) -> Union[Any]:
+    def all_elements(self) -> List[Element]:
         if getattr(self, '_wrapped', None):
             raise RecursionError(f'all_elements property already used for {self.name}')
 
@@ -360,7 +360,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         :param silent: erase log
         :param check_displaying: trigger is_displayed additionally
-        :return: bool
+        :return: :class:`bool`
         """
         if not silent:
             self.log(f'Check visibility of "{self.name}"')
@@ -384,8 +384,9 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         Check is current element top left corner and bottom right corner visible on current screen
 
         :param silent: erase log
-        :param check_displaying: trigger is_displayed additionally
-        :return: bool
+        :param check_displaying: If `True`, the :func:`is_displayed` method will be called additionally.
+          The checking process will stop if this method returns `False`.
+        :return: :class:`bool`
         """
         if not silent:
             self.log(f'Check fully visibility of "{self.name}"')
@@ -517,8 +518,8 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param remove: remove elements from screenshot
         :param hide: hide elements from page before taking screenshot
         :param fill_background: fill background with given color or black color by default
-        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
-        :return: bool - True: screenshots equal; False: screenshots mismatch;
+        :param cut_box: :class:`CutBox` - custom coordinates, that will be cut from original image
+        :return: :class:`bool` - :obj:`True`: screenshots equal; :obj:`False`: screenshots mismatch;
         """
         try:
             self.assert_screenshot(
@@ -531,7 +532,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return True, f'No visual mismatch found for {self.name}'
 
-    def get_element_info(self, element: Any = None) -> str:
+    def get_element_info(self, element: Element = None) -> str:
         """
         Get full loging data depends on parent element
 
