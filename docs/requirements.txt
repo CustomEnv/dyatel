@@ -5,7 +5,7 @@ myst-parser==3.0.1
 # Needed for autodoc generation
 numpy==1.24.2
 scikit-image==0.20.0
-opencv-python==4.5.5.62
+opencv-python==4.8.1.78
 Appium-Python-Client==2.11.1
 Pillow==9.4.0
 selenium==4.12.0
