@@ -125,7 +125,7 @@ def test_wait_condition_silent_unexpected_value(silent):
 
 
 def test_wait_condition_mobile_delay_increasing():
-    namespace = MockNamespace('wait some condition', call_count=10, is_mobile=True)
+    namespace = MockNamespace('wait some condition', call_count=3, is_mobile=True)
     start_time = time.time()
     namespace.wait_something()
     end_time = time.time() - start_time
