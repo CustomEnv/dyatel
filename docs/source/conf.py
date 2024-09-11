@@ -40,6 +40,10 @@ source_dirs = ['../../dyatel']
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
     'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
+    'pillow': ('https://pillow.readthedocs.io/en/stable/', None),
+    'appium': ('https://appium.github.io/python-client-sphinx/', None),
+    'selenium': ('https://www.selenium.dev/selenium/docs/api/py/', None),
+    # 'playwright': ('https://playwright.dev/python/docs', None),
 }
 intersphinx_disabled_domains = ['std']
 
@@ -58,7 +62,7 @@ html_theme_options = {
     "light_logo": "dark_logo.png",
     "dark_logo": "light_logo.png",
 }
-autodoc_member_order = 'groupwise'
+autodoc_member_order = 'bysource'
 
 
 # -- Options for EPUB output
