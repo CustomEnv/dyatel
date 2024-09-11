@@ -3,7 +3,7 @@
 <br>
 
 ## v2.3.0
-*Release date: 2024-09-0?*
+*Release date: 2024-09-12*
 
 ### Added
 - [ReadTheDocs documentation](https://dyatel-wrapper.readthedocs.io/)
@@ -13,7 +13,9 @@
 - `ScrollTo` & `ScrollTypes` constants
 - `VisualComparison.assert_screenshot` now supports the use of the `CutBox` object
 - `Element.execute_script` method, which automatically sets itself to script arguments
-- Appium only: `NativeContext` & `NativeSafari` objects
+- Selenium only: 0.1 seconds delay between requests for all waiting methods
+- Playwright only: 0.1 seconds delay between requests for a few waiting methods
+- Appium only: exponential backoff delay starting at 0.1 seconds between requests for all waiting methods
 
 ### Changed
 - **Breaking:** `locator_type`, `mobile`, `ios`, `android`, and `desktop` kwargs removed
