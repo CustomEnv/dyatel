@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import time
 from abc import ABC
+from typing import Union
 
 from PIL.Image import Image
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.mixins.objects.location import Location
+from dyatel.mixins.objects.locator import Locator, take_locator_type
 from dyatel.mixins.objects.size import Size
 from dyatel.utils.internal_utils import calculate_coordinate_to_click
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type, get_appium_selector
@@ -14,16 +16,15 @@ from dyatel.utils.selector_synchronizer import get_platform_locator, get_seleniu
 
 class MobileElement(CoreElement, ABC):
 
-    def __init__(self, locator: str, locator_type: str):
+    def __init__(self, locator: Union[Locator, str]):
         """
         Initializing of mobile element with appium driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
-        :param locator_type: specific locator type
         """
-        locator = get_platform_locator(self, default_locator=locator)
-        locator_type = locator_type if locator_type else get_selenium_locator_type(locator)
-        self.locator, self.locator_type = get_appium_selector(locator, locator_type)
+        self.locator = get_platform_locator(self)
+        locator_type = take_locator_type(locator) or get_selenium_locator_type(self.locator)
+        self.locator, self.locator_type = get_appium_selector(self.locator, locator_type)
 
     def click_outside(self, x: int = 0, y: int = -5) -> MobileElement:
         """
@@ -40,7 +41,7 @@ class MobileElement(CoreElement, ABC):
         x, y = calculate_coordinate_to_click(self, x, y)
 
         if self.driver_wrapper.is_ios:
-            y += self.driver_wrapper.get_top_bar_height()
+            y += self.driver_wrapper.top_bar_height
 
         self.log(f'Tap outside from "{self.name}" with coordinates (x: {x}, y: {y})')
 
@@ -61,7 +62,7 @@ class MobileElement(CoreElement, ABC):
         x, y = calculate_coordinate_to_click(self, 0, 0)
 
         if self.driver_wrapper.is_ios:
-            y += self.driver_wrapper.get_top_bar_height()
+            y += self.driver_wrapper.top_bar_height
 
         if not silent:
             self.log(f'Tap into the center by coordinates (x: {x}, y: {y}) for "{self.name}"')
@@ -102,7 +103,7 @@ class MobileElement(CoreElement, ABC):
         try:
             self.driver_wrapper.switch_to_native()
             time.sleep(1)
-            if self.wait_element_without_error(timeout=5, silent=True).is_displayed(silent=True):
+            if self.wait_visibility_without_error(timeout=5, silent=True).is_displayed(silent=True):
                 self.click()
         finally:
             self.driver_wrapper.switch_to_web()

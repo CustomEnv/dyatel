@@ -1,5 +1,42 @@
 # Dyatel Changelog
 
+<br>
+
+## v2.3.0
+*Release date: 2024-09-12*
+
+### Added
+- [ReadTheDocs documentation](https://dyatel-wrapper.readthedocs.io/)
+- `Locator` object
+- `CutBox` object
+- `tablet` locator support
+- `ScrollTo` & `ScrollTypes` constants
+- `VisualComparison.assert_screenshot` now supports the use of the `CutBox` object
+- `Element.execute_script` method, which automatically sets itself to script arguments
+- Selenium only: 0.1 seconds delay between requests for all waiting methods
+- Playwright only: 0.1 seconds delay between requests for a few waiting methods
+- Appium only: exponential backoff delay starting at 0.1 seconds between requests for all waiting methods
+
+### Changed
+- **Breaking:** `locator_type`, `mobile`, `ios`, `android`, and `desktop` kwargs removed
+- **Breaking:** Most `Element` methods have been renamed
+- **Breaking:** `DriverWrapper.execute_script` now uses the `Element` object instead of the source element object
+- `MobileDriver.get_top_bar_height` method is now the `top_bar_height` property 
+- `MobileDriver.get_bottom_bar_height` method is now the `bottom_bar_height` property 
+- `Element.scroll_into_view` method now uses `ScrollTo` & `ScrollTypes` constants
+- Default timeout for `Element.wait_hidden_without_error` reduced to 2.5 seconds since it's a negative wait
+- Default timeout for `Element.wait_visibility_without_error` reduced to 2.5 seconds since it's a negative wait
+- Selenium only: `Element.click` now retries on `InvalidArgumentException` & `InvalidSelectorException` exceptions
+- Automatically generated `name` argument, based on the attribute name, has been removed
+
+### Fixed
+- Playwright: Appending of dummy elements inside `Element.assert_screenshot`
+- Playwright: `DriverWrapper.execute_script` error when multiple elements are available
+
+### Reworked
+- Mobile `top_bar_height` and `bottom_bar_height` now use `NativeContext` & `NativeSafari` objects
+- Most `Element` `wait` methods are now resolved with the `wait_condition` decorator
+
 ---
 
 ## v2.2.15

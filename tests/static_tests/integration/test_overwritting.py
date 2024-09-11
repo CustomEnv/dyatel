@@ -21,12 +21,12 @@ class B(A):
 
 
 def test_overwriting_from_subclass(mocked_selenium_driver):
-    obj = B()
+    obj = B('')
     assert obj.value == value
     assert obj.all_elements == replaced_data
 
 
 def test_overwriting_from_class(mocked_selenium_driver):
-    obj = A()
+    obj = A('')
     assert obj.value == value
     assert obj.all_elements == replaced_data

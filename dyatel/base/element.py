@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-import time
 from copy import copy
-from typing import Any, Union, List, Type, Tuple
+from typing import Union, List, Type, Tuple, Optional
 
 from PIL.Image import Image
+from dyatel.mixins.objects.wait_result import Result
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
+from selenium.common import WebDriverException
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
 from dyatel.abstraction.element_abc import ElementABC
@@ -16,7 +17,9 @@ from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
-from dyatel.mixins.internal_mixin import InternalMixin, get_element_info, all_locator_types
+from dyatel.mixins.internal_mixin import InternalMixin, get_element_info
+from dyatel.mixins.objects.cut_box import CutBox
+from dyatel.mixins.objects.locator import Locator
 from dyatel.mixins.objects.size import Size
 from dyatel.utils.logs import Logging, LogLevel
 from dyatel.utils.previous_object_driver import PreviousObjectDriver, set_instance_frame
@@ -30,6 +33,8 @@ from dyatel.utils.internal_utils import (
     safe_getattribute,
     set_parent_for_attr,
     is_page,
+    QUARTER_WAIT_EL,
+    wait_condition,
 )
 
 
@@ -63,42 +68,28 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     def __init__(
             self,
-            locator: str = '',
-            locator_type: str = '',
+            locator: Union[Locator, str],
             name: str = '',
             parent: Union[Any, False] = None,
             wait: bool = None,
             driver_wrapper: Union[DriverWrapper, Any] = None,
-            **kwargs
     ):
         """
         Initializing of element based on current driver
         Skip init if there are no driver, so will be initialized in Page/Group
 
         :param locator: locator of element. Can be defined without locator_type
-        :param locator_type: Selenium only: specific locator type
         :param name: name of element (will be attached to logs)
         :param parent: parent of element. Can be Group or other Element objects or False for skip
         :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
-        :param kwargs:
-          - desktop: str = locator that will be used for desktop platform
-          - mobile: str = locator that will be used for all mobile platforms and mobile_resolution
-          - ios: str = locator that will be used for ios platform
-          - android: str = locator that will be used for android platform
         """
         self._validate_inheritance()
-        self._check_kwargs(kwargs)
-
-        if locator_type:
-            assert locator_type in all_locator_types, \
-                f'Locator type "{locator_type}" is not supported. Choose from {all_locator_types}'
 
         if parent:
             assert isinstance(parent, (bool, Element)), \
                 f'The "parent" of "{self.name}" should take an Element/Group object or False for skip. Get {parent}'
 
         self.locator = locator
-        self.locator_type = locator_type
         self.name = name if name else locator
         self.parent = parent
         self.wait = wait
@@ -139,7 +130,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')
 
         self._set_static(self._base_cls)
-        self._base_cls.__init__(self, locator=self.locator, locator_type=self.locator_type)
+        self._base_cls.__init__(self, locator=self.locator)
         self._initialized = True
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using internal methods
@@ -177,9 +168,165 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     # Elements waits
 
+    def wait_visibility_without_error(self, *, timeout: Union[int, float] = QUARTER_WAIT_EL, silent: bool = False) -> Element:
+        """
+        Wait until element visibility without error
+
+        :param timeout: time to stop waiting
+        :param silent: erase log
+        :return: self
+        """
+        if not silent:
+            self.log(f'Wait until "{self.name}" becomes visible without error exception')
+
+        try:
+            self.wait_visibility(timeout=timeout, silent=True)
+        except (TimeoutException, WebDriverException) as exception:
+            if not silent:
+                self.log(f'Ignored exception: "{exception.msg}"')
+        return self
+
+    def wait_hidden_without_error(
+            self,
+            *,
+            timeout: Union[int, float] = QUARTER_WAIT_EL,
+            silent: bool = False
+    ) -> Element:
+        """
+        Wait until element hidden without error
+
+        :param timeout: time to stop waiting
+        :param silent: erase log
+        :return: self
+        """
+        if not silent:
+            self.log(f'Wait until "{self.name}" becomes hidden without error exception')
+
+        try:
+            self.wait_hidden(timeout=timeout, silent=True)
+        except (TimeoutException, WebDriverException) as exception:
+            if not silent:
+                self.log(f'Ignored exception: "{exception.msg}"')
+        return self
+
+    @wait_condition
+    def wait_for_text(
+            self,
+            expected_text: Optional[str] = None,
+            *,
+            timeout: Union[int, float] = WAIT_EL,
+            silent: bool = False
+    ) -> Element:
+        """
+        Wait given or non-empty text presence in element
+
+        :param expected_text: text to be waiting for. None or empty for any text
+        :param timeout: wait timeout
+        :param silent: erase log
+        :return: self
+        """
+        actual_text = self.text
+
+        if expected_text:
+            result = actual_text == expected_text
+            error = f'Not expected text for "{self.name}"'
+            log_msg = f'Wait until text of "{self.name}" will be equal to "{expected_text}"'
+        else:
+            result = actual_text
+            error = f'Text of "{self.name}" is empty'
+            log_msg = f'Wait for any text of "{self.name}"'
+
+        return Result(result, log_msg, UnexpectedTextException(error, actual_text, expected_text))  # noqa
+
+    @wait_condition
+    def wait_for_value(
+            self,
+            expected_value: Optional[str] = None,
+            *,
+            timeout: Union[int, float] = WAIT_EL,
+            silent: bool = False
+    ) -> Element:
+        """
+        Wait given or non-empty value presence in element
+
+        :param expected_value: value to be waiting for. :obj:`None` - any value; :class:`str` - expected value
+        :param timeout: wait timeout
+        :param silent: erase log
+        :return: :class:`Element`
+        """
+        actual_value = self.value
+
+        if expected_value:
+            result = actual_value == expected_value
+            error = f'Not expected value for "{self.name}"'
+            log_msg = f'Wait until value of "{self.name}" will be equal to "{expected_value}"'
+        else:
+            result = actual_value
+            error = f'Value of "{self.name}" is empty'
+            log_msg = f'Wait for any value inside "{self.name}"'
+
+        return Result(result, log_msg, UnexpectedValueException(error, actual_value, expected_value))  # noqa
+
+    @wait_condition
+    def wait_enabled(self, *, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
+        """
+        Wait until element clickable
+
+        :param timeout: time to stop waiting
+        :param silent: erase log
+        :return: self
+        """
+        return Result(  # noqa
+            execution_result=self.is_enabled(silent=True),
+            log=f'Wait until "{self.name}" becomes enabled',
+            exc=TimeoutException(f'"{self.name}" is not enabled', info=self),
+        )
+
+    @wait_condition
+    def wait_disabled(self, *, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
+        """
+        Wait until element disabled
+
+        :param timeout: time to stop waiting
+        :param silent: erase log
+        :return: self
+        """
+        return Result(  # noqa
+            execution_result=not self.is_enabled(silent=True),
+            log=f'Wait until "{self.name}" becomes disabled',
+            exc=TimeoutException(f'"{self.name}" is not disabled', info=self),
+        )
+
+    @wait_condition
+    def wait_for_size(
+            self,
+            expected_size: Size,
+            *,
+            timeout: Union[int, float] = WAIT_EL,
+            silent: bool = False
+    ) -> Element:
+        """
+        Wait until element size will be equal to given Size object
+
+        :param expected_size: expected element size in Size object
+        :param timeout: time to stop waiting
+        :param silent: erase log
+        :return: self
+        """
+        actual = self.size
+        is_height_equal = actual.height == expected_size.height if expected_size.height is not None else True
+        is_width_equal = actual.width == expected_size.width if expected_size.width is not None else True
+        return Result(  # noqa
+            execution_result=is_height_equal and is_width_equal,
+            log=f'Wait until "{self.name}" size will be equal to {expected_size}',
+            exc=UnexpectedElementSizeException(f'Unexpected size for "{self.name}"', actual, expected_size),
+        )
+
+    @wait_condition
     def wait_elements_count(
             self,
             expected_count: int,
+            *,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
     ) -> Element:
@@ -191,176 +338,17 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param silent: erase log
         :return: self
         """
-        if not silent:
-            self.log(f'Wait until elements count will be equal to "{expected_count}"')
+        actual_count = self.get_elements_count(silent=True)
+        error_msg = f'Unexpected elements count of "{self.name}"'
+        return Result(  # noqa
+            execution_result=actual_count == expected_count,
+            log=f'Wait until elements count of "{self.name}" will be equal to "{expected_count}"',
+            exc=UnexpectedElementsCountException(error_msg, actual_count, expected_count),
+        )
 
-        is_equal, actual_count = False, None
-        start_time = time.time()
-        while time.time() - start_time < timeout and not is_equal:
-            actual_count = self.get_elements_count(silent=True)
-            is_equal = actual_count == expected_count
-
-        if not is_equal:
-            msg = f'Unexpected elements count of "{self.name}". Actual: {actual_count}; Expected: {expected_count}'
-            raise UnexpectedElementsCountException(msg)
-
-        return self
-
-    def wait_element_text(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
-        """
-        Wait non empty text in element
-
-        :param timeout: wait timeout
-        :param silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait for any text is available in "{self.name}"')
-
-        text = None
-        start_time = time.time()
-        while time.time() - start_time < timeout and not text:
-            text = self.text
-
-        if not text:
-            raise UnexpectedTextException(f'Text of "{self.name}" is empty')
-
-        return self
-
-    def wait_element_value(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
-        """
-        Wait non empty value in element
-
-        :param timeout: wait timeout
-        :param silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait for any value is available in "{self.name}"')
-
-        value = None
-        start_time = time.time()
-        while time.time() - start_time < timeout and not value:
-            value = self.value
-
-        if not value:
-            raise UnexpectedValueException(f'Value of "{self.name}" is empty')
-
-        return self
-
-    def wait_element_without_error(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
-        """
-        Wait until element visibility without error
-
-        :param timeout: time to stop waiting
-        :param silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait until presence of "{self.name}" without error exception')
-
-        try:
-            self.wait_element(timeout=timeout, silent=True)
-        except TimeoutException as exception:
-            if not silent:
-                self.log(f'Ignored exception: "{exception.msg}"')
-        return self
-
-    def wait_element_hidden_without_error(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
-        """
-        Wait until element hidden without error
-
-        :param timeout: time to stop waiting
-        :param silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait until invisibility of "{self.name}" without error exception')
-
-        try:
-            self.wait_element_hidden(timeout=timeout, silent=True)
-        except TimeoutException as exception:
-            if not silent:
-                self.log(f'Ignored exception: "{exception.msg}"')
-        return self
-
-    def wait_enabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
-        """
-        Wait until element clickable
-
-        :param timeout: time to stop waiting
-        :param silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait until "{self.name}" become enabled')
-
-        element = self.element
-        enabled = False
-        start_time = time.time()
-        while time.time() - start_time < timeout and not enabled:
-            enabled = element.is_enabled()
-
-        if not enabled:
-            msg = f'"{self.name}" not enabled after {timeout} seconds. {self.get_element_info()}'
-            raise TimeoutException(msg)
-
-        return self
-
-    def wait_disabled(self, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
-        """
-        Wait until element clickable
-
-        :param timeout: time to stop waiting
-        :param silent: erase log
-        :return: self
-        """
-        if not silent:
-            self.log(f'Wait until "{self.name}" become disabled')
-
-        element = self.element
-        disabled = False
-        start_time = time.time()
-        while time.time() - start_time < timeout and not disabled:
-            disabled = not element.is_enabled()
-
-        if not disabled:
-            msg = f'"{self.name}" not disabled after {timeout} seconds. {self.get_element_info()}'
-            raise TimeoutException(msg)
-
-        return self
-
-    def wait_element_size(self, expected_size: Size, timeout: Union[int, float] = WAIT_EL) -> Element:
-        """
-        Wait until element size will be equal to given Size object
-
-        :param expected_size: expected element size in Size object
-        :param timeout: time to stop waiting
-        :return: Element
-        """
-        is_equal = False
-        start_time = time.time()
-        actual_size = Size(None, None)
-        is_height_equal, is_width_equal = True, True
-
-        while time.time() - start_time < timeout and not is_equal:
-            actual_size = self.size
-
-            if expected_size.height is not None:
-                is_height_equal = actual_size.height == expected_size.height
-            if expected_size.width is not None:
-                is_width_equal = actual_size.width == expected_size.width
-
-            is_equal = is_height_equal == is_width_equal
-
-        if not is_equal:
-            raise TimeoutException(f'"{self.name}" size is not equal to {expected_size} after {timeout} seconds. '
-                                   f'Actual: {actual_size}. {self.get_element_info()}')
-
-        return self
 
     @property
-    def all_elements(self) -> Union[Any]:
+    def all_elements(self) -> List[Element]:
         if getattr(self, '_wrapped', None):
             raise RecursionError(f'all_elements property already used for {self.name}')
 
@@ -372,7 +360,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         :param silent: erase log
         :param check_displaying: trigger is_displayed additionally
-        :return: bool
+        :return: :class:`bool`
         """
         if not silent:
             self.log(f'Check visibility of "{self.name}"')
@@ -396,8 +384,9 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         Check is current element top left corner and bottom right corner visible on current screen
 
         :param silent: erase log
-        :param check_displaying: trigger is_displayed additionally
-        :return: bool
+        :param check_displaying: If `True`, the :func:`is_displayed` method will be called additionally.
+          The checking process will stop if this method returns `False`.
+        :return: :class:`bool`
         """
         if not silent:
             self.log(f'Check fully visibility of "{self.name}"')
@@ -416,7 +405,12 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return is_visible
 
-    def save_screenshot(self, file_name: str, screenshot_base: bytes = None, convert_type: str = None) -> Image:
+    def save_screenshot(
+            self,
+            file_name: str,
+            screenshot_base: Union[bytes, Image] = None,
+            convert_type: str = None
+    ) -> Image:
         """
         Takes element screenshot and saving with given path/filename
 
@@ -426,7 +420,10 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :return: PIL Image object
         """
         self.log(f'Save screenshot of {self.name}')
-        image_object = self._base_cls.screenshot_image(self, screenshot_base)
+
+        image_object = screenshot_base
+        if type(screenshot_base) is bytes:
+            image_object = self._base_cls.screenshot_image(self, screenshot_base)
 
         if convert_type:
             image_object = image_object.convert(convert_type)
@@ -435,14 +432,24 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return image_object
 
-    def hide_element(self) -> Element:
+    def hide(self) -> Element:
         """
-        Hide element from page
+        Hide current element from page
 
-        :return: Element
+        :return: self
         """
-        self.driver_wrapper.execute_script('arguments[0].style.opacity = "0";', self.element)
+        self.execute_script('arguments[0].style.opacity = "0";')
         return self
+
+    def execute_script(self, script: str, *args) -> Any:
+        """
+        Execute script using current element
+
+        :param script: js script, that have `arguments[0]`
+        :param args: any other args for `arguments[1]` `arguments[2]` etc.
+        :return: Any
+        """
+        return self.driver_wrapper.execute_script(script, *[self, *[arg for arg in args]])
 
     def assert_screenshot(
             self,
@@ -453,8 +460,9 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             delay: Union[int, float] = None,
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
+            fill_background: Union[str, bool] = False,
+            cut_box: CutBox = None,
             hide: Union[Element, List[Element]] = None,
-            fill_background: Union[str, bool] = False
     ) -> None:
         """
         Assert given (by name) and taken screenshot equals
@@ -468,6 +476,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param remove: remove elements from screenshot
         :param hide: hide elements from page before taking screenshot
         :param fill_background: fill background with given color or black color by default
+        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
         :return: None
         """
         delay = delay or VisualComparison.default_delay
@@ -477,11 +486,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             if not isinstance(hide, list):
                 hide = [hide]
             for object_to_hide in hide:
-                object_to_hide.hide_element()
+                object_to_hide.hide()
 
         VisualComparison(self.driver_wrapper, self).assert_screenshot(
             filename=filename, test_name=test_name, name_suffix=name_suffix, threshold=threshold, delay=delay,
-            scroll=scroll, remove=remove, fill_background=fill_background
+            scroll=scroll, remove=remove, fill_background=fill_background, cut_box=cut_box
         )
 
     def soft_assert_screenshot(
@@ -493,8 +502,9 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             delay: Union[int, float] = None,
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
+            fill_background: Union[str, bool] = False,
+            cut_box: CutBox = None,
             hide: Union[Element, List[Element]] = None,
-            fill_background: Union[str, bool] = False
     ) -> Tuple[bool, str]:
         """
         Soft assert given (by name) and taken screenshot equals
@@ -508,11 +518,12 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param remove: remove elements from screenshot
         :param hide: hide elements from page before taking screenshot
         :param fill_background: fill background with given color or black color by default
-        :return: bool - True: screenshots equal; False: screenshots mismatch;
+        :param cut_box: :class:`CutBox` - custom coordinates, that will be cut from original image
+        :return: :class:`bool` - :obj:`True`: screenshots equal; :obj:`False`: screenshots mismatch;
         """
         try:
             self.assert_screenshot(
-                filename, test_name, name_suffix, threshold, delay, scroll, remove, hide, fill_background
+                filename, test_name, name_suffix, threshold, delay, scroll, remove, fill_background, cut_box, hide
             )
         except AssertionError as exc:
             exc = str(exc)
@@ -521,7 +532,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return True, f'No visual mismatch found for {self.name}'
 
-    def get_element_info(self, element: Any = None) -> str:
+    def get_element_info(self, element: Element = None) -> str:
         """
         Get full loging data depends on parent element
 
@@ -548,7 +559,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             wrapped_elements.append(wrapped_object)
 
         return wrapped_elements
-        
+
     def _modify_children(self):
         """
         Initializing of attributes with  type == Element.

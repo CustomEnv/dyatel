@@ -2,17 +2,22 @@ from __future__ import annotations
 
 import sys
 import inspect
+import time
 from copy import copy
-from functools import lru_cache
+from functools import lru_cache, wraps
 from typing import Any, Union, Callable
 
+from dyatel.mixins.objects.wait_result import Result
 from selenium.common.exceptions import StaleElementReferenceException as SeleniumStaleElementReferenceException
 
 from dyatel.exceptions import NoSuchElementException, InvalidSelectorException, TimeoutException, NoSuchParentException
 
 
+WAIT_METHODS_DELAY = 0.1
 WAIT_UNIT = 1
 WAIT_EL = 10
+HALF_WAIT_EL = WAIT_EL / 2
+QUARTER_WAIT_EL = HALF_WAIT_EL / 2
 WAIT_PAGE = 15
 
 
@@ -49,23 +54,18 @@ def safe_call(func: Callable, *args, **kwargs) -> Union[Any, None]:
 
 
 @lru_cache(maxsize=None)
-def get_timeout_in_ms(timeout: int):
+def get_timeout_in_ms(timeout: Union[int, float]):
     """
     Get timeout in milliseconds for playwright
 
     :param timeout: timeout in seconds
     :return: timeout in milliseconds
     """
-    return timeout * 1000
+    return validate_timeout(timeout) * 1000
 
 
 def safe_getattribute(obj, item):
     return object.__getattribute__(obj, item)
-
-
-def set_name_for_attr(attr, name):
-    if not attr.name or attr.name == attr.locator:
-        attr.name = name.replace('_', ' ')
 
 
 def get_frame(frame=1):
@@ -108,7 +108,6 @@ def initialize_objects(current_object, objects: dict, cls: Any):
     :return: None
     """
     for name, obj in objects.items():
-        set_name_for_attr(obj, name)
         copied_obj = copy(obj)
         promote_parent_element(copied_obj, current_object, cls)
         setattr(current_object, name, copied_obj(driver_wrapper=current_object.driver_wrapper))
@@ -274,3 +273,57 @@ def calculate_coordinate_to_click(element: Any, x: int = 0, y: int = 0) -> tuple
     y = emy + bool(y) * (y + meh * sy)
 
     return int(x), int(y)
+
+
+def validate_timeout(timeout) -> Union[float, int]:
+    if type(timeout) not in (int, float):
+        raise TypeError('The type of `timeout` arg must be int or float')
+
+    if timeout <= 0:
+        raise ValueError('The `timeout` value must be a positive number')
+
+    return timeout
+
+
+def validate_silent(silent) -> bool:
+    if not isinstance(silent, bool):
+        raise TypeError(f'The type of `silent` arg must be bool')
+
+    return silent
+
+
+def increase_delay(delay, max_delay: Union[int, float] = 1.5) -> Union[int, float]:
+    if delay < max_delay:
+        return delay + delay
+    return delay
+
+
+def wait_condition(method: Callable):
+
+    @wraps(method)
+    def wrapper(self, *args, timeout: Union[int, float] = WAIT_EL, silent: bool = False, **kwargs):
+        validate_timeout(timeout)
+        validate_silent(silent)
+
+        start_time = time.time()
+        result: Result = method(self, *args, **kwargs)
+
+        if not silent:
+            self.log(result.log)
+
+        should_increase_delay = self.driver_wrapper.is_appium
+        delay = WAIT_METHODS_DELAY
+
+        while time.time() - start_time < timeout and not result.execution_result:
+            time.sleep(delay)
+            result: Result = method(self, *args, **kwargs)
+            if should_increase_delay:
+                delay = increase_delay(delay)
+
+        if result.execution_result:
+            return self
+
+        result.exc._timeout = timeout  # noqa
+        raise result.exc
+
+    return wrapper

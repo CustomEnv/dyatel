@@ -173,21 +173,20 @@ class PlayDriver(Logging, DriverWrapperABC):
         Completable with selenium `execute_script` method
 
         :param script: the JavaScript to execute
-        :param args: any applicable arguments for your JavaScript
+        :param args: any applicable arguments for your JavaScript (Element object)
         :return: execution return value
         """
         script = script.replace('return ', '')
 
-        script_args = list(args)
         if 'arguments[0]' in script:
-            script_args = [*args]
+            args = [getattr(arg, 'element', arg) for arg in args]
             script = f'arguments => {{{script}}}'
 
         for index, arg in enumerate(args):
             if isinstance(arg, Locator):
-                script_args[index] = arg.element_handle()
+                args[index] = arg.first.element_handle()
 
-        return self.driver.evaluate(script, script_args)
+        return self.driver.evaluate(script, args)
 
     def evaluate(self, expression: str, arg: Any = None) -> Any:
         """

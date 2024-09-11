@@ -1,6 +1,7 @@
 import os
 import shutil
 
+from dyatel import dyatel_version
 from setuptools import setup
 
 with open('README.md') as f:
@@ -40,7 +41,7 @@ cleanup()
 
 setup(
     name=pypi_name,
-    version='2.2.15',
+    version=dyatel_version,
     url=f'https://github.com/EnvInc/{project_name}',
     packages=get_packages(project_name),
     install_requires=[
@@ -61,6 +62,7 @@ setup(
     project_urls={
         'Source': f'https://github.com/EnvInc/{project_name}',
         'Tracker': f'https://github.com/EnvInc/{project_name}/issues',
+        'Documentation': f'https://{pypi_name}.readthedocs.io',
         'Changelog': f'https://github.com/EnvInc/{project_name}/blob/master/CHANGELOG.md'
     },
     classifiers=[

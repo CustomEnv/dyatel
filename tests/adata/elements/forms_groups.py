@@ -27,3 +27,6 @@ class ControlsForm(Group):
     selenium_radio = Element('rad_selenium', name='selenium radiobutton')
     protractor_radio = Element('rad_protractor', name='protractor radiobutton')
     german_slider = Element('.custom-control-label', name='german language slider')
+    salary_input = Element('salary', name='salary input')  # initially disabled on page
+
+    broken_input = Element('data', name='invalid element')  # non available element on page

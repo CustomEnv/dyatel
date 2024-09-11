@@ -33,15 +33,14 @@ class PlayElement(ElementABC, Logging, ABC):
     parent: Union[ElementABC, PlayElement]
     _element: Locator = None
 
-    def __init__(self, locator: str, locator_type: str):
+    def __init__(self, locator: str):  # noqa
         """
         Initializing of web element with playwright driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
-        :param locator_type: compatibility arg - specific locator type
         """
-        self.locator = get_playwright_locator(get_platform_locator(self, default_locator=locator))
-        self.locator_type = f'{locator_type} - locator_type does not supported for playwright'
+        self.locator = get_playwright_locator(get_platform_locator(self))
+        self.locator_type = 'locator_type does not supported for playwright'
 
     # Element
 
@@ -94,7 +93,7 @@ class PlayElement(ElementABC, Logging, ABC):
         self.log(f'Click into "{self.name}"')
 
         if force_wait:
-            self.wait_element(silent=True)
+            self.wait_visibility(silent=True)
 
         self._first_element.click(*args, **kwargs)
         return self
@@ -141,7 +140,7 @@ class PlayElement(ElementABC, Logging, ABC):
         text = str(text)
 
         if not silent:
-            self.log(f'Type text {cut_log_data(text)} into "{self.name}"')
+            self.log(f'Type text "{cut_log_data(text)}" into "{self.name}"')
 
         self._first_element.type(text=text)
         return self
@@ -219,7 +218,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
     # Element waits
 
-    def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
+    def wait_visibility(self, *, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait for current element available in page
 
@@ -228,15 +227,15 @@ class PlayElement(ElementABC, Logging, ABC):
         :return: self
         """
         if not silent:
-            self.log(f'Wait until presence of "{self.name}"')
+            self.log(f'Wait until "{self.name}" becomes visible')
 
         try:
             self._first_element.wait_for(state='visible', timeout=get_timeout_in_ms(timeout))
         except PlayTimeoutError:
-            raise TimeoutException(f'Element "{self.name}" not visible after {timeout} seconds')
+            raise TimeoutException(f'"{self.name}" not visible', timeout=timeout, info=self)
         return self
 
-    def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
+    def wait_hidden(self, *, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait until element hidden
 
@@ -245,15 +244,14 @@ class PlayElement(ElementABC, Logging, ABC):
         :return: self
         """
         if not silent:
-            self.log(f'Wait hidden of "{self.name}"')
-
+            self.log(f'Wait until "{self.name}" becomes hidden')
         try:
             self._first_element.wait_for(state='hidden', timeout=get_timeout_in_ms(timeout))
         except PlayTimeoutError:
-            raise TimeoutException(f'Element "{self.name}" still visible after {timeout} seconds')
+            raise TimeoutException(f'"{self.name}" still visible', timeout=timeout, info=self)
         return self
 
-    def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
+    def wait_availability(self, *, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
         Wait for current element available in DOM
 
@@ -264,7 +262,10 @@ class PlayElement(ElementABC, Logging, ABC):
         if not silent:
             self.log(f'Wait until presence of "{self.name}"')
 
-        self._first_element.wait_for(state='attached', timeout=get_timeout_in_ms(timeout))
+        try:
+            self._first_element.wait_for(state='attached', timeout=get_timeout_in_ms(timeout))
+        except PlayTimeoutError:
+            raise TimeoutException(f'"{self.name}" not available in DOM', timeout=timeout, info=self)
         return self
 
     # Element state
@@ -321,7 +322,6 @@ class PlayElement(ElementABC, Logging, ABC):
 
         :return: element text
         """
-        self.log(f'Get text from "{self.name}"')
         element = self._first_element
         return element.text_content() if element.text_content() else element.input_value()
 
@@ -388,7 +388,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
         return self._first_element.get_attribute(attribute)
 
-    def get_elements_texts(self, silent: bool = False) -> List:
+    def get_all_texts(self, silent: bool = False) -> List:
         """
         Get all texts from all matching elements
 
@@ -428,7 +428,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
         :return: Size(width/height) obj
         """
-        box = self.element.bounding_box()
+        box = self.element.first.bounding_box()
         return Size(width=box['width'], height=box['height'])
 
     @property
@@ -438,7 +438,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
         :return: Location(x/y) obj
         """
-        box = self.element.bounding_box()
+        box = self.element.first.bounding_box()
         return Location(x=box['x'], y=box['y'])
 
     def is_enabled(self, silent: bool = False) -> bool:

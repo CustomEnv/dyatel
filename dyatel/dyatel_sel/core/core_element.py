@@ -5,6 +5,7 @@ from abc import ABC
 from typing import Union, List, Any, Callable
 
 from PIL import Image
+from dyatel.mixins.objects.wait_result import Result
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from appium.webdriver.webelement import WebElement as AppiumWebElement
@@ -15,16 +16,18 @@ from selenium.common.exceptions import (
     NoSuchElementException as SeleniumNoSuchElementException,
     ElementNotInteractableException as SeleniumElementNotInteractableException,
     ElementClickInterceptedException as SeleniumElementClickInterceptedException,
+    StaleElementReferenceException as SeleniumStaleElementReferenceException,
 )
 
 from dyatel.abstraction.element_abc import ElementABC
 from dyatel.dyatel_sel.sel_utils import ActionChains
-from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js, scroll_into_view_blocks
+from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.objects.location import Location
+from dyatel.mixins.objects.scrolls import ScrollTo, ScrollTypes, scroll_into_view_blocks
 from dyatel.mixins.objects.size import Size
 from dyatel.shared_utils import cut_log_data, _scaled_screenshot
-from dyatel.utils.internal_utils import WAIT_EL, safe_call, get_dict
+from dyatel.utils.internal_utils import WAIT_EL, safe_call, get_dict, HALF_WAIT_EL, wait_condition
 from dyatel.exceptions import (
     TimeoutException,
     InvalidSelectorException,
@@ -77,25 +80,33 @@ class CoreElement(ElementABC, ABC):
         Click to current element
 
         :param force_wait: wait for element visibility before click
-        :param args: compatibility arg
-        :param kwargs: compatibility arg
+        :param args: compatibility arg.
+        :param kwargs: compatibility arg.
         :return: self
         """
         self.log(f'Click into "{self.name}"')
 
         self.element = self._get_element(force_wait=force_wait)
-        exception_msg = f'Element "{self.name}" not interactable {self.get_element_info()}'
 
-        try:
-            self.wait_enabled(silent=True).element.click()
-        except SeleniumElementNotInteractableException:
-            raise ElementNotInteractableException(exception_msg)
-        except SeleniumElementClickInterceptedException as exc:
-            raise ElementNotInteractableException(f'{exception_msg}. Original error: {exc.msg}')
-        finally:
-            self.element = None
+        selenium_exc_msg = None
+        start_time = time.time()
+        while time.time() - start_time < HALF_WAIT_EL:
+            try:
+                self.wait_enabled(silent=True).element.click()
+                return self
+            except (
+                    SeleniumElementNotInteractableException,
+                    SeleniumElementClickInterceptedException,
+                    SeleniumStaleElementReferenceException,
+            ) as exc:
+                selenium_exc_msg = exc.msg
+            finally:
+                self.element = None
 
-        return self
+        raise ElementNotInteractableException(
+            f'Element "{self.name}" not interactable after {HALF_WAIT_EL} seconds. {self.get_element_info()}. '
+            f'Original error: {selenium_exc_msg}'
+        )
 
     def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> CoreElement:
         """
@@ -108,7 +119,7 @@ class CoreElement(ElementABC, ABC):
         text = str(text)
 
         if not silent:
-            self.log(f'Type text {cut_log_data(text)} into "{self.name}"')
+            self.log(f'Type text "{cut_log_data(text)}" into "{self.name}"')
 
         self.element.send_keys(text)
         return self
@@ -180,7 +191,8 @@ class CoreElement(ElementABC, ABC):
 
     # Element waits
 
-    def wait_element(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
+    @wait_condition
+    def wait_visibility(self, *, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
         """
         Wait for current element available in page
 
@@ -188,21 +200,14 @@ class CoreElement(ElementABC, ABC):
         :param silent: erase log
         :return: self
         """
-        if not silent:
-            self.log(f'Wait until presence of "{self.name}"')
+        return Result(  # noqa
+            execution_result=self.is_displayed(silent=True),
+            log=f'Wait until "{self.name}" becomes visible',
+            exc=TimeoutException(f'"{self.name}" not visible', info=self)
+        )
 
-        is_displayed = False
-        start_time = time.time()
-        while time.time() - start_time < timeout and not is_displayed:
-            is_displayed = self.is_displayed(silent=True)
-
-        if not is_displayed:
-            base_exception_msg = f'Element "{self.name}" not visible after {timeout} seconds'
-            raise TimeoutException(f'{base_exception_msg} {self.get_element_info()}')
-
-        return self
-
-    def wait_element_hidden(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
+    @wait_condition
+    def wait_hidden(self, *, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
         """
         Wait until element hidden
 
@@ -210,21 +215,14 @@ class CoreElement(ElementABC, ABC):
         :param silent: erase log
         :return: self
         """
-        if not silent:
-            self.log(f'Wait hidden of "{self.name}"')
+        return Result(  # noqa
+            execution_result=self.is_hidden(silent=True),
+            log=f'Wait until "{self.name}" becomes hidden',
+            exc=TimeoutException(f'"{self.name}" still visible', info=self),
+        )
 
-        is_hidden = False
-        start_time = time.time()
-        while time.time() - start_time < timeout and not is_hidden:
-            is_hidden = self.is_hidden(silent=True)
-
-        if not is_hidden:
-            msg = f'"{self.name}" still visible after {timeout} seconds. {self.get_element_info()}'
-            raise TimeoutException(msg)
-
-        return self
-
-    def wait_availability(self, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
+    @wait_condition
+    def wait_availability(self, *, timeout: int = WAIT_EL, silent: bool = False) -> CoreElement:
         """
         Wait for current element available in DOM
 
@@ -232,34 +230,26 @@ class CoreElement(ElementABC, ABC):
         :param silent: erase log
         :return: self
         """
-        if not silent:
-            self.log(f'Wait until "{self.name}" will be available in DOM')
-
-        is_available = False
-        start_time = time.time()
-        while time.time() - start_time < timeout and not is_available:
-            is_available = self.is_available()
-
-        if not is_available:
-            msg = f'"{self.name}" not available in DOM after {timeout} seconds. {self.get_element_info()}'
-            raise TimeoutException(msg)
-
-        return self
+        return Result(  # noqa
+            execution_result=self.is_available(),
+            log=f'Wait until presence of "{self.name}"',
+            exc=TimeoutException(f'"{self.name}" not available in DOM', info=self),
+        )
 
     # Element state
 
     def scroll_into_view(
             self,
-            block: str = 'center',
-            behavior: str = 'instant',
+            block: ScrollTo = ScrollTo.CENTER,
+            behavior: ScrollTypes = ScrollTypes.INSTANT,
             sleep: Union[int, float] = 0,
             silent: bool = False,
     ) -> CoreElement:
         """
         Scroll element into view by js script
 
-        :param block: start - element on the top; end - element at the bottom. All: start, center, end, nearest
-        :param behavior: scroll type: smooth or instant
+        :param block: start - element on the top; end - element at the bottom. All types in ScrollTo object
+        :param behavior: scroll type: ScrollTypes.INSTANT or ScrollTypes.SMOOTH
         :param sleep: delay after scroll
         :param silent: erase log
         :return: self
@@ -269,9 +259,7 @@ class CoreElement(ElementABC, ABC):
 
         assert block in scroll_into_view_blocks, f'Provide one of {scroll_into_view_blocks} option in `block` argument'
 
-        self.driver.execute_script(
-            f'arguments[0].scrollIntoView({{block: "{block}", behavior: "{behavior}"}});', self.element
-        )
+        self.execute_script(f'arguments[0].scrollIntoView({{block: "{block}", behavior: "{behavior}"}});')
 
         if sleep:
             time.sleep(sleep)
@@ -377,7 +365,7 @@ class CoreElement(ElementABC, ABC):
 
         return self.element.get_attribute(attribute)
 
-    def get_elements_texts(self, silent: bool = False) -> List[str]:
+    def get_all_texts(self, silent: bool = False) -> List[str]:
         """
         Get all texts from all matching elements
 
@@ -387,7 +375,7 @@ class CoreElement(ElementABC, ABC):
         if not silent:
             self.log(f'Get all texts from "{self.name}"')
 
-        self.wait_element(silent=True)
+        self.wait_visibility(silent=True)
         return list(element_item.text for element_item in self.all_elements)
 
     def get_elements_count(self, silent: bool = False) -> int:
@@ -418,7 +406,7 @@ class CoreElement(ElementABC, ABC):
 
         :return: Size(width/height) obj
         """
-        return Size(**self.driver.execute_script(get_element_size_js, self.element))
+        return Size(**self.execute_script(get_element_size_js))
 
     @property
     def location(self) -> Location:
@@ -427,7 +415,7 @@ class CoreElement(ElementABC, ABC):
 
         :return: Location(x/y) obj
         """
-        return Location(**self.driver.execute_script(get_element_position_on_screen_js, self.element))
+        return Location(**self.execute_script(get_element_position_on_screen_js))
 
     def is_enabled(self, silent: bool = False) -> bool:
         """
@@ -479,7 +467,7 @@ class CoreElement(ElementABC, ABC):
         element = self._element
 
         if wait is True:
-            wait = self.wait_element
+            wait = self.wait_visibility
 
         if not element:
 
@@ -494,7 +482,7 @@ class CoreElement(ElementABC, ABC):
         if not element:
             if self.parent and not self._get_cached_element(self.parent):
                 raise NoSuchParentException(
-                    f'Cant find parent object "{self.parent.name}". {self.get_element_info(self.parent)}'
+                    f'Cant find parent object "{self.parent.name}". {self.get_element_info(self.parent)}'  # noqa
                 )
 
             raise NoSuchElementException(
@@ -570,7 +558,7 @@ class CoreElement(ElementABC, ABC):
         :return: None
         """
         if 'invalid locator' in exc.msg or 'is not a valid' in exc.msg:
-            msg = f'Selector for "{self.name}" is invalid. {self.get_element_info(self)}'
+            msg = f'Selector for "{self.name}" is invalid. {self.get_element_info()}'
             raise InvalidSelectorException(msg)
         else:
             raise exc

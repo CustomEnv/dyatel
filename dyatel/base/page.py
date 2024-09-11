@@ -15,6 +15,7 @@ from dyatel.dyatel_sel.pages.web_page import WebPage
 from dyatel.exceptions import DriverWrapperException
 from dyatel.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
 from dyatel.mixins.internal_mixin import InternalMixin
+from dyatel.mixins.objects.locator import Locator
 from dyatel.utils.logs import Logging
 from dyatel.utils.previous_object_driver import PreviousObjectDriver, set_instance_frame
 from dyatel.utils.internal_utils import (
@@ -45,8 +46,7 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
 
     def __init__(
             self,
-            locator: str = '',
-            locator_type: str = '',
+            locator: Union[Locator, str] = '',
             name: str = '',
             driver_wrapper: Union[DriverWrapper, Any] = None,
             **kwargs
@@ -55,21 +55,15 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         Initializing of page based on current driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
-        :param locator_type: Selenium only: specific locator type
         :param name: name of page (will be attached to logs)
         :param driver_wrapper: set custom driver for page and page elements
-        :param kwargs:
-          - desktop: str = locator that will be used for desktop platform
-          - mobile: str = locator that will be used for all mobile platforms
-          - ios: str = locator that will be used for ios platform
-          - android: str = locator that will be used for android platform
         """
         self._validate_inheritance()
         self._check_kwargs(kwargs)
 
         self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
         
-        self.anchor = Element(locator=locator, locator_type=locator_type, name=name, driver_wrapper=self.driver_wrapper)
+        self.anchor = Element(locator, name=name, driver_wrapper=self.driver_wrapper)
         self.locator = self.anchor.locator
         self.locator_type = self.anchor.locator_type
         self.name = self.anchor.name
@@ -143,13 +137,13 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         if not silent:
             self.log(f'Wait until page "{self.name}" loaded')
 
-        self.anchor.wait_element(timeout=timeout, silent=True)
+        self.anchor.wait_visibility(timeout=timeout, silent=True)
 
         for element in self.page_elements:
             if getattr(element, 'wait') is False:
-                element.wait_element_hidden(timeout=timeout, silent=True)
+                element.wait_hidden(timeout=timeout, silent=True)
             elif getattr(element, 'wait') is True:
-                element.wait_element(timeout=timeout, silent=True)
+                element.wait_visibility(timeout=timeout, silent=True)
         return self
 
     def is_page_opened(self, with_elements: bool = False, with_url: bool = False) -> bool:

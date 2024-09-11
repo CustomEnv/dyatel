@@ -1,23 +1,24 @@
 from __future__ import annotations
 
 from abc import ABC
+from typing import Union
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
+from dyatel.mixins.objects.locator import take_locator_type, Locator
 from dyatel.utils.internal_utils import calculate_coordinate_to_click
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type
 
 
 class WebElement(CoreElement, ABC):
 
-    def __init__(self, locator: str, locator_type: str):
+    def __init__(self, locator: Union[Locator, str]):
         """
         Initializing of web element with selenium driver
 
         :param locator: anchor locator of page. Can be defined without locator_type
-        :param locator_type: specific locator type
         """
-        self.locator = get_platform_locator(self, default_locator=locator)
-        self.locator_type = locator_type if locator_type else get_selenium_locator_type(self.locator)
+        self.locator = get_platform_locator(self)
+        self.locator_type = take_locator_type(locator) or get_selenium_locator_type(self.locator)
 
     def hover(self, silent: bool = False) -> WebElement:
         """

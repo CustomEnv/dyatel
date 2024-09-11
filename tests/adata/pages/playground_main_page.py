@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from dyatel.base.element import Element
 from dyatel.base.group import Group
 from dyatel.base.page import Page
+from dyatel.mixins.objects.locator import Locator
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.keyboard_page import KeyboardPage
 from tests.settings import domain_name, repo_name
@@ -27,7 +28,6 @@ class PlaygroundMainPage(Page):
     overview_section_broken = Element('overviewshka', name='broken overview section')
     kube = Element('.img-fluid', name='rubik\'s cube')
     any_link = Element('a', name='any link')
-    kube_invalid_locator = Element('.img-fluid', locator_type=By.XPATH, name='rubik\'s cube with invalid locator')
     kube_broken = Element('.img-fluid .not-available', name='rubik\'s cube broken locator')
     kube_parent = Element('.img-fluid', name='kube with parent', parent=description_section)
     kube_wrong_parent = Element('.img-fluid', name='kube with wrong parent', parent=overview_section)

@@ -49,7 +49,7 @@ def platform(request):
 def chrome_options(request):
     options = ChromeOptions()
     if request.config.getoption('headless'):
-        options.headless = True
+        options.add_argument('--headless=new')
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     return options
 
@@ -58,7 +58,7 @@ def chrome_options(request):
 def firefox_options(request):
     options = FirefoxOptions()
     if request.config.getoption('headless'):
-        options.headless = True
+        options.add_argument('--headless=new')
     return options
 
 
@@ -107,6 +107,7 @@ def visual_comparisons_settings(request):
     VisualComparison.soft_visual_reference_generation = request.config.getoption('--sgr')
     VisualComparison.skip_screenshot_comparison = request.config.getoption('--sv')
     VisualComparison.default_threshold = 0.1
+    VisualComparison.default_delay = 0.1
     VisualComparison.test_item = request.node
 
 

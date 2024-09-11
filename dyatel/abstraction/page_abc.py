@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import abstractmethod, ABC
+from abc import ABC
 from typing import Union
 
 from dyatel.abstraction.mixin_abc import MixinABC
@@ -10,7 +10,6 @@ from dyatel.utils.internal_utils import WAIT_PAGE
 
 class PageABC(MixinABC, ABC):
 
-    @abstractmethod
     def reload_page(self, wait_page_load: bool = True) -> PageABC:
         """
         Reload current page
@@ -20,7 +19,6 @@ class PageABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def open_page(self, url: str = '') -> PageABC:
         """
         Open page with given url or use url from page class f url isn't given
@@ -30,7 +28,6 @@ class PageABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def wait_page_loaded(self, silent: bool = False, timeout: Union[int, float] = WAIT_PAGE) -> PageABC:
         """
         Wait until page loaded
@@ -41,7 +38,6 @@ class PageABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def is_page_opened(self, with_elements: bool = False, with_url: bool = False) -> bool:
         """
         Check is current page opened or not

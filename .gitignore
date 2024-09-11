@@ -170,5 +170,5 @@ cython_debug/
 /tests/adata/visual/difference
 
 # not needed references:
-/tests/adata/visual/reference/test_assert_screenshot_negative_missmatch_action_cards_mac_selenium_chrome_headless_shell.png
-/tests/adata/visual/reference/test_assert_screenshot_negative_different_sizes_action_cards_mac_selenium_chrome_headless_shell.png
+/tests/adata/visual/reference/test_assert_screenshot_negative_missmatch_action_cards*
+/tests/adata/visual/reference/test_assert_screenshot_negative_different_sizes_action_cards*
