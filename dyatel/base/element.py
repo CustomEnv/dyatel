@@ -157,8 +157,8 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         Send a keyboard action to the current element (e.g., press a key or shortcut).
 
-        :param action: The keyboard action to perform (can be a string or :class:`KeyboardKeys` object).
-        :type action: str, :class:`KeyboardKeys`
+        :param action: The keyboard action to perform.
+        :type action: str or :class:`KeyboardKeys`
         :return: :class:`Element`
         """
         if self.driver_wrapper.is_playwright:
@@ -311,7 +311,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
           (starting at 0.1 seconds, up to a maximum of 1.6 seconds) which increases
           with each iteration during the waiting process.
 
-        :param expected_value: Value to be waiting for. :obj:`None` - any value; :class:`str` - expected value.
+        :param expected_value: The value to waiting for. :obj:`None` - any value; :class:`str` - expected value.
         :type expected_value: typing.Optional[str]
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
         :type timeout: int or float
@@ -417,7 +417,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
           with each iteration during the waiting process.
 
         :param expected_size: expected element size
-        :type timeout: class:`Size`
+        :type expected_size: :class:`Size`
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
         :type timeout: int or float
         :param silent: If :obj:`True`, suppresses logging.
@@ -479,7 +479,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         Returns a list of all matching elements.
 
-        :return: List of wrapped elements as :class:`Element`.
+        :return: A list of wrapped :class:`Element` objects.
         """
         if getattr(self, '_wrapped', None):
             raise RecursionError(f'all_elements property already used for {self.name}')
@@ -488,7 +488,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     def is_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
-        Checks if the current element's top-left corner or bottom-right corner is visible on the screen.
+        Checks is the current element's top-left corner or bottom-right corner is visible on the screen.
 
         :param check_displaying: If :obj:`True`, the :func:`is_displayed` method will be called to further verify
           visibility. The check will stop if this method returns :obj:`False`.
@@ -620,25 +620,25 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :type name_suffix: str
         :param threshold: The acceptable threshold for comparing screenshots.
           If :obj:`None` - takes default threshold or calculate its automatically based on screenshot size.
-        :type threshold: int or float, optional
+        :type threshold: typing.Optional[int or float]
         :param delay: The delay in seconds before taking the screenshot.
           If :obj:`None` - takes default delay.
-        :type delay: int or float, optional
+        :type delay: typing.Optional[int or float]
         :param scroll: Whether to scroll to the element before taking the screenshot.
         :type scroll: bool
         :param remove: :class:`Element` to remove from the screenshot.
           Can be a single element or a list of elements.
-        :type remove: Element or typing.List[Element], optional
+        :type remove: typing.Optional[Element or typing.List[Element]]
         :param fill_background: The color to fill the background.
           If :obj:`True`, uses a default color (black). If a :class:`str`, uses the specified color.
-        :type fill_background: str or bool, optional
+        :type fill_background: typing.Optional[str or bool]
         :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
-            If `None`, no region is cut.
-        :type cut_box: :class:`CutBox`, optional
+            If :obj:`None`, no region is cut.
+        :type cut_box: typing.Optional[CutBox]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
-        :type hide: Element or typing.List[Element], optional
-        :return: :class:`None`
+        :type hide: typing.Optional[Element or typing.List[Element]]
+        :return: :obj:`None`
         """
         delay = delay or VisualComparison.default_delay
         remove = [remove] if type(remove) is not list and remove else remove
@@ -681,21 +681,20 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :type name_suffix: str
         :param threshold: The acceptable threshold for comparing screenshots.
           If :obj:`None` - takes default threshold or calculate its automatically based on screenshot size.
-        :type threshold: int or float, optional
+        :type threshold: typing.Optional[int or float]
         :param delay: The delay in seconds before taking the screenshot.
           If :obj:`None` - takes default delay.
-        :type delay: int or float, optional
+        :type delay: typing.Optional[int or float]
         :param scroll: Whether to scroll to the element before taking the screenshot.
         :type scroll: bool
         :param remove: :class:`Element` to remove from the screenshot.
-          Can be a single element or a list of elements.
-        :type remove: Element or typing.List[Element], optional
+        :type remove: typing.Optional[Element or typing.List[Element]]
         :param fill_background: The color to fill the background.
           If :obj:`True`, uses a default color (black). If a :class:`str`, uses the specified color.
-        :type fill_background: str or bool, optional
+        :type fill_background: typing.Optional[str or bool]
         :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
-            If `None`, no region is cut.
-        :type cut_box: :class:`CutBox`, optional
+            If :obj:`None`, no region is cut.
+        :type cut_box: typing.Optional[CutBox]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :return: :class:`typing.Tuple` (:class:`bool`, :class:`str`) - result state and result message

@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from dyatel import dyatel_version
+from dyatel import dyatel_version, project_name
 from setuptools import setup
 
 with open('README.md') as f:
@@ -9,7 +9,6 @@ with open('README.md') as f:
 
 
 pypi_name = 'dyatel-wrapper'
-project_name = 'dyatel'
 egg_name = pypi_name.replace('-', '_')
 
 
