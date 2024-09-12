@@ -139,11 +139,13 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     def set_text(self, text: str, silent: bool = False) -> Element:
         """
-        Set (clear and type) text in current element
+        Clear the current input field and type the provided text.
 
-        :param text: text to be filled
-        :param silent: erase log
-        :return: self
+        :param text: The text to enter into the element.
+        :type text: str
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`Element`
         """
         if not silent:
             self.log(f'Set text in "{self.name}"')
@@ -153,10 +155,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     def send_keyboard_action(self, action: Union[str, KeyboardKeys]) -> Element:
         """
-        Send keyboard action to current element
+        Send a keyboard action to the current element (e.g., press a key or shortcut).
 
-        :param action: keyboard action
-        :return: self
+        :param action: The keyboard action to perform (can be a string or :class:`KeyboardKeys` object).
+        :type action: str, :class:`KeyboardKeys`
+        :return: :class:`Element`
         """
         if self.driver_wrapper.is_playwright:
             self.click()
@@ -170,11 +173,26 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     def wait_visibility_without_error(self, *, timeout: Union[int, float] = QUARTER_WAIT_EL, silent: bool = False) -> Element:
         """
-        Wait until element visibility without error
+        Wait for the element to become visible, without raising an error if it does not.
 
-        :param timeout: time to stop waiting
-        :param silent: erase log
-        :return: self
+        **Note:** The method requires the use of named arguments.
+
+        **Selenium & Playwright:**
+
+        - Applied :func:`wait_condition` decorator integrates a 0.1 seconds delay for each iteration
+          during the waiting process.
+
+        **Appium:**
+
+        - Applied :func:`wait_condition` decorator integrates an exponential delay
+          (starting at 0.1 seconds, up to a maximum of 1.6 seconds) which increases
+          with each iteration during the waiting process.
+
+        :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`QUARTER_WAIT_EL`.
+        :type timeout: int or float
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`Element`
         """
         if not silent:
             self.log(f'Wait until "{self.name}" becomes visible without error exception')
@@ -193,11 +211,26 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             silent: bool = False
     ) -> Element:
         """
-        Wait until element hidden without error
+        Wait for the element to become hidden, without raising an error if it does not.
 
-        :param timeout: time to stop waiting
-        :param silent: erase log
-        :return: self
+        **Note:** The method requires the use of named arguments.
+
+        **Selenium & Playwright:**
+
+        - Applied :func:`wait_condition` decorator integrates a 0.1 seconds delay for each iteration
+          during the waiting process.
+
+        **Appium:**
+
+        - Applied :func:`wait_condition` decorator integrates an exponential delay
+          (starting at 0.1 seconds, up to a maximum of 1.6 seconds) which increases
+          with each iteration during the waiting process.
+
+        :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`QUARTER_WAIT_EL`.
+        :type timeout: int or float
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`Element`
         """
         if not silent:
             self.log(f'Wait until "{self.name}" becomes hidden without error exception')
@@ -218,12 +251,28 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             silent: bool = False
     ) -> Element:
         """
-        Wait given or non-empty text presence in element
+        Wait for the presence of a specific text in the current element, or for any non-empty text.
 
-        :param expected_text: text to be waiting for. None or empty for any text
-        :param timeout: wait timeout
-        :param silent: erase log
-        :return: self
+        **Note:** The method requires the use of named arguments except ``expected_text``.
+
+        **Selenium & Playwright:**
+
+        - Applied :func:`wait_condition` decorator integrates a 0.1 seconds delay for each iteration
+          during the waiting process.
+
+        **Appium:**
+
+        - Applied :func:`wait_condition` decorator integrates an exponential delay
+          (starting at 0.1 seconds, up to a maximum of 1.6 seconds) which increases
+          with each iteration during the waiting process.
+
+        :param expected_text: The text to wait for. :obj:`None` - any text; :class:`str` - expected text.
+        :type expected_text: typing.Optional[str]
+        :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
+        :type timeout: int or float
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`Element`
         """
         actual_text = self.text
 
@@ -247,11 +296,27 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             silent: bool = False
     ) -> Element:
         """
-        Wait given or non-empty value presence in element
+        Wait for a specific value in the current element, or for any non-empty value.
 
-        :param expected_value: value to be waiting for. :obj:`None` - any value; :class:`str` - expected value
-        :param timeout: wait timeout
-        :param silent: erase log
+        **Note:** The method requires the use of named arguments except ``expected_value``.
+
+        **Selenium & Playwright:**
+
+        - Applied :func:`wait_condition` decorator integrates a 0.1 seconds delay for each iteration
+          during the waiting process.
+
+        **Appium:**
+
+        - Applied :func:`wait_condition` decorator integrates an exponential delay
+          (starting at 0.1 seconds, up to a maximum of 1.6 seconds) which increases
+          with each iteration during the waiting process.
+
+        :param expected_value: Value to be waiting for. :obj:`None` - any value; :class:`str` - expected value.
+        :type expected_value: typing.Optional[str]
+        :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
+        :type timeout: int or float
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
         :return: :class:`Element`
         """
         actual_value = self.value
@@ -270,11 +335,26 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     @wait_condition
     def wait_enabled(self, *, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
-        Wait until element clickable
+        Wait for the element to become enabled and/or clickable.
 
-        :param timeout: time to stop waiting
-        :param silent: erase log
-        :return: self
+        **Note:** The method requires the use of named arguments.
+
+        **Selenium & Playwright:**
+
+        - Applied :func:`wait_condition` decorator integrates a 0.1 seconds delay for each iteration
+          during the waiting process.
+
+        **Appium:**
+
+        - Applied :func:`wait_condition` decorator integrates an exponential delay
+          (starting at 0.1 seconds, up to a maximum of 1.6 seconds) which increases
+          with each iteration during the waiting process.
+
+        :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
+        :type timeout: int or float
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`Element`
         """
         return Result(  # noqa
             execution_result=self.is_enabled(silent=True),
@@ -285,11 +365,26 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     @wait_condition
     def wait_disabled(self, *, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
-        Wait until element disabled
+        Wait for the element to become disabled.
 
-        :param timeout: time to stop waiting
-        :param silent: erase log
-        :return: self
+        **Note:** The method requires the use of named arguments.
+
+        **Selenium & Playwright:**
+
+        - Applied :func:`wait_condition` decorator integrates a 0.1 seconds delay for each iteration
+          during the waiting process.
+
+        **Appium:**
+
+        - Applied :func:`wait_condition` decorator integrates an exponential delay
+          (starting at 0.1 seconds, up to a maximum of 1.6 seconds) which increases
+          with each iteration during the waiting process.
+
+        :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
+        :type timeout: [int, float]
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`Element`
         """
         return Result(  # noqa
             execution_result=not self.is_enabled(silent=True),
@@ -306,12 +401,28 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             silent: bool = False
     ) -> Element:
         """
-        Wait until element size will be equal to given Size object
+        Wait until element size will be equal to given :class:`Size` object
 
-        :param expected_size: expected element size in Size object
-        :param timeout: time to stop waiting
-        :param silent: erase log
-        :return: self
+        **Note:** The method requires the use of named arguments except ``expected_size``.
+
+        **Selenium & Playwright:**
+
+        - Applied :func:`wait_condition` decorator integrates a 0.1 seconds delay for each iteration
+          during the waiting process.
+
+        **Appium:**
+
+        - Applied :func:`wait_condition` decorator integrates an exponential delay
+          (starting at 0.1 seconds, up to a maximum of 1.6 seconds) which increases
+          with each iteration during the waiting process.
+
+        :param expected_size: expected element size
+        :type timeout: class:`Size`
+        :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
+        :type timeout: int or float
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`Element`
         """
         actual = self.size
         is_height_equal = actual.height == expected_size.height if expected_size.height is not None else True
@@ -331,12 +442,28 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             silent: bool = False
     ) -> Element:
         """
-        Wait until elements count will be equal to expected value
+        Wait until the number of matching elements equals the expected count.
 
-        :param expected_count: expected elements count
-        :param timeout: wait timeout
-        :param silent: erase log
-        :return: self
+        **Note:** The method requires the use of named arguments except ``expected_count``.
+
+        **Selenium & Playwright:**
+
+        - Applied :func:`wait_condition` decorator integrates a 0.1 seconds delay for each iteration
+          during the waiting process.
+
+        **Appium:**
+
+        - Applied :func:`wait_condition` decorator integrates an exponential delay
+          (starting at 0.1 seconds, up to a maximum of 1.6 seconds) which increases
+          with each iteration during the waiting process.
+
+        :param expected_count: The expected number of elements.
+        :type expected_count: int
+        :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
+        :type timeout: Union[int, float]
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`Element`
         """
         actual_count = self.get_elements_count(silent=True)
         error_msg = f'Unexpected elements count of "{self.name}"'
@@ -349,6 +476,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     @property
     def all_elements(self) -> List[Element]:
+        """
+        Returns a list of all matching elements.
+
+        :return: List of wrapped elements as :class:`Element`.
+        """
         if getattr(self, '_wrapped', None):
             raise RecursionError(f'all_elements property already used for {self.name}')
 
@@ -356,10 +488,13 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     def is_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
         """
-        Check is current element top left corner or bottom right corner visible on current screen
+        Checks if the current element's top-left corner or bottom-right corner is visible on the screen.
 
-        :param silent: erase log
-        :param check_displaying: trigger is_displayed additionally
+        :param check_displaying: If :obj:`True`, the :func:`is_displayed` method will be called to further verify
+          visibility. The check will stop if this method returns :obj:`False`.
+        :type check_displaying: bool
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
         :return: :class:`bool`
         """
         if not silent:
@@ -383,9 +518,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         Check is current element top left corner and bottom right corner visible on current screen
 
-        :param silent: erase log
-        :param check_displaying: If `True`, the :func:`is_displayed` method will be called additionally.
-          The checking process will stop if this method returns `False`.
+        :param check_displaying: If :obj:`True`, the :func:`is_displayed` method will be called to further verify
+          visibility. The check will stop if this method returns :obj:`False`.
+        :type check_displaying: bool
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
         :return: :class:`bool`
         """
         if not silent:
@@ -412,12 +549,15 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             convert_type: str = None
     ) -> Image:
         """
-        Takes element screenshot and saving with given path/filename
+        Saves a screenshot of the element.
 
-        :param file_name: path/filename
-        :param screenshot_base: use given image binary instead of taking a new screenshot
-        :param convert_type: convert image type before save
-        :return: PIL Image object
+        :param file_name: Path or filename for the screenshot.
+        :type file_name: str
+        :param screenshot_base: Screenshot binary or image to use (optional).
+        :type screenshot_base: :obj:`bytes`, :class:`PIL.Image.Image`
+        :param convert_type: Image conversion type before saving (optional).
+        :type convert_type: str
+        :return: :class:`PIL.Image.Image`
         """
         self.log(f'Save screenshot of {self.name}')
 
@@ -434,20 +574,22 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     def hide(self) -> Element:
         """
-        Hide current element from page
+        Hides the element.
 
-        :return: self
+        :return: :class:`Element`
         """
         self.execute_script('arguments[0].style.opacity = "0";')
         return self
 
     def execute_script(self, script: str, *args) -> Any:
         """
-        Execute script using current element
+        Executes a JavaScript script on the element.
 
-        :param script: js script, that have `arguments[0]`
-        :param args: any other args for `arguments[1]` `arguments[2]` etc.
-        :return: Any
+        :param script: JavaScript code to be executed, referring to the element as ``arguments[0]``.
+        :type script: str
+        :param args: Additional arguments for the script,
+          that appear in script as ``arguments[1]`` ``arguments[2]`` etc.
+        :return: :obj:`typing.Any` result from the script.
         """
         return self.driver_wrapper.execute_script(script, *[self, *[arg for arg in args]])
 
@@ -465,19 +607,38 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             hide: Union[Element, List[Element]] = None,
     ) -> None:
         """
-        Assert given (by name) and taken screenshot equals
+        Asserts that the given screenshot matches the currently taken screenshot.
 
-        :param filename: full screenshot name. Custom filename will be used if empty string given
-        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
-        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
-        :param threshold: possible threshold
-        :param delay: delay before taking screenshot
-        :param scroll: scroll to element before taking the screenshot
-        :param remove: remove elements from screenshot
-        :param hide: hide elements from page before taking screenshot
-        :param fill_background: fill background with given color or black color by default
-        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
-        :return: None
+        :param filename: The full name of the screenshot file.
+          If empty - filename will be generated based on test name & :class:`Element` ``name`` argument & platform.
+        :type filename: str
+        :param test_name: The custom test name for generated filename.
+          If empty - it will be determined automatically.
+        :type test_name: str
+        :param name_suffix: A suffix to add to the filename.
+          Useful for distinguishing between positive and negative cases for the same :class:`Element` during one test.
+        :type name_suffix: str
+        :param threshold: The acceptable threshold for comparing screenshots.
+          If :obj:`None` - takes default threshold or calculate its automatically based on screenshot size.
+        :type threshold: int or float, optional
+        :param delay: The delay in seconds before taking the screenshot.
+          If :obj:`None` - takes default delay.
+        :type delay: int or float, optional
+        :param scroll: Whether to scroll to the element before taking the screenshot.
+        :type scroll: bool
+        :param remove: :class:`Element` to remove from the screenshot.
+          Can be a single element or a list of elements.
+        :type remove: Element or typing.List[Element], optional
+        :param fill_background: The color to fill the background.
+          If :obj:`True`, uses a default color (black). If a :class:`str`, uses the specified color.
+        :type fill_background: str or bool, optional
+        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+            If `None`, no region is cut.
+        :type cut_box: :class:`CutBox`, optional
+        :param hide: :class:`Element` to hide in the screenshot.
+          Can be a single element or a list of elements.
+        :type hide: Element or typing.List[Element], optional
+        :return: :class:`None`
         """
         delay = delay or VisualComparison.default_delay
         remove = [remove] if type(remove) is not list and remove else remove
@@ -507,19 +668,37 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             hide: Union[Element, List[Element]] = None,
     ) -> Tuple[bool, str]:
         """
-        Soft assert given (by name) and taken screenshot equals
+        Compares the currently taken screenshot to the expected screenshot and returns a result.
 
-        :param filename: full screenshot name. Custom filename will be used if empty string given
-        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
-        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
-        :param threshold: possible threshold
-        :param delay: delay before taking screenshot
-        :param scroll: scroll to element before taking the screenshot
-        :param remove: remove elements from screenshot
-        :param hide: hide elements from page before taking screenshot
-        :param fill_background: fill background with given color or black color by default
-        :param cut_box: :class:`CutBox` - custom coordinates, that will be cut from original image
-        :return: :class:`bool` - :obj:`True`: screenshots equal; :obj:`False`: screenshots mismatch;
+        :param filename: The full name of the screenshot file.
+          If empty - filename will be generated based on test name & :class:`Element` ``name`` argument & platform.
+        :type filename: str
+        :param test_name: The custom test name for generated filename.
+          If empty - it will be determined automatically.
+        :type test_name: str
+        :param name_suffix: A suffix to add to the filename.
+          Useful for distinguishing between positive and negative cases for the same :class:`Element` during one test.
+        :type name_suffix: str
+        :param threshold: The acceptable threshold for comparing screenshots.
+          If :obj:`None` - takes default threshold or calculate its automatically based on screenshot size.
+        :type threshold: int or float, optional
+        :param delay: The delay in seconds before taking the screenshot.
+          If :obj:`None` - takes default delay.
+        :type delay: int or float, optional
+        :param scroll: Whether to scroll to the element before taking the screenshot.
+        :type scroll: bool
+        :param remove: :class:`Element` to remove from the screenshot.
+          Can be a single element or a list of elements.
+        :type remove: Element or typing.List[Element], optional
+        :param fill_background: The color to fill the background.
+          If :obj:`True`, uses a default color (black). If a :class:`str`, uses the specified color.
+        :type fill_background: str or bool, optional
+        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+            If `None`, no region is cut.
+        :type cut_box: :class:`CutBox`, optional
+        :param hide: :class:`Element` to hide in the screenshot.
+          Can be a single element or a list of elements.
+        :return: :class:`typing.Tuple` (:class:`bool`, :class:`str`) - result state and result message
         """
         try:
             self.assert_screenshot(
@@ -534,20 +713,24 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     def get_element_info(self, element: Element = None) -> str:
         """
-        Get full loging data depends on parent element
+        Retrieves detailed logging information for the specified element.
 
-        :param element: element to collect log data
-        :return: log string
+        :param element: The :class:`Element` for which to collect logging data.
+          If :obj:`None`, logging data for the ``parent`` element is used.
+        :type element: :class:`Element` or :obj:`None`
+        :return: A string containing the log data.
+        :rtype: str
         """
         element = element if element else self
         return get_element_info(element)
 
     def _get_all_elements(self, sources: Union[tuple, list]) -> List[Any]:
         """
-        Get all wrapped elements from sources
+        Retrieves all wrapped elements from the given sources.
 
-        :param sources: list of elements: `all_elements` from selenium or `element_handles` from playwright
-        :return: list of wrapped elements
+        :param sources: A list or tuple of source objects
+        :type sources: tuple or list
+        :return: A list of wrapped :class:`Element` objects.
         """
         wrapped_elements = []
 

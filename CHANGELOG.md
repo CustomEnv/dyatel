@@ -15,7 +15,7 @@
 - `Element.execute_script` method, which automatically sets itself to script arguments
 - Selenium only: 0.1 seconds delay between requests for all waiting methods
 - Playwright only: 0.1 seconds delay between requests for a few waiting methods
-- Appium only: exponential backoff delay starting at 0.1 seconds between requests for all waiting methods
+- Appium only: exponential delay starting at 0.1 seconds between requests for all waiting methods
 
 ### Changed
 - **Breaking:** `locator_type`, `mobile`, `ios`, `android`, and `desktop` kwargs removed
