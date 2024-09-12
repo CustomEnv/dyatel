@@ -21,12 +21,12 @@
 - **Breaking:** `locator_type`, `mobile`, `ios`, `android`, and `desktop` kwargs removed
 - **Breaking:** Most `Element` methods have been renamed
 - **Breaking:** `DriverWrapper.execute_script` now uses the `Element` object instead of the source element object
-- **Breaking:** `MobileDriver.get_top_bar_height` method is now the `top_bar_height` property 
-- **Breaking:** `MobileDriver.get_bottom_bar_height` method is now the `bottom_bar_height` property 
+- **Breaking:** `MobileDriver.get_top_bar_height` method changed to the `top_bar_height` property 
+- **Breaking:** `MobileDriver.get_bottom_bar_height` method changed to the `bottom_bar_height` property 
 - `Element.scroll_into_view` method now uses `ScrollTo` & `ScrollTypes` constants
 - Default timeout for `Element.wait_hidden_without_error` reduced to 2.5 seconds since it's a negative wait
 - Default timeout for `Element.wait_visibility_without_error` reduced to 2.5 seconds since it's a negative wait
-- Selenium only: `Element.click` now retries on `ElementNotInteractableException`, `ElementClickInterceptedException`, `StaleElementReferenceException`, exceptions
+- Selenium & Appium only: `Element.click` now retries on `ElementNotInteractableException`, `ElementClickInterceptedException`, `StaleElementReferenceException` exceptions
 - Automatically generated `name` argument, based on the attribute name, has been removed
 
 ### Fixed
