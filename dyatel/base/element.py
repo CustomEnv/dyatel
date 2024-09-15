@@ -486,7 +486,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return self._base_cls.all_elements.fget(self)
 
-    def is_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
+    def is_visible(self, check_displaying: bool = True, silent: bool = False) -> bool:
         """
         Checks is the current element's top-left corner or bottom-right corner is visible on the screen.
 
@@ -514,7 +514,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return is_visible
 
-    def is_fully_visible(self, silent: bool = False, check_displaying: bool = True) -> bool:
+    def is_fully_visible(self, check_displaying: bool = True, silent: bool = False) -> bool:
         """
         Check is current element top left corner and bottom right corner visible on current screen
 

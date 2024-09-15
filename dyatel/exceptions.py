@@ -118,3 +118,10 @@ class NotInitializedException(DriverWrapperException):
     Thrown when getting access to not initialized object
     """
     pass
+
+
+class InvalidLocatorException(DriverWrapperException):
+    """
+    Thrown when locator is invalid
+    """
+    pass
