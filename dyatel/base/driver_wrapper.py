@@ -196,7 +196,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         self.log(f'Save driver screenshot')
 
         image_object = screenshot_base
-        if type(screenshot_base) is bytes:
+        if isinstance(screenshot_base, bytes) or screenshot_base is None:
             image_object = self.screenshot_image(screenshot_base)
 
         if convert_type:

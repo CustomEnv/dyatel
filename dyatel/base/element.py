@@ -562,7 +562,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         self.log(f'Save screenshot of {self.name}')
 
         image_object = screenshot_base
-        if type(screenshot_base) is bytes:
+        if isinstance(screenshot_base, bytes) or screenshot_base is None:
             image_object = self._base_cls.screenshot_image(self, screenshot_base)
 
         if convert_type:
