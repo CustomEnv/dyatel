@@ -21,37 +21,37 @@ The class also handles dynamic thresholds, image comparison metrics, and can gen
    :exclude-members: calculate_threshold 
    :members: assert_screenshot
    
-   .. attribute:: visual_regression_path
+   .. attribute:: visual_regression_path: str = ''
       -   Path where visual regression images (reference, output, and diff) will be stored. 
    
-   .. attribute:: test_item
+   .. attribute:: test_item: pytest.Item = None
       -   The pytest `request.node.` object associated with the visual comparison.
    
-   .. attribute:: attach_diff_image_path
+   .. attribute:: attach_diff_image_path: bool = False
       -   Flag to determine whether to attach the diff image path to the report. 
    
-   .. attribute:: skip_screenshot_comparison
+   .. attribute:: skip_screenshot_comparison: bool = False
       -   If set to `True`, the screenshot comparison will be skipped. 
    
-   .. attribute:: visual_reference_generation
+   .. attribute:: visual_reference_generation: bool = False
       -   Enables generation of visual references. 
    
-   .. attribute:: hard_visual_reference_generation
+   .. attribute:: hard_visual_reference_generation: bool = False
       -   Forces generation of visual references, replacing existing ones. 
    
-   .. attribute:: soft_visual_reference_generation
+   .. attribute:: soft_visual_reference_generation: bool = False
       -   Allows generation of visual references only if they do not exist. 
    
-   .. attribute:: default_delay
+   .. attribute:: default_delay: Union[int, float] = 0.75
       -   Default delay before taking a screenshot. 
    
-   .. attribute:: default_threshold
+   .. attribute:: default_threshold: Union[int, float] = 0
       -   Default threshold for image comparison. 
    
-   .. attribute:: dynamic_threshold_factor
+   .. attribute:: dynamic_threshold_factor: int = 0
       -   Factor for dynamically calculating threshold based on image size. 
    
-   .. attribute:: diff_color_scheme
+   .. attribute:: diff_color_scheme: tuple = (0, 255, 0)
       -   Color scheme used for highlighting differences in images. 
 ```
 

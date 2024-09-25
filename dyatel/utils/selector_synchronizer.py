@@ -4,7 +4,7 @@ from typing import Any, Union
 
 from selenium.webdriver.common.by import By
 
-from dyatel.exceptions import InvalidSelectorException
+from dyatel.exceptions import InvalidSelectorException, InvalidLocatorException
 from dyatel.mixins.objects.locator import Locator
 from dyatel.utils.internal_utils import get_child_elements, all_tags
 
@@ -32,10 +32,13 @@ def get_platform_locator(obj: Any):
         locator = locator.android or mobile_fallback_locator
     elif obj.driver_wrapper.is_ios:
         locator = locator.ios or mobile_fallback_locator
-    elif obj.driver_wrapper.is_mobile or obj.driver_wrapper.is_appium:
+    elif obj.driver_wrapper.is_mobile:
         locator = mobile_fallback_locator
     elif obj.driver_wrapper.is_desktop:
         locator = locator.desktop or locator.default
+
+    if not isinstance(locator, str):
+        raise InvalidLocatorException(f'Cannot extract locator for current platform for following object: {obj}')
 
     return locator
 
