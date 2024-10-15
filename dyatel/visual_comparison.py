@@ -91,7 +91,11 @@ class VisualComparison:
         if cut_box:
             image = image.crop(cut_box.get_box(image.size))
 
-        desired_obj.save_screenshot(screenshot_name, screenshot_base=image)
+        try:
+            self.driver_wrapper.execute_script('document.body.style.overflow = "hidden";')
+            desired_obj.save_screenshot(screenshot_name, screenshot_base=image)
+        finally:
+            self.driver_wrapper.execute_script('document.body.style.overflow = "";')
 
         self._remove_dummy_elements()
 
