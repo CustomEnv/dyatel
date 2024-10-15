@@ -80,19 +80,19 @@ class VisualComparison:
             fill_background: bool,
             cut_box: Optional[CutBox],
     ):
-        time.sleep(delay)
-
-        self._fill_background(fill_background)
-        self._appends_dummy_elements(remove)
-
-        desired_obj = self.dyatel_element or self.driver_wrapper.anchor or self.driver_wrapper
-        image = desired_obj.screenshot_image()
-
-        if cut_box:
-            image = image.crop(cut_box.get_box(image.size))
-
         try:
             self.driver_wrapper.execute_script('document.body.style.overflow = "hidden";')
+            time.sleep(delay)
+
+            self._fill_background(fill_background)
+            self._appends_dummy_elements(remove)
+
+            desired_obj = self.dyatel_element or self.driver_wrapper.anchor or self.driver_wrapper
+            image = desired_obj.screenshot_image()
+
+            if cut_box:
+                image = image.crop(cut_box.get_box(image.size))
+
             desired_obj.save_screenshot(screenshot_name, screenshot_base=image)
         finally:
             self.driver_wrapper.execute_script('document.body.style.overflow = "";')
