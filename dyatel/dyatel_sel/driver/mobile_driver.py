@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Union, List, Optional
 
 from appium.webdriver.applicationstate import ApplicationState
-from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
@@ -249,7 +248,7 @@ class MobileDriver(CoreDriver):
             self.log(f'Tap by given coordinates (x: {x}, y: {y})')
 
         if self.is_ios:
-            TouchAction(self.driver).tap(x=x, y=y).perform()
+            self.driver.tap(positions=[(x, y)])
         elif self.is_android:
             CoreDriver.click_by_coordinates(self, x=x, y=y, silent=True)
 
