@@ -3,6 +3,14 @@
 <br>
 
 ## v2.3.0
+*Release date: 2024-12-16*
+
+### Fixed
+- Memory leak due to misuse of lru_cache
+
+---
+
+## v2.3.0
 *Release date: 2024-09-12*
 
 ### Added
