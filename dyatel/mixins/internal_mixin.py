@@ -38,7 +38,6 @@ class InternalMixin:
         assert all(item in available_kwarg_keys for item in kwargs), \
             f'The given kwargs is not available. Please provide them according to available keys: {available_kwarg_keys}'
 
-    @lru_cache(maxsize=None)
     def __get_static(self, cls: Any):
         return get_child_elements_with_names(cls).items()
 
