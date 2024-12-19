@@ -5,19 +5,19 @@
 ## v2.3.2
 *Release date: 2024-12-19*
 
-### Fixed
-- Memory leak due to misuse of lru_cache
+### Changed
+- Supported Python-Appium-Client version changed from `2.11.1` to `3.1.0`
+- Supported appium version changed from `2.2.1` to `2.12.1`
+- Supported xcuitest version changed from `5.0.0` to `7.28.3`
+- Supported uiautomator2 version changed from `2.34.1` to `3.9.0`
 
 ---
 
 ## v2.3.1
 *Release date: 2024-12-16*
 
-### Changed
-- Supported Python-Appium-Client version changed from `2.11.1` to `3.1.0`
-- Supported appium version changed from `2.2.1` to `2.12.1`
-- Supported xcuitest version changed from `5.0.0` to `7.28.3`
-- Supported uiautomator2 version changed from `2.34.1` to `3.9.0`
+### Fixed
+- Memory leak due to misuse of lru_cache
 
 ---
 
