@@ -1,1 +1,1 @@
-dyatel_version = '2.3.1'
+dyatel_version = '2.3.2'
