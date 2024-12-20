@@ -1,5 +1,5 @@
 /* Change color of method names in autodoc */
 /* For general method names in autodoc */
-[data-theme="dark"] .sig-name.descname {
-    color: #FFC66D !important;  /* Red color with higher specificity */
-}
+/* [data-theme="dark"] .sig-name.descname {
+/*     color: #FFC66D !important;  /* Red color with higher specificity */
+/* }

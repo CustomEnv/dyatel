@@ -5,6 +5,8 @@ from abc import ABC
 from typing import Union, List, Any
 
 from PIL.Image import Image
+from dyatel.keyboard_keys import KeyboardKeys
+from dyatel.mixins.objects.scrolls import ScrollTo, ScrollTypes
 from playwright.sync_api import TimeoutError as PlayTimeoutError
 from playwright.sync_api import Page as PlaywrightPage
 from playwright.sync_api import Locator, Page, Browser, BrowserContext
@@ -98,25 +100,29 @@ class PlayElement(ElementABC, Logging, ABC):
         self._first_element.click(*args, **kwargs)
         return self
 
-    def click_outside(self, x: int = -5.0, y: int = -5.0) -> PlayElement:
+    def click_outside(self, x: int = -5, y: int = -5) -> PlayElement:
         """
-        Click outside of element. By default, 5px above and 5px left of element
+        Perform a click outside the current element, by default 5px left and above it.
 
-        :param x: x offset of element to click
-        :param y: y offset of element to click
-        :return: self
+        :param x: Horizontal offset from the element to click.
+        :type x: int
+        :param y: Vertical offset from the element to click.
+        :type y: int
+        :return: :class:`PlayElement`
         """
         self.log(f'Click outside from "{self.name}"')
 
-        self._first_element.click(position={'x': x, 'y': y}, force=True)
+        self._first_element.click(position={'x': float(x), 'y': float(y)}, force=True)
         return self
+
 
     def click_into_center(self, silent: bool = False) -> PlayElement:
         """
-        Click into the center of element
+        Clicks at the center of the element.
 
-        :param silent: erase log message
-        :return: self
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`PlayElement`
         """
         if not self.is_fully_visible(silent=True):
             self.scroll_into_view()
@@ -129,13 +135,16 @@ class PlayElement(ElementABC, Logging, ABC):
         self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
         return self
 
-    def type_text(self, text: str, silent: bool = False) -> PlayElement:
-        """
-        Type text to current element
 
-        :param: text: text to be typed
-        :param: silent: erase log
-        :return: self
+    def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> PlayElement:
+        """
+        Types text into the element.
+
+        :param text: The text to be typed or a keyboard key.
+        :type text: str, :class:`KeyboardKeys`
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`PlayElement`
         """
         text = str(text)
 
@@ -272,19 +281,23 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def scroll_into_view(
             self,
+            block: ScrollTo = ScrollTo.CENTER,
+            behavior: ScrollTypes = ScrollTypes.INSTANT,
             sleep: Union[int, float] = 0,
             silent: bool = False,
-            *args,  # noqa
-            **kwargs,  # noqa
     ) -> PlayElement:
         """
-        Scroll element into view
+        Scrolls the element into view.
 
-        :param: sleep: delay after scroll
-        :param: silent: erase log
-        :param: args: compatibility arg
-        :param: kwargs: compatibility arg
-        :return: self
+        :param block: Compatibility arg. One of the :class:`ScrollTo` options.
+        :type block: ScrollTo
+        :param behavior: Compatibility arg. One of the :class:`ScrollTypes` options.
+        :type behavior: ScrollTypes
+        :param sleep: Delay in seconds after scrolling. Can be an integer or a float.
+        :type sleep: int or float
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`PlayElement`
         """
         if not silent:
             self.log(f'Scroll element "{self.name}" into view')

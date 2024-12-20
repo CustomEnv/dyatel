@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Union
+from typing import Union, Any
 
 from appium.webdriver.webdriver import WebDriver as AppiumWebDriver
 from dyatel.utils.logs import LogLevel
@@ -43,7 +43,7 @@ class MixinABC(ABC):
         """
         raise NotImplementedError()
 
-    def log(self, message: str, level: str = LogLevel.INFO) -> None:
+    def log(self: Any, message: str, level: str = LogLevel.INFO) -> None:
         """
         Logs a message with detailed context in the following format:
 

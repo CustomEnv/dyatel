@@ -4,11 +4,10 @@ import time
 from abc import ABC
 from typing import Union
 
-from dyatel.abstraction.page_abc import PageABC
 from dyatel.dyatel_sel.core.core_page import CorePage
 
 
-class MobilePage(CorePage, PageABC, ABC):
+class MobilePage(CorePage, ABC):
 
     def swipe(
             self,

@@ -710,7 +710,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return True, f'No visual mismatch found for {self.name}'
 
-    def get_element_info(self, element: Element = None) -> str:
+    def get_element_info(self, element: Optional[Element] = None) -> str:
         """
         Retrieves detailed logging information for the specified element.
 

@@ -25,7 +25,7 @@ class ElementABC(MixinABC, ABC):
     locator: str = None
     locator_type: str = None
     name: str = None
-    parent: Optional["Element"] = None
+    parent: Optional[Element] = None
     wait: bool = None
 
     @property
@@ -51,7 +51,7 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @property
-    def all_elements(self) -> Union[list, List["Element"]]:
+    def all_elements(self) -> Union[list, List[Element]]:
         """
         Returns a list of all matching elements.
 
@@ -59,7 +59,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def click(self, force_wait: bool = True, *args, **kwargs) -> "Element":
+    def click(self, force_wait: bool = True, *args, **kwargs) -> Element:
         """
         Clicks on the element.
 
@@ -80,7 +80,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def click_into_center(self, silent: bool = False) -> "Element":
+    def click_into_center(self, silent: bool = False) -> Element:
         """
         Clicks at the center of the element.
 
@@ -90,7 +90,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> "Element":
+    def type_text(self, text: Union[str, KeyboardKeys], silent: bool = False) -> Element:
         """
         Types text into the element.
 
@@ -102,7 +102,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def type_slowly(self, text: str, sleep_gap: float = 0.05, silent: bool = False) -> "Element":
+    def type_slowly(self, text: str, sleep_gap: float = 0.05, silent: bool = False) -> Element:
         """
         Types text into the element slowly with a delay between keystrokes.
 
@@ -116,7 +116,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def clear_text(self, silent: bool = False) -> "Element":
+    def clear_text(self, silent: bool = False) -> Element:
         """
         Clears the text of the element.
 
@@ -126,7 +126,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def check(self) -> "Element":
+    def check(self) -> Element:
         """
         Checks the checkbox element.
 
@@ -134,7 +134,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def uncheck(self) -> "Element":
+    def uncheck(self) -> Element:
         """
         Unchecks the checkbox element.
 
@@ -142,7 +142,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_visibility(self, *, timeout: int = WAIT_EL, silent: bool = False) -> "Element":
+    def wait_visibility(self, *, timeout: int = WAIT_EL, silent: bool = False) -> Element:
         """
         Waits until the element becomes visible.
         **Note:** The method requires the use of named arguments.
@@ -166,7 +166,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_hidden(self, *, timeout: int = WAIT_EL, silent: bool = False) -> "Element":
+    def wait_hidden(self, *, timeout: int = WAIT_EL, silent: bool = False) -> Element:
         """
         Waits until the element becomes hidden.
         **Note:** The method requires the use of named arguments.
@@ -190,7 +190,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_availability(self, *, timeout: int = WAIT_EL, silent: bool = False) -> "Element":
+    def wait_availability(self, *, timeout: int = WAIT_EL, silent: bool = False) -> Element:
         """
         Waits until the element becomes available in DOM tree. \n
         **Note:** The method requires the use of named arguments.
@@ -230,7 +230,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def hide(self) -> "Element":
+    def hide(self) -> Element:
         """
         Hides the element.
 
@@ -242,18 +242,18 @@ class ElementABC(MixinABC, ABC):
         """
         Executes a JavaScript script on the element.
 
-        :param script: JavaScript code in Selenium format to be executed,
-           referring to the element as ``arguments[0]``.
+        :param script: JavaScript code to be executed, referring to the element as ``arguments[0]``.
         :type script: str
         :param args: Additional arguments for the script,
           that appear in script as ``arguments[1]`` ``arguments[2]`` etc.
-        :return: :class:`Any` result from the script.
+        :return: :obj:`typing.Any` result from the script.
         """
         raise NotImplementedError()
 
     def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
         Returns a :class:`PIL.Image.Image` object representing the screenshot of the web element.
+        Appium iOS: Take driver screenshot and crop manually element from it
 
         :param screenshot_base: Screenshot binary data (optional).
           If :obj:`None` is provided then takes a new screenshot
@@ -402,7 +402,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def hover(self, silent: bool = False) -> "Element":
+    def hover(self, silent: bool = False) -> Element:
         """
         Hover the mouse over the current element.
 
@@ -412,7 +412,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def hover_outside(self, x: int = 0, y: int = -5) -> "Element":
+    def hover_outside(self, x: int = 0, y: int = -5) -> Element:
         """
         Hover the mouse outside the current element, by default 5px above it.
 
@@ -424,9 +424,9 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def click_outside(self, x: int = -1, y: int = -1) -> "Element":
+    def click_outside(self, x: int = -5, y: int = -5) -> Element:
         """
-        Perform a click outside the current element, by default 1px left and above it.
+        Perform a click outside the current element, by default 5px left and above it.
 
         :param x: Horizontal offset from the element to click.
         :type x: int
@@ -436,7 +436,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def click_in_alert(self) -> "Element":
+    def click_in_alert(self) -> Element:
         """
         Perform a click on an element inside an alert box (Mobile only).
         **Note:** Automatically switches to native context of the browser.
@@ -445,7 +445,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def set_text(self, text: str, silent: bool = False) -> "Element":
+    def set_text(self, text: str, silent: bool = False) -> Element:
         """
         Clear the current input field and type the provided text.
 
@@ -457,7 +457,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def send_keyboard_action(self, action: Union[str, KeyboardKeys]) -> "Element":
+    def send_keyboard_action(self, action: Union[str, KeyboardKeys]) -> Element:
         """
         Send a keyboard action to the current element (e.g., press a key or shortcut).
 
@@ -473,7 +473,7 @@ class ElementABC(MixinABC, ABC):
             *,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
-    ) -> "Element":
+    ) -> Element:
         """
         Wait until the number of matching elements equals the expected count.
 
@@ -506,7 +506,7 @@ class ElementABC(MixinABC, ABC):
             *,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
-    ) -> "Element":
+    ) -> Element:
         """
         Wait for the presence of a specific text in the current element, or for any non-empty text.
 
@@ -539,7 +539,7 @@ class ElementABC(MixinABC, ABC):
             *,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
-    ) -> "Element":
+    ) -> Element:
         """
         Wait for a specific value in the current element, or for any non-empty value.
 
@@ -571,7 +571,7 @@ class ElementABC(MixinABC, ABC):
             *,
             timeout: Union[int, float] = QUARTER_WAIT_EL,
             silent: bool = False
-    ) -> "Element":
+    ) -> Element:
         """
         Wait for the element to become visible, without raising an error if it does not.
 
@@ -601,7 +601,7 @@ class ElementABC(MixinABC, ABC):
             *,
             timeout: Union[int, float] = QUARTER_WAIT_EL,
             silent: bool = False
-    ) -> "Element":
+    ) -> Element:
         """
         Wait for the element to become hidden, without raising an error if it does not.
 
@@ -626,7 +626,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_enabled(self, *, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> "Element":
+    def wait_enabled(self, *, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait for the element to become enabled and/or clickable.
 
@@ -651,7 +651,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def wait_disabled(self, *, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> "Element":
+    def wait_disabled(self, *, timeout: Union[int, float] = WAIT_EL, silent: bool = False) -> Element:
         """
         Wait for the element to become disabled.
 
@@ -682,7 +682,7 @@ class ElementABC(MixinABC, ABC):
             *,
             timeout: Union[int, float] = WAIT_EL,
             silent: bool = False
-    ) -> "Element":
+    ) -> Element:
         """
         Wait until element size will be equal to given :class:`Size` object
 
@@ -741,7 +741,7 @@ class ElementABC(MixinABC, ABC):
             behavior: ScrollTypes = ScrollTypes.INSTANT,
             sleep: Union[int, float] = 0,
             silent: bool = False,
-    ) -> "Element":
+    ) -> Element:
         """
         Scrolls the element into view using a JavaScript script.
 
@@ -765,7 +765,7 @@ class ElementABC(MixinABC, ABC):
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
             scroll: bool = False,
-            remove: Union["Element", List["Element"]] = None,
+            remove: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False,
             cut_box: CutBox = None,
             hide: Union[Element, List[Element]] = None,
@@ -853,19 +853,19 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def get_element_info(self, element: Optional["Element"] = None) -> str:
+    def get_element_info(self, element: Optional[Element] = None) -> str:
         """
         Retrieves detailed logging information for the specified element.
 
         :param element: The :class:`Element` for which to collect logging data.
           If :obj:`None`, logging data for the ``parent`` element is used.
-        :type element: Element or :obj:`None`
+        :type element: :class:`Element` or :obj:`None`
         :return: A string containing the log data.
         :rtype: str
         """
         raise NotImplementedError()
 
-    def _get_all_elements(self, sources: Union[tuple, list]) -> List["Element"]:
+    def _get_all_elements(self, sources: Union[tuple, list]) -> List[Element]:
         """
         Retrieves all wrapped elements from the given sources.
 
