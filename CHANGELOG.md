@@ -2,6 +2,25 @@
 
 <br>
 
+## v2.3.2
+*Release date: 2024-12-19*
+
+### Changed
+- Supported Python-Appium-Client version changed from `2.11.1` to `3.1.0`
+- Supported appium version changed from `2.2.1` to `2.12.1`
+- Supported xcuitest version changed from `5.0.0` to `7.28.3`
+- Supported uiautomator2 version changed from `2.34.1` to `3.9.0`
+
+---
+
+## v2.3.1
+*Release date: 2024-12-16*
+
+### Fixed
+- Memory leak due to misuse of lru_cache
+
+---
+
 ## v2.3.0
 *Release date: 2024-09-12*
 
@@ -21,12 +40,12 @@
 - **Breaking:** `locator_type`, `mobile`, `ios`, `android`, and `desktop` kwargs removed
 - **Breaking:** Most `Element` methods have been renamed
 - **Breaking:** `DriverWrapper.execute_script` now uses the `Element` object instead of the source element object
-- `MobileDriver.get_top_bar_height` method is now the `top_bar_height` property 
-- `MobileDriver.get_bottom_bar_height` method is now the `bottom_bar_height` property 
+- **Breaking:** `MobileDriver.get_top_bar_height` method renamed to the `top_bar_height` property 
+- **Breaking:** `MobileDriver.get_bottom_bar_height` method renamed to the `bottom_bar_height` property 
 - `Element.scroll_into_view` method now uses `ScrollTo` & `ScrollTypes` constants
 - Default timeout for `Element.wait_hidden_without_error` reduced to 2.5 seconds since it's a negative wait
 - Default timeout for `Element.wait_visibility_without_error` reduced to 2.5 seconds since it's a negative wait
-- Selenium only: `Element.click` now retries on `InvalidArgumentException` & `InvalidSelectorException` exceptions
+- Selenium & Appium only: `Element.click` now retries on `ElementNotInteractableException`, `ElementClickInterceptedException`, `StaleElementReferenceException` exceptions
 - Automatically generated `name` argument, based on the attribute name, has been removed
 
 ### Fixed

@@ -30,6 +30,9 @@ def get_element_info(element: Any) -> str:
         current_data = f'{current_data}. {parent_data}'
     return current_data
 
+@lru_cache(maxsize=16)
+def get_static(cls: Any):
+    return get_child_elements_with_names(cls).items()
 
 class InternalMixin:
 
@@ -37,10 +40,6 @@ class InternalMixin:
     def _check_kwargs(kwargs):
         assert all(item in available_kwarg_keys for item in kwargs), \
             f'The given kwargs is not available. Please provide them according to available keys: {available_kwarg_keys}'
-
-    @lru_cache(maxsize=None)
-    def __get_static(self, cls: Any):
-        return get_child_elements_with_names(cls).items()
 
     def _safe_setter(self, var: str, value: Any):
         if not hasattr(self, var):
@@ -53,7 +52,7 @@ class InternalMixin:
         :return: None
         """
         data = {
-            name: value for name, value in self.__get_static(cls)
+            name: value for name, value in get_static(cls)
             if name not in get_all_attributes_from_object(self).keys()
         }.items()
 
