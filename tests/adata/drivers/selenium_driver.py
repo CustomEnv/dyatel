@@ -4,6 +4,7 @@ from selenium.webdriver.safari.service import Service as SafariService
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
 from selenium.webdriver.firefox.webdriver import WebDriver as GeckoWebDriver
 from selenium.webdriver.safari.webdriver import WebDriver as SafariWebDriver
+from selenium.webdriver.remote.webdriver import WebDriver as Remote
 
 from dyatel.base.driver_wrapper import DriverWrapperSessions
 from tests.adata.drivers.driver_entities import DriverEntities
@@ -17,7 +18,10 @@ class SeleniumDriver:
         if driver_name == 'safari' and DriverWrapperSessions.is_connected():
             driver_name = 'chrome'  # Cannot create second selenium driver
 
-        if driver_name == 'chrome':
+
+        if entities.env == 'remote':
+            driver = Remote(options=entities.selenium_chrome_options)
+        elif driver_name == 'chrome':
             driver = ChromeWebDriver(options=entities.selenium_chrome_options, service=ChromeService())
         elif driver_name == 'firefox':
             driver = GeckoWebDriver(options=entities.selenium_firefox_options, service=FirefoxService())

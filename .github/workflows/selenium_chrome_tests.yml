@@ -1,0 +1,45 @@
+name: Run Selenium Tests with Selenoid
+
+on:
+  push:
+    branches:
+      - '**'  # Trigger on push to any branch
+
+jobs:
+  selenium-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      selenoid:
+        image: selenoid/vnc:chrome_128.0
+        options: --privileged
+        ports:
+          - 4444:4444
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install Tox
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox==3.28.0
+
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker.io
+
+      - name: Start Selenoid in Docker
+        run: |
+          docker pull selenoid/vnc:chrome_128.0
+          docker run -d -p 4444:4444 selenoid/vnc:chrome_128.0
+
+      - name: Run Selenium tests
+        run: |
+          tox -e py38-selenium-chrome -- --env remote
