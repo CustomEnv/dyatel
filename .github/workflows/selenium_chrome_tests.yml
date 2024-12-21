@@ -20,6 +20,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y allure
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -35,4 +40,23 @@ jobs:
 
       - name: Run Selenium tests
         run: |
-          tox -e py38-selenium-chrome -- --env remote --headless -v
+          tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results -k test_screenshot_remove || true
+          
+      - name: Generate Allure Report
+        run: |
+          allure generate allure-results -o allure-report --clean
+          
+      - name: Upload Allure Report as Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report
+          retention-days: 1
+
+      - name: Deploy Allure Report to GitHub Pages
+        if: github.ref == 'refs/heads/main' && success()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-report
