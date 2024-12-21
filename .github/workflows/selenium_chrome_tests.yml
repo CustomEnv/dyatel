@@ -38,10 +38,15 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
+      - name: Set Directory Permissions
+        run: |
+          mkdir -p allure-report
+          chmod -R 777 allure-report
+
       - name: Run Selenium tests
         run: |
           tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results -k test_screenshot_remove || true
-          
+
       - name: Generate Allure Report using Docker
         run: |
           docker run --rm \
