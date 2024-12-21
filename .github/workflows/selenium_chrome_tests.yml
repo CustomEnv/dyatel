@@ -42,9 +42,13 @@ jobs:
         run: |
           tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results -k test_screenshot_remove || true
           
-      - name: Generate Allure Report
+      - name: Generate Allure Report using Docker
         run: |
-          allure generate allure-results -o allure-report --clean
+          docker run --rm \
+            -v ${{ github.workspace }}/allure-results:/allure-results \
+            -v ${{ github.workspace }}/allure-report:/allure-report \
+            ghcr.io/allure-framework/allure-docker-service:latest \
+            allure generate /allure-results -o /allure-report --clean
           
       - name: Upload Allure Report as Artifact
         if: always()
