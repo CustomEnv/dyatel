@@ -33,11 +33,6 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
-      - name: Start Selenoid in Docker
-        run: |
-          docker pull selenoid/vnc:chrome_128.0
-          docker run -d -p 4444:4444 selenoid/vnc:chrome_128.0
-
       - name: Run Selenium tests
         run: |
           tox -e py38-selenium-chrome -- --env remote
