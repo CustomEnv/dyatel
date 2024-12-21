@@ -6,7 +6,7 @@ on:
       - '**'  # Trigger on push to any branch
 
 jobs:
-  main:
+  static:
     runs-on: ubuntu-latest  #'windows-latest' / 'macos-latest'
 
     steps:

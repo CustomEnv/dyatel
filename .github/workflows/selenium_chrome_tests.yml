@@ -6,13 +6,13 @@ on:
       - '**'  # Trigger on push to any branch
 
 jobs:
-  main:
+  selenium-selenoid-chrome:
     runs-on: ubuntu-latest
 
     services:
       selenoid:
         image: selenoid/vnc:chrome_128.0
-        options: --privileged
+        options: --privileged --memory=4g --cpus=2
         ports:
           - 4444:4444
 
