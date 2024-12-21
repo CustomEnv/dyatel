@@ -11,8 +11,8 @@ jobs:
 
     services:
       selenoid:
-        image: selenoid/vnc:chrome_128.0
-        options: --privileged --memory=4g --cpus=2
+        image: selenoid/vnc:chrome_112.0
+        options: --privileged --no-vnc
         ports:
           - 4444:4444
 
