@@ -35,4 +35,4 @@ jobs:
 
       - name: Run Selenium tests
         run: |
-          tox -e py38-selenium-chrome -- --env remote
+          tox -e py38-selenium-chrome -- --env remote --headless
