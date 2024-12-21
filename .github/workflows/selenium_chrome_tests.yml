@@ -47,7 +47,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}/allure-results:/allure-results \
             -v ${{ github.workspace }}/allure-report:/allure-report \
-            ghcr.io/allure-framework/allure-docker-service:latest \
+            frankescobar/allure-docker-service \
             allure generate /allure-results -o /allure-report --clean
           
       - name: Upload Allure Report as Artifact
