@@ -22,10 +22,11 @@ class WebElement(CoreElement, ABC):
 
     def hover(self, silent: bool = False) -> WebElement:
         """
-        Hover over current element
+        Hover the mouse over the current element.
 
-        :param silent: erase log
-        :return: self
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`WebElement`
         """
         if not silent:
             self.log(f'Hover over "{self.name}"')
@@ -39,11 +40,13 @@ class WebElement(CoreElement, ABC):
 
     def hover_outside(self, x: int = 0, y: int = -5) -> WebElement:
         """
-        Hover outside from current element
+        Hover the mouse outside the current element, by default 5px above it.
 
-        :param x: x-offset of element to hover
-        :param y: y-offset of element to hover
-        :return: self
+        :param x: Horizontal offset from the element to hover.
+        :type x: int
+        :param y: Vertical offset from the element to hover.
+        :type y: int
+        :return: :class:`WebElement`
         """
         self.log(f'Hover outside from "{self.name}"')
 
@@ -56,13 +59,15 @@ class WebElement(CoreElement, ABC):
             .perform()
         return self
 
-    def click_outside(self, x: int = -1, y: int = -1) -> WebElement:
+    def click_outside(self, x: int = -5, y: int = -5) -> WebElement:
         """
-        Click outside of element. By default, 1px above and 1px left of element
+        Perform a click outside the current element, by default 5px left and above it.
 
-        :param x: x offset of element to click
-        :param y: y offset of element to click
-        :return: self
+        :param x: Horizontal offset from the element to click.
+        :type x: int
+        :param y: Vertical offset from the element to click.
+        :type y: int
+        :return: :class:`WebElement`
         """
         self.log(f'Click outside from "{self.name}"')
 
@@ -76,10 +81,11 @@ class WebElement(CoreElement, ABC):
 
     def click_into_center(self, silent: bool = False) -> WebElement:
         """
-        Click into the center of element
+        Clicks at the center of the element.
 
-        :param silent: erase log message
-        :return: self
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`WebElement`
         """
         if not self.is_fully_visible(silent=True):
             self.scroll_into_view()

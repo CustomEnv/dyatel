@@ -4,9 +4,11 @@ from dyatel.mixins.objects.size import Size
 
 @pytest.mark.medium
 def test_wait_element_size_log_msg(forms_page, caplog, driver_wrapper):
-    expected_height = 256.5 if driver_wrapper.is_playwright else 257
-    expected_width = 930
-    forms_page.validation_form.wait_for_size(Size(expected_width, expected_height))
+    expected_height, expected_width = 10, 20
+    try:
+        forms_page.validation_form.wait_for_size(Size(20, 10), timeout=0.3)
+    except: # noqa
+        pass
     assert (f'Wait until "Validation form" size will be equal to Size(width={expected_width}, height={expected_height})'
             in caplog.messages[0])
 

@@ -95,11 +95,32 @@ def mocked_selenium_driver():
 
 
 @pytest.fixture
+def mocked_selenium_mobile_driver():
+    selenium_driver = SeleniumDriver
+    selenium_driver.__init__ = lambda *args, **kwargs: None
+    selenium_driver.session_id = None
+    selenium_driver.command_executor = MagicMock()
+    selenium_driver.error_handler = MagicMock()
+
+    selenium_driver.caps = {}
+    driver_wrapper = MockedDriverWrapper(selenium_driver(), mobile_resolution=True)
+    return driver_wrapper
+
+
+@pytest.fixture
 def mocked_play_driver():
     PlayDriver.__init__ = MagicMock()
     driver_wrapper = MockedDriverWrapper(Browser(MagicMock()))
     driver_wrapper.driver = PlaywrightSourcePage(MagicMock())
     driver_wrapper.is_desktop = True
+    return driver_wrapper
+
+
+@pytest.fixture
+def mocked_play_mobile_driver():
+    PlayDriver.__init__ = MagicMock()
+    driver_wrapper = MockedDriverWrapper(Browser(MagicMock()), mobile_resolution=True)
+    driver_wrapper.driver = PlaywrightSourcePage(MagicMock())
     return driver_wrapper
 
 

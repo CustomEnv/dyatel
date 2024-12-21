@@ -268,10 +268,13 @@ class CoreElement(ElementABC, ABC):
 
     def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
-        Get PIL Image object with scaled screenshot of current element
+        Returns a :class:`PIL.Image.Image` object representing the screenshot of the web element.
+        Appium iOS: Take driver screenshot and crop manually element from it
 
-        :param screenshot_base: screenshot bytes
-        :return: PIL Image object
+        :param screenshot_base: Screenshot binary data (optional).
+          If :obj:`None` is provided then takes a new screenshot
+        :type screenshot_base: bytes
+        :return: :class:`PIL.Image.Image`
         """
         screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
         return _scaled_screenshot(screenshot_base, self.size.width)

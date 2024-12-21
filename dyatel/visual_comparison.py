@@ -250,7 +250,7 @@ class VisualComparison:
         """
         reference_image = cv2.imread(reference_file)
         output_image = cv2.imread(actual_file)
-        threshold = threshold if threshold else self.default_threshold
+        threshold = threshold if threshold is not None else self.default_threshold
 
         additional_data = ''
         if not threshold:

@@ -33,6 +33,7 @@ def pytest_addoption(parser):
     parser.addoption('--sgr', action='store_true', help='Soft generate reference images in visual tests')
     parser.addoption('--appium-port', default='1000')
     parser.addoption('--appium-ip', default='0.0.0.0')
+    parser.addoption('--env', default='local', choices=['local', 'remote'])
 
 
 @pytest.fixture(scope='session')
@@ -46,10 +47,22 @@ def platform(request):
 
 
 @pytest.fixture(scope='session')
+def driver_entities(request, firefox_options, chrome_options, driver_name):
+    return DriverEntities(
+        request=request,
+        driver_name=driver_name,
+        selenium_chrome_options=chrome_options,
+        selenium_firefox_options=firefox_options,
+        **vars(request.config.option),
+    )
+
+
+@pytest.fixture(scope='session')
 def chrome_options(request):
     options = ChromeOptions()
     if request.config.getoption('headless'):
         options.add_argument('--headless=new')
+    options.add_argument('--no-sandbox')
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     return options
 
@@ -70,26 +83,25 @@ def redirect(request):
     print()
     if DriverWrapper.session.sessions_count() > 0:
         driver_wrapper = request.getfixturevalue('driver_wrapper')
-        driver_wrapper.get('data:,', silent=True)
+        driver_wrapper.get('data:,', silent=True)  # noqa
 
 
 @pytest.fixture
-def second_driver_wrapper(request, driver_name, platform, chrome_options, firefox_options):
-    driver = driver_func(**locals())
+def second_driver_wrapper(driver_entities):
+    driver = driver_func(driver_entities)
     yield driver
     driver.quit(silent=True)
 
 
 @pytest.fixture(scope='session')
-def driver_wrapper(request, driver_name, platform, chrome_options, firefox_options):
-    driver = driver_func(**locals())
+def driver_wrapper(driver_entities):
+    driver = driver_func(driver_entities)
     yield driver
     driver.quit(silent=True)
 
 
-def driver_func(request, driver_name, platform, chrome_options, firefox_options):
-    entities = DriverEntities(request, driver_name, platform, chrome_options, firefox_options)
-    driver = DriverFactory.create_driver(entities)
+def driver_func(driver_entities):
+    driver = DriverFactory.create_driver(driver_entities)
 
     driver_wrapper = DriverWrapper(driver)
 
