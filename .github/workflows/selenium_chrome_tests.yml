@@ -12,7 +12,7 @@ jobs:
     services:
       selenoid:
         image: selenoid/vnc:chrome_112.0
-        options: --privileged --no-vnc
+        options: --privileged
         ports:
           - 4444:4444
 
