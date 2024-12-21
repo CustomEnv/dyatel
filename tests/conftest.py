@@ -81,9 +81,9 @@ def redirect(request):
     print()
     yield
     print()
-    if DriverWrapper.session.sessions_count() > 0:
-        driver_wrapper = request.getfixturevalue('driver_wrapper')
-        driver_wrapper.get('data:,', silent=True)  # noqa
+    # if DriverWrapper.session.sessions_count() > 0:
+    #     driver_wrapper = request.getfixturevalue('driver_wrapper')
+    #     driver_wrapper.get('data:,', silent=True)  # noqa
 
 
 @pytest.fixture
@@ -93,7 +93,7 @@ def second_driver_wrapper(driver_entities):
     driver.quit(silent=True)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def driver_wrapper(driver_entities):
     driver = driver_func(driver_entities)
     yield driver
