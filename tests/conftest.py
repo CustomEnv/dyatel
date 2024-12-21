@@ -63,6 +63,9 @@ def chrome_options(request):
     if request.config.getoption('headless'):
         options.add_argument('--headless=new')
     options.add_argument('--no-sandbox')
+    options.add_argument("--disable-gpu")
+    options.add_argument("--remote-allow-origins=*")
+    options.add_argument("--disable-dev-shm-usage")
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     return options
 
