@@ -12,7 +12,7 @@ jobs:
     services:
       selenoid:
         image: selenoid/vnc:chrome_112.0
-        options: --privileged
+        options: --privileged --memory=4g
         ports:
           - 4444:4444
 
@@ -35,4 +35,4 @@ jobs:
 
       - name: Run Selenium tests
         run: |
-          tox -e py38-selenium-chrome -- --env remote --headless
+          tox -e py38-selenium-chrome -- --env remote --headless -v -n auto
