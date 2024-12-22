@@ -43,15 +43,6 @@ jobs:
           tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results
         continue-on-error: true
 
-      - name: Generate Allure Report using Docker
-        if: steps.tests.outcome == 'failure'
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}/allure-results:/allure-results \
-            -v ${{ github.workspace }}/allure-report:/allure-report \
-            frankescobar/allure-docker-service \
-            allure generate /allure-results -o /allure-report --clean
-
       - name: Upload Allure Report as Artifact
         if: steps.tests.outcome == 'failure'
         uses: actions/upload-artifact@v4
