@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest  #'windows-latest' / 'macos-latest'
 
     strategy:
+      fail-fast: false
       matrix:
         python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12"]
 
@@ -29,4 +30,4 @@ jobs:
 
       - name: Run Tox for ${{ matrix.python-version }}
         run: |
-          tox -e py${{ matrix.python-version }}-static
+          tox -e py${{ matrix.python-version.replace('.', '') }}-static
