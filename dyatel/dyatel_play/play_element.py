@@ -84,13 +84,22 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def click(self, force_wait: bool = True, *args, **kwargs) -> ElementABC:
         """
-        Click to current element
+        Clicks on the element.
 
-        :param force_wait: wait for element visibility before click
+        :param force_wait: If :obj:`True`, waits for element visibility before clicking.
+        :type force_wait: bool
 
-        :param: args: https://playwright.dev/python/docs/api/class-locator#locator-click
-        :param: kwargs: https://playwright.dev/python/docs/api/class-locator#locator-click
-        :return: self
+        **Selenium/Appium:**
+
+        :param args: compatibility arg for playwright
+        :param kwargs: compatibility arg for playwright
+
+        **Playwright:**
+
+        :param args: `any args params from source API <https://playwright.dev/python/docs/api/class-locator#locator-click>`_
+        :param kwargs: `any kwargs params from source API <https://playwright.dev/python/docs/api/class-locator#locator-click>`_
+
+        :return: :class:`PlayElement`
         """
         self.log(f'Click into "{self.name}"')
 
@@ -156,12 +165,15 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def type_slowly(self, text: str, sleep_gap: float = 0.05, silent: bool = False) -> PlayElement:
         """
-        Type text to current element slowly
+        Types text into the element slowly with a delay between keystrokes.
 
-        :param: text: text to be slowly typed
-        :param: sleep_gap: sleep gap before each key press
-        :param: silent: erase log
-        :return: self
+        :param text: The text to be typed.
+        :type text: str
+        :param sleep_gap: Delay between keystrokes in seconds.
+        :type sleep_gap: float
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`PlayElement`
         """
         if not silent:
             self.log(f'Type text {cut_log_data(text)} into "{self.name}"')
@@ -171,10 +183,11 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def clear_text(self, silent: bool = False) -> PlayElement:
         """
-        Clear text from current element
+        Clears the text of the element.
 
-        :param: silent: erase log
-        :return: self
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`PlayElement`
         """
         if not silent:
             self.log(f'Clear text in "{self.name}"')
@@ -184,10 +197,11 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def hover(self, silent: bool = False) -> PlayElement:
         """
-        Hover over current element
+        Hover the mouse over the current element.
 
-        :param: silent: erase log
-        :return: self
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`PlayElement`
         """
         if not silent:
             self.log(f'Hover over "{self.name}"')
@@ -197,9 +211,13 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def hover_outside(self, x: int = 0, y: int = -5) -> PlayElement:
         """
-        Hover outside from current element
+        Hover the mouse outside the current element, by default 5px above it.
 
-        :return: self
+        :param x: Horizontal offset from the element to hover.
+        :type x: int
+        :param y: Vertical offset from the element to hover.
+        :type y: int
+        :return: :class:`PlayElement`
         """
         self.log(f'Hover outside from "{self.name}"')
         self._first_element.hover(position={'x': float(x), 'y': float(y)}, force=True)
@@ -207,9 +225,9 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def check(self) -> PlayElement:
         """
-        Check current checkbox
+        Checks the checkbox element.
 
-        :return: self
+        :return: :class:`PlayElement`
         """
         self._first_element.check()
 
@@ -217,9 +235,9 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def uncheck(self) -> PlayElement:
         """
-        Uncheck current checkbox
+        Unchecks the checkbox element.
 
-        :return: self
+        :return: :class:`PlayElement`
         """
         self._first_element.uncheck()
 
@@ -229,11 +247,25 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def wait_visibility(self, *, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
-        Wait for current element available in page
+        Waits until the element becomes visible.
+        **Note:** The method requires the use of named arguments.
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
-        :return: self
+        **Selenium:**
+
+        - Applied :func:`wait_condition` decorator integrates a 0.1 seconds delay for each iteration
+          during the waiting process.
+
+        **Appium:**
+
+        - Applied :func:`wait_condition` decorator integrates an exponential delay
+          (starting at 0.1 seconds, up to a maximum of 1.6 seconds) which increases
+          with each iteration during the waiting process.
+
+        :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
+        :type timeout: int
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`PlayElement`
         """
         if not silent:
             self.log(f'Wait until "{self.name}" becomes visible')
@@ -246,11 +278,25 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def wait_hidden(self, *, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
-        Wait until element hidden
+        Waits until the element becomes hidden.
+        **Note:** The method requires the use of named arguments.
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
-        :return: self
+        **Selenium:**
+
+        - Applied :func:`wait_condition` decorator integrates a 0.1 seconds delay for each iteration
+          during the waiting process.
+
+        **Appium:**
+
+        - Applied :func:`wait_condition` decorator integrates an exponential delay
+          (starting at 0.1 seconds, up to a maximum of 1.6 seconds) which increases
+          with each iteration during the waiting process.
+
+        :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
+        :type timeout: int
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`PlayElement`
         """
         if not silent:
             self.log(f'Wait until "{self.name}" becomes hidden')
@@ -262,11 +308,25 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def wait_availability(self, *, timeout: int = WAIT_EL, silent: bool = False) -> PlayElement:
         """
-        Wait for current element available in DOM
+        Waits until the element becomes available in DOM tree. \n
+        **Note:** The method requires the use of named arguments.
 
-        :param: timeout: time to stop waiting
-        :param: silent: erase log
-        :return: self
+        **Selenium:**
+
+        - Applied :func:`wait_condition` decorator integrates a 0.1 seconds delay for each iteration
+          during the waiting process.
+
+        **Appium:**
+
+        - Applied :func:`wait_condition` decorator integrates an exponential delay
+          (starting at 0.1 seconds, up to a maximum of 1.6 seconds) which increases
+          with each iteration during the waiting process.
+
+        :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
+        :type timeout: int
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`PlayElement`
         """
         if not silent:
             self.log(f'Wait until presence of "{self.name}"')
@@ -287,11 +347,11 @@ class PlayElement(ElementABC, Logging, ABC):
             silent: bool = False,
     ) -> PlayElement:
         """
-        Scrolls the element into view.
+        Scrolls the element into view using a JavaScript script.
 
-        :param block: Compatibility arg. One of the :class:`ScrollTo` options.
+        :param block: The scrolling block alignment. One of the :class:`ScrollTo` options.
         :type block: ScrollTo
-        :param behavior: Compatibility arg. One of the :class:`ScrollTypes` options.
+        :param behavior: The scrolling behavior. One of the :class:`ScrollTypes` options.
         :type behavior: ScrollTypes
         :param sleep: Delay in seconds after scrolling. Can be an integer or a float.
         :type sleep: int or float
@@ -311,10 +371,13 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
-        Get PIL Image object with scaled screenshot of current element
+        Returns a :class:`PIL.Image.Image` object representing the screenshot of the web element.
+        Appium iOS: Take driver screenshot and crop manually element from it
 
-        :param screenshot_base: screenshot bytes
-        :return: PIL Image object
+        :param screenshot_base: Screenshot binary data (optional).
+          If :obj:`None` is provided then takes a new screenshot
+        :type screenshot_base: bytes
+        :return: :class:`PIL.Image.Image`
         """
         screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
         return get_image(screenshot_base)
@@ -358,18 +421,19 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def is_available(self) -> bool:
         """
-        Check current element availability in DOM
+        Checks if the element is available in DOM tree.
 
-        :return: True if present in DOM
+        :return: :class:`bool` - :obj:`True` if present in DOM
         """
         return bool(len(self.element.element_handles()))
 
     def is_displayed(self, silent: bool = False) -> bool:
         """
-        Check visibility of current element
+        Checks if the element is displayed.
 
-        :param: silent: erase log
-        :return: True if element visible
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`bool`
         """
         if not silent:
             self.log(f'Check visibility of "{self.name}"')
@@ -378,10 +442,11 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def is_hidden(self, silent: bool = False) -> bool:
         """
-        Check invisibility of current element
+        Checks if the element is hidden.
 
-        :param: silent: erase log
-        :return: True if element hidden
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`bool`
         """
         if not silent:
             self.log(f'Check invisibility of "{self.name}"')
@@ -390,11 +455,13 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def get_attribute(self, attribute: str, silent: bool = False) -> str:
         """
-        Get custom attribute from current element
+        Retrieve a specific attribute from the current element.
 
-        :param: attribute: custom attribute: value, innerText, textContent etc.
-        :param: silent: erase log
-        :return: custom attribute value
+        :param attribute: The name of the attribute to retrieve, such as 'value', 'innerText', 'textContent', etc.
+        :type attribute: str
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`str` - The value of the specified attribute.
         """
         if not silent:
             self.log(f'Get "{attribute}" from "{self.name}"')
@@ -403,10 +470,11 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def get_all_texts(self, silent: bool = False) -> List:
         """
-        Get all texts from all matching elements
+        Retrieve text content from all matching elements.
 
-        :param: silent: erase log
-        :return: list of texts
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`list` of :class:`str` - A list containing the text content of all matching elements.
         """
         if not silent:
             self.log(f'Get all texts from "{self.name}"')
@@ -415,10 +483,11 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def get_elements_count(self, silent: bool = False) -> int:
         """
-        Get elements count
+        Get the count of matching elements.
 
-        :param: silent: erase log
-        :return: elements count
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`int` - The number of matching elements.
         """
         if not silent:
             self.log(f'Get elements count of "{self.name}"')
@@ -427,9 +496,9 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def get_rect(self) -> dict:
         """
-        A dictionary with the size and location of the element.
+        Retrieve the size and position of the element as a dictionary.
 
-        :return: dict ~ {'y': 0, 'x': 0, 'width': 0, 'height': 0}
+        :return: :class:`dict` - A dictionary {'x', 'y', 'width', 'height'} of the element.
         """
         sorted_items: list = sorted(self.element.bounding_box().items(), reverse=True)
         return dict(sorted_items)
@@ -456,10 +525,11 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def is_enabled(self, silent: bool = False) -> bool:
         """
-        Check if element enabled
+        Check if the current element is enabled.
 
-        :param silent: erase log
-        :return: True if element enabled
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`bool` - :obj:`True` if the element is enabled, :obj:`False` otherwise.
         """
         if not silent:
             self.log(f'Check is element "{self.name}" enabled')
@@ -468,9 +538,9 @@ class PlayElement(ElementABC, Logging, ABC):
 
     def is_checked(self) -> bool:
         """
-        Is checkbox checked
+        Check if a checkbox or radio button is selected.
 
-        :return: bool
+        :return: :class:`bool` - :obj:`True` if the checkbox or radio button is checked, :obj:`False` otherwise.
         """
         return self._first_element.is_checked()
 
