@@ -32,7 +32,7 @@ jobs:
       - name: Run Playwright tests
         id: tests
         run: |
-          tox -e py38-playwright-chrome -- --headless -v --alluredir=allure-results
+          tox -e py38-playwright-chrome -- --headless -v --alluredir=allure-report
         continue-on-error: true
           
       - name: Upload Allure Report as Artifact
