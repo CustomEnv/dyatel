@@ -23,8 +23,8 @@ jobs:
           pip install tox==3.28.0
           mkdir -p allure-report
           chmod -R 777 allure-report
-          sudo apt-get update
-          sudo apt-get install -y allure
+          apt-get update
+          apt-get install -y allure
 
       - name: Run Playwright tests
         id: tests
