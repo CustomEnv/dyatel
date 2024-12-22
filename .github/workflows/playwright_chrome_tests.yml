@@ -38,6 +38,7 @@ jobs:
 
   generate-allure-report:
     needs: playwright-docker-chrome
+    if: failure()
     runs-on: ubuntu-latest
 
     steps:
