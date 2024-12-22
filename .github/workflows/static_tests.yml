@@ -29,6 +29,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install  tox==3.28.0
 
-      - name: Run Tox for ${{ matrix.python-version }}
+      - name: Run Tox for ${{ matrix.env-version }}
         run: |
-          tox -e py${{ matrix.env-name }}-static
+          tox -e py${{ matrix.env-version }}-static
