@@ -51,8 +51,9 @@ jobs:
 
   update_screenshots:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' }}  # Only runs when manually triggered
-    continue-on-error: true  # This ensures the job doesn't stop if previous jobs fail
+    needs: playwright-docker-chrome
+    if: ${{ always() }}
+    continue-on-error: true
 
     steps:
       - name: Checkout code
@@ -81,7 +82,7 @@ jobs:
 
       - name: Commit changes
         run: |
-          git commit -m "Processed artifacts and updated files" || echo "No changes to commit"
+          git commit -m "updating screenshots" || echo "No changes to commit"
 
       - name: Push changes
         run: |
