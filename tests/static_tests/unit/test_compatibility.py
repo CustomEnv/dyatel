@@ -24,7 +24,7 @@ def get_methods_and_names(_class):
     result = {}
 
     for name, func in inspect.getmembers(_class, predicate=inspect.isfunction):
-        if not name.startswith('_') and _class.__name__ in str(func):
+        if not name.startswith('_') and f' {_class.__name__}.{name}'  in str(func):
             result[name] = func
 
     return result
@@ -56,7 +56,8 @@ def compare_methods_bulk(_class, _abc, _main_class):
         if get_signature(func1) != get_signature(func2):
             results[method] = "Signatures do not match"
 
-        if _class is _main_class or method not in _main_class.__dict__:
+        # if 'type_text' in method and _class is CoreElement: breakpoint()
+        if _class is _main_class or method not in get_methods_and_names(_main_class).keys():
             class_func_doc = inspect.getdoc(func1)
             abc_class_func_doc = inspect.getdoc(func2).replace(_main_class.__name__, _class.__name__)
             if class_func_doc != abc_class_func_doc:

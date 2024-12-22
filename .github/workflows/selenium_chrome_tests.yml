@@ -20,9 +20,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v2
-
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -40,28 +37,4 @@ jobs:
       - name: Run Selenium tests
         id: tests
         run: |
-          tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results
-        continue-on-error: true
-
-      - name: Generate Allure Report using Docker
-        if: steps.tests.outcome == 'failure'
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}/allure-results:/allure-results \
-            -v ${{ github.workspace }}/allure-report:/allure-report \
-            frankescobar/allure-docker-service \
-            allure generate /allure-results -o /allure-report --clean
-
-      - name: Upload Allure Report as Artifact
-        if: steps.tests.outcome == 'failure'
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-report
-          path: allure-report
-          retention-days: 1
-
-      - name: Check Test Results
-        if: steps.tests.outcome == 'failure'
-        run: |
-          echo "❌ Tests failed! Check the Allure Report for details."
-          exit 1 
+          tox -e py38-selenium-chrome -- --env remote --headless -v --sv
