@@ -45,7 +45,7 @@ jobs:
 
       - name: Run Selenium tests
         run: |
-          tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results -k test_screenshot_remove
+          tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results -k test_assert_screenshot_hide
         continue-on-error: true
 
       - name: Check Test Results
