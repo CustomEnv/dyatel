@@ -47,6 +47,7 @@ jobs:
       - name: Generate Allure Report using Docker
         if: steps.tests.outcome == 'failure'
         run: |
+          chmod -R 777 allure-report
           docker run --rm \
             -v ${{ github.workspace }}/allure-results:/allure-results \
             -v ${{ github.workspace }}/allure-report:/allure-report \
