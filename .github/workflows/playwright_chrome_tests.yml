@@ -9,6 +9,16 @@ jobs:
   playwright-docker-chrome:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        browser-name: ["chrome", "firefox", "safari"]
+        include:
+          - python-version: "3.8"
+            env-name: "38"
+          - python-version: "3.12"
+            env-name: "312"
+
     container:
       image: mcr.microsoft.com/playwright/python:v1.41.0-jammy
       options: --ipc=host
@@ -27,7 +37,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install tox==3.28.0
 
-      - name: Run Playwright tests
+      - name: Run Playwright ${{ matrix.browser-name }} tests
         id: tests
         run: |
-          tox -e py38-playwright-chrome -- --headless -v --sv
+          tox -e py38-playwright-${{ matrix.browser-name }} -- --headless -v --sv
