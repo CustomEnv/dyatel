@@ -26,8 +26,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install tox==3.28.0
-          mkdir -p allure-report
-          chmod -R 777 allure-report
           apt-get update
           apt-get install -y allure
 
@@ -64,6 +62,7 @@ jobs:
 
       - name: Generate Allure Report
         run: |
+          chmod -R 777 allure-report
           docker run --rm \
             -v ${{ github.workspace }}/allure-results:/allure-results \
             -v ${{ github.workspace }}/allure-report:/allure-report \
