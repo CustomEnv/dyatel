@@ -45,7 +45,8 @@ jobs:
 
       - name: Run Selenium tests
         run: |
-          tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results -k test_screenshot_remove || true
+          tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results -k test_screenshot_remove
+        continue-on-error: true
 
       - name: Generate Allure Report using Docker
         run: |
@@ -69,3 +70,9 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: allure-report
+
+      - name: Check Test Results
+        if: steps.selenium_tests.outcome == 'failure'
+        run: |
+          echo "❌ Tests failed! Check the Allure Report for details."
+          exit 1
