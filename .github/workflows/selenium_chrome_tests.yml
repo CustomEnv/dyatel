@@ -44,15 +44,10 @@ jobs:
           chmod -R 777 allure-report
 
       - name: Run Selenium tests
+        id: selenium_tests
         run: |
-          tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results -k test_assert_screenshot_hide
+          tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results -k='not screenshot'
         continue-on-error: true
-
-      - name: Check Test Results
-        if: steps.selenium_tests.outcome == 'failure'
-        run: |
-          echo "❌ Tests failed! Check the Allure Report for details."
-          exit 1 
 
       - name: Generate Allure Report using Docker
         run: |
@@ -61,13 +56,7 @@ jobs:
             -v ${{ github.workspace }}/allure-report:/allure-report \
             frankescobar/allure-docker-service \
             allure generate /allure-results -o /allure-report --clean
-          
-      - name: Deploy Allure Report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: allure-report
-          
+
       - name: Upload Allure Report as Artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -75,3 +64,9 @@ jobs:
           name: allure-report
           path: allure-report
           retention-days: 1
+
+      - name: Check Test Results
+        if: steps.selenium_tests.outcome == 'failure'
+        run: |
+          echo "❌ Tests failed! Check the Allure Report for details."
+          exit 1 

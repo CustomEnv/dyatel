@@ -169,6 +169,9 @@ cython_debug/
 /tests/adata/visual/output
 /tests/adata/visual/difference
 
-# not needed references:
+# Not needed references:
 /tests/adata/visual/reference/test_assert_screenshot_negative_missmatch_action_cards*
 /tests/adata/visual/reference/test_assert_screenshot_negative_different_sizes_action_cards*
+
+# Allure report
+/allure-report
