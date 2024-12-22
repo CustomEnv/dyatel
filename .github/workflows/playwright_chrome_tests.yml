@@ -12,12 +12,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser-name: ["chrome", "firefox", "safari"]
-        include:
+        browser-name: [ "chrome", "firefox", "safari" ]
+        python-version: [ "3.8", "3.12" ]
+        env-name: [ "38", "312" ]
+        exclude:
           - python-version: "3.8"
-            env-name: "38"
+            env-name: "321"
           - python-version: "3.12"
-            env-name: "312"
+            env-name: "38"
 
     container:
       image: mcr.microsoft.com/playwright/python:v1.41.0-jammy
