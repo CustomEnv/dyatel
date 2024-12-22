@@ -14,12 +14,6 @@ jobs:
       matrix:
         browser-name: [ "chrome", "firefox", "safari" ]
         python-version: [ "3.8", "3.12" ]
-        env-name: [ "38", "312" ]
-        exclude:
-          - python-version: "3.8"
-            env-name: "321"
-          - python-version: "3.12"
-            env-name: "38"
 
     container:
       image: mcr.microsoft.com/playwright/python:v1.41.0-jammy
@@ -38,8 +32,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install tox==3.28.0
+          
+      - name: Extract tox env
+        run: |
+          tox_env_variable=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
+          echo "TOX_ENV=${tox_env_variable}" >> $GITHUB_ENV
 
-      - name: Run Playwright ${{ matrix.browser-name }} on py${{ matrix.env-name }} tests
+      - name: Run Playwright ${{ matrix.browser-name }} on py${{ matrix.python-version }} tests
         id: tests
         run: |
-          tox -e py${{ matrix.env-name }}-playwright-${{ matrix.browser-name }} -- --headless -v --sv
+          tox -e py${{ env.TOX_ENV }}-playwright-${{ matrix.browser-name }} -- --headless -v --sv
