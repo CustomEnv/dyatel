@@ -1,0 +1,56 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches:
+      - '**'  # Trigger on push to any branch
+
+jobs:
+  playwright-selenoid-chrome:
+    runs-on: ubuntu-latest
+
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.41.0-jammy
+      options: --ipc=host
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup tests
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox==3.28.0
+          mkdir -p allure-report
+          chmod -R 777 allure-report
+          sudo apt-get update
+          sudo apt-get install -y allure
+
+      - name: Run Playwright tests
+        id: tests
+        run: |
+          tox -e py38-playwright-chrome -- --headless -v --alluredir=allure-results
+        continue-on-error: true
+
+      - name: Generate Allure Report using Docker
+        if: steps.tests.outcome == 'failure'
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/allure-results:/allure-results \
+            -v ${{ github.workspace }}/allure-report:/allure-report \
+            frankescobar/allure-docker-service \
+            allure generate /allure-results -o /allure-report --clean
+
+      - name: Upload Allure Report as Artifact
+        if: steps.tests.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report
+          retention-days: 1
+
+      - name: Check Test Results
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "❌ Tests failed! Check the Allure Report for details."
+          exit 1 
