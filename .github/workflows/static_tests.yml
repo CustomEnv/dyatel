@@ -12,8 +12,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12"]
-        env-version: [ "38", "39", "310", "311", "312"]
+        include:
+          - python-version: "3.8"
+            env-name: "py38"
+          - python-version: "3.9"
+            env-name: "py39"
+          - python-version: "3.10"
+            env-name: "py310"
+          - python-version: "3.11"
+            env-name: "py311"
+          - python-version: "3.12"
+            env-name: "py312"
 
     steps:
       - name: Checkout code
@@ -27,8 +36,8 @@ jobs:
       - name: Install Tox
         run: |
           python -m pip install --upgrade pip
-          pip install  tox==3.28.0
+          pip install tox==3.28.0
 
-      - name: Run Tox for ${{ matrix.env-version }}
+      - name: Run Tox for ${{ matrix.env-name }}
         run: |
-          tox -e py${{ matrix.env-version }}-static
+          tox -e py${{ matrix.env-name }}-static
