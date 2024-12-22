@@ -14,15 +14,15 @@ jobs:
       matrix:
         include:
           - python-version: "3.8"
-            env-name: "py38"
+            env-name: "38"
           - python-version: "3.9"
-            env-name: "py39"
+            env-name: "39"
           - python-version: "3.10"
-            env-name: "py310"
+            env-name: "310"
           - python-version: "3.11"
-            env-name: "py311"
+            env-name: "311"
           - python-version: "3.12"
-            env-name: "py312"
+            env-name: "312"
 
     steps:
       - name: Checkout code
