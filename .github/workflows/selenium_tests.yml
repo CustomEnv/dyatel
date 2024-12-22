@@ -6,7 +6,7 @@ on:
       - '**'  # Trigger on push to any branch
 
 jobs:
-  selenium-selenoid-chrome:
+  selenium-selenoid:
     runs-on: ubuntu-latest
 
     services:
