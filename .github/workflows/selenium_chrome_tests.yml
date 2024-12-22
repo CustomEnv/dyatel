@@ -56,14 +56,6 @@ jobs:
             frankescobar/allure-docker-service \
             allure generate /allure-results -o /allure-report --clean
           
-      - name: Upload Allure Report as Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-report
-          path: allure-report
-          retention-days: 1
-
       - name: Deploy Allure Report to GitHub Pages
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3
@@ -76,3 +68,11 @@ jobs:
         run: |
           echo "❌ Tests failed! Check the Allure Report for details."
           exit 1
+          
+      - name: Upload Allure Report as Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report
+          retention-days: 1
