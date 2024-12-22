@@ -35,6 +35,20 @@ jobs:
         id: tests
         run: |
           tox -e py38-playwright-chrome -- --headless -v --alluredir=allure-results
+          
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+          retention-days: 1
+
+      - name: Check Test Results
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "❌ Tests failed! Check the Allure Report for details."
+          exit 1 
 
   generate-allure-report:
     needs: playwright-docker-chrome
@@ -55,10 +69,3 @@ jobs:
             -v ${{ github.workspace }}/allure-report:/allure-report \
             frankescobar/allure-docker-service \
             allure generate /allure-results -o /allure-report --clean
-
-      - name: Upload Allure Report as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-report
-          path: allure-report
-          retention-days: 1
