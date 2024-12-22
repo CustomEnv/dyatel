@@ -44,7 +44,6 @@ jobs:
           chmod -R 777 allure-report
 
       - name: Run Selenium tests
-        id: selenium_tests
         run: |
           tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results -k='not screenshot'
         continue-on-error: true
@@ -66,7 +65,7 @@ jobs:
           retention-days: 1
 
       - name: Check Test Results
-        if: steps.selenium_tests.outcome == 'failure'
+        if: failure()
         run: |
           echo "❌ Tests failed! Check the Allure Report for details."
           exit 1 
