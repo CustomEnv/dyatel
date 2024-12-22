@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -44,6 +44,5 @@ jobs:
           echo "HOME=/root" >> $GITHUB_ENV  # Set HOME environment variable
 
       - name: Run Playwright ${{ matrix.browser-name }} on py${{ matrix.python-version }} tests
-        id: tests
         run: |
           tox -e py${{ env.TOX_ENV }}-playwright-${{ matrix.browser-name }} -- --headless -v --sv
