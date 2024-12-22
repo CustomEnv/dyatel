@@ -5,6 +5,8 @@ on:
     branches:
       - '**'  # Trigger on push to any branch
 
+  workflow_dispatch:
+
 jobs:
   playwright-docker-chrome:
     runs-on: ubuntu-latest
