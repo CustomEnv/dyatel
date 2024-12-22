@@ -12,7 +12,7 @@ jobs:
     services:
       selenoid:
         image: selenoid/vnc:chrome_112.0
-        options: --privileged
+        options: --privileged --memory=4g
         ports:
           - 4444:4444
 
@@ -20,19 +20,48 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.8'
 
-      - name: Install Tox
+      - name: Setup tests
         run: |
           python -m pip install --upgrade pip
           pip install tox==3.28.0
-
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v2
+          mkdir -p allure-report
+          chmod -R 777 allure-report
+          sudo apt-get update
+          sudo apt-get install -y allure
 
       - name: Run Selenium tests
+        id: tests
         run: |
-          tox -e py38-selenium-chrome -- --env remote --headless
+          tox -e py38-selenium-chrome -- --env remote --headless -v --alluredir=allure-results
+        continue-on-error: true
+
+      - name: Generate Allure Report using Docker
+        if: steps.tests.outcome == 'failure'
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/allure-results:/allure-results \
+            -v ${{ github.workspace }}/allure-report:/allure-report \
+            frankescobar/allure-docker-service \
+            allure generate /allure-results -o /allure-report --clean
+
+      - name: Upload Allure Report as Artifact
+        if: steps.tests.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report
+          retention-days: 1
+
+      - name: Check Test Results
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "❌ Tests failed! Check the Allure Report for details."
+          exit 1 
