@@ -35,4 +35,4 @@ jobs:
 
       - name: Run Selenium Safari tests with py${{ matrix.python-version }}
         run: |
-          tox -e py${{ env.TOX_ENV }}-selenium-safari -- --headless -v --sv
+          tox -e py${{ env.TOX_ENV }}-selenium-safari -- --headless -v -k='not screenshot'

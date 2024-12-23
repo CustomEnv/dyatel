@@ -21,10 +21,6 @@ from tests.adata.pages.playground_main_page import PlaygroundMainPage, SecondPla
 from tests.adata.pytest_utils import skip_platform
 
 
-# Suppress deprecation warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-
 dyatel_logs_settings()
 
 
