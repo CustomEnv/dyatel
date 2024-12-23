@@ -76,6 +76,9 @@ def firefox_options(request):
     options = FirefoxOptions()
     if request.config.getoption('headless'):
         options.add_argument('--headless=new')
+    options.set_preference('browser.safebrowsing.enabled', False)
+    options.set_preference('dom.webnotifications.enabled', False)
+    options.set_preference('dom.disable_open_during_load', True)
     return options
 
 
@@ -85,10 +88,6 @@ def redirect(request):
     print()
     yield
     print()
-    # if DriverWrapper.session.sessions_count() > 0:
-    #     driver_wrapper = request.getfixturevalue('driver_wrapper')
-    #     driver_wrapper.get('data:,', silent=True)  # noqa
-
 
 @pytest.fixture
 def second_driver_wrapper(driver_entities):

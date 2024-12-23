@@ -83,8 +83,6 @@ def test_append_dummy_elements_multiple_available(second_playground_page, driver
 
 def test_assert_screenshot_hide_elements(second_playground_page, driver_wrapper):
     all_cards = second_playground_page.get_all_cards()
-    for card in all_cards:
-        print(card.element)
     second_playground_page.row_with_cards.assert_screenshot(
         hide=all_cards[1],
         name_suffix='middle hidden'
