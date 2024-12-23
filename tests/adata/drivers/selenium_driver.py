@@ -18,8 +18,9 @@ class SeleniumDriver:
         options = None
         remote_url = "http://127.0.0.1:4444"
 
-        if driver_name == 'safari' and DriverWrapperSessions.is_connected():
-            driver_name = 'chrome'  # Cannot create second selenium driver
+        if driver_name == 'safari':
+            if DriverWrapperSessions.is_connected():
+                driver_name = 'chrome'  # Cannot create second selenium driver
         elif driver_name == 'chrome':
             options = entities.selenium_chrome_options
         elif driver_name == 'firefox':

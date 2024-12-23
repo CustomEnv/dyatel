@@ -19,7 +19,8 @@ def enable_skip():
 
 
 def test_skip_visual_comparison(enable_skip):
+    params = default_parameters(VisualComparison.assert_screenshot)
     start = time.time()
-    VisualComparison(None, None).assert_screenshot(*default_parameters(VisualComparison.assert_screenshot))
+    VisualComparison(None, None).assert_screenshot(*params)
     end = time.time() - start
     assert end < 0.001
