@@ -1,4 +1,4 @@
-name: Selenium Selenoid Tests
+name: Selenium Safari Tests
 
 on:
   push:
@@ -6,21 +6,13 @@ on:
       - '**'  # Trigger on push to any branch
 
 jobs:
-  selenium-selenoid:
-    runs-on: ubuntu-24.04
+  selenium-safari:
+    runs-on: macos-13
 
     strategy:
       fail-fast: false
       matrix:
-        image: [ "selenoid/chrome:128.0", "selenoid/firefox:125.0"]
         python-version: [ "3.8", "3.12" ]
-
-    services:
-      selenoid:
-        image: ${{ matrix.image }}
-        options: --privileged --memory=4g
-        ports:
-          - 4444:4444
 
     steps:
       - name: Checkout code
@@ -35,17 +27,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install tox==3.28.0
-      
+          
       - name: Extract tox env
         run: |
           tox_env_variable=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
           echo "TOX_ENV=${tox_env_variable}" >> $GITHUB_ENV
 
-      - name: Extract Browser Name
+      - name: Run Selenium Safari tests with py${{ matrix.python-version }}
         run: |
-          browser_name=$(echo "${{ matrix.image }}" | sed -E 's|.*/([^:]+):.*|\1|')
-          echo "BROWSER=${browser_name}" >> $GITHUB_ENV
-
-      - name: Run Selenium ${{ env.BROWSER }} tests with py${{ matrix.python-version }}
-        run: |
-          tox -e py${{ env.TOX_ENV }}-selenium-${{ env.BROWSER }} -- --env remote --headless -v
+          tox -e py${{ env.TOX_ENV }}-selenium-safari -- --headless -v --sv

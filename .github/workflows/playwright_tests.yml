@@ -7,7 +7,7 @@ on:
 
 jobs:
   playwright-docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
@@ -43,6 +43,6 @@ jobs:
         run: |
           echo "HOME=/root" >> $GITHUB_ENV  # Set HOME environment variable
 
-      - name: Run Playwright ${{ matrix.browser-name }} on py${{ matrix.python-version }} tests
+      - name: Run Playwright ${{ matrix.browser-name }} tests with py${{ matrix.python-version }}
         run: |
           tox -e py${{ env.TOX_ENV }}-playwright-${{ matrix.browser-name }} -- --headless -v --sv
