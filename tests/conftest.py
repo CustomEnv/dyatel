@@ -10,6 +10,7 @@ from dyatel.utils.logs import dyatel_logs_settings
 from dyatel.visual_comparison import VisualComparison
 from tests.adata.drivers.driver_entities import DriverEntities
 from tests.adata.drivers.driver_factory import DriverFactory
+from tests.adata.pages.colored_blocks_page import ColoredBlocksPage
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
 from tests.adata.pages.frames_page import FramesPage
@@ -67,6 +68,8 @@ def chrome_options(request):
     options.add_argument("--disable-gpu")
     options.add_argument("--remote-allow-origins=*")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_experimental_option("useAutomationExtension", False)
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     return options
 
@@ -139,6 +142,11 @@ def base_playground_page(driver_wrapper):
 @pytest.fixture
 def second_playground_page(driver_wrapper):
     return SecondPlaygroundMainPage().open_page()
+
+
+@pytest.fixture
+def colored_blocks_page(driver_wrapper):
+    return ColoredBlocksPage().open_page()
 
 
 @pytest.fixture

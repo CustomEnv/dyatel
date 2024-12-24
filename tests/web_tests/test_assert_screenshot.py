@@ -81,34 +81,37 @@ def test_append_dummy_elements_multiple_available(second_playground_page, driver
     VisualComparison(driver_wrapper)._appends_dummy_elements([Card()])
 
 
-def test_assert_screenshot_hide_elements(second_playground_page, driver_wrapper):
-    all_cards = second_playground_page.get_all_cards()
-    second_playground_page.row_with_cards.assert_screenshot(
+def test_assert_screenshot_hide_elements(colored_blocks_page, driver_wrapper):
+    all_cards = colored_blocks_page.get_all_cards()
+    colored_blocks_page.blocks_container.assert_screenshot(
         hide=all_cards[1],
-        name_suffix='middle hidden'
+        name_suffix='middle hidden',
+        delay=0.5
     )
     driver_wrapper.refresh()
-    second_playground_page.row_with_cards.scroll_into_view()
-    all_cards = second_playground_page.get_all_cards()
-    second_playground_page.row_with_cards.assert_screenshot(
+    all_cards = colored_blocks_page.get_all_cards()
+    colored_blocks_page.blocks_container.assert_screenshot(
         hide=[all_cards[0], all_cards[2]],
-        name_suffix='sides hidden'
+        name_suffix='sides hidden',
+        delay=0.5
     )
 
 
-def test_assert_screenshot_hide_driver_elements(second_playground_page, driver_wrapper):
-    all_cards = second_playground_page.get_all_cards()
-    second_playground_page.row_with_cards.scroll_into_view()
+def test_assert_screenshot_hide_driver_elements(colored_blocks_page, driver_wrapper):
+    all_cards = colored_blocks_page.get_all_cards()
+    colored_blocks_page.blocks_container.scroll_into_view()
     driver_wrapper.assert_screenshot(
-        hide=all_cards[1],
-        name_suffix='middle hidden'
+        hide=[all_cards[1]] + colored_blocks_page.navbar.all_elements,
+        name_suffix='middle hidden',
+        delay=0.5,
     )
     driver_wrapper.refresh()
-    second_playground_page.row_with_cards.scroll_into_view()
-    all_cards = second_playground_page.get_all_cards()
+    colored_blocks_page.blocks_container.scroll_into_view()
+    all_cards = colored_blocks_page.get_all_cards()
     driver_wrapper.assert_screenshot(
-        hide=[all_cards[0], all_cards[2]],
-        name_suffix='sides hidden'
+        hide=[all_cards[0], all_cards[2]] + colored_blocks_page.navbar.all_elements,
+        name_suffix='sides hidden',
+        delay=0.5,
     )
 
 
