@@ -26,4 +26,4 @@ class ColoredBlocksPage(Page):
     navbar = Element('.navbar', name='navbar')
 
     def get_all_cards(self) -> List[Element]:
-        return self.card.all_elements
+        return self.card.wait_elements_count(16).all_elements

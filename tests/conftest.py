@@ -67,6 +67,7 @@ def chrome_options(request):
     options.add_argument('--no-sandbox')
     options.add_argument("--disable-gpu")
     options.add_argument("--remote-allow-origins=*")
+    options.add_argument("--hide-scrollbars")
     options.add_argument("--disable-dev-shm-usage")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option("useAutomationExtension", False)
@@ -78,10 +79,7 @@ def chrome_options(request):
 def firefox_options(request):
     options = FirefoxOptions()
     if request.config.getoption('headless'):
-        options.add_argument('--headless=new')
-    options.set_preference('browser.safebrowsing.enabled', False)
-    options.set_preference('dom.webnotifications.enabled', False)
-    options.set_preference('dom.disable_open_during_load', True)
+        options.add_argument('--headless')
     return options
 
 
