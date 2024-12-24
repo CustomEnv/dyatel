@@ -34,9 +34,14 @@ def test_screenshot_name_with_suffix(base_playground_page, driver_name, platform
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename, name_suffix='second')
 
 
-def test_screenshot_remove(base_playground_page):
-    base_playground_page.text_container.scroll_into_view(sleep=0.5).assert_screenshot(
-            remove=[base_playground_page.inner_text_1, base_playground_page.inner_text_2])
+def test_screenshot_remove(colored_blocks_page):
+    row2_card = colored_blocks_page.row2.card
+    cards = row2_card.wait_elements_count(8).all_elements
+    colored_blocks_page.row2.assert_screenshot(
+        scroll=True,
+        remove=[cards[5], cards[3]],
+        delay=0.5
+    )
 
 
 @pytest.fixture
