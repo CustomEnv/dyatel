@@ -70,7 +70,6 @@ def chrome_options(request):
     options.add_argument("--hide-scrollbars")
     options.add_argument("--disable-dev-shm-usage")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    options.add_experimental_option("useAutomationExtension", False)
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     return options
 
