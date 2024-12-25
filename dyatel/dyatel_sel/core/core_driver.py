@@ -195,15 +195,6 @@ class CoreDriver(Logging, DriverWrapperABC):
         self.driver.switch_to.frame(frame.element)
         return self
 
-    def switch_to_parent_frame(self) -> CoreDriver:
-        """
-        Switch to parent frame from child frame
-
-        :return: self
-        """
-        self.driver.switch_to.parent_frame()
-        return self
-
     def switch_to_default_content(self) -> CoreDriver:
         """
         Switch to default content from frame

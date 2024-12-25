@@ -34,8 +34,8 @@ def test_wait_element_value(expected_condition_page):
     assert all((not value_without_wait, value_with_wait))
 
 
-@pytest.mark.xfail_platform('playwright', 'safari', reason='Unexpected text')
-def test_wait_element_text(expected_condition_page):
+@pytest.mark.xfail_platform('playwright', reason='Unexpected text')
+def test_wait_element_text(expected_condition_page, driver_wrapper):
     btn = expected_condition_page.value_card.wait_for_text_button
 
     expected_condition_page.value_card.trigger_button.click()

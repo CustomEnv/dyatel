@@ -14,7 +14,8 @@ def test_switch_to_frame(driver_wrapper, frames_page):
     assert frames_page.frame2.button.text == 'Click Me 2'
     assert frames_page.frame2.button.click().text == 'Clicked'
 
-    driver_wrapper.switch_to_parent_frame()
+    driver_wrapper.switch_to_default_content()
+    driver_wrapper.switch_to_frame(frames_page.frame1)
 
     driver_wrapper.switch_to_frame(frames_page.frame3)
     assert not frames_page.frame3.button.is_displayed()

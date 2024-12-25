@@ -1,4 +1,4 @@
-domain_name = 'https://customenv.github.io/'
+domain_name = 'https://customenv.github.io'
 repo_name = 'dyatel-playground'
 
 appium_logs_path = '.tox/.tmp/logs/android_appium.txt'

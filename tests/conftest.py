@@ -127,7 +127,11 @@ def visual_comparisons_settings(request):
 
 def pytest_collection_modifyitems(items):
     for item in items:
-        skip_platform(item=item, platform=item.session.config.getoption("--platform"))
+        skip_platform(
+            item=item,
+            platform=item.session.config.getoption("--platform"),
+            browser=item.session.config.getoption("--driver")
+        )
 
 
 @pytest.fixture

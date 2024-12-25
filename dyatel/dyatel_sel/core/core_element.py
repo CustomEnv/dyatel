@@ -358,6 +358,10 @@ class CoreElement(ElementABC, ABC):
         :return: element text
         """
         element = self._get_element(wait=self.wait_availability)
+
+        if self.driver_wrapper.browser_name.lower() == 'safari':
+            return element.get_attribute('innerText')
+
         return element.text
 
     @property

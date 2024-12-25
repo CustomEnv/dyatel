@@ -173,14 +173,6 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
-    def switch_to_parent_frame(self) -> DriverWrapperABC:
-        """
-        Appium/Selenium only: Switch to parent frame from child frame
-
-        :return: self
-        """
-        raise NotImplementedError()
-
     def switch_to_default_content(self) -> DriverWrapperABC:
         """
         Appium/Selenium only: Switch to default content from frame
