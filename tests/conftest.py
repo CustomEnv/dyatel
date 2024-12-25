@@ -1,7 +1,6 @@
 import os
 
 import pytest
-import warnings
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
