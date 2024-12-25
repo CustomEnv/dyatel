@@ -34,14 +34,13 @@ def test_wait_element_value(expected_condition_page):
     assert all((not value_without_wait, value_with_wait))
 
 
-@pytest.mark.xfail_platform('playwright', reason='Unexpected text')
-def test_wait_element_text(expected_condition_page, driver_wrapper):
+def test_wait_element_text1(expected_condition_page, driver_wrapper):
     btn = expected_condition_page.value_card.wait_for_text_button
 
     expected_condition_page.value_card.trigger_button.click()
     value_without_wait = btn.text
-    value_with_wait = btn.wait_for_text().text == 'Submit'
-    assert all((not value_without_wait, value_with_wait))
+    assert not value_without_wait
+    assert btn.wait_for_text().text == 'Submit'
 
 
 def test_wait_elements_count_v1(forms_page):

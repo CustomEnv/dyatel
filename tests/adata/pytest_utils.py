@@ -19,9 +19,10 @@ def skip_platform(item: pytest.Item, platform: str, browser: str = ''):
 
     except_marker = skip_platform_marker or xfail_platform_marker
 
-    platform = platform if not browser else f'{platform}-{browser}'
+    platform_with_browser = platform if not browser else f'{platform}-{browser}'
+    args = str(getattr(except_marker, 'args', []))
 
-    if platform in str(getattr(except_marker, 'args', [])):
+    if platform in args or platform_with_browser in args:
         kwargs = getattr(except_marker, 'kwargs', {})
         skip_message = f"Skip platform {platform}. Reason={kwargs.get('reason')}"
         item.add_marker(pytest.mark.skip(skip_message))
