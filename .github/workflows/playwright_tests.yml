@@ -55,8 +55,8 @@ jobs:
         if: steps.tests.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
-          name: allure-report
-          path: allure-report-${{ matrix.browser-name }}-${{ env.TOX_ENV }}
+          name: allure-report-${{ matrix.browser-name }}-${{ env.TOX_ENV }}
+          path: allure-report
           retention-days: 1
 
       - name: Check Test Results
