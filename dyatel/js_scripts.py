@@ -1,5 +1,6 @@
 get_inner_height_js = 'return window.innerHeight'
 get_inner_width_js = 'return window.innerWidth'
+js_click = 'arguments[0].click();'
 
 get_element_position_on_screen_js = """
 function getPositionOnScreen(elem) {
@@ -46,15 +47,16 @@ function appendElement(given_obj) {
 
     dyatel_obj.style.zIndex=9999999;
     dyatel_obj.setAttribute("class","dyatel-visual-comparison-support-element");
-    document.body.appendChild(dyatel_obj);
 
-    dyatel_obj.style.position = "fixed";
+    dyatel_obj.style.position = "absolute";
     dyatel_obj.style.backgroundColor = "#000";
 
     dyatel_obj.style.width = given_obj.width + "px";
     dyatel_obj.style.height = given_obj.height + "px";
-    dyatel_obj.style.top = given_obj.y + "px";
-    dyatel_obj.style.left = given_obj.x + "px";
+    dyatel_obj.style.top = (given_obj.top + window.scrollY) + "px";
+    dyatel_obj.style.left = (given_obj.left + window.scrollX) + "px";
+    
+    document.body.appendChild(dyatel_obj);
 };
 
 return appendElement(arguments[0]);

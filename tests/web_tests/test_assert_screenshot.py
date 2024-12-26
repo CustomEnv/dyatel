@@ -1,4 +1,5 @@
 import os
+import time
 
 import pytest
 import pytest_rerunfailures
@@ -34,9 +35,14 @@ def test_screenshot_name_with_suffix(base_playground_page, driver_name, platform
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename, name_suffix='second')
 
 
-def test_screenshot_remove(base_playground_page):
-    base_playground_page.text_container.scroll_into_view(sleep=0.5).assert_screenshot(
-            remove=[base_playground_page.inner_text_1, base_playground_page.inner_text_2])
+def test_screenshot_remove(colored_blocks_page):
+    row2_card = colored_blocks_page.row2.card
+    cards = row2_card.wait_elements_count(8).all_elements
+    colored_blocks_page.row2.assert_screenshot(
+        remove=[cards[5], cards[3]],
+        delay=0.5,
+        scroll=True
+    )
 
 
 @pytest.fixture
@@ -81,36 +87,35 @@ def test_append_dummy_elements_multiple_available(second_playground_page, driver
     VisualComparison(driver_wrapper)._appends_dummy_elements([Card()])
 
 
-def test_assert_screenshot_hide_elements(second_playground_page, driver_wrapper):
-    all_cards = second_playground_page.get_all_cards()
-    for card in all_cards:
-        print(card.element)
-    second_playground_page.row_with_cards.assert_screenshot(
+def test_assert_screenshot_hide_elements(colored_blocks_page, driver_wrapper):
+    all_cards = colored_blocks_page.get_all_cards()
+    colored_blocks_page.row1.assert_screenshot(
         hide=all_cards[1],
-        name_suffix='middle hidden'
+        name_suffix='middle hidden',
+        delay=0.5
     )
     driver_wrapper.refresh()
-    second_playground_page.row_with_cards.scroll_into_view()
-    all_cards = second_playground_page.get_all_cards()
-    second_playground_page.row_with_cards.assert_screenshot(
+    all_cards = colored_blocks_page.get_all_cards()
+    colored_blocks_page.row1.assert_screenshot(
         hide=[all_cards[0], all_cards[2]],
-        name_suffix='sides hidden'
+        name_suffix='sides hidden',
+        delay=0.5
     )
 
 
-def test_assert_screenshot_hide_driver_elements(second_playground_page, driver_wrapper):
-    all_cards = second_playground_page.get_all_cards()
-    second_playground_page.row_with_cards.scroll_into_view()
+def test_assert_screenshot_hide_driver_elements(colored_blocks_page, driver_wrapper):
+    all_cards = colored_blocks_page.get_all_cards()
     driver_wrapper.assert_screenshot(
-        hide=all_cards[1],
-        name_suffix='middle hidden'
+        hide=[all_cards[1]] + colored_blocks_page.navbar.all_elements,
+        name_suffix='middle hidden',
+        delay=0.5,
     )
     driver_wrapper.refresh()
-    second_playground_page.row_with_cards.scroll_into_view()
-    all_cards = second_playground_page.get_all_cards()
+    all_cards = colored_blocks_page.get_all_cards()
     driver_wrapper.assert_screenshot(
-        hide=[all_cards[0], all_cards[2]],
-        name_suffix='sides hidden'
+        hide=[all_cards[0], all_cards[2]] + colored_blocks_page.navbar.all_elements,
+        name_suffix='sides hidden',
+        delay=0.5,
     )
 
 

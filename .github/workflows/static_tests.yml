@@ -7,7 +7,7 @@ on:
 
 jobs:
   static:
-    runs-on: ubuntu-latest  #'windows-latest' / 'macos-latest'
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
@@ -33,6 +33,6 @@ jobs:
           tox_env_variable=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
           echo "TOX_ENV=${tox_env_variable}" >> $GITHUB_ENV
 
-      - name: Run Tox on ${{ matrix.python-version }}
+      - name: Run Static tests with ${{ matrix.python-version }}
         run: |
           tox -e py${{ env.TOX_ENV }}-static

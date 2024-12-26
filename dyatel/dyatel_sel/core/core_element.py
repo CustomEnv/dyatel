@@ -21,7 +21,7 @@ from selenium.common.exceptions import (
 
 from dyatel.abstraction.element_abc import ElementABC
 from dyatel.dyatel_sel.sel_utils import ActionChains
-from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js
+from dyatel.js_scripts import get_element_size_js, get_element_position_on_screen_js, js_click
 from dyatel.keyboard_keys import KeyboardKeys
 from dyatel.mixins.objects.location import Location
 from dyatel.mixins.objects.scrolls import ScrollTo, ScrollTypes, scroll_into_view_blocks
@@ -102,7 +102,13 @@ class CoreElement(ElementABC, ABC):
         start_time = time.time()
         while time.time() - start_time < HALF_WAIT_EL:
             try:
-                self.wait_enabled(silent=True).element.click()
+                element = self.wait_enabled(silent=True).element
+
+                if self.driver_wrapper.is_safari:
+                    self.execute_script(js_click)
+                else:
+                    element.click()
+
                 return self
             except (
                     SeleniumElementNotInteractableException,
@@ -358,6 +364,10 @@ class CoreElement(ElementABC, ABC):
         :return: element text
         """
         element = self._get_element(wait=self.wait_availability)
+
+        if self.driver_wrapper.is_safari:
+            return element.get_attribute('innerText')
+
         return element.text
 
     @property

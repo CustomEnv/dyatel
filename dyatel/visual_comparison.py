@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+import shutil
 import time
 import math
 import json
@@ -167,7 +168,9 @@ class VisualComparison:
             self._assert_same_images(output_file, reference_file, diff_file, threshold)
         except AssertionError as exc:
             if self.soft_visual_reference_generation:
-                self._save_screenshot(reference_file, **screenshot_params)
+                if os.path.exists(reference_file):
+                    os.remove(reference_file)
+                shutil.move(output_file, reference_file)
             else:
                 raise exc
 
@@ -201,12 +204,12 @@ class VisualComparison:
         for obj in remove_data:
 
             try:
-                obj.wait_visibility()
+                obj.wait_visibility(silent=True)
             except TimeoutException:
                 msg = f'Cannot find {obj.name} while removing background from screenshot. {get_element_info(obj)}'
                 raise TimeoutException(msg)
 
-            self.driver_wrapper.execute_script(add_element_over_js, obj)
+            obj.execute_script(add_element_over_js)
         return self
 
     def _remove_dummy_elements(self) -> VisualComparison:

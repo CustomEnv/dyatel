@@ -15,16 +15,26 @@ class SeleniumDriver:
     @staticmethod
     def create_selenium_driver(entities: DriverEntities):
         driver_name = entities.driver_name
-        if driver_name == 'safari' and DriverWrapperSessions.is_connected():
-            driver_name = 'chrome'  # Cannot create second selenium driver
+        options = None
+        remote_url = "http://127.0.0.1:4444"
 
+        if driver_name == 'safari':
+            if DriverWrapperSessions.is_connected():
+                driver_name = 'chrome'  # Cannot create second selenium driver
+        elif driver_name == 'chrome':
+            options = entities.selenium_chrome_options
+        elif driver_name == 'firefox':
+            options = entities.selenium_firefox_options
+            remote_url += '/wd/hub'
+        else:
+            raise Exception('Unknown driver: %s' % driver_name)
 
         if entities.env == 'remote':
-            driver = Remote(options=entities.selenium_chrome_options)
+            driver = Remote(remote_url, options=options)
         elif driver_name == 'chrome':
-            driver = ChromeWebDriver(options=entities.selenium_chrome_options, service=ChromeService())
+            driver = ChromeWebDriver(options=options, service=ChromeService())
         elif driver_name == 'firefox':
-            driver = GeckoWebDriver(options=entities.selenium_firefox_options, service=FirefoxService())
+            driver = GeckoWebDriver(options=options, service=FirefoxService())
         elif driver_name == 'safari':
             driver = SafariWebDriver(service=SafariService())
         else:

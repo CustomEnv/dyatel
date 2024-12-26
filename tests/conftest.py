@@ -1,7 +1,6 @@
 import os
 
 import pytest
-import warnings
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
@@ -10,6 +9,7 @@ from dyatel.utils.logs import dyatel_logs_settings
 from dyatel.visual_comparison import VisualComparison
 from tests.adata.drivers.driver_entities import DriverEntities
 from tests.adata.drivers.driver_factory import DriverFactory
+from tests.adata.pages.colored_blocks_page import ColoredBlocksPage
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
 from tests.adata.pages.frames_page import FramesPage
@@ -19,10 +19,6 @@ from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import PlaygroundMainPage, SecondPlaygroundMainPage
 from tests.adata.pytest_utils import skip_platform
-
-
-# Suppress deprecation warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 dyatel_logs_settings()
@@ -70,7 +66,9 @@ def chrome_options(request):
     options.add_argument('--no-sandbox')
     options.add_argument("--disable-gpu")
     options.add_argument("--remote-allow-origins=*")
+    options.add_argument("--hide-scrollbars")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     return options
 
@@ -79,7 +77,7 @@ def chrome_options(request):
 def firefox_options(request):
     options = FirefoxOptions()
     if request.config.getoption('headless'):
-        options.add_argument('--headless=new')
+        options.add_argument('--headless')
     return options
 
 
@@ -89,10 +87,6 @@ def redirect(request):
     print()
     yield
     print()
-    # if DriverWrapper.session.sessions_count() > 0:
-    #     driver_wrapper = request.getfixturevalue('driver_wrapper')
-    #     driver_wrapper.get('data:,', silent=True)  # noqa
-
 
 @pytest.fixture
 def second_driver_wrapper(driver_entities):
@@ -133,7 +127,11 @@ def visual_comparisons_settings(request):
 
 def pytest_collection_modifyitems(items):
     for item in items:
-        skip_platform(item=item, platform=item.session.config.getoption("--platform"))
+        skip_platform(
+            item=item,
+            platform=item.session.config.getoption("--platform"),
+            browser=item.session.config.getoption("--driver")
+        )
 
 
 @pytest.fixture
@@ -144,6 +142,11 @@ def base_playground_page(driver_wrapper):
 @pytest.fixture
 def second_playground_page(driver_wrapper):
     return SecondPlaygroundMainPage().open_page()
+
+
+@pytest.fixture
+def colored_blocks_page(driver_wrapper):
+    return ColoredBlocksPage().open_page()
 
 
 @pytest.fixture

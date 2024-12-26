@@ -398,8 +398,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
         :return: element text
         """
-        element = self._first_element
-        return element.text_content() if element.text_content() else element.input_value()
+        return self.inner_text
 
     @property
     def inner_text(self) -> str:
