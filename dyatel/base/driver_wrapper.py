@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import cached_property
 from typing import Union, Type, List, Tuple, Any, Optional
 
 from PIL import Image
@@ -153,6 +154,33 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             self.is_mobile_resolution = True
             self.is_desktop = False
             self.is_mobile = True
+
+    @cached_property
+    def is_safari(self) -> bool:
+        """
+        Returns the status of whether the current driver is Safari
+
+        :return: :class:`bool`
+        """
+        return self.browser_name.lower() == 'safari'
+
+    @cached_property
+    def is_chrome(self) -> bool:
+        """
+        Returns the status of whether the current driver is Chrome
+
+        :return: :class:`bool`
+        """
+        return self.browser_name.lower() == 'chrome'
+
+    @cached_property
+    def is_firefox(self) -> bool:
+        """
+        Returns the status of whether the current driver is Firefox
+
+        :return: :class:`bool`
+        """
+        return self.browser_name.lower() == 'firefox'
 
     def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """

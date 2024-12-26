@@ -1,5 +1,6 @@
 get_inner_height_js = 'return window.innerHeight'
 get_inner_width_js = 'return window.innerWidth'
+js_click = 'arguments[0].click();'
 
 get_element_position_on_screen_js = """
 function getPositionOnScreen(elem) {

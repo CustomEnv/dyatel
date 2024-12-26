@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
+from functools import cached_property
 from typing import List, Union, Any, Tuple
 
 from dyatel.mixins.objects.cut_box import CutBox
@@ -37,6 +38,33 @@ class DriverWrapperABC(ABC):
     is_real_device = False
 
     browser_name = None
+
+    @cached_property
+    def is_safari(self) -> bool:
+        """
+        Returns the status of whether the current driver is Safari
+
+        :return: :class:`bool`
+        """
+        raise NotImplementedError()
+
+    @cached_property
+    def is_chrome(self) -> bool:
+        """
+        Returns the status of whether the current driver is Chrome
+
+        :return: :class:`bool`
+        """
+        raise NotImplementedError()
+
+    @cached_property
+    def is_firefox(self) -> bool:
+        """
+        Returns the status of whether the current driver is Firefox
+
+        :return: :class:`bool`
+        """
+        raise NotImplementedError()
 
     def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """
