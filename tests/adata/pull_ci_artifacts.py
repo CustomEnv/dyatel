@@ -172,5 +172,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Download GitHub Actions artifacts from a PR based on commit SHA.")
     parser.add_argument("commit_sha", help="Commit SHA")
     parser.add_argument("-o", "--output-dir", default="./artifacts", help="Output directory (default: ./artifacts)")
-    parser.add_argument("-t", "--token", help="GitHub personal access token (or set GITHUB_TOKEN environment variable)")
+    parser.add_argument("-t", "--token", default=os.environ['GH_TOKEN'], help="GitHub personal access token (or set GITHUB_TOKEN environment variable)")
     DownloadArtifacts(Args(parser)).download_artefact_and_replace_references()

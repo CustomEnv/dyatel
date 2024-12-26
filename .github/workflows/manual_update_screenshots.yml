@@ -3,9 +3,6 @@ name: Update Screenshot References
 on:
   workflow_dispatch:
     inputs:
-      target_branch:
-        description: 'Target branch to push changes to'
-        required: true
       commit_sha:
         description: 'Commit sha for artifacts lookup'
         required: true
@@ -29,8 +26,10 @@ jobs:
           pip install Pillow==9.4.0 requests==2.32.3
 
       - name: Run script
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python tests/adata/pull_ci_artifacts.py ${{ github.event.inputs.commit_sha }} -t ${{ secrets.GITHUB_PAT }}
+          python tests/adata/pull_ci_artifacts.py ${{ github.event.inputs.commit_sha }}
 
       - name: Configure Git
         run: |
@@ -44,6 +43,6 @@ jobs:
 
       - name: Push changes
         run: |
-          git push origin ${{ github.event.inputs.target_branch }}
+          git push origin ${{ github.ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
