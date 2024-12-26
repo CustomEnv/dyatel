@@ -1,0 +1,49 @@
+name: Update Screenshot References
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'Target branch to push changes to'
+        required: true
+      commit_sha:
+        description: 'Commit sha for artifacts lookup'
+        required: true
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install Pillow==9.4.0 requests==2.32.3
+
+      - name: Run script
+        run: |
+          python tests/adata/pull_ci_artifacts.py ${{ github.event.inputs.commit_sha }} -t ${{ secrets.GITHUB_PAT }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Commit changes
+        run: |
+          git add .
+          git commit -m "Run pull request CI artifacts script" || echo "No changes to commit"
+
+      - name: Push changes
+        run: |
+          git push origin ${{ github.event.inputs.target_branch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

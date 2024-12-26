@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import zipfile
 import base64
@@ -11,13 +12,15 @@ import requests
 from PIL import Image
 
 
+REPO = 'CustomEnv/dyatel'
+ARTIFACT_NAME = 'allure-report'
+
+
 class Args:
 
     def __init__(self, parser):
         launched_args = parser.parse_args()
-        self.repo = launched_args.repo
         self.commit_sha = launched_args.commit_sha
-        self.artifact_name = launched_args.artifact_name
         self.output_dir = launched_args.output_dir
         self.token = launched_args.token
 
@@ -70,13 +73,14 @@ class DownloadArtifacts:
         self.launch_args = launch_args
         self.updated_artifact_names = []
 
-    def _is_already_updated(self):
-        for artefact_name in self.updated_artifact_names:
-            if self.launch_args.artifact_name in artefact_name:
-                print('Already updated artifact: ', artefact_name)
-                return True
+    def _drop_python_version(self, artefact_name):
+        return re.sub(r"-\b\d{2,3}\b", "", artefact_name).strip()
 
-        return False
+    def _is_already_updated(self, artifact_name):
+        status = artifact_name in self.updated_artifact_names
+        if status:
+            print(f'{artifact_name} already exists in uploaded artifacts: {self.updated_artifact_names}')
+        return status
 
     def download_artefact_and_replace_references(self):
 
@@ -87,24 +91,32 @@ class DownloadArtifacts:
 
         try:
             print(f"Finding PR associated with commit {self.launch_args.commit_sha}...")
-            pr_number = self._api_request(f"{bae_api_url}/search/issues?q=repo:{self.launch_args.repo}+sha:{self.launch_args.commit_sha}+is:pr")['items'][0]['number']
-            branch_name = self._api_request(f"{repos_url}/{self.launch_args.repo}/pulls/{pr_number}")['head']['ref']
-            runs_response = self._api_request(f"{repos_url}/{self.launch_args.repo}/actions/runs?per_page=100&event=push&branch={branch_name}")
+            pr_number = self._api_request(f"{bae_api_url}/search/issues?q=repo:{REPO}+sha:{self.launch_args.commit_sha}+is:pr")['items'][0]['number']
+            branch_name = self._api_request(f"{repos_url}/{REPO}/pulls/{pr_number}")['head']['ref']
+            runs_response = self._api_request(f"{repos_url}/{REPO}/actions/runs?per_page=100&event=push&branch={branch_name}")
             run_ids = [run["id"] for run in runs_response.get("workflow_runs", []) if any(pr.get("number") == pr_number for pr in run.get("pull_requests", []))]
             for run_id in run_ids:
-                artifacts_response = self._api_request(f"{repos_url}/{self.launch_args.repo}/actions/runs/{run_id}/artifacts")
+                artifacts_response = self._api_request(f"{repos_url}/{REPO}/actions/runs/{run_id}/artifacts")
                 for artifact in artifacts_response.get("artifacts", []):
-                    # allure-report-${{ matrix.browser-name }}-${{ env.TOX_ENV }}
-                    if self.launch_args.artifact_name in artifact["name"] and not self._is_already_updated():
+                    artifact_name = self._drop_python_version(artifact["name"])
+                    if (
+                            ARTIFACT_NAME in artifact_name
+                            and not self._is_already_updated(artifact_name)
+                            and self.launch_args.commit_sha == artifact['workflow_run']['head_sha']
+                    ):
                         download_url = artifact["archive_download_url"]
                         self._download_and_extract_artifact(download_url)
                         try:
                             reference_updater.replace_references()
+                            self.updated_artifact_names.append(artifact_name)
                         except Exception as exc:
                             raise exc
                         finally:
-                            print('Cleaning up directory: ', self.launch_args.output_dir)
-                            shutil.rmtree(self.launch_args.output_dir)
+                            if os.path.exists(self.launch_args.output_dir):
+                                print('Cleaning up directory: ', self.launch_args.output_dir)
+                                shutil.rmtree(f'{self.launch_args.output_dir}/{ARTIFACT_NAME}')
+
+                        print()
 
 
         except requests.exceptions.RequestException as e:
@@ -123,8 +135,8 @@ class DownloadArtifacts:
 
     def _download_and_extract_artifact(self, download_url):
         """Downloads and extracts a ZIP artifact."""
-        zip_path = os.path.join(self.launch_args.output_dir, f"{self.launch_args.artifact_name}.zip")
-        extract_path = os.path.join(self.launch_args.output_dir, self.launch_args.artifact_name)
+        zip_path = os.path.join(self.launch_args.output_dir, f"{ARTIFACT_NAME}.zip")
+        extract_path = os.path.join(self.launch_args.output_dir, ARTIFACT_NAME)
 
         try:
             print(f"Downloading artifact to {zip_path}...")
@@ -158,9 +170,7 @@ class DownloadArtifacts:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Download GitHub Actions artifacts from a PR based on commit SHA.")
-    parser.add_argument("repo", help="Repository in the format <owner>/<repo>")
     parser.add_argument("commit_sha", help="Commit SHA")
-    parser.add_argument("artifact_name", help="Name of the artifact to download")
     parser.add_argument("-o", "--output-dir", default="./artifacts", help="Output directory (default: ./artifacts)")
     parser.add_argument("-t", "--token", help="GitHub personal access token (or set GITHUB_TOKEN environment variable)")
     DownloadArtifacts(Args(parser)).download_artefact_and_replace_references()
