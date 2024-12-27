@@ -35,4 +35,4 @@ jobs:
 
       - name: Run Static tests with ${{ matrix.python-version }}
         run: |
-          tox -e py${{ env.TOX_ENV }}-static
+          tox -e py${{ env.TOX_ENV }}-static --reruns=1

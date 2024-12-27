@@ -40,10 +40,6 @@ jobs:
         run: |
           git add .
           git commit -m "Screenshots updated for ${{ github.event.inputs.commit_sha }}" || echo "No changes to commit"
-          
-      - name: Set up Git for authentication
-        run: |
-          git config --global url."https://${{ secrets.PAT }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
       - name: Push changes
         run: |
