@@ -48,7 +48,7 @@ jobs:
       - name: Run Playwright ${{ matrix.browser-name }} tests with py${{ matrix.python-version }}
         id: tests
         run: |
-          tox -e py${{ env.TOX_ENV }}-playwright-${{ matrix.browser-name }} -- --headless -v --alluredir=allure-report --reruns=1
+          tox -e py${{ env.TOX_ENV }}-playwright-${{ matrix.browser-name }} -- --headless -v --alluredir=allure-report --reruns=2
         continue-on-error: true
 
       - name: Upload Allure Report as Artifact

@@ -47,11 +47,12 @@ def test_screenshot_remove(colored_blocks_page):
 
 @pytest.fixture
 def file(request):
+    initial_reruns_count = request.node.session.config.option.reruns
     request.node.execution_count = 1
     request.node.session.config.option.reruns = 1
     filename = 'reference_with_rerun'
     yield filename
-    request.node.session.config.option.reruns = 0
+    request.node.session.config.option.reruns = initial_reruns_count
     if not request.config.option.sv:
         os.remove(f'{os.getcwd()}/tests/adata/visual/reference/{filename}.png')
 
