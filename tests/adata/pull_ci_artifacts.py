@@ -29,6 +29,10 @@ class UpdateReferences:
 
     def __init__(self, directory):
         self.directory = self._get_project_path(directory)
+        self.ref_directory =  self._get_reference_screenshots_path()
+
+        if not os.path.exists(self.ref_directory ):
+            os.makedirs(self.ref_directory )
 
     def _get_project_path(self, suffix: str = ''):
         return str(Path(os.path.dirname(__file__)).parent.parent.joinpath(suffix))
@@ -57,13 +61,12 @@ class UpdateReferences:
         return sources
 
     def replace_references(self):
-        reference_screenshots_dir_path = self._get_reference_screenshots_path()
         for screenshot_name, file_name in self._collect_screenshot_names_and_files().items():
             with open(f'{self.directory}/allure-report/{file_name}', 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 image_bytes = base64.b64decode(data['actual'].replace('data:image/png;base64,', ''))
                 image = Image.open(BytesIO(image_bytes))  # noqa
-                image.save(reference_screenshots_dir_path + screenshot_name)
+                image.save(self.ref_directory  + screenshot_name)
                 print('Replaced: ', screenshot_name)
 
 
