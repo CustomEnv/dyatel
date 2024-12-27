@@ -27,7 +27,7 @@ jobs:
 
       - name: Run script
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT }}
         run: |
           python tests/adata/pull_ci_artifacts.py ${{ github.event.inputs.commit_sha }}
 
@@ -45,4 +45,4 @@ jobs:
         run: |
           git push origin ${{ github.ref }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
