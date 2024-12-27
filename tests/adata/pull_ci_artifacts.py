@@ -84,6 +84,7 @@ class DownloadArtifacts:
 
     def download_artefact_and_replace_references(self):
 
+        assert self.launch_args.token, 'Env varaible GH_TOKEN or --token arg required'
         os.makedirs(self.launch_args.output_dir, exist_ok=True)
         reference_updater = UpdateReferences(self.launch_args.output_dir)
         bae_api_url = 'https://api.github.com'
@@ -172,5 +173,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Download GitHub Actions artifacts from a PR based on commit SHA.")
     parser.add_argument("commit_sha", help="Commit SHA")
     parser.add_argument("-o", "--output-dir", default="./artifacts", help="Output directory (default: ./artifacts)")
-    parser.add_argument("-t", "--token", default=os.environ['GH_TOKEN'], help="GitHub personal access token (or set GITHUB_TOKEN environment variable)")
+    parser.add_argument("-t", "--token", default=os.environ.get('GH_TOKEN'), help="GitHub personal access token (or set GITHUB_TOKEN environment variable)")
     DownloadArtifacts(Args(parser)).download_artefact_and_replace_references()
