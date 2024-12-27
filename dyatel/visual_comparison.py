@@ -86,6 +86,9 @@ class VisualComparison:
         self._fill_background(fill_background)
         self._appends_dummy_elements(remove)
 
+        if fill_background or remove:
+            time.sleep(delay)  # TODO: REMOVE ME
+
         desired_obj = self.dyatel_element or self.driver_wrapper.anchor or self.driver_wrapper
         image = desired_obj.screenshot_image()
 
@@ -233,10 +236,11 @@ class VisualComparison:
 
         dyatel_element = self.dyatel_element
 
+        script = 'arguments[0].style.background'
         if fill_background_data is True:
-            dyatel_element.execute_script('arguments[0].style.background = "#000";')
+            dyatel_element.wait_visibility().execute_script(f'{script} = "#000";')
         elif type(fill_background_data) is str:
-            dyatel_element.execute_script(f'arguments[0].style.background = "{fill_background_data}";')
+            dyatel_element.wait_visibility().execute_script(f'{script} = "{fill_background_data}";')
 
         return self
 
