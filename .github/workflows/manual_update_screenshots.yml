@@ -8,7 +8,7 @@ on:
         required: true
 
 jobs:
-  run-tests:
+  screenshots_updating:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,10 +28,8 @@ jobs:
           pip install Pillow==9.4.0 requests==2.32.3
 
       - name: Run script
-        env:
-          GH_TOKEN: ${{ secrets.PAT }}
         run: |
-          python tests/adata/pull_ci_artifacts.py ${{ github.event.inputs.commit_sha }}
+          python tests/adata/pull_ci_artifacts.py ${{ github.event.inputs.commit_sha }} -t ${{ secrets.PAT }}
 
       - name: Configure Git
         run: |
@@ -45,7 +43,7 @@ jobs:
           
       - name: Set up Git for authentication
         run: |
-          git config --global url."https://${GH_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://${{ secrets.PAT }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
       - name: Push changes
         run: |
