@@ -6,6 +6,7 @@ import base64
 import argparse
 import json
 from io import BytesIO
+from os.path import join
 from pathlib import Path
 
 import requests
@@ -66,7 +67,7 @@ class UpdateReferences:
                 data = json.load(file)
                 image_bytes = base64.b64decode(data['actual'].replace('data:image/png;base64,', ''))
                 image = Image.open(BytesIO(image_bytes))  # noqa
-                image.save(self.ref_directory  + screenshot_name)
+                image.save(join(self.ref_directory, screenshot_name))
                 print('Replaced: ', screenshot_name)
 
 
