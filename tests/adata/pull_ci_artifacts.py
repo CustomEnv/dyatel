@@ -131,7 +131,7 @@ class DownloadArtifacts:
             print(f"Error decoding JSON response: {e}")
 
         if not self.updated_artifact_names:
-            sys.exit('No any artifacts were updated')
+            sys.exit(f'No any artifacts were updated for "{self.launch_args.commit_sha}" commit')
 
     def _api_request(self, url):
         headers = {
