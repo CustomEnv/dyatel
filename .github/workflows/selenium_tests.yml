@@ -47,6 +47,7 @@ jobs:
           echo "BROWSER=${browser_name}" >> $GITHUB_ENV
 
       - name: Run Selenium ${{ env.BROWSER }} tests with py${{ matrix.python-version }}
+        id: tests
         run: |
           tox -e py${{ env.TOX_ENV }}-selenium-${{ env.BROWSER }} -- --env remote --headless -v
         continue-on-error: true
