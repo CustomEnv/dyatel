@@ -48,4 +48,19 @@ jobs:
 
       - name: Run Selenium ${{ env.BROWSER }} tests with py${{ matrix.python-version }}
         run: |
-          tox -e py${{ env.TOX_ENV }}-selenium-${{ env.BROWSER }} -- --env remote --headless -v --reruns=2
+          tox -e py${{ env.TOX_ENV }}-selenium-${{ env.BROWSER }} -- --env remote --headless -v
+        continue-on-error: true
+
+      - name: Upload Allure Report as Artifact
+        if: steps.tests.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-${{ matrix.browser-name }}-selenium-${{ env.TOX_ENV }}
+          path: allure-report
+          retention-days: 1
+
+      - name: Check Test Results
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "❌ Tests failed! Check the Allure Report for details."
+          exit 1 
