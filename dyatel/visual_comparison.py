@@ -169,6 +169,9 @@ class VisualComparison:
 
         try:
             self._assert_same_images(output_file, reference_file, diff_file, threshold)
+            for file_path in (output_file, diff_file):
+                if os.path.exists(file_path):
+                    os.remove(file_path)
         except AssertionError as exc:
             if self.soft_visual_reference_generation:
                 if os.path.exists(reference_file):
