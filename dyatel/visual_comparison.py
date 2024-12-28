@@ -86,7 +86,7 @@ class VisualComparison:
         self._fill_background(fill_background)
         self._appends_dummy_elements(remove)
 
-        if self.driver_wrapper.is_playwright and fill_background or remove:
+        if fill_background or remove:
             time.sleep(0.1)
 
         desired_obj = self.dyatel_element or self.driver_wrapper.anchor or self.driver_wrapper
