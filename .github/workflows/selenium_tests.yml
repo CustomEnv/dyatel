@@ -49,7 +49,7 @@ jobs:
       - name: Run Selenium ${{ env.BROWSER }} tests with py${{ matrix.python-version }}
         id: tests
         run: |
-          tox -e py${{ env.TOX_ENV }}-selenium-${{ env.BROWSER }} -- --env remote --headless -v
+          tox -e py${{ env.TOX_ENV }}-selenium-${{ env.BROWSER }} -- --env remote --headless -v --alluredir=allure-report
         continue-on-error: true
 
       - name: Upload Allure Report as Artifact
