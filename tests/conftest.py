@@ -121,7 +121,6 @@ def visual_comparisons_settings(request):
     VisualComparison.soft_visual_reference_generation = request.config.getoption('--sgr')
     VisualComparison.skip_screenshot_comparison = request.config.getoption('--sv')
     VisualComparison.default_threshold = 0.1
-    VisualComparison.default_delay = 0.1
     VisualComparison.test_item = request.node
 
 

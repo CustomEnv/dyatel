@@ -175,3 +175,5 @@ cython_debug/
 
 # Allure report
 /allure-report
+/tests/adata/artifacts
+tests/adata/visual/reference/reference_with_rerun.png

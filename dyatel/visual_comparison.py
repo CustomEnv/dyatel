@@ -86,6 +86,9 @@ class VisualComparison:
         self._fill_background(fill_background)
         self._appends_dummy_elements(remove)
 
+        if self.driver_wrapper.is_playwright and fill_background or remove:
+            time.sleep(0.1)
+
         desired_obj = self.dyatel_element or self.driver_wrapper.anchor or self.driver_wrapper
         image = desired_obj.screenshot_image()
 
@@ -166,6 +169,9 @@ class VisualComparison:
 
         try:
             self._assert_same_images(output_file, reference_file, diff_file, threshold)
+            for file_path in (output_file, diff_file):
+                if os.path.exists(file_path):
+                    os.remove(file_path)
         except AssertionError as exc:
             if self.soft_visual_reference_generation:
                 if os.path.exists(reference_file):
@@ -221,7 +227,7 @@ class VisualComparison:
         self.driver_wrapper.execute_script(delete_element_over_js)
         return self
 
-    def _fill_background(self, fill_background_data) -> VisualComparison:
+    def _fill_background(self, fill_background_data: Union[bool, str]) -> VisualComparison:
         """
         Fill background of element
 
@@ -233,10 +239,10 @@ class VisualComparison:
 
         dyatel_element = self.dyatel_element
 
-        if fill_background_data is True:
-            dyatel_element.execute_script('arguments[0].style.background = "#000";')
-        elif type(fill_background_data) is str:
-            dyatel_element.execute_script(f'arguments[0].style.background = "{fill_background_data}";')
+        color = fill_background_data if type(fill_background_data) is str else 'black'
+        dyatel_element\
+            .wait_visibility(silent=True)\
+            .execute_script(f'arguments[0].style.background = "{color}";')
 
         return self
 

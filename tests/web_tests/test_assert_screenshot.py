@@ -47,11 +47,12 @@ def test_screenshot_remove(colored_blocks_page):
 
 @pytest.fixture
 def file(request):
+    initial_reruns_count = request.node.session.config.option.reruns
     request.node.execution_count = 1
     request.node.session.config.option.reruns = 1
     filename = 'reference_with_rerun'
     yield filename
-    request.node.session.config.option.reruns = 0
+    request.node.session.config.option.reruns = initial_reruns_count
     if not request.config.option.sv:
         os.remove(f'{os.getcwd()}/tests/adata/visual/reference/{filename}.png')
 
@@ -68,18 +69,20 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
             raise Exception('Unexpected behavior')
 
 
-def test_screenshot_soft_assert(base_playground_page):
-    base_playground_page.kube.scroll_into_view().soft_assert_screenshot(
+def test_screenshot_soft_assert(colored_blocks_page):
+    check, message = colored_blocks_page.row1.soft_assert_screenshot(
         test_name=test_screenshot_fill_background_default.__name__
     )
 
-
-def test_screenshot_fill_background_blue(base_playground_page):
-    base_playground_page.kube.scroll_into_view().assert_screenshot(fill_background='blue')
+    assert not check, message
 
 
-def test_screenshot_fill_background_default(base_playground_page):
-    base_playground_page.kube.scroll_into_view().assert_screenshot(fill_background=True)
+def test_screenshot_fill_background_blue(colored_blocks_page):
+    colored_blocks_page.row1.assert_screenshot(fill_background='blue')
+
+
+def test_screenshot_fill_background_default(colored_blocks_page):
+    colored_blocks_page.row1.assert_screenshot(fill_background=True)
 
 
 def test_append_dummy_elements_multiple_available(second_playground_page, driver_wrapper):
