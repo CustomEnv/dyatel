@@ -33,13 +33,9 @@ jobs:
           tox_env_variable=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
           echo "TOX_ENV=${tox_env_variable}" >> $GITHUB_ENV
 
-      - name: Ensure Safari and SafariDriver are up-to-date
-        run: |
-          safaridriver --version
-          softwareupdate --install --recommended
-
       - name: Enable Safari Remote Automation
         run: |
+          safaridriver --version
           sudo safaridriver --enable
 
       - name: Run Selenium Safari tests with py${{ matrix.python-version }}
