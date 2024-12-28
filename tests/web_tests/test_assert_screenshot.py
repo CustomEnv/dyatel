@@ -69,11 +69,12 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
             raise Exception('Unexpected behavior')
 
 
-def test_screenshot_soft_assert(base_playground_page):
-    check, message = base_playground_page.kube.scroll_into_view().soft_assert_screenshot(
+def test_screenshot_soft_assert(colored_blocks_page):
+    check, message = colored_blocks_page.row1.soft_assert_screenshot(
         test_name=test_screenshot_fill_background_default.__name__
     )
-    assert check, message
+
+    assert not check, message
 
 
 def test_screenshot_fill_background_blue(colored_blocks_page):
