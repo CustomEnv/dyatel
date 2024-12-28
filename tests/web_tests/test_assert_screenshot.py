@@ -76,12 +76,12 @@ def test_screenshot_soft_assert(base_playground_page):
     assert check, message
 
 
-def test_screenshot_fill_background_blue(base_playground_page):
-    base_playground_page.kube.scroll_into_view().assert_screenshot(fill_background='blue')
+def test_screenshot_fill_background_blue(colored_blocks_page):
+    colored_blocks_page.row1.assert_screenshot(fill_background='blue')
 
 
-def test_screenshot_fill_background_default(base_playground_page):
-    base_playground_page.kube.scroll_into_view().assert_screenshot(fill_background=True)
+def test_screenshot_fill_background_default(colored_blocks_page):
+    colored_blocks_page.row1.assert_screenshot(fill_background=True)
 
 
 def test_append_dummy_elements_multiple_available(second_playground_page, driver_wrapper):
