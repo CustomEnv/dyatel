@@ -33,6 +33,8 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
     _object = 'page'
     _base_cls: Type[PlayPage, MobilePage, WebPage]
 
+    anchor: Element
+
     def __new__(cls, *args, **kwargs):
         instance = super(Page, cls).__new__(cls)
         set_instance_frame(instance)
@@ -101,10 +103,12 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
 
     def reload_page(self, wait_page_load: bool = True) -> Page:
         """
-        Reload current page
+        Reload the current page and optionally wait for the page to fully load.
 
-        :param wait_page_load: wait until anchor will be element loaded
-        :return: self
+        :param wait_page_load: If :obj:`True`, waits until the page is fully loaded and an
+          anchor element is visible. Defaults to :obj:`True`.
+        :type wait_page_load: bool
+        :return: :obj:`Page` - The current instance of the page object.
         """
         self.log(f'Reload "{self.name}" page')
         self.driver_wrapper.refresh()
@@ -116,10 +120,11 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
 
     def open_page(self, url: str = '') -> Page:
         """
-        Open page with given url or use url from page class f url isn't given
+        Open a page using the given URL, or use the default URL from the page class if no URL is provided.
 
-        :param url: url for navigation
-        :return: self
+        :param url: The URL to navigate to. If not provided, the default URL from the page class will be used.
+        :type url: str
+        :return: :obj:`Page` - The current instance of the page object.
         """
         url = self.url if not url else url
         self.driver_wrapper.get(url)
@@ -128,11 +133,16 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
 
     def wait_page_loaded(self, silent: bool = False, timeout: Union[int, float] = WAIT_PAGE) -> Page:
         """
-        Wait until page loaded
+        Wait until the page is fully loaded by checking the visibility of the anchor element and other page elements.
 
-        :param silent: erase log
-        :param timeout: page/elements wait timeout
-        :return: self
+        Waits for the anchor element to become visible, and depending on the configuration of each page element,
+        it waits for either their visibility or to be hidden.
+
+        :param silent: If :obj:`True`, suppresses logging during the waiting process. Defaults to :obj:`False`.
+        :type silent: bool
+        :param timeout: The maximum time (in seconds) to wait for the page or elements to load. Defaults to `WAIT_PAGE`.
+        :type timeout: Union[int, float]
+        :return: :obj:`Page` - The current instance of the page object.
         """
         if not silent:
             self.log(f'Wait until page "{self.name}" loaded')
@@ -148,11 +158,13 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
 
     def is_page_opened(self, with_elements: bool = False, with_url: bool = False) -> bool:
         """
-        Check is current page opened or not
+        Check whether the current page is opened.
 
-        :param with_elements: is page opened with signed elements
-        :param with_url: is page opened check with url
-        :return: self
+        :param with_elements: If `True`, verify the page is opened by checking specific elements.
+        :type with_elements: bool
+        :param with_url: If `True`, verify the page is opened by checking the URL.
+        :type with_url: bool
+        :return: :obj:`bool` - `True` if the page is opened, otherwise `False`.
         """
         result = True
 

@@ -2,15 +2,21 @@ import inspect
 
 import pytest
 
+from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
 from dyatel.abstraction.element_abc import ElementABC
 from dyatel.abstraction.page_abc import PageABC
+from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.base.element import Element
 from dyatel.base.page import Page
+from dyatel.dyatel_play.play_driver import PlayDriver
 
 from dyatel.dyatel_play.play_element import PlayElement
 from dyatel.dyatel_play.play_page import PlayPage
+from dyatel.dyatel_sel.core.core_driver import CoreDriver
 from dyatel.dyatel_sel.core.core_element import CoreElement
 from dyatel.dyatel_sel.core.core_page import CorePage
+from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
+from dyatel.dyatel_sel.driver.web_driver import WebDriver
 from dyatel.dyatel_sel.elements.mobile_element import MobileElement
 from dyatel.dyatel_sel.elements.web_element import WebElement
 from dyatel.dyatel_sel.pages.mobile_page import MobilePage
@@ -91,9 +97,9 @@ def test_page_to_abc(base_class):
     compare_methods_bulk(base_class, PageABC, Page)
 
 
-# @pytest.mark.parametrize('base_class', [MobileDriver])
-# def test_driver_wrapper_to_abc(base_class):
-#     compare_methods_bulk(base_class, DriverWrapperABC, DriverWrapper)
+@pytest.mark.parametrize('base_class', [DriverWrapper, CoreDriver, WebDriver, MobileDriver, PlayDriver])
+def test_driver_wrapper_to_abc(base_class):
+    compare_methods_bulk(base_class, DriverWrapperABC, DriverWrapper)
 
 
 @pytest.mark.parametrize('base_class', [WebPage, CorePage, PlayPage])
