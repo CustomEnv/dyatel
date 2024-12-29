@@ -91,7 +91,7 @@ def test_type_clear_text_get_value(pizza_order_page):
 
 def test_hover(mouse_event_page):
     initial_not_displayed = not mouse_event_page.dropdown.is_displayed()
-    mouse_event_page.choose_language_button.scroll_into_view(sleep=0.3).hover()
+    mouse_event_page.choose_language_button.scroll_into_view(sleep=1).hover()
     after_hover_displayed = mouse_event_page.dropdown.wait_visibility_without_error().is_displayed()
     mouse_event_page.choose_language_button.hover_outside()
     after_outside_hover_displayed = not mouse_event_page.dropdown.wait_hidden().is_displayed()
