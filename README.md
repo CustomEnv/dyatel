@@ -8,16 +8,16 @@
     <a href="https://pypi.org/project/dyatel-wrapper/"><img alt="PyPI" src="https://img.shields.io/pypi/v/dyatel-wrapper"></a>
 </p>  
 <p align="center">
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="Python3.8" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?label=Python%203.8"></a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="Python3.9" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?label=Python%203.9"></a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="Python3.10" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?label=Python%203.10"></a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="Python3.11" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?label=Python%203.11"></a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="Python3.12" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?label=Python%203.12"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="GitHub Actions status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?label=Python%203.8"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="GitHub Actions status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?label=Python%203.9"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="GitHub Actions status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?label=Python%203.10"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="GitHub Actions status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?label=Python%203.11"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="GitHub Actions status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?label=Python%203.12"></a>
 </p>
 <p align="center">
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml"><img alt="PyPI" src="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml/badge.svg"></a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml"><img alt="PyPI" src="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml/badge.svg"></a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml"><img alt="PyPI" src="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml/badge.svg"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml"><img alt="GitHub Actions status" src="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml/badge.svg"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml"><img alt="GitHub Actions status" src="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml/badge.svg"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml"><img alt="GitHub Actions status" src="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml/badge.svg"></a>
 </p>
 
 
