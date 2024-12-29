@@ -17,7 +17,7 @@ from dyatel.mixins.objects.size import Size
 from dyatel.utils.internal_utils import WAIT_EL, QUARTER_WAIT_EL
 
 if TYPE_CHECKING:
-    from dyatel.base.element import Element  # Import the concrete class for documentation purposes
+    from dyatel.base.element import Element
 
 
 class ElementABC(MixinABC, ABC):
@@ -215,7 +215,10 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     def save_screenshot(
-        self, file_name: str, screenshot_base: Union[bytes, Image] = None, convert_type: str = None
+            self,
+            file_name: str,
+            screenshot_base: Union[bytes, Image] = None,
+            convert_type: str = None
     ) -> Image:
         """
         Saves a screenshot of the element.
@@ -493,7 +496,7 @@ class ElementABC(MixinABC, ABC):
         :param expected_count: The expected number of elements.
         :type expected_count: int
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: Union[int, float]
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -860,8 +863,7 @@ class ElementABC(MixinABC, ABC):
         :param element: The :class:`Element` for which to collect logging data.
           If :obj:`None`, logging data for the ``parent`` element is used.
         :type element: :class:`Element` or :obj:`None`
-        :return: A string containing the log data.
-        :rtype: str
+        :return: :class:`str` - A string containing the log data.
         """
         raise NotImplementedError()
 

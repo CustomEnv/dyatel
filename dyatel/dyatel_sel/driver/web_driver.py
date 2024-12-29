@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List
 
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
@@ -19,49 +21,53 @@ class WebDriver(CoreDriver):
 
         CoreDriver.__init__(self, driver=driver)
 
-    def set_window_size(self, width: int, height: int) -> CoreDriver:
+    def set_window_size(self, width: int, height: int) -> WebDriver:
         """
-        Sets the width and height of the current window
+        Set the width and height of the current window.
 
-        :param width: the width in pixels to set the window to
-        :param height: the height in pixels to set the window to
-        :return: self
+        :param width: The width, in pixels, to set the window to.
+        :type width: int
+        :param height: The height, in pixels, to set the window to.
+        :type height: int
+        :return: :obj:`WebDriver` - The current instance of the driver wrapper.
         """
         self.driver.set_window_size(width, height)
         return self
 
     def get_all_tabs(self) -> List[str]:
         """
-        Get all opened tabs
+        Selenium/Playwright only: Retrieve all opened tabs.
 
-        :return: list of tabs
+        :return: A list of :class:`str`, each representing an open tab.
+        :rtype: typing.List[str]
         """
         return self.driver.window_handles
 
-    def create_new_tab(self) -> CoreDriver:
+    def create_new_tab(self) -> WebDriver:
         """
-        Create new tab and switch into it
+        Selenium/Playwright only: Create a new tab and switch to it.
 
-        :return: self
+        :return: :obj:`WebDriver` - The current instance of the driver wrapper, now switched to the new tab.
         """
         self.driver.switch_to.new_window('tab')
         return self
 
-    def switch_to_original_tab(self) -> CoreDriver:
+    def switch_to_original_tab(self) -> WebDriver:
         """
-        Switch to original tab
+        Selenium/Playwright only: Switch back to the original tab.
 
-        :return: self
+        :return: :obj:`WebDriver` - The current instance of the driver wrapper, now switched to the original tab.
         """
         self.driver.switch_to.window(self.original_tab)
         return self
 
-    def switch_to_tab(self, tab=-1) -> CoreDriver:
+    def switch_to_tab(self, tab: int = -1) -> WebDriver:
         """
-        Switch to specific tab
+        Selenium/Playwright only: Switch to a specific tab.
 
-        :param tab: tab index. Start from 1. Default: latest tab
-        :return: self
+        :param tab: The index of the tab to switch to, starting from 1. Default is the latest tab.
+        :type tab: int
+        :return: :obj:`WebDriver` - The current instance of the driver wrapper, now switched to the specified tab.
         """
         if tab == -1:
             tab = self.get_all_tabs()[tab]
@@ -71,11 +77,12 @@ class WebDriver(CoreDriver):
         self.driver.switch_to.window(tab)
         return self
 
-    def close_unused_tabs(self) -> CoreDriver:
+    def close_unused_tabs(self) -> WebDriver:
         """
-        Close all tabs except original
+        Selenium/Playwright only: Close all tabs except the original.
 
-        :return: self
+        :return: :obj:`WebDriver` - The current instance of the driver wrapper,
+          with all tabs except the original closed.
         """
         tabs = self.get_all_tabs()
         tabs.remove(self.original_tab)

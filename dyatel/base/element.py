@@ -460,7 +460,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param expected_count: The expected number of elements.
         :type expected_count: int
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: Union[int, float]
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -717,8 +717,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param element: The :class:`Element` for which to collect logging data.
           If :obj:`None`, logging data for the ``parent`` element is used.
         :type element: :class:`Element` or :obj:`None`
-        :return: A string containing the log data.
-        :rtype: str
+        :return: :class:`str` - A string containing the log data.
         """
         element = element if element else self
         return get_element_info(element)

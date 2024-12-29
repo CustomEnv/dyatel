@@ -43,17 +43,17 @@ class MobileDriver(CoreDriver):
 
     def is_app_installed(self) -> bool:
         """
-        Is app running checking
+        Appium only: Check if the app is running.
 
-        :return: True if the app running
+        :return: :obj:`bool` - :obj:`True` if the app is running, otherwise :obj:`False`.
         """
         return self.driver.query_app_state(self.bundle_id) == ApplicationState.RUNNING_IN_FOREGROUND
 
     def is_app_deleted(self) -> bool:
         """
-        Is app deleted checking
+        Appium only: Check if the app is deleted.
 
-        :return: True if the app deleted
+        :return: :obj:`bool` - :obj:`True` if the app is deleted, otherwise :obj:`False`.
         """
         if self.is_ios:  # query_app_state return value equal 1(NOT_RUNNING), that not accurate
             return not self.is_app_installed()
@@ -62,25 +62,25 @@ class MobileDriver(CoreDriver):
 
     def is_app_closed(self) -> bool:
         """
-        Is app closed checking
+        Appium only: Check if the app is closed.
 
-        :return: True if the app closed
+        :return: :obj:`bool` - :obj:`True` if the app is closed, otherwise :obj:`False`.
         """
         return self.driver.query_app_state(self.bundle_id) == ApplicationState.NOT_RUNNING
 
     def is_app_in_foreground(self) -> bool:
         """
-        Is app in foreground checking
+        Appium only: Check if the app is in the foreground.
 
-        :return: True if the app in foreground
+        :return: :obj:`bool` - :obj:`True` if the app is in the foreground, otherwise :obj:`False`.
         """
         return self.driver.query_app_state(self.bundle_id) == ApplicationState.RUNNING_IN_FOREGROUND
 
     def is_app_in_background(self) -> bool:
         """
-        Is app in background checking
+        Appium only: Check if the app is in the background.
 
-        :return: True if the app in background
+        :return: :obj:`bool` - :obj:`True` if the app is in the background, otherwise :obj:`False`.
         """
         background_state = ApplicationState.RUNNING_IN_BACKGROUND
 
@@ -89,20 +89,21 @@ class MobileDriver(CoreDriver):
 
         return self.driver.query_app_state(self.bundle_id) == background_state
 
-    def terminate_app(self, bundle_id) -> bool:
+    def terminate_app(self, bundle_id: str) -> bool:
         """
-        Terminates the application if it is running
+        Appium only: Terminates the application if it is running.
 
-        :param bundle_id: the application id to be terminates
-        :return: True if the app has been successfully terminated
+        :param bundle_id: The application ID of the app to terminate.
+        :type bundle_id: str
+        :return: :obj:`bool` - :obj:`True` if the app has been successfully terminated, otherwise :obj:`False`.
         """
         return self.driver.terminate_app(bundle_id)
 
     def switch_to_native(self) -> MobileDriver:
         """
-        Switch to native app context
+        Appium only: Switch to the native app context.
 
-        :return: self
+        :return: :obj:`MobileDriver` - The current instance of the driver wrapper, now in the native app context.
         """
         self.driver.switch_to.context(self.native_context_name)
         self.__is_native_context = True
@@ -111,9 +112,9 @@ class MobileDriver(CoreDriver):
 
     def switch_to_web(self) -> MobileDriver:
         """
-        Switch to web app context
+        Appium only: Switch to the web app context.
 
-        :return: self
+        :return: :obj:`MobileDriver` - The current instance of the driver wrapper, now in the web app context.
         """
         self.driver.switch_to.context(self.web_context_name)
         self.__is_native_context = False
@@ -122,9 +123,10 @@ class MobileDriver(CoreDriver):
 
     def get_web_view_context(self) -> Union[None, str]:
         """
-        Get WEBVIEW context name
+        Appium only: Get the WEBVIEW context name.
 
-        :return: None or WEBVIEW context name
+        :return: :obj:`None` if no WEBVIEW context is found, otherwise the name of the WEBVIEW context.
+        :rtype: typing.Union[None, str]
         """
         for context in self.get_all_contexts():
             if 'WEBVIEW' in context:
@@ -132,18 +134,18 @@ class MobileDriver(CoreDriver):
 
     def get_current_context(self) -> str:
         """
-        Get current context name
+        Appium only: Get the current context name.
 
-        :return: current context name
+        :return: :class:`str` - The name of the current context.
         """
         return self.driver.context
 
     @property
     def is_native_context(self) -> bool:
         """
-        Check is current context is native or not
+        Appium only: Check if the current context is native.
 
-        :return: bool
+        :return: :obj:`bool` - :obj:`True` if the current context is native, otherwise :obj:`False`.
         """
         if self.__is_native_context is None:
             self.__is_native_context = self.get_current_context() == self.native_context_name
@@ -153,9 +155,9 @@ class MobileDriver(CoreDriver):
     @property
     def is_web_context(self) -> bool:
         """
-        Check is current context is web or not
+        Appium only: Check if the current context is web.
 
-        :return: bool
+        :return: :obj:`bool` - :obj:`True` if the current context is web, otherwise :obj:`False`.
         """
         if self.__is_web_context is None:
             self.__is_web_context = self.get_current_context() == self.web_context_name
@@ -165,9 +167,9 @@ class MobileDriver(CoreDriver):
     @property
     def top_bar_height(self) -> int:
         """
-        iOS only: Get top bar height
+        iOS only - Get the height of the top bar.
 
-        :return: self
+        :return: :obj:`int` - The height of the top bar in pixels.
         """
         if self._top_bar_height is None:
             with NativeContext(self):
@@ -178,9 +180,9 @@ class MobileDriver(CoreDriver):
     @property
     def bottom_bar_height(self) -> int:
         """
-        iOS only: Get bottom bar height
+        iOS only - Get the height of the bottom bar.
 
-        :return: self
+        :return: :obj:`int` - The height of the bottom bar in pixels.
         """
         if self.is_tablet:
             return 0
@@ -193,9 +195,10 @@ class MobileDriver(CoreDriver):
 
     def get_all_contexts(self) -> List[str]:
         """
-        Get the contexts within the current session
+        Appium only: Get all contexts within the current session.
 
-        :return: list of available contexts
+        :return: A list of available context names.
+        :rtype: typing.List[str]
         """
         return self.driver.contexts
 
@@ -222,10 +225,10 @@ class MobileDriver(CoreDriver):
 
     def hide_keyboard(self, **kwargs) -> MobileDriver:
         """
-        Hide keyboard for real device
+        Appium only: Hide the keyboard on a real device.
 
-        :param kwargs: kwargs from Keyboard.hide_keyboard
-        :return: MobileDriver
+        :param kwargs: Additional arguments passed to the `Keyboard.hide_keyboard` method.
+        :return: :obj:`MobileDriver` - The current instance of the driver wrapper.
         """
         if self.is_real_device:
             self.driver.hide_keyboard(**kwargs)
@@ -239,12 +242,15 @@ class MobileDriver(CoreDriver):
 
     def click_by_coordinates(self, x: int, y: int, silent: bool = False) -> MobileDriver:
         """
-        Click by given coordinates
+        Click at the specified coordinates on the screen.
 
-        :param x: tap by given x-axis
-        :param y: tap by given y-axis
-        :param silent: erase log
-        :return: self
+        :param x: The x-axis coordinate to click at.
+        :type x: int
+        :param y: The y-axis coordinate to click at.
+        :type y: int
+        :param silent: If :obj:`True`, suppresses the log message. Default is :obj:`False`.
+        :type silent: bool
+        :return: :obj:`MobileDriver` - The current instance of the driver wrapper.
         """
         if not silent:
             self.log(f'Tap by given coordinates (x: {x}, y: {y})')

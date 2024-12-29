@@ -125,11 +125,11 @@ class VisualComparison:
         :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
         :return: self
         """
-        remove = remove if remove else []
-        screenshot_params = dict(delay=delay, remove=remove, fill_background=fill_background, cut_box=cut_box)
-
         if self.skip_screenshot_comparison:
             return self
+
+        remove = remove if remove else []
+        screenshot_params = dict(delay=delay, remove=remove, fill_background=fill_background, cut_box=cut_box)
 
         if filename:
             if name_suffix:
