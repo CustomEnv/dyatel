@@ -3,6 +3,7 @@ import os
 import pytest
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.safari.options import Options as SafariOptions
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.utils.logs import dyatel_logs_settings
@@ -48,12 +49,13 @@ def platform(request):
 
 
 @pytest.fixture(scope='session')
-def driver_entities(request, firefox_options, chrome_options, driver_name):
+def driver_entities(request, firefox_options, chrome_options, safari_options, driver_name):
     return DriverEntities(
         request=request,
         driver_name=driver_name,
         selenium_chrome_options=chrome_options,
         selenium_firefox_options=firefox_options,
+        selenium_safari_options=safari_options,
         **vars(request.config.option),
     )
 
@@ -81,12 +83,24 @@ def firefox_options(request):
     return options
 
 
+@pytest.fixture(scope='session')
+def safari_options():
+    options = SafariOptions()
+    options.automatic_inspection = False
+    options.automatic_profiling = False
+    return options
+
+
 @pytest.fixture(autouse=True)
 def redirect(request):
     # Prints are required for better readability: https://github.com/pytest-dev/pytest/issues/8574
     print()
     yield
     print()
+    if DriverWrapper.session.sessions_count() > 0:
+        driver_wrapper = request.getfixturevalue('driver_wrapper')
+        driver_wrapper.get('data:,', silent=True)  # noqa
+
 
 @pytest.fixture
 def second_driver_wrapper(driver_entities):
@@ -95,7 +109,7 @@ def second_driver_wrapper(driver_entities):
     driver.quit(silent=True)
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def driver_wrapper(driver_entities):
     driver = driver_func(driver_entities)
     yield driver

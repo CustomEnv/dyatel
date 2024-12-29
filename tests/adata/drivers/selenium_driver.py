@@ -36,7 +36,7 @@ class SeleniumDriver:
         elif driver_name == 'firefox':
             driver = GeckoWebDriver(options=options, service=FirefoxService())
         elif driver_name == 'safari':
-            driver = SafariWebDriver(service=SafariService())
+            driver = SafariWebDriver(options=entities.selenium_safari_options, service=SafariService())
         else:
             raise ValueError(f"Unsupported driver for selenium: {driver_name}")
 
