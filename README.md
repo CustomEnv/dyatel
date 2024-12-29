@@ -8,17 +8,41 @@
     <a href="https://pypi.org/project/dyatel-wrapper/"><img alt="PyPI" src="https://img.shields.io/pypi/v/dyatel-wrapper"></a>
 </p>  
 <p align="center">
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?style=plastic&logo=github&label=Python%203.9&labelColor=%233B434B"></a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?style=plastic&logo=github&label=Python%203.9&labelColor=%233B434B"></a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?style=plastic&logo=github&label=Python%203.10&labelColor=%233B434B"></a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?style=plastic&logo=github&label=Python%203.11&labelColor=%233B434B"></a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?style=plastic&logo=github&label=Python%203.12&labelColor=%233B434B"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.9&labelColor=%232E353B">
+    </a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.9&labelColor=%232E353B">
+    </a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.10&labelColor=%232E353B">
+    </a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.11&labelColor=%232E353B">
+    </a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.12&labelColor=%232E353B">
+    </a>
 </p>
+
 <p align="center">
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml/badge.svg"></a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml/badge.svg"></a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml/badge.svg"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/selenium_tests.yml?logo=github&label=Selenium%20Chrome%20Tests%20Py3.8&labelColor=%232E353B">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/selenium_tests.yml?logo=github&label=Selenium%20Chrome%20Tests%20Py3.12&labelColor=%232E353B">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/selenium_tests.yml?logo=github&label=Selenium%20Firefox%20Tests%20Py3.8&labelColor=%232E353B">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/selenium_tests.yml?logo=github&label=Selenium%20Firefox%20Tests%20Py3.12&labelColor=%232E353B">
+    </a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/selenium_safari_tests.yml/badge.svg">
+    </a>
 </p>
+
+<p align="center">
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/playwright_tests.yml/badge.svg">
+    </a>
+</p>
+
 
 
 Dyatel Wrapper is a Python framework that seamlessly wraps over Selenium, Appium, and sync Playwright,
