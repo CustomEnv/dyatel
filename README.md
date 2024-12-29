@@ -7,15 +7,6 @@
     <a href="https://github.com/CustomEnv/dyatel/blob/master/LICENSE"><img alt="License: MIT" src="https://dyatel-wrapper.readthedocs.io/_static/license.svg"></a>
     <a href="https://pypi.org/project/dyatel-wrapper/"><img alt="PyPI" src="https://img.shields.io/pypi/v/dyatel-wrapper"></a>
 </p>  
-<p align="center">
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml">
-        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.9&labelColor=%232E353B">
-        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.9&labelColor=%232E353B">
-        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.10&labelColor=%232E353B">
-        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.11&labelColor=%232E353B">
-        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.12&labelColor=%232E353B">
-    </a>
-</p>
 
 <p align="center">
     <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml">
@@ -33,6 +24,15 @@
     </a>
 </p>
 
+<p align="center">
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.9&labelColor=%232E353B">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.9&labelColor=%232E353B">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.10&labelColor=%232E353B">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.11&labelColor=%232E353B">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Python%203.12&labelColor=%232E353B">
+    </a>
+</p>
 
 
 Dyatel Wrapper is a Python framework that seamlessly wraps over Selenium, Appium, and sync Playwright,
