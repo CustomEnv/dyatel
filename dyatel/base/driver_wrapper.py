@@ -13,6 +13,7 @@ from playwright.sync_api import (
 )
 
 from dyatel.mixins.objects.cut_box import CutBox
+from dyatel.mixins.objects.size import Size
 from dyatel.visual_comparison import VisualComparison
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
 from dyatel.dyatel_play.play_driver import PlayDriver
@@ -207,16 +208,16 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         self._base_cls.quit(self, trace_path)
         self.session.remove_session(self)
 
-    def get_inner_window_size(self) -> dict:
+    def get_inner_window_size(self) -> Size:
         """
         Get inner size of driver window
 
         :return: {'height': value, 'width': value}
         """
-        return {
-            'height': self.execute_script(get_inner_height_js),
-            'width': self.execute_script(get_inner_width_js)
-        }
+        return Size(
+            height=self.execute_script(get_inner_height_js),
+            width=self.execute_script(get_inner_width_js)
+        )
 
     def save_screenshot(
             self,

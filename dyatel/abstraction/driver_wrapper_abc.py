@@ -8,6 +8,7 @@ from dyatel.mixins.objects.cut_box import CutBox
 from selenium.webdriver.common.alert import Alert
 from PIL import Image
 
+from dyatel.mixins.objects.size import Size
 from dyatel.utils.internal_utils import WAIT_EL, WAIT_UNIT
 
 
@@ -87,7 +88,7 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
-    def get_inner_window_size(self) -> dict:
+    def get_inner_window_size(self) -> Size:
         """
         Get inner size of driver window
 

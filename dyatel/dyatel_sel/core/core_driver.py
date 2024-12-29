@@ -69,7 +69,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         :return: :class:`PIL.Image.Image`
         """
         screenshot_base = screenshot_base if screenshot_base else self.screenshot_base
-        return _scaled_screenshot(screenshot_base, self.get_inner_window_size()['width'])
+        return _scaled_screenshot(screenshot_base, self.get_inner_window_size().width)
 
     @property
     def screenshot_base(self) -> bytes:
