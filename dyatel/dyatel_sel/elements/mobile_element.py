@@ -143,9 +143,9 @@ class MobileElement(CoreElement, ABC):
     @property
     def size(self) -> Size:
         """
-        Get Size object of current element
+        Get the size of the current element, including width and height.
 
-        :return: Size(width/height) obj
+        :return: :class:`Size` - An object representing the element's dimensions.
         """
         if self.driver_wrapper.is_native_context:
             return Size(**self.element.size)
@@ -155,9 +155,9 @@ class MobileElement(CoreElement, ABC):
     @property
     def location(self) -> Location:
         """
-        Get Location object of current element
+        Get the location of the current element, including the x and y coordinates.
 
-        :return: Location(x/y) obj
+        :return: :class:`Location` - An object representing the element's position.
         """
         if self.driver_wrapper.is_native_context:
             return Location(**self.element.location)

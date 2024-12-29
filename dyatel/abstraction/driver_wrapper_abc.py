@@ -68,11 +68,22 @@ class DriverWrapperABC(ABC):
 
     def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """
-        Quit the driver instance
+        Quit the driver instance.
 
-        :param silent: erase log
-        :param trace_path: Playwright only: path for the trace
-        :return: None
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+
+        **Selenium/Appium:**
+
+        :param trace_path: Compatibility argument for Playwright.
+        :type trace_path: str
+
+        **Playwright:**
+
+        :param trace_path: Path to the trace file.
+        :type trace_path: str
+
+        :return: :obj:`None`
         """
         raise NotImplementedError()
 
@@ -319,19 +330,22 @@ class DriverWrapperABC(ABC):
 
     def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
-        Get driver width scaled screenshot binary of element without saving
+        Returns a :class:`PIL.Image.Image` object representing the screenshot of the web page.
+        Appium iOS: Removes native controls from image manually
 
-        :param screenshot_base: screenshot bytes
-        :return: screenshot binary
+        :param screenshot_base: Screenshot binary data (optional).
+          If :obj:`None` is provided then takes a new screenshot
+        :type screenshot_base: bytes
+        :return: :class:`PIL.Image.Image`
         """
         raise NotImplementedError()
 
     @property
     def screenshot_base(self) -> bytes:
         """
-        Get screenshot base
+        Returns the binary screenshot data of the element.
 
-        :return: screenshot bytes
+        :return: :class:`bytes` - screenshot binary
         """
         raise NotImplementedError()
 

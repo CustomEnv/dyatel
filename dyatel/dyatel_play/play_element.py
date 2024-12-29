@@ -74,15 +74,15 @@ class PlayElement(ElementABC, Logging, ABC):
     @property
     def all_elements(self) -> Union[list, List[Any]]:
         """
-        Get all wrapped elements with playwright bases
+        Returns a list of all matching elements.
 
-        :return: list of wrapped objects
+        :return: A list of wrapped :class:`PlayElement` objects.
         """
         return self._get_all_elements(self.element.all())
 
     # Element interaction
 
-    def click(self, force_wait: bool = True, *args, **kwargs) -> ElementABC:
+    def click(self, force_wait: bool = True, *args, **kwargs) -> PlayElement:
         """
         Clicks on the element.
 
@@ -385,36 +385,36 @@ class PlayElement(ElementABC, Logging, ABC):
     @property
     def screenshot_base(self) -> bytes:
         """
-        Get screenshot binary of current element
+        Returns the binary screenshot data of the element.
 
-        :return: screenshot binary
+        :return: :class:`bytes` - screenshot binary
         """
         return self._first_element.screenshot()
 
     @property
     def text(self) -> str:
         """
-        Get current element text
+        Returns the text of the element.
 
-        :return: element text
+        :return: :class:`str` - element text
         """
         return self.inner_text
 
     @property
     def inner_text(self) -> str:
         """
-        Get current element inner text
+        Returns the inner text of the element.
 
-        :return: element inner text
+        :return: :class:`str` - element inner text
         """
         return self._first_element.inner_text()
 
     @property
     def value(self) -> str:
         """
-        Get value from current element
+        Returns the value of the element.
 
-        :return: element value
+        :return: :class:`str` - element value
         """
         return self._first_element.input_value()
 
@@ -505,9 +505,9 @@ class PlayElement(ElementABC, Logging, ABC):
     @property
     def size(self) -> Size:
         """
-        Get Size object of current element
+        Get the size of the current element, including width and height.
 
-        :return: Size(width/height) obj
+        :return: :class:`Size` - An object representing the element's dimensions.
         """
         box = self.element.first.bounding_box()
         return Size(width=box['width'], height=box['height'])
@@ -515,9 +515,9 @@ class PlayElement(ElementABC, Logging, ABC):
     @property
     def location(self) -> Location:
         """
-        Get Location object of current element
+        Get the location of the current element, including the x and y coordinates.
 
-        :return: Location(x/y) obj
+        :return: :class:`Location` - An object representing the element's position.
         """
         box = self.element.first.bounding_box()
         return Location(x=box['x'], y=box['y'])

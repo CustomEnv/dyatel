@@ -1,6 +1,7 @@
 import inspect
 
 import pytest
+
 from dyatel.abstraction.element_abc import ElementABC
 from dyatel.abstraction.page_abc import PageABC
 from dyatel.base.element import Element
@@ -16,16 +17,15 @@ from dyatel.dyatel_sel.pages.mobile_page import MobilePage
 from dyatel.dyatel_sel.pages.web_page import WebPage
 
 
-def get_class_static(class_object):
-    all_static = list(dict(class_object.__dict__.items()).keys())
-    return sorted(filter(None, [item if not item.startswith('_') else None for item in all_static]))
-
 def get_methods_and_names(_class):
     result = {}
 
-    for name, func in inspect.getmembers(_class, predicate=inspect.isfunction):
-        if not name.startswith('_') and f' {_class.__name__}.{name}'  in str(func):
-            result[name] = func
+    for name, member in inspect.getmembers(_class):
+        if not name.startswith('_') and f' {_class.__name__}.{name}' in str(member):
+            if inspect.ismethod(member) or inspect.isfunction(member):
+                result[name] = member
+            elif isinstance(member, property):
+                result[name] = member
 
     return result
 
@@ -44,6 +44,8 @@ def compare_methods_bulk(_class, _abc, _main_class):
     # Get all methods from both classes
     cls1_methods = get_methods_and_names(_class)
     cls2_methods = get_methods_and_names(_abc)
+    assert cls1_methods
+    assert cls2_methods
 
     # Find common methods
     common_methods = set(cls1_methods.keys()).intersection(cls2_methods.keys())
@@ -52,12 +54,20 @@ def compare_methods_bulk(_class, _abc, _main_class):
         func1 = cls1_methods[method]
         func2 = cls2_methods[method]
 
-        # Compare signatures
-        if get_signature(func1) != get_signature(func2):
-            results[method] = "Signatures do not match"
 
-        # if 'type_text' in method and _class is CoreElement: breakpoint()
-        if _class is _main_class or method not in get_methods_and_names(_main_class).keys():
+        # Compare signatures
+        if inspect.isfunction(func1):
+            if not inspect.isfunction(func2):
+                results[method] = "Function type do not match"
+
+            if get_signature(func1) != get_signature(func2):
+                results[method] = "Signatures do not match"
+
+        if isinstance(func1, property):
+            if not isinstance(func2, property):
+                results[method] = "Property type do not match"
+
+        if method != 'element' or _class is _main_class:
             class_func_doc = inspect.getdoc(func1)
             abc_class_func_doc = inspect.getdoc(func2).replace(_main_class.__name__, _class.__name__)
             if class_func_doc != abc_class_func_doc:
@@ -70,21 +80,27 @@ def compare_methods_bulk(_class, _abc, _main_class):
 
     assert not results, f'{_class.__name__} & {_abc.__name__} methods missmatch: {results}'
 
-# TODO: Rework with compare_methods_bulk
-def test_playwright_and_selenium_page_compatibility():
-    assert sorted(get_class_static(PlayPage)) == sorted(get_class_static(WebPage) + get_class_static(CorePage))
-
-# TODO: Rework with compare_methods_bulk
-def test_playwright_and_selenium_element_compatibility():
-    assert sorted(get_class_static(PlayElement)) == sorted(get_class_static(WebElement) + get_class_static(CoreElement))
-
 
 @pytest.mark.parametrize('base_class', [Element, WebElement, CoreElement, MobileElement, PlayElement])
 def test_element_to_abc(base_class):
     compare_methods_bulk(base_class, ElementABC, Element)
 
 
-@pytest.mark.parametrize('base_class', [Page, WebPage, CorePage, MobilePage, PlayPage])
+@pytest.mark.parametrize('base_class', [Page, MobilePage])
 def test_page_to_abc(base_class):
     compare_methods_bulk(base_class, PageABC, Page)
+
+
+# @pytest.mark.parametrize('base_class', [MobileDriver])
+# def test_driver_wrapper_to_abc(base_class):
+#     compare_methods_bulk(base_class, DriverWrapperABC, DriverWrapper)
+
+
+@pytest.mark.parametrize('base_class', [WebPage, CorePage, PlayPage])
+def test_empty_pages(base_class):
+    """
+    Test relevant, when base_class are empty and does not contain any members
+    When base_class is not empty it should be moved to test_page_to_abc
+    """
+    assert not get_methods_and_names(base_class)
 

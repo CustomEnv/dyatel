@@ -201,11 +201,13 @@ class MobileDriver(CoreDriver):
 
     def screenshot_image(self, screenshot_base: bytes = None):
         """
-        Get driver width scaled screenshot binary of element without saving
-        iOS: remove native controls from image manually
+        Returns a :class:`PIL.Image.Image` object representing the screenshot of the web page.
+        Appium iOS: Removes native controls from image manually
 
-        :param screenshot_base: screenshot bytes
-        :return: screenshot binary
+        :param screenshot_base: Screenshot binary data (optional).
+          If :obj:`None` is provided then takes a new screenshot
+        :type screenshot_base: bytes
+        :return: :class:`PIL.Image.Image`
         """
         image = CoreDriver.screenshot_image(self, screenshot_base)
 

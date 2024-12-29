@@ -184,11 +184,22 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
     def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """
-        Quit the driver instance
+        Quit the driver instance.
 
-        :param silent: erase log
-        :param trace_path: Playwright only: path for the trace
-        :return: None
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+
+        **Selenium/Appium:**
+
+        :param trace_path: Compatibility argument for Playwright.
+        :type trace_path: str
+
+        **Playwright:**
+
+        :param trace_path: Path to the trace file.
+        :type trace_path: str
+
+        :return: :obj:`None`
         """
         if not silent:
             self.log('Quit driver instance')

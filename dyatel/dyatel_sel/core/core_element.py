@@ -67,9 +67,9 @@ class CoreElement(ElementABC, ABC):
     @property
     def all_elements(self) -> Union[None, List[Any]]:
         """
-        Get all wrapped elements with selenium/appium bases
+        Returns a list of all matching elements.
 
-        :return: list of wrapped objects
+        :return: A list of wrapped :class:`CoreElement` objects.
         """
         return self._get_all_elements(self._find_elements())
 
@@ -350,18 +350,18 @@ class CoreElement(ElementABC, ABC):
     @property
     def screenshot_base(self) -> bytes:
         """
-        Get screenshot binary of current element
+        Returns the binary screenshot data of the element.
 
-        :return: screenshot binary
+        :return: :class:`bytes` - screenshot binary
         """
         return self.element.screenshot_as_png
 
     @property
     def text(self) -> str:
         """
-        Get text from current element
+        Returns the text of the element.
 
-        :return: element text
+        :return: :class:`str` - element text
         """
         element = self._get_element(wait=self.wait_availability)
 
@@ -373,18 +373,18 @@ class CoreElement(ElementABC, ABC):
     @property
     def inner_text(self) -> str:
         """
-        Get current element inner text
+        Returns the inner text of the element.
 
-        :return: element inner text
+        :return: :class:`str` - element inner text
         """
         return self.get_attribute('textContent', silent=True) or self.get_attribute('innerText', silent=True)
 
     @property
     def value(self) -> str:
         """
-        Get value from current element
+        Returns the value of the element.
 
-        :return: element value
+        :return: :class:`str` - element value
         """
         return self.get_attribute('value', silent=True)
 
@@ -483,18 +483,18 @@ class CoreElement(ElementABC, ABC):
     @property
     def size(self) -> Size:
         """
-        Get Size object of current element
+        Get the size of the current element, including width and height.
 
-        :return: Size(width/height) obj
+        :return: :class:`Size` - An object representing the element's dimensions.
         """
         return Size(**self.execute_script(get_element_size_js))
 
     @property
     def location(self) -> Location:
         """
-        Get Location object of current element
+        Get the location of the current element, including the x and y coordinates.
 
-        :return: Location(x/y) obj
+        :return: :class:`Location` - An object representing the element's position.
         """
         return Location(**self.execute_script(get_element_position_on_screen_js))
 
