@@ -3,15 +3,15 @@
 <h2 align="center">Automation Beyond Limits</h2>
 
 <p align="center">
-<a href="https://dyatel-wrapper.readthedocs.io"><img alt="Documentation Status" src="https://readthedocs.org/projects/dyatel-wrapper/badge/?version=latest"></a>
-<a href="https://github.com/CustomEnv/dyatel/blob/master/LICENSE"><img alt="License: MIT" src="https://dyatel-wrapper.readthedocs.io/_static/license.svg"></a>
-<a href="https://pypi.org/project/dyatel-wrapper/"><img alt="PyPI" src="https://img.shields.io/pypi/v/dyatel-wrapper"></a>
-<p align="center">
+    <a href="https://dyatel-wrapper.readthedocs.io"><img alt="Documentation Status" src="https://readthedocs.org/projects/dyatel-wrapper/badge/?version=latest"></a>
+    <a href="https://github.com/CustomEnv/dyatel/blob/master/LICENSE"><img alt="License: MIT" src="https://dyatel-wrapper.readthedocs.io/_static/license.svg"></a>
+    <a href="https://pypi.org/project/dyatel-wrapper/"><img alt="PyPI" src="https://img.shields.io/pypi/v/dyatel-wrapper"></a>
 </p>  
-<a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="PyPI" src="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml/badge.svg"></a>
-<a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml"><img alt="PyPI" src="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml/badge.svg"></a>
-<a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml"><img alt="PyPI" src="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml/badge.svg"></a>
-<a href="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml"><img alt="PyPI" src="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml/badge.svg"></a>
+<p align="center">
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml"><img alt="PyPI" src="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml/badge.svg"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml"><img alt="PyPI" src="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml/badge.svg"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml"><img alt="PyPI" src="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml/badge.svg"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml"><img alt="PyPI" src="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml/badge.svg"></a>
 </p>
 
 
