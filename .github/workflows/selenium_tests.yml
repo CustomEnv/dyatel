@@ -47,5 +47,21 @@ jobs:
           echo "BROWSER=${browser_name}" >> $GITHUB_ENV
 
       - name: Run Selenium ${{ env.BROWSER }} tests with py${{ matrix.python-version }}
+        id: tests
         run: |
-          tox -e py${{ env.TOX_ENV }}-selenium-${{ env.BROWSER }} -- --env remote --headless -v --reruns=2
+          tox -e py${{ env.TOX_ENV }}-selenium-${{ env.BROWSER }} -- --env remote --headless -v --alluredir=allure-report --reruns=2
+        continue-on-error: true
+
+      - name: Upload Allure Report as Artifact
+        if: steps.tests.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-${{ env.BROWSER }}-selenium-${{ env.TOX_ENV }}
+          path: allure-report
+          retention-days: 1
+
+      - name: Check Test Results
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "❌ Tests failed! Check the Allure Report for details."
+          exit 1 

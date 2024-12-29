@@ -33,6 +33,28 @@ jobs:
           tox_env_variable=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
           echo "TOX_ENV=${tox_env_variable}" >> $GITHUB_ENV
 
-      - name: Run Selenium Safari tests with py${{ matrix.python-version }}
+      - name: Enable Safari Remote Automation
         run: |
-          tox -e py${{ env.TOX_ENV }}-selenium-safari -- --headless -v -k='not screenshot' --reruns=2
+          safaridriver --version
+          sudo safaridriver --enable
+
+      - name: Run Selenium Safari tests with py${{ matrix.python-version }}
+        id: tests
+        run: |
+          tox -e py${{ env.TOX_ENV }}-selenium-safari -- -v --alluredir=allure-report --reruns=2
+        continue-on-error: true
+          
+      - name: Upload Allure Report as Artifact
+        if: steps.tests.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-safari-selenium-${{ env.TOX_ENV }}
+          path: allure-report
+          retention-days: 1
+
+      - name: Check Test Results
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "❌ Tests failed! Check the Allure Report for details."
+          exit 1 
+

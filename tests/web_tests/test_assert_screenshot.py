@@ -69,7 +69,12 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
             raise Exception('Unexpected behavior')
 
 
-def test_screenshot_soft_assert(colored_blocks_page):
+def test_screenshot_soft_assert(colored_blocks_page, request):
+    options = request.config.option
+
+    if options.sgr or options.hgr:
+        pytest.skip('Negative check from other test ref')
+
     check, message = colored_blocks_page.row1.soft_assert_screenshot(
         test_name=test_screenshot_fill_background_default.__name__
     )

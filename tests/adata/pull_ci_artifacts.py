@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import sys
 import zipfile
 import base64
 import argparse
@@ -106,8 +107,8 @@ class DownloadArtifacts:
                     artifact_name = self._drop_python_version(artifact["name"])
                     if (
                             ARTIFACT_NAME in artifact_name
-                            and not self._is_already_updated(artifact_name)
                             and self.launch_args.commit_sha == artifact['workflow_run']['head_sha']
+                            and not self._is_already_updated(artifact_name)
                     ):
                         download_url = artifact["archive_download_url"]
                         self._download_and_extract_artifact(download_url)
@@ -128,6 +129,9 @@ class DownloadArtifacts:
             print(f"Error: {e}")
         except json.JSONDecodeError as e:
             print(f"Error decoding JSON response: {e}")
+
+        if not self.updated_artifact_names:
+            sys.exit(f'No any artifacts were updated for "{self.launch_args.commit_sha}" commit')
 
     def _api_request(self, url):
         headers = {
