@@ -39,16 +39,22 @@ jobs:
         run: yes | sdkmanager --licenses || true
 
       - name: Install Android Dependencies
+        env:
+          ANDROID_AVD_HOME: $HOME/.android/avd
         run: |
           sdkmanager "platform-tools" "platforms;android-34" "emulator" "system-images;android-34;google_apis;x86_64"
           echo "no" | avdmanager create avd -n testAVD -k "system-images;android-34;google_apis;x86_64" --device "pixel_4" --force
 
       - name: List Available AVDs
+        env:
+          ANDROID_AVD_HOME: $HOME/.android/avd
         run: |
           avdmanager list avd
           ls $HOME/.android/avd
 
       - name: Start Android Emulator
+        env:
+          ANDROID_AVD_HOME: $HOME/.android/avd
         run: |
           $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off &
           adb wait-for-device
