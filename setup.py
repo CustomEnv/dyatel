@@ -74,6 +74,6 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Quality Assurance',
         'Topic :: Software Development :: Testing :: Acceptance',
-        'License :: OSI Approved :: Apache Software License'
+        'License :: OSI Approved :: MIT License'
     ],
 )
