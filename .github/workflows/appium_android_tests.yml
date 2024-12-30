@@ -51,11 +51,13 @@ jobs:
       - name: List Available AVDs
         run: |
           avdmanager list avd
-          ls $HOME/.android/avd
+          ls /home/runner/.config/.android/avd
 
       - name: Start Android Emulator
+        env:
+          ANDROID_AVD_HOME: /home/runner/.config/.android/avd
         run: |
-          $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off &
+          $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off -verbose &
           adb wait-for-device
           adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
 
