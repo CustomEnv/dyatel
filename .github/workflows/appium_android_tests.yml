@@ -1,103 +1,58 @@
-name: Functional Tests
+name: Android Web Tests with Appium
 
 on:
   push:
     branches:
-      - '**'  # Trigger on push to any branch
+      - main
+  pull_request:
 
 jobs:
-  test:
-    env:
-      CI: true
-      ANDROID_AVD: emulator
-      APPIUM_TEST_SERVER_PORT: 4567
-      APPIUM_TEST_SERVER_HOST: 127.0.0.1
-      _FORCE_LOGS: 1
-      TEST_PASS_THRESHOLD: 10
-      API_LEVEL: 32
-      EMU_TAG: google_apis
-      ARCH: x86_64
-
+  android-tests:
+    name: Run Appium Web Tests on Android
     runs-on: ubuntu-latest
 
+    services:
+      appium:
+        image: appium/appium
+        ports:
+          - 4723:4723
+        options: >-
+          --health-cmd "curl -s http://localhost:4723/status || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          check-latest: true
-
-      - run: curl -sSL https://bit.ly/install-xq | sudo bash
-
-      - name: Install dev dependencies
-        run: |
-          npm install mocha-multi-reporters --save-dev
-          npm install -g appium
-          npm install --no-save mjpeg-consumer
-
-      - uses: actions/setup-java@v3
+      - name: Set Up JDK
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '11'
 
-      - name: Enable KVM group perms
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      - name: Setup Android SDK
+      - name: Set Up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: AVD cache
-        uses: actions/cache@v3
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ env.API_LEVEL }}
+      - name: Accept Android Licenses
+        run: yes | sdkmanager --licenses || true
 
-      - name: Create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          avd-name: ${{ env.ANDROID_AVD }}
-          force-avd-creation: false
-          api-level: ${{ env.API_LEVEL }}
-          disable-spellchecker: true
-          target: ${{ env.EMU_TAG }}
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-          arch: ${{ env.ARCH }}
-          disable-animations: true
-          script: echo "Generated AVD snapshot for caching."
-
-      - name: Start Appium server
+      - name: Install Android Dependencies
         run: |
-          cwd=$(pwd)
-          pushd "$cwd"
-          cd ~
-          appium driver install --source=local "$cwd"
-          appium driver doctor uiautomator2
-          nohup appium server \
-            --port=$APPIUM_TEST_SERVER_PORT \
-            --address=$APPIUM_TEST_SERVER_HOST \
-            --relaxed-security \
-            --log-no-colors \
-            --log-timestamp \
-            2>&1 > "$cwd/appium.log" &
-          popd
+          sdkmanager "platform-tools" "platforms;android-34" "emulator" "system-images;android-34;google_apis;x86_64"
+          avdmanager create avd -n testAVD -k "system-images;android-34;google_apis;x86_64" --device "pixel_4"
 
-      - name: e2e_api${{ env.API_LEVEL }}
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          script: ./gradlew connectedCheck
-          avd-name: ${{ env.ANDROID_AVD }}
-          force-avd-creation: false
-          api-level: ${{ env.API_LEVEL }}
-          disable-spellchecker: true
-          disable-animations: true
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-          target: ${{ env.EMU_TAG }}
-          arch: ${{ env.ARCH }}
+      - name: Start Android Emulator
+        run: |
+          $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off &
+          adb wait-for-device
+          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+
+      - name: Install Appium Client Dependencies
+        run: |
+          pip install -r requirements.txt  # Ensure your Python test dependencies are listed here
+
+      - name: Run Tests
+        run: |
+          pytest tests/  # Adjust this path to your test folder
