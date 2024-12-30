@@ -41,17 +41,18 @@ jobs:
       - name: Install Android Dependencies
         run: |
           sdkmanager "platform-tools" "platforms;android-34" "emulator" "system-images;android-34;google_apis;x86_64"
-          avdmanager create avd -n testAVD -k "system-images;android-34;google_apis;x86_64" --device "pixel_4"
+          echo "no" | avdmanager create avd -n testAVD -k "system-images;android-34;google_apis;x86_64" --device "pixel_4" --force
+
+      - name: List Available AVDs
+        run: |
+          avdmanager list avd
+          ls $HOME/.android/avd
 
       - name: Start Android Emulator
         run: |
           $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off &
           adb wait-for-device
           adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-
-      - name: Install Appium Client Dependencies
-        run: |
-          pip install -r requirements.txt  # Ensure your Python test dependencies are listed here
 
       - name: Run Tests
         run: |
