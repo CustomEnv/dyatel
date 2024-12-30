@@ -53,13 +53,21 @@ jobs:
           avdmanager list avd
           ls /home/runner/.config/.android/avd
 
-      - name: Start Android Emulator
+      - name: Start Android Emulator (Software Rendering)
         env:
           ANDROID_AVD_HOME: /home/runner/.config/.android/avd
         run: |
-          $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off -verbose &
+          # Start the emulator in the background
+          $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off -accel off -verbose &
+          
+          # Wait for the emulator to start and become available for adb
           adb wait-for-device
+          
+          # Ensure the emulator is fully booted
           adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+          
+          # Add a delay to make sure emulator is completely up
+          sleep 30
 
       - name: Run Tests
         run: |
