@@ -1,6 +1,7 @@
 from appium.webdriver.webdriver import WebDriver as SourceAppiumDriver
 
 from dyatel.base.driver_wrapper import DriverWrapperSessions
+from dyatel.mixins.objects.driver import Driver
 from tests.adata.drivers.driver_entities import DriverEntities
 from tests.adata.drivers.selenium_driver import SeleniumDriver
 from tests.settings import android_desired_caps, ios_desired_caps
@@ -9,7 +10,7 @@ from tests.settings import android_desired_caps, ios_desired_caps
 class AppiumDriver:
 
     @staticmethod
-    def create_appium_driver(entities: DriverEntities):
+    def create_appium_driver(entities: DriverEntities) -> Driver:
         appium_ip = entities.config.getoption('--appium-ip')
         appium_port = entities.config.getoption('--appium-port')
         command_exc = f'http://{appium_ip}:{appium_port}/wd/hub'
@@ -24,4 +25,4 @@ class AppiumDriver:
         if DriverWrapperSessions.is_connected():
             return SeleniumDriver.create_selenium_driver(entities)
 
-        return SourceAppiumDriver(command_executor=command_exc, desired_capabilities=caps)
+        return Driver(driver=SourceAppiumDriver(command_executor=command_exc, desired_capabilities=caps))

@@ -1,4 +1,5 @@
 import pytest
+from dyatel.mixins.objects.driver import Driver
 from mock.mock import MagicMock
 
 from playwright.sync_api import Browser, Page as PlaywrightSourcePage
@@ -36,7 +37,7 @@ def mocked_ios_driver(mocked_shared_mobile_driver):
             'automationName': 'safari'
         }
     )()
-    driver_wrapper = MockedDriverWrapper(mocked_shared_mobile_driver())
+    driver_wrapper = MockedDriverWrapper(Driver(driver=mocked_shared_mobile_driver()))
     return driver_wrapper
 
 
@@ -49,7 +50,7 @@ def mocked_android_driver(mocked_shared_mobile_driver):
             'automationName': 'UiAutomator2'
         }
     )()
-    driver_wrapper = MockedDriverWrapper(mocked_shared_mobile_driver())
+    driver_wrapper = MockedDriverWrapper(Driver(driver=mocked_shared_mobile_driver()))
     return driver_wrapper
 
 
@@ -63,7 +64,7 @@ def mocked_ios_tablet_driver(mocked_shared_mobile_driver):
             'is_tablet': True,
         }
     )()
-    driver_wrapper = MockedDriverWrapper(mocked_shared_mobile_driver())
+    driver_wrapper = MockedDriverWrapper(Driver(driver=mocked_shared_mobile_driver()))
     return driver_wrapper
 
 
@@ -77,7 +78,7 @@ def mocked_android_tablet_driver(mocked_shared_mobile_driver):
             'is_tablet': True,
         }
     )()
-    driver_wrapper = MockedDriverWrapper(mocked_shared_mobile_driver())
+    driver_wrapper = MockedDriverWrapper(Driver(driver=mocked_shared_mobile_driver()))
     return driver_wrapper
 
 
@@ -90,14 +91,14 @@ def mocked_selenium_driver():
     selenium_driver.error_handler = MagicMock()
 
     selenium_driver.caps = {}
-    driver_wrapper = MockedDriverWrapper(selenium_driver())
+    driver_wrapper = MockedDriverWrapper(Driver(driver=selenium_driver()))
     return driver_wrapper
 
 
 @pytest.fixture
 def mocked_play_driver():
     PlayDriver.__init__ = MagicMock()
-    driver_wrapper = MockedDriverWrapper(Browser(MagicMock()))
+    driver_wrapper = MockedDriverWrapper(Driver(driver=None, instance=Browser(MagicMock())))
     driver_wrapper.driver = PlaywrightSourcePage(MagicMock())
     driver_wrapper.is_desktop = True
     return driver_wrapper

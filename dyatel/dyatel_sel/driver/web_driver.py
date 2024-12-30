@@ -3,21 +3,23 @@ from typing import List
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
 from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from dyatel.mixins.objects.driver import Driver
 
 
 class WebDriver(CoreDriver):
 
-    def __init__(self, driver: SeleniumWebDriver, *args, **kwargs):  # noqa
+    def __init__(self, driver: Driver, *args, **kwargs):  # noqa
         """
         Initializing of desktop web driver with selenium
 
         :param driver: selenium driver to initialize
         """
+        self.driver : SeleniumWebDriver = driver.driver
         self.is_desktop = True
-        self.original_tab = driver.current_window_handle
-        self.browser_name = driver.caps.get('browserName', None)
+        self.original_tab = self.driver.current_window_handle
+        self.browser_name = self.driver.caps.get('browserName', None)
 
-        CoreDriver.__init__(self, driver=driver)
+        CoreDriver.__init__(self, driver=self.driver)
 
     def set_window_size(self, width: int, height: int) -> CoreDriver:
         """

@@ -6,13 +6,14 @@ from selenium.webdriver.firefox.webdriver import WebDriver as GeckoWebDriver
 from selenium.webdriver.safari.webdriver import WebDriver as SafariWebDriver
 
 from dyatel.base.driver_wrapper import DriverWrapperSessions
+from dyatel.mixins.objects.driver import Driver
 from tests.adata.drivers.driver_entities import DriverEntities
 
 
 class SeleniumDriver:
 
     @staticmethod
-    def create_selenium_driver(entities: DriverEntities):
+    def create_selenium_driver(entities: DriverEntities) -> Driver:
         driver_name = entities.driver_name
         if driver_name == 'safari' and DriverWrapperSessions.is_connected():
             driver_name = 'chrome'  # Cannot create second selenium driver
@@ -28,4 +29,4 @@ class SeleniumDriver:
 
         driver.set_window_position(0, 0)  # FIXME
 
-        return driver
+        return Driver(driver=driver)

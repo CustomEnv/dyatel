@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 from dyatel.base.driver_wrapper import DriverWrapper
+from dyatel.mixins.objects.driver import Driver
 from dyatel.utils.logs import dyatel_logs_settings
 from dyatel.visual_comparison import VisualComparison
 from tests.adata.drivers.driver_entities import DriverEntities
@@ -89,7 +90,7 @@ def driver_wrapper(request, driver_name, platform, chrome_options, firefox_optio
 
 def driver_func(request, driver_name, platform, chrome_options, firefox_options):
     entities = DriverEntities(request, driver_name, platform, chrome_options, firefox_options)
-    driver = DriverFactory.create_driver(entities)
+    driver: Driver = DriverFactory.create_driver(entities)
 
     driver_wrapper = DriverWrapper(driver)
 
