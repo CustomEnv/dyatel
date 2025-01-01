@@ -65,13 +65,13 @@ jobs:
           
           # Ensure the emulator is fully booted
           adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-          
-          # Add a delay to make sure emulator is completely up
-          sleep 30
-          
-          # Kill emulator process after a timeout (Optional)
-          kill $(ps aux | grep 'emulator' | awk '{print $2}')
+
+      - name: Extract Emulator Details
+        run: |
+          echo "AVD_NAME=$(cat $ANDROID_AVD_HOME/testAVD.avd/config.ini | grep 'AvdId' | cut -d '=' -f2)" >> $GITHUB_ENV
+          echo "DEVICE_NAME=$(adb shell getprop ro.product.model)" >> $GITHUB_ENV
+          echo "PLATFORM_VERSION=$(adb shell getprop ro.build.version.release)" >> $GITHUB_ENV
 
       - name: Run Tests
         run: |
-          pytest tests/  # Adjust this path to your test folder
+          tox -e py38-android-web -- -k test_wait_element_text1
