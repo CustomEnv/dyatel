@@ -13,7 +13,7 @@ class AppiumDriver:
     def create_appium_driver(entities: DriverEntities):
         appium_ip = entities.config.getoption('--appium-ip')
         appium_port = entities.config.getoption('--appium-port')
-        command_exc = f'http://{appium_ip}:{appium_port}/wd/hub'
+        command_exc = f'http://{appium_ip}:{appium_port}'
         is_android = entities.platform == 'android'
 
         caps = get_android_desired_caps() if is_android else ios_desired_caps

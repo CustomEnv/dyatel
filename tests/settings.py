@@ -8,12 +8,13 @@ android_device_start_timeout = 60
 
 def get_android_desired_caps():
     env = os.environ
+    print('Env variables: ', env)
 
     return {
-        'avd': env.get('AVD_NAME') or 'Pixel5',
-        'deviceName': env.get('DEVICE_NAME') or 'Pixel5',
+        'avd': env.get('AVD_NAME') or 'pixel_4',
+        'deviceName': env.get('DEVICE_NAME') or 'testAVD',
         'platformName': 'Android',
-        'platformVersion': env.get('PLATFORM_VERSION') or '12.0',
+        'platformVersion': env.get('PLATFORM_VERSION') or '14.0',
         # Update following capabilities before driver init
         # 'app': 'https://testingbot.com/appium/sample.apk',
         # 'browserName': 'Chrome',
