@@ -57,10 +57,10 @@ jobs:
         env:
           ANDROID_AVD_HOME: /home/runner/.config/.android/avd
         run: |
-          # Start the emulator in the background
-          $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off -accel off -verbose &
+          # Start emulator in the background
+          nohup $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off -accel off -no-snapshot-load -no-boot-anim -netdelay none -netspeed full -verbose &
           
-          # Wait for the emulator to start and become available for adb
+          # Wait for the emulator to become available for adb
           adb wait-for-device
           
           # Ensure the emulator is fully booted
@@ -68,6 +68,9 @@ jobs:
           
           # Add a delay to make sure emulator is completely up
           sleep 30
+          
+          # Kill emulator process after a timeout (Optional)
+          kill $(ps aux | grep 'emulator' | awk '{print $2}')
 
       - name: Run Tests
         run: |
