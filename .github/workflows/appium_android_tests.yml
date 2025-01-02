@@ -12,13 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      android-emulator:
-        image: budtmo/docker-android:emulator_14.0
+      appium:
+        image: appium/appium
         ports:
           - 4723:4723
-        env:
-          EMULATOR_DEVICE: "Samsung Galaxy S10"
-          APPIUM: "true"
         options: >-
           --health-cmd "curl -s http://localhost:4723/status || exit 1"
           --health-interval 10s
@@ -34,44 +31,64 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Setup Tests
+      - name: Setup tests
         run: |
           python -m pip install --upgrade pip
           pip install tox==3.28.0
 
-      - name: Wait for Appium Server to be Ready
-        run: |
-          for i in {1..30}; do
-            curl -s http://localhost:4723/status && break || sleep 2
-          done
-          
-      - name: Wait for Emulator to Become Ready
-        run: |
-          echo "Waiting for Android Emulator to be fully READY..."
-          CONTAINER_ID=$(docker ps -q --filter "ancestor=budtmo/docker-android:emulator_14.0")
-          TIMEOUT=1200  # Timeout in seconds (20 minutes)
-          START_TIME=$(date +%s)
-          
-          while true; do
-            STATUS=$(docker exec $CONTAINER_ID cat device_status || echo "NOT_READY")
-            echo "Current Status: $STATUS"
-            
-            if [[ "$STATUS" != "STARTING" ]]; then
-              echo "✅ Emulator is now in $STATUS state!"
-              break
-            fi
-            
-            CURRENT_TIME=$(date +%s)
-            ELAPSED=$((CURRENT_TIME - START_TIME))
-            
-            if [[ $ELAPSED -ge $TIMEOUT ]]; then
-              echo "❌ Timeout reached. Emulator failed to become READY within $TIMEOUT seconds."
-              exit 1
-            fi
-            
-            sleep 5
-          done
+      - name: Set Up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Run Tests
+      - name: Set Up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android Licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Set Environment Variables
         run: |
+          echo "ANDROID_AVD_HOME=$HOME/.android/avd" >> $GITHUB_ENV
+          echo "ANDROID_SDK_HOME=$HOME/.android" >> $GITHUB_ENV
+
+      - name: Install Android Dependencies
+        run: |
+          sdkmanager "platform-tools" "platforms;android-34" "emulator" "system-images;android-34;google_apis;x86_64"
+          echo "no" | avdmanager create avd -n testAVD -k "system-images;android-34;google_apis;x86_64" --device "pixel_4" --force
+
+      - name: List Available AVDs
+        run: |
+          avdmanager list avd
+          ls /home/runner/.config/.android/avd
+
+      - name: Start Android Emulator (Software Rendering)
+        env:
+          ANDROID_AVD_HOME: /home/runner/.config/.android/avd
+        run: |
+          # Start emulator in the background
+          nohup $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off -accel off -no-snapshot-load -no-boot-anim -netdelay none -netspeed full -verbose &
+          
+          # Wait for the emulator to become available for adb
+          adb wait-for-device
+          
+          # Ensure the emulator is fully booted
+          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+
+          # Optionally wait for some additional time to ensure the emulator is fully ready
+          sleep 30 # Adjust the sleep time as needed for your environment
+
+      - name: Extract Emulator Details
+        run: |
+          echo "AVD_NAME=$(cat $ANDROID_AVD_HOME/testAVD.avd/config.ini | grep 'AvdId' | cut -d '=' -f2)" >> $GITHUB_ENV
+          echo "DEVICE_NAME=$(adb shell getprop ro.product.model)" >> $GITHUB_ENV
+          echo "PLATFORM_VERSION=$(adb shell getprop ro.build.version.release)" >> $GITHUB_ENV
+
+      - name: Run Appium Web Tests
+        run: |
+          # Ensure Appium server is ready before running the tests
+          curl --retry 10 --retry-delay 5 --max-time 60 http://localhost:4723/status
+
+          # Run tests
           tox -e py38-android-web -- -k test_wait_element_text1

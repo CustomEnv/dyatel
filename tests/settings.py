@@ -11,8 +11,8 @@ def get_android_desired_caps():
     print('Env variables: ', env)
 
     return {
-        'avd': env.get('AVD_NAME') or 'samsung_galaxy_s10_14.0',
-        'deviceName': env.get('DEVICE_NAME') or 'samsung_galaxy_s10_14.0',
+        'avd': env.get('AVD_NAME') or 'pixel_4',
+        'deviceName': env.get('DEVICE_NAME') or 'testAVD',
         'platformName': 'Android',
         'platformVersion': env.get('PLATFORM_VERSION') or '14.0',
         # Update following capabilities before driver init
