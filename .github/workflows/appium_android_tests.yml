@@ -49,7 +49,7 @@ jobs:
         run: |
           echo "Waiting for Android Emulator to be fully READY..."
           CONTAINER_ID=$(docker ps -q --filter "ancestor=budtmo/docker-android:emulator_14.0")
-          TIMEOUT=300  # Timeout in seconds (5 minutes)
+          TIMEOUT=1200  # Timeout in seconds (20 minutes)
           START_TIME=$(date +%s)
           
           while true; do
