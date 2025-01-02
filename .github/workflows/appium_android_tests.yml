@@ -45,9 +45,9 @@ jobs:
             curl -s http://localhost:4723/status && break || sleep 2
           done
           
-      - name: Wait for Emulator to Start
+      - name: Wait for Emulator to Become Ready
         run: |
-          echo "Waiting for Android Emulator to start..."
+          echo "Waiting for Android Emulator to be fully READY..."
           CONTAINER_ID=$(docker ps -q --filter "ancestor=budtmo/docker-android:emulator_14.0")
           TIMEOUT=300  # Timeout in seconds (5 minutes)
           START_TIME=$(date +%s)
@@ -56,8 +56,8 @@ jobs:
             STATUS=$(docker exec $CONTAINER_ID cat device_status || echo "NOT_READY")
             echo "Current Status: $STATUS"
             
-            if [[ "$STATUS" == "STARTING" ]]; then
-              echo "✅ Emulator is now in STARTING state!"
+            if [[ "$STATUS" != "STARTING" ]]; then
+              echo "✅ Emulator is now in $STATUS state!"
               break
             fi
             
@@ -65,7 +65,7 @@ jobs:
             ELAPSED=$((CURRENT_TIME - START_TIME))
             
             if [[ $ELAPSED -ge $TIMEOUT ]]; then
-              echo "❌ Timeout reached. Emulator failed to start within $TIMEOUT seconds."
+              echo "❌ Timeout reached. Emulator failed to become READY within $TIMEOUT seconds."
               exit 1
             fi
             
