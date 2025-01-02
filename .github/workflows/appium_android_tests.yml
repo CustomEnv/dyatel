@@ -39,22 +39,38 @@ jobs:
           python -m pip install --upgrade pip
           pip install tox==3.28.0
 
-      - name: Extract Emulator Details
-        run: |
-          echo "DEVICE_NAME=Samsung Galaxy S10" >> $GITHUB_ENV
-          echo "PLATFORM_VERSION=14.0" >> $GITHUB_ENV
-
       - name: Wait for Appium Server to be Ready
         run: |
           for i in {1..30}; do
             curl -s http://localhost:4723/status && break || sleep 2
           done
-
-      - name: Debug Emulator State
+          
+      - name: Wait for Emulator to Start
         run: |
-          adb devices
-          adb shell getprop ro.build.version.release
-          adb shell getprop ro.product.model
+          echo "Waiting for Android Emulator to start..."
+          CONTAINER_ID=$(docker ps -q --filter "ancestor=budtmo/docker-android:emulator_14.0")
+          TIMEOUT=300  # Timeout in seconds (5 minutes)
+          START_TIME=$(date +%s)
+          
+          while true; do
+            STATUS=$(docker exec $CONTAINER_ID cat device_status || echo "NOT_READY")
+            echo "Current Status: $STATUS"
+            
+            if [[ "$STATUS" == "STARTING" ]]; then
+              echo "✅ Emulator is now in STARTING state!"
+              break
+            fi
+            
+            CURRENT_TIME=$(date +%s)
+            ELAPSED=$((CURRENT_TIME - START_TIME))
+            
+            if [[ $ELAPSED -ge $TIMEOUT ]]; then
+              echo "❌ Timeout reached. Emulator failed to start within $TIMEOUT seconds."
+              exit 1
+            fi
+            
+            sleep 5
+          done
 
       - name: Run Tests
         run: |
