@@ -50,6 +50,7 @@ jobs:
 
       - name: Set Environment Variables
         run: |
+          echo "ANDROID_HOME=$HOME/Android/Sdk" >> $GITHUB_ENV
           echo "ANDROID_AVD_HOME=$HOME/.android/avd" >> $GITHUB_ENV
           echo "ANDROID_SDK_HOME=$HOME/.android" >> $GITHUB_ENV
 
@@ -81,6 +82,8 @@ jobs:
 
       - name: Extract Emulator Details
         run: |
+          sdkmanager "emulator"
+          find $ANDROID_HOME -name "emulator"
           echo "AVD_NAME=$(cat $ANDROID_AVD_HOME/testAVD.avd/config.ini | grep 'AvdId' | cut -d '=' -f2)" >> $GITHUB_ENV
           echo "DEVICE_NAME=$(adb shell getprop ro.product.model)" >> $GITHUB_ENV
           echo "PLATFORM_VERSION=$(adb shell getprop ro.build.version.release)" >> $GITHUB_ENV
