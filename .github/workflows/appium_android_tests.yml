@@ -27,7 +27,7 @@ jobs:
           - ${{ github.workspace }}/cmdline-tools:/opt/android/cmdline-tools    # Mount cmdline-tools
           - ${{ github.workspace }}/build-tools:/opt/android/build-tools        # Mount build-tools
           - ${{ github.workspace }}/sdk:/opt/android/sdk                        # Mount the SDK (if needed)
-          - $HOME/.android:/home/runner/.android # Mount the Android AVD directory
+          - v "/home/runner/.android":"/home/runner/.android"                   # Mount the Android AVD directory
 
     steps:
       - name: Checkout Repository
