@@ -64,13 +64,18 @@ jobs:
         run: |
           avdmanager list avd
           ls /home/runner/.config/.android/avd
+      
+      - name: Run Appium Doctor inside the Appium container
+        run: |
+          CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
+          docker exec $CONTAINER_ID appium doctor
 
       - name: Start Android Emulator (Optimized)
         env:
           ANDROID_AVD_HOME: /home/runner/.config/.android/avd
         run: |
           # Start emulator with minimal options for faster boot
-          nohup $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off -accel off -no-snapshot-save -no-snapshot-load -no-boot-anim -netdelay none -netspeed full -verbose &
+          nohup $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off -accel off -no-snapshot-save -no-snapshot-load -no-boot-anim -memory 4096 -netdelay none -netspeed full -verbose &
           
           # Wait for the emulator to become available for adb
           adb wait-for-device
@@ -85,9 +90,11 @@ jobs:
         run: |
           sdkmanager "emulator"
           find $ANDROID_HOME -name "emulator"
-          echo "AVD_NAME=$(cat $ANDROID_AVD_HOME/testAVD.avd/config.ini | grep 'AvdId' | cut -d '=' -f2)" >> $GITHUB_ENV
-          echo "DEVICE_NAME=$(adb shell getprop ro.product.model)" >> $GITHUB_ENV
-          echo "PLATFORM_VERSION=$(adb shell getprop ro.build.version.release)" >> $GITHUB_ENV
+          
+      - name: Run Appium Doctor inside the Appium container
+        run: |
+          CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
+          docker exec $CONTAINER_ID appium doctor
 
       - name: Run Appium Web Tests
         run: |
