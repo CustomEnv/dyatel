@@ -31,7 +31,7 @@ jobs:
       - name: Install appium-doctor inside Appium container
         run: |
           CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
-          docker exec $CONTAINER_ID npm install -g appium-doctor
+          docker exec $CONTAINER_ID sudo npm install -g appium-doctor
 
       - name: Run Appium Doctor inside the Appium container
         run: |
