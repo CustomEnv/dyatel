@@ -21,8 +21,10 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
         volumes:
-          - $ANDROID_HOME/platform-tools:/opt/android/platform-tools
+          - ${{ env.ANDROID_HOME }}/platform-tools:/opt/android/platform-tools
 
     steps:
       - name: Checkout Repository
