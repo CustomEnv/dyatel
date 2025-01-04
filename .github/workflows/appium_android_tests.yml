@@ -21,16 +21,16 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          --env ANDROID_HOME=/opt/android
+#          --env ANDROID_HOME=/opt/android
 #          --env JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 #          --env PATH=/opt/android/platform-tools:/opt/android/cmdline-tools:/opt/android/emulator:/opt/android/build-tools:/opt/android/sdk:$PATH
         volumes:
           - ${{ github.workspace }}/platform-tools:/opt/android/platform-tools  # Mount platform-tools
-          - ${{ github.workspace }}/emulator:/opt/android/emulator              # Mount emulator tools
-          - ${{ github.workspace }}/cmdline-tools:/opt/android/cmdline-tools    # Mount cmdline-tools
-          - ${{ github.workspace }}/build-tools:/opt/android/build-tools        # Mount build-tools
-          - ${{ github.workspace }}/sdk:/opt/android/sdk                        # Mount the SDK (if needed)
-          - /home/runner/.android:/home/runner/.android                         # Mount the Android AVD directory
+#          - ${{ github.workspace }}/emulator:/opt/android/emulator              # Mount emulator tools
+#          - ${{ github.workspace }}/cmdline-tools:/opt/android/cmdline-tools    # Mount cmdline-tools
+#          - ${{ github.workspace }}/build-tools:/opt/android/build-tools        # Mount build-tools
+#          - ${{ github.workspace }}/sdk:/opt/android/sdk                        # Mount the SDK (if needed)
+#          - /home/runner/.android:/home/runner/.android                         # Mount the Android AVD directory
 
     steps:
       - name: Checkout Repository
