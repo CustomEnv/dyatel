@@ -3,47 +3,33 @@ name: Android Web Tests with Appium
 on:
   push:
     branches:
-      - main
-  pull_request:
+      - '**'
 
 jobs:
   android-tests:
     name: Run Appium Web Tests on Android
     runs-on: ubuntu-latest
 
-#    services:
-#      appium:
-#        image: appium/appium
-#        ports:
-#          - 4723:4723
-#        options: >-
-#          --health-cmd "curl -s http://localhost:4723/status || exit 1"
-#          --health-interval 10s
-#          --health-timeout 5s
-#          --health-retries 5
-#        volumes:
-#          - ${{ github.workspace }}/platform-tools:/opt/android/platform-tools
-
-    container:
-      image: appium/appium
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-#      - name: Install appium-doctor inside Appium container
-#        run: |
-#          CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
-#          docker exec $CONTAINER_ID sudo npm install -g appium-doctor
-#
-#      - name: Run Appium Doctor inside the Appium container
-#        run: |
-#          CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
-#          docker exec $CONTAINER_ID appium-doctor
-#
-      - name: Run Appium Doctor inside the Appium container
+      - name: Set up Node.js and Install Appium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y npm
+          sudo npm install -g appium
+
+      - name: Start Appium Server in the Background
+        run: |
+          nohup appium > appium.log 2>&1 &
+
+      - name: Install appium-doctor
         run: |
           sudo npm install -g appium-doctor
+
+      - name: Run Appium Doctor
+        run: |
           appium-doctor
 
       - name: Set up Python
@@ -82,15 +68,6 @@ jobs:
         run: |
           avdmanager list avd
           ls /home/runner/.config/.android/avd
-      
-#      - name: Run Appium Doctor inside the Appium container
-#        run: |
-#          CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
-#          docker exec $CONTAINER_ID appium-doctor
-
-      - name: Run Appium Doctor inside the Appium container
-        run: |
-          appium-doctor
 
       - name: Start Android Emulator (Optimized)
         env:
@@ -108,15 +85,14 @@ jobs:
           # Optionally wait for additional time to ensure readiness
           sleep 30
 
-      - name: Run Appium Doctor inside the Appium container
-        run: |
-          CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
-          docker exec $CONTAINER_ID appium-doctor
-
       - name: Extract Emulator Details
         run: |
           sdkmanager "emulator"
           find $ANDROID_HOME -name "emulator"
+          
+      - name: Run Appium Doctor
+        run: |
+          appium-doctor
 
       - name: Run Appium Web Tests
         run: |
