@@ -11,40 +11,45 @@ jobs:
     name: Run Appium Web Tests on Android
     runs-on: ubuntu-latest
 
-    services:
-      appium:
-        image: appium/appium
-        ports:
-          - 4723:4723
-        options: >-
-          --health-cmd "curl -s http://localhost:4723/status || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-#          --env ANDROID_HOME=/opt/android
-#          --env JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-#          --env PATH=/opt/android/platform-tools:/opt/android/cmdline-tools:/opt/android/emulator:/opt/android/build-tools:/opt/android/sdk:$PATH
+#    services:
+#      appium:
+#        image: appium/appium
+#        ports:
+#          - 4723:4723
+#        options: >-
+#          --health-cmd "curl -s http://localhost:4723/status || exit 1"
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
 #        volumes:
-#          - ${{ github.workspace }}/platform-tools:/opt/android/platform-tools  # Mount platform-tools
-#          - ${{ github.workspace }}/emulator:/opt/android/emulator              # Mount emulator tools
-#          - ${{ github.workspace }}/cmdline-tools:/opt/android/cmdline-tools    # Mount cmdline-tools
-#          - ${{ github.workspace }}/build-tools:/opt/android/build-tools        # Mount build-tools
-#          - ${{ github.workspace }}/sdk:/opt/android/sdk                        # Mount the SDK (if needed)
-#          - /home/runner/.android:/home/runner/.android                         # Mount the Android AVD directory
+#          - ${{ github.workspace }}/platform-tools:/opt/android/platform-tools
+
+    container:
+      image: appium/appium
+      options: >-
+        --health-cmd "curl -s http://localhost:4723/status || exit 1"
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install appium-doctor inside Appium container
-        run: |
-          CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
-          docker exec $CONTAINER_ID sudo npm install -g appium-doctor
-
+#      - name: Install appium-doctor inside Appium container
+#        run: |
+#          CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
+#          docker exec $CONTAINER_ID sudo npm install -g appium-doctor
+#
+#      - name: Run Appium Doctor inside the Appium container
+#        run: |
+#          CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
+#          docker exec $CONTAINER_ID appium-doctor
+#
       - name: Run Appium Doctor inside the Appium container
         run: |
-          CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
-          docker exec $CONTAINER_ID appium-doctor
+          sudo npm install -g appium-doctor
+          appium-doctor
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -83,10 +88,14 @@ jobs:
           avdmanager list avd
           ls /home/runner/.config/.android/avd
       
+#      - name: Run Appium Doctor inside the Appium container
+#        run: |
+#          CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
+#          docker exec $CONTAINER_ID appium-doctor
+
       - name: Run Appium Doctor inside the Appium container
         run: |
-          CONTAINER_ID=$(docker ps -q --filter "ancestor=appium/appium")
-          docker exec $CONTAINER_ID appium-doctor
+          appium-doctor
 
       - name: Start Android Emulator (Optimized)
         env:
