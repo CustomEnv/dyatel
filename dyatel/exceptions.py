@@ -42,7 +42,13 @@ class DriverWrapperException(Exception):
         return self._msg.rstrip()
 
     def wrap_by_quotes(self, data):
-        return f'"{data}"' if isinstance(data, str) else data
+        if data is None:
+            return ""
+
+        elif isinstance(data, str):
+            return f'"{data}"'
+
+        return data
 
 
 class UnexpectedElementsCountException(DriverWrapperException):

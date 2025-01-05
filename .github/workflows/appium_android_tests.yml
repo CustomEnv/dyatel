@@ -18,11 +18,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y npm
-          sudo npm install -g appium
+          sudo npm install -g appium@2.14.0
 
       - name: Install UiAutomator2 Driver
         run: |
-          appium driver install uiautomator2
+          appium driver install uiautomator2@3.9.0
 
       - name: Set up Python
         uses: actions/setup-python@v5
