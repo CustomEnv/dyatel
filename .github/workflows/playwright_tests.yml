@@ -13,10 +13,10 @@ jobs:
       fail-fast: false
       matrix:
         browser-name: [ "chrome", "firefox", "safari" ]
-        python-version: [ "3.8", "3.9" ]
+        python-version: [ "3.8", "3.12" ]
 
     container:
-      image: mcr.microsoft.com/playwright/python:v1.41.1-jammy-amd64
+      image: mcr.microsoft.com/playwright/python:v1.42.0-jammy
       options: --ipc=host
 
     steps:
@@ -27,6 +27,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Verify GLIBC Version
+        run: ldd --version
 
       - name: Setup tests
         run: |
