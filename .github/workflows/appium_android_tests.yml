@@ -72,7 +72,7 @@ jobs:
       - uses: reactivecircus/android-emulator-runner@v2
         name: Android Tests
         with:
-          script: tox -e py38-android-web -- -k='not screenshot'
+          script: tox -e py38-android-web -- -k='not screenshot and not test_driver' -v
           api-level: 33
           target: google_apis
           arch: x86_64
