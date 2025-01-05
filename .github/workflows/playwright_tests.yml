@@ -40,9 +40,9 @@ jobs:
           
       - name: Extract tox env
         run: |
-          tox_env_variable=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
+          tox_env_variable=$(echo "${{ matrix.python-version }}" | sed -E 's/^([0-9]+\.[0-9]+)\..*/\1/' || echo "${{ matrix.python-version }}")
           echo "TOX_ENV=${tox_env_variable}" >> $GITHUB_ENV
-      
+
       # Needed for Firefox
       - name: Set HOME to /root
         run: |
