@@ -16,20 +16,15 @@ jobs:
         python-version: [ "3.8", "3.12" ]
 
     container:
-      image: mcr.microsoft.com/playwright/python:v1.47.0-noble
+      image: mcr.microsoft.com/playwright/python:v1.41.0-jammy
       options: --ipc=host
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Verify GLIBC Version
-        run: ldd --version
+      - name: Check System Python Version
+        run: python --version
 
       - name: Setup tests
         run: |
