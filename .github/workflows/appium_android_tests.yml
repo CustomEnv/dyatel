@@ -20,6 +20,10 @@ jobs:
           sudo apt-get install -y npm
           sudo npm install -g appium
 
+      - name: Install UiAutomator2 Driver
+        run: |
+          appium driver install uiautomator2
+
       - name: Start Appium Server in the Background
         run: |
           nohup appium > appium.log 2>&1 &
