@@ -16,7 +16,7 @@ jobs:
         python-version: [ "3.8", "3.12" ]
 
     container:
-      image: mcr.microsoft.com/playwright/python:v1.41.0-noble
+      image: mcr.microsoft.com/playwright/python:v1.41.0-focal
       options: --ipc=host
 
     steps:
