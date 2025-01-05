@@ -102,12 +102,12 @@ jobs:
         run: |
           echo "Checking initial Chrome browser"
           adb shell "pm list packages | grep chrome"
-          echo "\nChecking Chrome version"
+          echo "Checking Chrome version"
           adb shell dumpsys package com.android.chrome | grep versionName
-          echo "\nStarting Chrome manually"
-          adb shell am start -a android.intent.action.VIEW -d "http://www.google.com" com.android.chrome
-          echo "\nGet logs from Chrome"
-          adb logcat | grep chrome
+#          echo "\nStarting Chrome manually"
+#          adb shell am start -a android.intent.action.VIEW -d "http://www.google.com" com.android.chrome
+#          echo "\nGet logs from Chrome"
+#          adb logcat | grep chrome
 
       - name: Run Appium Doctor
         run: |
