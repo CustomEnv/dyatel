@@ -30,8 +30,8 @@ jobs:
 
       - name: Upgrade GLIBC in container (required by python@3.12)
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libc6-dev
+          apt-get update
+          apt-get install -y libc6-dev
 
       - name: Setup tests
         run: |
