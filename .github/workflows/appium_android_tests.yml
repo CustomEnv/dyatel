@@ -3,28 +3,26 @@ name: Android Web Tests with Appium
 on:
   push:
     branches:
-      - main
-  pull_request:
+      - '**'
 
 jobs:
   android-tests:
     name: Run Appium Web Tests on Android
-    runs-on: ubuntu-latest
-
-    services:
-      appium:
-        image: appium/appium
-        ports:
-          - 4723:4723
-        options: >-
-          --health-cmd "curl -s http://localhost:4723/status || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y npm
+
+      - name: Install Appium & UiAutomator2 Driver
+        run: |
+          sudo npm install -g appium@2.14.0
+          appium driver install uiautomator2@3.9.0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -53,35 +51,30 @@ jobs:
           echo "ANDROID_AVD_HOME=$HOME/.android/avd" >> $GITHUB_ENV
           echo "ANDROID_SDK_HOME=$HOME/.android" >> $GITHUB_ENV
 
-      - name: Install Android Dependencies
+      - name: Start Appium Server in the Background
         run: |
-          sdkmanager "platform-tools" "platforms;android-34" "emulator" "system-images;android-34;google_apis;x86_64"
-          echo "no" | avdmanager create avd -n testAVD -k "system-images;android-34;google_apis;x86_64" --device "pixel_4" --force
+          nohup appium --allow-insecure chromedriver_autodownload > appium.log 2>&1 &
 
-      - name: List Available AVDs
+      - name: Install appium-doctor
         run: |
-          avdmanager list avd
-          ls /home/runner/.config/.android/avd
+          sudo npm install -g appium-doctor
 
-      - name: Start Android Emulator (Software Rendering)
-        env:
-          ANDROID_AVD_HOME: /home/runner/.config/.android/avd
+      - name: Run Appium Doctor
         run: |
-          # Start emulator in the background
-          nohup $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off -accel off -no-snapshot-load -no-boot-anim -netdelay none -netspeed full -verbose &
+          appium-doctor
           
-          # Wait for the emulator to become available for adb
-          adb wait-for-device
-          
-          # Ensure the emulator is fully booted
-          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-
-      - name: Extract Emulator Details
+      - name: Enable KVM
         run: |
-          echo "AVD_NAME=$(cat $ANDROID_AVD_HOME/testAVD.avd/config.ini | grep 'AvdId' | cut -d '=' -f2)" >> $GITHUB_ENV
-          echo "DEVICE_NAME=$(adb shell getprop ro.product.model)" >> $GITHUB_ENV
-          echo "PLATFORM_VERSION=$(adb shell getprop ro.build.version.release)" >> $GITHUB_ENV
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
 
-      - name: Run Tests
-        run: |
-          tox -e py38-android-web -- -k test_wait_element_text1
+      - uses: reactivecircus/android-emulator-runner@v2
+        name: Android Tests
+        with:
+          script: tox -e py38-android-web -- -k='not screenshot and not test_driver' -v
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          emulator-options: '-no-window -no-audio -no-boot-anim'
+#          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
