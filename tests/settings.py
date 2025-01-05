@@ -18,6 +18,7 @@ def get_android_desired_caps():
         # 'app': 'https://testingbot.com/appium/sample.apk',
         # 'browserName': 'Chrome',
         'automationName': 'UiAutomator2',
+        'autoDownloadChromeDriver': True,
         'noReset': True,
         'newCommandTimeout': 3000,
         'avdLaunchTimeout': 120000,

@@ -97,6 +97,13 @@ jobs:
           adb devices
           adb shell getprop ro.build.version.release
           
+      - name: Chrome browser
+        run: |
+          echo "Checking initial Chrome browser"
+          adb shell "pm list packages | grep chrome"
+          echo "Installing Chrome browser"
+          adb install -r https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
       - name: Run Appium Doctor
         run: |
           appium-doctor
