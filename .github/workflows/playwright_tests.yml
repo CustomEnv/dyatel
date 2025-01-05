@@ -28,9 +28,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Verify Python version
+        run: python --version
+
       - name: Setup tests
         run: |
-          pip install -U pip tox==3.28.0
+          python -m ensurepip --upgrade  # Installs pip if not already installed
+          python -m pip install tox==3.28.0  # Using pip to install tox from Python
           mkdir -p allure-report
           chmod -R 777 allure-report
           
