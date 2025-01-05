@@ -29,8 +29,6 @@ class DriverWrapperException(Exception):
     def msg(self):
         self._msg = f'{self._original_msg} '
 
-        print('self._actual: ', self._actual, '. self._expected: ', self._expected)
-
         if self._timeout:
             self._msg += f'after {self._timeout} seconds. '
         if self._expected is not None:
