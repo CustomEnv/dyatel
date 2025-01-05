@@ -63,40 +63,24 @@ jobs:
           echo "ANDROID_AVD_HOME=$HOME/.android/avd" >> $GITHUB_ENV
           echo "ANDROID_SDK_HOME=$HOME/.android" >> $GITHUB_ENV
 
-      - name: Install Android Dependencies
+      - name: Run android emulator inside docker
         run: |
-          sdkmanager "platform-tools" "platforms;android-34" "emulator" "system-images;android-34;google_apis;x86_64"
-          echo "no" | avdmanager create avd -n testAVD -k "system-images;android-34;google_apis;x86_64" --device "pixel_4" --force
+          docker run \
+              -e ADBKEY="$(cat ~/.android/adbkey)" \
+              --device /dev/kvm \
+              --publish 8554:8554/tcp \
+              --publish 5555:5555/tcp  \
+              us-docker.pkg.dev/android-emulator-268719/images/30-google-x64:30.1.2
 
-      - name: List Available AVDs
+      - name: Verifying ADB connection
         run: |
-          avdmanager list avd
-          ls /home/runner/.config/.android/avd
-
-      - name: Start Android Emulator (Optimized)
-        env:
-          ANDROID_AVD_HOME: /home/runner/.config/.android/avd
-        run: |
-          # Start emulator with minimal options for faster boot
-          nohup $ANDROID_HOME/emulator/emulator -avd testAVD -no-window -no-audio -gpu off -accel off -no-snapshot-save -no-snapshot-load -no-boot-anim -memory 4096 -netdelay none -netspeed full -verbose &
-          
-          # Wait for the emulator to become available for adb
+          adb connect localhost:5555
           adb wait-for-device
 
-          # Ensure the emulator is fully booted
-          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-
-          # Optionally wait for additional time to ensure readiness
-          sleep 30
-
-      - name: Extract Emulator Details
-        run: |
-          sdkmanager "emulator"
-          find $ANDROID_HOME -name "emulator"
-          
       - name: Run Appium Doctor
         run: |
           appium-doctor
+          tail -f $ANDROID_HOME/emulator/emulator.log
 
       - name: Run Appium Web Tests
         run: |
