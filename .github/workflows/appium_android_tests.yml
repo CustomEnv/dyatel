@@ -74,5 +74,6 @@ jobs:
         with:
           script: tox -e py38-android-web -- -k test_wait_element_text1
           api-level: 33
+          arch: x86_64
           emulator-options: '-no-window -no-audio -no-boot-anim'
 #          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
