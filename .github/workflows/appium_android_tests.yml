@@ -77,8 +77,8 @@ jobs:
               --publish 8554:8554/tcp \
               --publish 15555:5555/tcp  \
               --name android-emulator \
-              us-docker.pkg.dev/android-emulator-268719/images/30-google-x64:30.1.2 \
-              -memory 4096 -gpu swiftshader_indirect -no-snapshot -no-audio
+              --memory 4g --cpus=2 \
+              us-docker.pkg.dev/android-emulator-268719/images/30-google-x64:30.1.2 
 
           # Wait for the emulator to initialize
           echo "Waiting 10 seconds for the container to start..."
