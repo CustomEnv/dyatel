@@ -16,7 +16,7 @@ jobs:
         python-version: [ "3.8", "3.12" ]
 
     container:
-      image: mcr.microsoft.com/playwright/python:v1.41.0-jammy
+      image: mcr.microsoft.com/playwright/python:v1.41.1-jammy-amd64
       options: --ipc=host
 
     steps:
@@ -27,29 +27,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Verify GLIBC Version
-        run: ldd --version
-
-      - name: Install GLIBC 2.38
-        run: |
-          apt-get update
-          apt-get install -y build-essential manpages-dev wget
-          wget http://ftp.gnu.org/gnu/libc/glibc-2.38.tar.gz
-          tar -xvzf glibc-2.38.tar.gz
-          cd glibc-2.38
-          mkdir build && cd build
-          ../configure --prefix=/opt/glibc-2.38
-          make -j$(nproc)
-          make install
-          echo "/opt/glibc-2.38/lib" | tee -a /etc/ld.so.conf.d/glibc-2.38.conf
-          ldconfig
-
-      - name: Verify GLIBC Version
-        run: ldd --version
-
-      - name: Set LD_LIBRARY_PATH
-        run: echo "LD_LIBRARY_PATH=/opt/glibc-2.38/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
       - name: Setup tests
         run: |
