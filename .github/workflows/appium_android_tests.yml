@@ -111,7 +111,6 @@ jobs:
       - name: Run Appium Doctor
         run: |
           appium-doctor
-          docker logs android-emulator
 
       - name: Run Appium Web Tests
         run: |
