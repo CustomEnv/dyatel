@@ -11,8 +11,7 @@ def get_android_desired_caps():
     print('Env variables: ', env)
 
     return {
-        'avd': env.get('AVD_NAME') or 'localhost:15555',
-        'deviceName': env.get('DEVICE_NAME') or 'localhost_device',
+        'deviceName': env.get('DEVICE_NAME') or 'emulator-5555',
         'platformName': 'Android',
         'platformVersion': env.get('PLATFORM_VERSION') or '11.0',
         # Update following capabilities before driver init

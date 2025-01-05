@@ -80,7 +80,7 @@ jobs:
               us-docker.pkg.dev/android-emulator-268719/images/30-google-x64:30.1.2
 
           # Wait for the emulator to initialize
-          echo "Waiting 30 seconds for the Android Emulator to start..."
+          echo "Waiting 10 seconds for the container to start..."
           sleep 10
           
           echo "Verifying ADB connection..."
@@ -90,23 +90,12 @@ jobs:
           echo "Waiting for Android system to complete booting..."
           while [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" != "1" ]; do
             echo "Still waiting for boot..."
-            sleep 1
+            sleep 5
           done
 
           echo "Android Emulator is fully booted and ready!"
           adb devices
-
-      - name: List Available AVDs in Android Emulator Container
-        run: |
-          CONTAINER_ID=$(docker ps -q --filter "name=android-emulator")
-          if [ -z "$CONTAINER_ID" ]; then
-            echo "Error: Android Emulator container is not running."
-            exit 1
-          fi
-
-          echo "Listing available AVDs in the emulator container..."
-          docker exec $CONTAINER_ID emulator -list-avds || \
-          echo "emulator not found, checking emulator configuration files instead."
+          adb shell getprop ro.build.version.release
           
       - name: Run Appium Doctor
         run: |
@@ -114,8 +103,5 @@ jobs:
 
       - name: Run Appium Web Tests
         run: |
-          # Ensure Appium server is ready before running the tests
           curl --retry 10 --retry-delay 5 --max-time 60 http://localhost:4723/status
-
-          # Run tests
           tox -e py38-android-web -- -k test_wait_element_text1
