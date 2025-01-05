@@ -87,7 +87,15 @@ jobs:
           adb connect localhost:15555
           adb wait-for-device
           
+          echo "Waiting for Android system to complete booting..."
+          while [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" != "1" ]; do
+            echo "Still waiting for boot..."
+            sleep 1
+          done
 
+          echo "Android Emulator is fully booted and ready!"
+          adb devices
+          
       - name: Run Appium Doctor
         run: |
           appium-doctor
