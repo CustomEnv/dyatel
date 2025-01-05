@@ -43,9 +43,9 @@ class DriverWrapperException(Exception):
 
     def wrap_by_quotes(self, data):
         if data is None:
-            return ""
+            data = ""
 
-        elif isinstance(data, str):
+        if isinstance(data, str):
             return f'"{data}"'
 
         return data

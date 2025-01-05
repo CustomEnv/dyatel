@@ -8,20 +8,20 @@ on:
 jobs:
   android-tests:
     name: Run Appium Web Tests on Android
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js and Install Appium
+      - name: Set up Node.js
         run: |
           sudo apt-get update
           sudo apt-get install -y npm
-          sudo npm install -g appium@2.14.0
 
-      - name: Install UiAutomator2 Driver
+      - name: Install Appium & UiAutomator2 Driver
         run: |
+          sudo npm install -g appium@2.14.0
           appium driver install uiautomator2@3.9.0
 
       - name: Set up Python
