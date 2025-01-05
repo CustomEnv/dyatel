@@ -95,6 +95,18 @@ jobs:
 
           echo "Android Emulator is fully booted and ready!"
           adb devices
+
+      - name: List Available AVDs in Android Emulator Container
+        run: |
+          CONTAINER_ID=$(docker ps -q --filter "name=android-emulator")
+          if [ -z "$CONTAINER_ID" ]; then
+            echo "Error: Android Emulator container is not running."
+            exit 1
+          fi
+
+          echo "Listing available AVDs in the emulator container..."
+          docker exec $CONTAINER_ID emulator -list-avds || \
+          echo "emulator not found, checking emulator configuration files instead."
           
       - name: Run Appium Doctor
         run: |
