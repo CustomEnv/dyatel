@@ -79,12 +79,19 @@ jobs:
           
       - name: List Available AVDs in Android Emulator Container
         run: |
-          docker exec $(docker ps -q --filter "ancestor=us-docker.pkg.dev/android-emulator-268719/images/30-google-x64:30.1.2") \
-          avdmanager list avd || echo "avdmanager not found, checking emulator directory instead"
+          CONTAINER_ID=$(docker ps -q --filter "name=android-emulator")
+          if [ -z "$CONTAINER_ID" ]; then
+            echo "Error: Android Emulator container is not running."
+            exit 1
+          fi
 
-          # If avdmanager is unavailable, fallback to list AVD config files
-          docker exec $(docker ps -q --filter "ancestor=us-docker.pkg.dev/android-emulator-268719/images/30-google-x64:30.1.2") \
-          ls -la $ANDROID_AVD_HOME
+          echo "Listing available AVDs in the emulator container..."
+          docker exec $CONTAINER_ID avdmanager list avd || \
+          echo "avdmanager not found, checking emulator configuration files instead."
+
+          echo "Listing AVD files in the container..."
+          docker exec $CONTAINER_ID ls -la $ANDROID_AVD_HOME || \
+          echo "Failed to list files in $ANDROID_AVD_HOME."
 
       - name: Verifying ADB connection
         run: |
