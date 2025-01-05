@@ -75,7 +75,7 @@ jobs:
           
           # Wait for the emulator to initialize
           echo "Waiting 30 seconds for the Android Emulator to start..."
-          sleep 30
+          sleep 10
           
       - name: List Available AVDs in Android Emulator Container
         run: |
@@ -86,12 +86,8 @@ jobs:
           fi
 
           echo "Listing available AVDs in the emulator container..."
-          docker exec $CONTAINER_ID avdmanager list avd || \
-          echo "avdmanager not found, checking emulator configuration files instead."
-
-          echo "Listing AVD files in the container..."
-          docker exec $CONTAINER_ID ls -la $ANDROID_AVD_HOME || \
-          echo "Failed to list files in $ANDROID_AVD_HOME."
+          docker exec $CONTAINER_ID adb devices || \
+          echo "adb not found, checking emulator configuration files instead."
 
       - name: Verifying ADB connection
         run: |
