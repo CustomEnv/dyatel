@@ -71,18 +71,26 @@ jobs:
 
       - name: Run android emulator inside docker
         run: |
+          mkdir -p ~/.android
+          echo -e "Vulkan = off\nGLDirectMem = on" > ~/.android/advancedFeatures.ini
+          
           docker run -d \
               -e ADBKEY="$(cat ~/.android/adbkey)" \
               --device /dev/kvm \
               --publish 8554:8554/tcp \
               --publish 15555:5555/tcp  \
               --name android-emulator \
-              --memory 4g --cpus=2 \
               us-docker.pkg.dev/android-emulator-268719/images/30-google-x64:30.1.2 
 
-          # Wait for the emulator to initialize
           echo "Waiting 10 seconds for the container to start..."
           sleep 10
+          
+          echo "Copy the file to the running container"
+          CONTAINER_ID=$(docker ps -q --filter "name=android-emulator")
+          docker cp ~/.android/advancedFeatures.ini $CONTAINER_ID:/root/.android/advancedFeatures.ini
+
+          echo "Verify the file has been copied"
+          docker exec $CONTAINER_ID cat /root/.android/advancedFeatures.ini
           
           echo "Verifying ADB connection..."
           adb connect localhost:15555
@@ -104,10 +112,6 @@ jobs:
           adb shell "pm list packages | grep chrome"
           echo "Checking Chrome version"
           adb shell dumpsys package com.android.chrome | grep versionName
-#          echo "\nStarting Chrome manually"
-#          adb shell am start -a android.intent.action.VIEW -d "http://www.google.com" com.android.chrome
-#          echo "\nGet logs from Chrome"
-#          adb logcat | grep chrome
 
       - name: Run Appium Doctor
         run: |
