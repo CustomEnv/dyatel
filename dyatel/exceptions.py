@@ -31,7 +31,7 @@ class DriverWrapperException(Exception):
 
         if self._timeout:
             self._msg += f'after {self._timeout} seconds. '
-        if self._actual is not None and self._expected is not None:
+        if self._actual and self._expected is not None:
             self._msg += f'Actual: {self.wrap_by_quotes(self._actual)}; ' \
                          f'Expected: {self.wrap_by_quotes(self._expected)}. '
         if self._info:
