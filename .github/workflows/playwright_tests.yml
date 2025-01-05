@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         browser-name: [ "chrome", "firefox", "safari" ]
-        python-version: [ "3.8", "3.12" ]
+        python-version: [ "3.8", "3.12.7" ]
 
     container:
       image: mcr.microsoft.com/playwright/python:v1.41.0-jammy
@@ -33,8 +33,8 @@ jobs:
 
       - name: Setup tests
         run: |
-          python -m ensurepip --upgrade  # Installs pip if not already installed
-          python -m pip install tox==3.28.0  # Using pip to install tox from Python
+          python -m pip install --upgrade pip
+          pip install tox==3.28.0
           mkdir -p allure-report
           chmod -R 777 allure-report
           
