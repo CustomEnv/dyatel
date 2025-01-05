@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         browser-name: [ "chrome", "firefox", "safari" ]
-        python-version: [ "3.8", "3.10" ]
+        python-version: [ "3.8", "3.9" ]
 
     container:
       image: mcr.microsoft.com/playwright/python:v1.41.0-jammy
