@@ -40,7 +40,7 @@ jobs:
           
       - name: Extract tox env
         run: |
-          tox_env_variable=$(echo "${{ matrix.python-version }}" | sed -E 's/^([0-9]+)\.([0-9]+)\..*/\1\2/' || echo "${{ matrix.python-version }}" | sed -E 's/^([0-9]+)\.([0-9]+)/\1\2/')
+          tox_env_variable=$(echo "${{ matrix.python-version }}" | sed -E 's/^([0-9]+)\.([0-9]+)(\..*)?/\1\2/')
           echo "TOX_ENV=${tox_env_variable}" >> $GITHUB_ENV
 
       # Needed for Firefox
