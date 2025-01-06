@@ -38,10 +38,10 @@ jobs:
       - uses: futureware-tech/simulator-action@v4
         name: iOS Simulator
         with:
-          udid: '116D1E30-F4F0-4737-BFDB-746F38A77AF8'
+#          udid: '116D1E30-F4F0-4737-BFDB-746F38A77AF8'
           os: 'iOS'
           model: 'iPhone 15'
-          os_version: '17.2'
+#          os_version: '17.2'
           wait_for_boot: true
 
       - name: Run Appium Safari tests
