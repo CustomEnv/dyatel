@@ -25,9 +25,9 @@ jobs:
 
       - name: Install Appium & UiAutomator2 Driver
         run: |
-#          npm install -g npm@10.9.0  # Uncomment for debug
           npm install -g appium@2.14.0
           appium driver install xcuitest@5.0.0
+#          npm install -g npm@10.9.0  # Uncomment for debug
 #          npm install -g appium-doctor  # Uncomment for debug
 #          appium-doctor  # Uncomment for debug
 
