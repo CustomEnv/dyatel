@@ -26,20 +26,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: Setup Environment
+        id: setup
+        uses: ./.github/actions/setup
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Setup tests
-        run: |
-          python -m pip install --upgrade pip
-          pip install tox==3.28.0
-      
-      - name: Extract tox env
-        run: |
-          tox_env_variable=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
-          echo "TOX_ENV=${tox_env_variable}" >> $GITHUB_ENV
 
       - name: Extract Browser Name
         run: |
@@ -49,14 +40,14 @@ jobs:
       - name: Run Selenium ${{ env.BROWSER }} tests with py${{ matrix.python-version }}
         id: tests
         run: |
-          tox -e py${{ env.TOX_ENV }}-selenium-${{ env.BROWSER }} -- --env remote --headless -v --alluredir=allure-report --reruns=2
+          tox -e py${{ steps.setup.outputs.tox-env }}-selenium-${{ env.BROWSER }} -- --env remote --headless -v --alluredir=allure-report --reruns=2
         continue-on-error: true
 
       - name: Upload Allure Report as Artifact
         if: steps.tests.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
-          name: allure-report-${{ env.BROWSER }}-selenium-${{ env.TOX_ENV }}
+          name: allure-report-${{ env.BROWSER }}-selenium-${{ steps.setup.outputs.tox-env }}
           path: allure-report
           retention-days: 1
 
