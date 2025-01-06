@@ -31,7 +31,7 @@ def get_ios_desired_caps():
     return {
         'deviceName': env.get('IOS_DEVICE_NAME') or 'iPhone 15',
         'platformVersion': env.get('IOS_PLATFORM_VERSION') or '17.0',
-        'udid': env.get('udid') or 'A33305FD-6CBC-4AD4-B5E3-65CEF85B6969',
+        'udid': env.get('udid') or '',
         'automationName': 'XCUITest',
         'platformName': 'iOS',
         'browserName': 'Safari',
