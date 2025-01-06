@@ -30,7 +30,7 @@ jobs:
 
       - name: Setup Tox and Extract Env
         id: setup-tox
-        uses: ./github/actions/tox
+        uses: ./.github/actions/tox
         with:
           python-version: ${{ matrix.python-version }}
 
