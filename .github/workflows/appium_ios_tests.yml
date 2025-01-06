@@ -33,15 +33,15 @@ jobs:
         run: |
           nohup appium > appium.log 2>&1 &
 
-      - uses: futureware-tech/simulator-action@v4
-        name: iOS Simulator
-        with:
+#      - uses: futureware-tech/simulator-action@v4
+#        name: iOS Simulator
+#        with:
 #          udid: 'C99A7963-9D05-4BC4-ABDB-4BE261BEA92E'
-          os: 'iOS'
-          model: 'iPhone 16'
-          erase_before_boot: false
-          os_version: '18.2'
-          wait_for_boot: true
+#          os: 'iOS'
+#          model: 'iPhone 16'
+#          erase_before_boot: false
+#          os_version: '18.2'
+#          wait_for_boot: true
 
       - name: Run Appium Safari tests
         id: tests
