@@ -20,16 +20,9 @@ jobs:
       options: --ipc=host
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Setup Tox and Extract Env
-        id: setup-tox
+      - name: Setup Environment
+        id: setup
         uses: ./.github/actions/tox
         with:
           python-version: ${{ matrix.python-version }}
@@ -42,14 +35,14 @@ jobs:
       - name: Run Playwright ${{ matrix.browser-name }} tests with py${{ matrix.python-version }}
         id: tests
         run: |
-          tox -e py${{ steps.setup-tox.outputs.tox-env }}-playwright-${{ matrix.browser-name }} -- --headless -v --alluredir=allure-report --reruns=2
+          tox -e py${{ steps.setup.outputs.tox-env }}-playwright-${{ matrix.browser-name }} -- --headless -v --alluredir=allure-report --reruns=2
         continue-on-error: true
 
       - name: Upload Allure Report as Artifact
         if: steps.tests.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
-          name: allure-report-${{ matrix.browser-name }}-playwright-${{ steps.setup-tox.outputs.tox-env }}
+          name: allure-report-${{ matrix.browser-name }}-playwright-${{ steps.setup.outputs.tox-env }}
           path: allure-report
           retention-days: 1
 

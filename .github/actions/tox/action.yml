@@ -1,4 +1,4 @@
-name: 'Setup Tox Environment'
+name: 'Setup Environment'
 description: 'Set up tests and extract tox environment variable'
 
 inputs:
@@ -14,7 +14,15 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Setup tests
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Setup Tox
       shell: bash
       run: |
         python -m pip install --upgrade pip
