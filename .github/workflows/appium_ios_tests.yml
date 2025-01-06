@@ -51,6 +51,12 @@ jobs:
           tox -e py38-ios-web -- -v --alluredir=allure-report -k test_wait_element_text1
         continue-on-error: true
 
+      - name: Print Appium Logs on Failure
+        if: ${{ steps.tests.outcome == 'failure' }}
+        run: |
+          echo "=== Appium Logs ==="
+          cat appium.log
+
       - name: Teardown (Allure Report and Error Handling)
         if: ${{ steps.tests.outcome == 'failure' }}
         uses: ./.github/actions/teardown
