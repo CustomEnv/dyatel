@@ -25,11 +25,9 @@ jobs:
 
       - name: Install Appium & UiAutomator2 Driver
         run: |
+          npm install -g npm@10.9.0
           npm install -g appium@2.14.0
           appium driver install xcuitest@7.35.1
-#          npm install -g npm@10.9.0  # Uncomment for debug
-#          npm install -g appium-doctor  # Uncomment for debug
-#          appium-doctor  # Uncomment for debug
 
       - name: Start Appium Server in the Background
         run: |
@@ -48,14 +46,8 @@ jobs:
       - name: Run Appium Safari tests
         id: tests
         run: |
-          tox -e py38-ios-web -- -v --alluredir=allure-report -k test_wait_element_text1
+          tox -e py38-ios-web -- -k='not screenshot and not test_driver' -v --alluredir=allure-report
         continue-on-error: true
-
-      - name: Print Appium Logs on Failure
-        if: ${{ steps.tests.outcome == 'failure' }}
-        run: |
-          echo "=== Appium Logs ==="
-          cat appium.log
 
       - name: Teardown (Allure Report and Error Handling)
         if: ${{ steps.tests.outcome == 'failure' }}
