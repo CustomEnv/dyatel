@@ -28,11 +28,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Setup tests and extract tox environment
-        uses: ./.github/workflows/setup_tox
+      - name: Setup Tox and Extract Env
+        id: setup-tox
+        uses: ./github/actions/tox
         with:
           python-version: ${{ matrix.python-version }}
 
+      # Needed for Firefox
       - name: Set HOME to /root
         run: |
           echo "HOME=/root" >> $GITHUB_ENV  # Set HOME environment variable
