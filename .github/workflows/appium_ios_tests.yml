@@ -25,9 +25,9 @@ jobs:
 
       - name: Install Appium & UiAutomator2 Driver
         run: |
-          npm install -g npm@10.9.0
+#          npm install -g npm@10.9.0  # Uncomment for debug
           npm install -g appium@2.14.0
-          appium driver install xcuitest@7.28.3
+          appium driver install xcuitest@5.0.0
 #          npm install -g appium-doctor  # Uncomment for debug
 #          appium-doctor  # Uncomment for debug
 
@@ -38,7 +38,7 @@ jobs:
       - uses: futureware-tech/simulator-action@v4
         name: iOS Simulator
         with:
-#          udid: '116D1E30-F4F0-4737-BFDB-746F38A77AF8'
+          udid: 'A33305FD-6CBC-4AD4-B5E3-65CEF85B6969'
           os: 'iOS'
           model: 'iPhone 15'
           erase_before_boot: false
