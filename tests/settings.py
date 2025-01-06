@@ -29,14 +29,12 @@ def get_ios_desired_caps():
     env = os.environ
 
     return {
-        'deviceName': env.get('IOS_DEVICE_NAME') or 'iPhone 15',
+        'deviceName': env.get('IOS_DEVICE_NAME') or 'iPhone 16',
         'platformVersion': env.get('IOS_PLATFORM_VERSION') or '18.2',
-        'udid': env.get('udid') or '',
+        'udid': env.get('udid') or 'C99A7963-9D05-4BC4-ABDB-4BE261BEA92E',
         'automationName': 'XCUITest',
         'platformName': 'iOS',
         'browserName': 'Safari',
-        # 'autoWebview': True,
-        'useSimulator': True,
         'newCommandTimeout': 3000,
         'wdaLaunchTimeout': 120000,
     }

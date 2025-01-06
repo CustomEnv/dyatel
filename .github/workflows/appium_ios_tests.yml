@@ -38,7 +38,7 @@ jobs:
       - uses: futureware-tech/simulator-action@v4
         name: iOS Simulator
         with:
-#          udid: 'C99A7963-9D05-4BC4-ABDB-4BE261BEA92E'
+          udid: 'C99A7963-9D05-4BC4-ABDB-4BE261BEA92E'
           os: 'iOS'
           model: 'iPhone 16'
           erase_before_boot: false
