@@ -7,7 +7,6 @@ on:
 
 jobs:
   android-tests:
-    name: Run Appium Web Tests on Android
     runs-on: ubuntu-24.04
 
     steps:

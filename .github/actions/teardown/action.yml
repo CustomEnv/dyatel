@@ -25,5 +25,5 @@ runs:
     - name: Check Test Results
       shell: bash
       run: |
-        echo "❌ Tests failed! Check the Allure Report for details."
+        echo "❌ Tests failed! Please check the pytest output in the step above for details."
         exit 1
