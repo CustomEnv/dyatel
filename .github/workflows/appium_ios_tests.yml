@@ -9,6 +9,18 @@ jobs:
   ios-tests:
     runs-on: macos-13
 
+    services:
+      appium:
+        image: appium/appium:v2.11.4-p2
+        ports:
+          - 4723:4723
+        options: >-
+          --privileged
+          --health-cmd="curl --fail http://localhost:4723/wd/hub/status || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -19,22 +31,6 @@ jobs:
         with:
           python-version: '3.8'
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22.12.0'
-
-      - name: Install Appium & UiAutomator2 Driver
-        run: |
-          npm install -g appium@2.14.0
-          appium driver install xcuitest@7.35.1
-#          npm install -g npm@10.9.0  # Uncomment for debug
-#          npm install -g appium-doctor  # Uncomment for debug
-#          appium-doctor  # Uncomment for debug
-
-      - name: Start Appium Server in the Background
-        run: |
-          nohup appium > appium.log 2>&1 &
-
       - uses: futureware-tech/simulator-action@v4
         name: iOS Simulator
         with:
@@ -44,6 +40,13 @@ jobs:
           erase_before_boot: false
           os_version: '17.0'
           wait_for_boot: true
+
+      - name: Wait for Appium Server
+        run: |
+          until curl -s http://localhost:4723/wd/hub/status | grep '"ready":true'; do
+            echo "Waiting for Appium server to be ready..."
+            sleep 2
+          done
 
       - name: Run Appium Safari tests
         id: tests
