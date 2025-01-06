@@ -65,18 +65,19 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - uses: reactivecircus/android-emulator-runner@v2
+      # https://github.com/ReactiveCircus/android-emulator-runner
+      - uses: reactivecircus/android-emulator-runner@v2.9.0
         name: Android Tests
         id: tests
+        continue-on-error: true
         with:
           script: tox -e py38-android-web -- -k='not screenshot and not test_driver' -v --alluredir=allure-report
           api-level: 33
           target: google_apis
           arch: x86_64
-          emulator-options: '-no-window -no-audio -no-boot-anim'
-#          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-        continue-on-error: true
-                           
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+#          emulator-options: '-no-window -no-audio -no-boot-anim'
+
                            
       - name: Teardown (allure report and result checking)
         uses: ./.github/actions/teardown

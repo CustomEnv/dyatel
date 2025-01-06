@@ -44,6 +44,7 @@ jobs:
         continue-on-error: true
 
       - name: Teardown (allure report and result checking)
+        if: ${{ steps.tests.outcome == 'failure' }}
         uses: ./.github/actions/teardown
         with:
           browser-name: ${{ env.BROWSER }}
