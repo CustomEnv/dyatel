@@ -8,12 +8,11 @@ android_device_start_timeout = 60
 
 def get_android_desired_caps():
     env = os.environ
-    print('Env variables: ', env)
 
     return {
-        'deviceName': env.get('DEVICE_NAME') or 'emulator-5555',
+        'deviceName': env.get('ANDROID_DEVICE_NAME') or 'emulator-5555',
         'platformName': 'Android',
-        'platformVersion': env.get('PLATFORM_VERSION') or '13.0',
+        'platformVersion': env.get('ANDROID_PLATFORM_VERSION') or '13.0',
         # Update following capabilities before driver init
         # 'app': 'https://testingbot.com/appium/sample.apk',
         # 'browserName': 'Chrome',
@@ -26,15 +25,18 @@ def get_android_desired_caps():
         'adbExecTimeout': 120000,
     }
 
-ios_desired_caps = {
-    'automationName': 'XCUITest',
-    'platformName': 'iOS',
-    'deviceName': 'iPhone 12 mini',
-    'platformVersion': '15.5',
-    'browserName': 'Safari',
-    'autoWebview': True,
-    'useSimulator': True,
-    'udid': '8239C85D-88C1-45B8-BD40-BB3AD3115A67',
-    'newCommandTimeout': 3000,
-    'wdaLaunchTimeout': 120000,
-}
+def get_ios_desired_caps():
+    env = os.environ
+
+    return {
+        'deviceName': env.get('IOS_DEVICE_NAME') or 'iPhone 15',
+        'platformVersion': env.get('IOS_PLATFORM_VERSION') or '17.2',
+        'udid': env.get('udid') or '116D1E30-F4F0-4737-BFDB-746F38A77AF8',
+        'automationName': 'XCUITest',
+        'platformName': 'iOS',
+        'browserName': 'Safari',
+        'autoWebview': True,
+        'useSimulator': True,
+        'newCommandTimeout': 3000,
+        'wdaLaunchTimeout': 120000,
+    }

@@ -6,7 +6,7 @@ from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from appium.webdriver.appium_service import AppiumService
 from allure_commons.types import AttachmentType
 
-from tests.settings import ios_desired_caps
+from tests.settings import get_ios_desired_caps
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 from dyatel.shared_utils import rescale_image, shell_running_command, shell_command
 
@@ -42,7 +42,7 @@ def appium(request):
 @pytest.fixture(scope='session')
 def emulator():
     """ Programmatically start and stop emulator """
-    device_name, device_udid = ios_desired_caps['deviceName'], ios_desired_caps['udid']
+    device_name, device_udid = get_ios_desired_caps()['deviceName'], get_ios_desired_caps()['udid']
     logging.info(f'Starting simulator {device_name}')
     process = shell_running_command(f'xcrun simctl boot {device_udid}')
     yield process
@@ -64,7 +64,7 @@ def mobile_driver(request, emulator):
     all_pytest_markers = [marker.name for marker in request.node.own_markers]
 
     logging.info('Installing & launching iOS app')
-    appium_driver = AppiumDriver(command_executor=command_exc, desired_capabilities=ios_desired_caps)
+    appium_driver = AppiumDriver(command_executor=command_exc, desired_capabilities=get_ios_desired_caps())
     mobile_driver = MobileDriver(driver=appium_driver)
     logging.info('iOS app ready')
 
@@ -72,7 +72,7 @@ def mobile_driver(request, emulator):
     yield mobile_driver
     if 'no_teardown' not in all_pytest_markers:
         logging.info('Terminate application')
-        mobile_driver.terminate_app(ios_desired_caps['bundleId'])
+        mobile_driver.terminate_app(get_ios_desired_caps()['bundleId'])
 
 
 @pytest.hookimpl(hookwrapper=True)

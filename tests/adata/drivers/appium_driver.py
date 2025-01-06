@@ -4,7 +4,7 @@ from dyatel.base.driver_wrapper import DriverWrapperSessions
 from tests.adata.drivers.driver_entities import DriverEntities
 from tests.adata.drivers.selenium_driver import SeleniumDriver
 from appium.options.common.base import AppiumOptions
-from tests.settings import get_android_desired_caps, ios_desired_caps
+from tests.settings import get_android_desired_caps, get_ios_desired_caps
 
 
 class AppiumDriver:
@@ -16,7 +16,7 @@ class AppiumDriver:
         command_exc = f'http://{appium_ip}:{appium_port}'
         is_android = entities.platform == 'android'
 
-        caps = get_android_desired_caps() if is_android else ios_desired_caps
+        caps = get_android_desired_caps() if is_android else get_ios_desired_caps()
         caps.update({'browserName': entities.driver_name.title()})
 
         if is_android:
