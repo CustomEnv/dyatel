@@ -18,8 +18,6 @@ jobs:
         with:
           node-version: '22.12.0'
 
-      - run: npm install -g npm@9.2.0
-          
       - name: Setup Environment
         id: setup
         uses: ./.github/actions/setup
@@ -28,7 +26,8 @@ jobs:
 
       - name: Install Appium & UiAutomator2 Driver
         run: |
-          sudo npm install -g appium@2.14.0
+          npm install -g npm@10.9.0
+          npm install -g appium@2.14.0
           appium driver install uiautomator2@3.9.0
 
       - name: Set Up JDK 17
@@ -54,7 +53,7 @@ jobs:
 
       - name: Install appium-doctor
         run: |
-          sudo npm install -g appium-doctor
+          npm install -g appium-doctor
 
       - name: Run Appium Doctor
         run: |
