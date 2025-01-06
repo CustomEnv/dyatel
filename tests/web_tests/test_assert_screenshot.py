@@ -9,13 +9,13 @@ from dyatel.visual_comparison import VisualComparison
 from tests.adata.pages.playground_main_page import Card
 
 
+@pytest.mark.low
 @pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])
 def test_screenshot(base_playground_page, driver_name, platform, with_name):
     filename = f'{driver_name}-{platform}-kube' if with_name else ''
     base_playground_page.kube.scroll_into_view().assert_screenshot(filename)
 
-
-@pytest.mark.medium
+@pytest.mark.low
 @pytest.mark.parametrize('left', [0, 35], ids=['left 0', 'left 35'])
 @pytest.mark.parametrize('top', [0, 35], ids=['top 0', 'top 35'])
 @pytest.mark.parametrize('right', [0, 35], ids=['right 0', 'right 35'])
@@ -28,6 +28,7 @@ def test_screenshot_with_box(base_playground_page, driver_name, platform, left, 
         base_playground_page.kube.scroll_into_view().assert_screenshot(cut_box=custom_box)
 
 
+@pytest.mark.low
 @pytest.mark.parametrize('with_name', [True, False], ids=['screenshot name given', 'screenshot name missed'])
 def test_screenshot_name_with_suffix(base_playground_page, driver_name, platform, with_name):
     filename = f'{driver_name}-{platform}-kube' if with_name else ''
@@ -57,6 +58,7 @@ def file(request):
         os.remove(f'{os.getcwd()}/tests/adata/visual/reference/{filename}.png')
 
 
+@pytest.mark.low
 def test_screenshot_without_reference_and_rerun(base_playground_page, file, request):
     assert pytest_rerunfailures.get_reruns_count(request.node) == 1
     try:
@@ -69,6 +71,7 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
             raise Exception('Unexpected behavior')
 
 
+@pytest.mark.low
 def test_screenshot_soft_assert(colored_blocks_page, request):
     options = request.config.option
 
