@@ -13,14 +13,20 @@
     <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml">
         <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Unit%20Tests&labelColor=%232E353B">
     </a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/playwright_tests.yml?logo=github&label=Playwright%20Tests&labelColor=%232E353B">
+    </a>
+</p> 
+
+<p align="center">
     <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml">
         <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/selenium_tests.yml?logo=github&label=Selenium%20Tests&labelColor=%232E353B">
     </a>
     <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml">
         <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/selenium_safari_tests.yml?logo=github&label=Selenium%20Safari%20Tests&labelColor=%232E353B">
     </a>
-    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml">
-        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/playwright_tests.yml?logo=github&label=Playwright%20Tests&labelColor=%232E353B">
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/appium_android_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/appium_android_tests.yml?logo=github&label=Android%20Tests&labelColor=%232E353B">
     </a>
 </p>
 

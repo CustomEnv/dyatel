@@ -41,7 +41,7 @@ jobs:
           tox -e py${{ steps.setup.outputs.tox-env }}-playwright-${{ matrix.browser-name }} -- --headless -v --alluredir=allure-report --reruns=2
         continue-on-error: true
 
-      - name: Teardown (allure report and result checking)
+      - name: Teardown (Allure Report and Error Handling)
         if: ${{ steps.tests.outcome == 'failure' }}
         uses: ./.github/actions/teardown
         with:
