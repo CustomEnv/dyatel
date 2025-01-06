@@ -27,7 +27,7 @@ jobs:
         run: |
           npm install -g npm@10.9.0
           npm install -g appium@2.14.0
-          appium driver install uiautomator2@3.9.0
+          appium driver install xcuitest@7.28.3
 #          npm install -g appium-doctor  # Uncomment for debug
 #          appium-doctor  # Uncomment for debug
 
@@ -41,7 +41,8 @@ jobs:
 #          udid: '116D1E30-F4F0-4737-BFDB-746F38A77AF8'
           os: 'iOS'
           model: 'iPhone 15'
-#          os_version: '17.2'
+          erase_before_boot: false
+          os_version: '17.0'
           wait_for_boot: true
 
       - name: Run Appium Safari tests
