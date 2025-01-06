@@ -36,7 +36,7 @@ jobs:
       - name: Run Appium Safari tests
         id: tests
         run: |
-          tox -e py38-ios-web -- -k='not screenshot and not test_driver' -v --alluredir=allure-report
+          tox -e py38-ios-web -- -k='screenshot' -v --alluredir=allure-report
         continue-on-error: true
 
       - name: Teardown (Allure Report and Error Handling)
