@@ -34,18 +34,10 @@ jobs:
         run: |
           tox -e py${{ steps.setup.outputs.tox-env }}-selenium-safari -- -v --alluredir=allure-report --reruns=2
         continue-on-error: true
-          
-      - name: Upload Allure Report as Artifact
-        if: steps.tests.outcome == 'failure'
-        uses: actions/upload-artifact@v4
+
+      - name: Teardown (allure report and result checking)
+        uses: ./.github/actions/teardown
         with:
-          name: allure-report-safari-selenium-${{ steps.setup.outputs.tox-env }}
-          path: allure-report
-          retention-days: 1
-
-      - name: Check Test Results
-        if: steps.tests.outcome == 'failure'
-        run: |
-          echo "❌ Tests failed! Check the Allure Report for details."
-          exit 1 
-
+          browser-name: "safari"
+          tox-env: ${{ steps.setup.outputs.tox-env }}
+          tests-outcome: ${{ steps.tests.outcome }}

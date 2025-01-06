@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         browser-name: [ "chrome", "firefox", "safari" ]
-        python-version: [ "3.8", "3.12.7" ]
+        python-version: [ "3.8", "3.12.7" ]  # 3.12.8 (latest) Throws unexpected error inside container
 
     container:
       image: mcr.microsoft.com/playwright/python:v1.41.0-jammy
@@ -42,8 +42,8 @@ jobs:
         continue-on-error: true
 
       - name: Teardown (allure report and result checking)
-        if: ${{ inputs.tests-outcome == 'failure' }}
         uses: ./.github/actions/teardown
         with:
           browser-name: ${{ matrix.browser-name }}
-          tox-env: ${{ steps.setup-tox.outputs.tox-env }}
+          tox-env: ${{ steps.setup.outputs.tox-env }}
+          tests-outcome: ${{ steps.tests.outcome }}

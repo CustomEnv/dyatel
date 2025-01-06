@@ -67,10 +67,20 @@ jobs:
 
       - uses: reactivecircus/android-emulator-runner@v2
         name: Android Tests
+        id: tests
         with:
-          script: tox -e py38-android-web -- -k='not screenshot and not test_driver' -v
+          script: tox -e py38-android-web -- -k='not screenshot and not test_driver' -v --alluredir=allure-report
           api-level: 33
           target: google_apis
           arch: x86_64
           emulator-options: '-no-window -no-audio -no-boot-anim'
 #          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+        continue-on-error: true
+                           
+                           
+      - name: Teardown (allure report and result checking)
+        uses: ./.github/actions/teardown
+        with:
+          browser-name: ${{ env.BROWSER }}
+          tox-env: ${{ steps.setup.outputs.tox-env }}
+          tests-outcome: ${{ steps.tests.outcome }}
