@@ -75,13 +75,12 @@ jobs:
           api-level: 33
           target: google_apis
           arch: x86_64
-          emulator-options: -no-snapshot-save -no-window -noaudio -no-boot-anim
-#          emulator-options: '-no-window -no-audio -no-boot-anim'
+          emulator-options: -no-window -noaudio -no-boot-anim
 
-                           
       - name: Teardown (allure report and result checking)
         if: ${{ steps.tests.outcome == 'failure' }}
         uses: ./.github/actions/teardown
         with:
-          browser-name: ${{ env.BROWSER }}
-          tox-env: ${{ steps.setup.outputs.tox-env }}
+          browser-name: "chrome"
+          tox-env: "38"
+          engine: "appium"

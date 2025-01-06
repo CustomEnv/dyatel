@@ -41,3 +41,4 @@ jobs:
         with:
           browser-name: "safari"
           tox-env: ${{ steps.setup.outputs.tox-env }}
+          engine: "selenium"

@@ -47,3 +47,4 @@ jobs:
         with:
           browser-name: ${{ matrix.browser-name }}
           tox-env: ${{ steps.setup.outputs.tox-env }}
+          engine: "playwright"

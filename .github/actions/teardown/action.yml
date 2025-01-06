@@ -8,6 +8,9 @@ inputs:
   tox-env:
     description: 'Tox environment variable'
     required: true
+  engine:
+    description: 'Tests engine'
+    required: true
 
 runs:
   using: 'composite'
@@ -15,7 +18,7 @@ runs:
     - name: Upload Allure Report as Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: allure-report-${{ inputs.browser-name }}-playwright-${{ inputs.tox-env }}
+        name: allure-report-${{ inputs.browser-name }}-${{ inputs.engine }}-${{ inputs.tox-env }}
         path: allure-report
         retention-days: 1
 

@@ -49,3 +49,4 @@ jobs:
         with:
           browser-name: ${{ env.BROWSER }}
           tox-env: ${{ steps.setup.outputs.tox-env }}
+          engine: "selenium"
