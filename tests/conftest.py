@@ -33,8 +33,8 @@ def pytest_addoption(parser):
     parser.addoption('--sv', action='store_true', help='Generate reference images in visual tests')
     parser.addoption('--hgr', action='store_true', help='Hard generate reference images in visual tests')
     parser.addoption('--sgr', action='store_true', help='Soft generate reference images in visual tests')
-    parser.addoption('--appium-port', default='1000')
-    parser.addoption('--appium-ip', default='0.0.0.0')
+    parser.addoption('--appium-port', default='4723')
+    parser.addoption('--appium-ip', default='127.0.0.1')
     parser.addoption('--env', default='local', choices=['local', 'remote'])
 
 

@@ -1,23 +1,30 @@
+import os
+
 domain_name = 'https://customenv.github.io'
 repo_name = 'dyatel-playground'
 
 appium_logs_path = '.tox/.tmp/logs/android_appium.txt'
 android_device_start_timeout = 60
-android_desired_caps = {
-    'avd': 'Pixel5',
-    'deviceName': 'Pixel5',
-    'platformName': 'Android',
-    'platformVersion': '12.0',
-    # Update following capabilities before driver init
-    # 'app': 'https://testingbot.com/appium/sample.apk',
-    # 'browserName': 'Chrome',
-    'automationName': 'UiAutomator2',
-    'noReset': True,
-    'newCommandTimeout': 3000,
-    'avdLaunchTimeout': 120000,
-    'avdReadyTimeout': 120000,
-    'adbExecTimeout': 120000,
-}
+
+def get_android_desired_caps():
+    env = os.environ
+    print('Env variables: ', env)
+
+    return {
+        'deviceName': env.get('DEVICE_NAME') or 'emulator-5555',
+        'platformName': 'Android',
+        'platformVersion': env.get('PLATFORM_VERSION') or '13.0',
+        # Update following capabilities before driver init
+        # 'app': 'https://testingbot.com/appium/sample.apk',
+        # 'browserName': 'Chrome',
+        'automationName': 'UiAutomator2',
+        'autoDownloadChromeDriver': True,
+        'noReset': True,
+        'newCommandTimeout': 3000,
+        'avdLaunchTimeout': 120000,
+        'avdReadyTimeout': 120000,
+        'adbExecTimeout': 120000,
+    }
 
 ios_desired_caps = {
     'automationName': 'XCUITest',

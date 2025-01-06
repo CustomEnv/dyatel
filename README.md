@@ -3,9 +3,31 @@
 <h2 align="center">Automation Beyond Limits</h2>
 
 <p align="center">
-<a href="https://dyatel-wrapper.readthedocs.io"><img alt="Documentation Status" src="https://readthedocs.org/projects/dyatel-wrapper/badge/?version=latest"></a>
-<a href="https://github.com/CustomEnv/dyatel/blob/master/LICENSE"><img alt="License: MIT" src="https://dyatel-wrapper.readthedocs.io/_static/license.svg"></a>
-<a href="https://pypi.org/project/dyatel-wrapper/"><img alt="PyPI" src="https://img.shields.io/pypi/v/dyatel-wrapper"></a>
+    <a href="https://github.com/CustomEnv/dyatel/blob/master/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/CustomEnv/dyatel?logo=github&color=%234F2684&labelColor=%232E353B"></a>
+    <a href="https://pypi.org/project/dyatel-wrapper/"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/dyatel-wrapper?logo=pypi&labelColor=%232E353B"></a>
+    <a href="https://pypi.org/project/dyatel-wrapper/"><img alt="PyPI - Version" src="https://img.shields.io/pypi/v/dyatel-wrapper?logo=pypi&labelColor=%232E353B"></a>
+</p> 
+
+<p align="center">
+    <a href="https://dyatel-wrapper.readthedocs.io"><img alt="Documentation Status" src="https://img.shields.io/readthedocs/dyatel-wrapper?logo=readthedocs&labelColor=%232E353B&label=docs"></a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/static_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/static_tests.yml?logo=github&label=Unit%20Tests&labelColor=%232E353B">
+    </a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/playwright_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/playwright_tests.yml?logo=github&label=Playwright%20Tests&labelColor=%232E353B">
+    </a>
+</p> 
+
+<p align="center">
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/selenium_tests.yml?logo=github&label=Selenium%20Tests&labelColor=%232E353B">
+    </a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/selenium_safari_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/selenium_safari_tests.yml?logo=github&label=Selenium%20Safari%20Tests&labelColor=%232E353B">
+    </a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/appium_android_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/appium_android_tests.yml?logo=github&label=Android%20Tests&labelColor=%232E353B">
+    </a>
 </p>
 
 
