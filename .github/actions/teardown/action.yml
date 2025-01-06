@@ -22,6 +22,13 @@ runs:
         path: allure-report
         retention-days: 1
 
+    - name: Print Appium Logs on Failure
+      if: ${{ inputs.engine == 'appium' }}
+      shell: bash
+      run: |
+        echo "=== Appium Logs ==="
+        cat appium.log
+
     - name: Check Test Results
       shell: bash
       run: |

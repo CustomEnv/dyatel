@@ -1,0 +1,48 @@
+name: Appium iOS Safari Tests
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  ios-tests:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        id: setup
+        uses: ./.github/actions/setup
+        with:
+          python-version: '3.8'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.12.0'
+
+      - name: Install Appium & UiAutomator2 Driver
+        run: |
+          npm install -g npm@10.9.0
+          npm install -g appium@2.14.0
+          appium driver install xcuitest@7.35.1
+
+      - name: Start Appium Server in the Background
+        run: |
+          nohup appium > appium.log 2>&1 &
+
+      - name: Run Appium Safari tests
+        id: tests
+        run: |
+          tox -e py38-ios-web -- -k='not screenshot and not test_driver' -v --alluredir=allure-report
+        continue-on-error: true
+
+      - name: Teardown (Allure Report and Error Handling)
+        if: ${{ steps.tests.outcome == 'failure' }}
+        uses: ./.github/actions/teardown
+        with:
+          browser-name: "chrome"
+          tox-env: "38"
+          engine: "appium"
