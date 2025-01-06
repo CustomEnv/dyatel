@@ -116,6 +116,7 @@ def test_assert_screenshot_hide_elements(colored_blocks_page, driver_wrapper):
 
 def test_assert_screenshot_hide_driver_elements(colored_blocks_page, driver_wrapper):
     all_cards = colored_blocks_page.get_all_cards()
+    colored_blocks_page.navbar.wait_elements_count(2)
     driver_wrapper.assert_screenshot(
         hide=[all_cards[1]] + colored_blocks_page.navbar.all_elements,
         name_suffix='middle hidden',
@@ -123,6 +124,7 @@ def test_assert_screenshot_hide_driver_elements(colored_blocks_page, driver_wrap
     )
     driver_wrapper.refresh()
     all_cards = colored_blocks_page.get_all_cards()
+    colored_blocks_page.navbar.wait_elements_count(2)
     driver_wrapper.assert_screenshot(
         hide=[all_cards[0], all_cards[2]] + colored_blocks_page.navbar.all_elements,
         name_suffix='sides hidden',

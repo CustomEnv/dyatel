@@ -47,7 +47,7 @@ jobs:
         id: tests
         continue-on-error: true
         with:
-          script: tox -e py38-android-web -- -k='screenshot' -v --alluredir=allure-report -m='not low'
+          script: tox -e py38-android-web -- -v --alluredir=allure-report -m='not low' --reruns=2
           api-level: 33
           target: google_apis
           arch: x86_64
