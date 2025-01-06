@@ -6,7 +6,7 @@ on:
       - '**'
 
 jobs:
-  android-tests:
+  ios-tests:
     runs-on: macos-13
 
     steps:
@@ -33,13 +33,7 @@ jobs:
 
       - name: Start Appium Server in the Background
         run: |
-          nohup appium --allow-insecure chromedriver_autodownload > appium.log 2>&1 &
-
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
+          nohup appium > appium.log 2>&1 &
 
       - uses: futureware-tech/simulator-action@v4
         name: iOS Simulator
