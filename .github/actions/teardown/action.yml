@@ -1,0 +1,31 @@
+name: 'Teardown'
+description: 'Handle test results and upload artifacts'
+
+inputs:
+  browser-name:
+    description: 'Browser name used in tests'
+    required: true
+  tox-env:
+    description: 'Tox environment variable'
+    required: true
+  tests-outcome:
+    description: 'Outcome of the test step'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Upload Allure Report as Artifact
+      if: ${{ inputs.tests-outcome == 'failure' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-report-${{ inputs.browser-name }}-playwright-${{ inputs.tox-env }}
+        path: allure-report
+        retention-days: 1
+
+    - name: Check Test Results
+      if: ${{ inputs.tests-outcome == 'failure' }}
+      shell: bash
+      run: |
+        echo "❌ Tests failed! Check the Allure Report for details."
+        exit 1

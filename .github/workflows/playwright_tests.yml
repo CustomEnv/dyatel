@@ -41,16 +41,9 @@ jobs:
           tox -e py${{ steps.setup.outputs.tox-env }}-playwright-${{ matrix.browser-name }} -- --headless -v --alluredir=allure-report --reruns=2
         continue-on-error: true
 
-      - name: Upload Allure Report as Artifact
-        if: steps.tests.outcome == 'failure'
-        uses: actions/upload-artifact@v4
+      - name: Teardown (allure report and result checking)
+        if: ${{ inputs.tests-outcome == 'failure' }}
+        uses: ./.github/actions/teardown
         with:
-          name: allure-report-${{ matrix.browser-name }}-playwright-${{ steps.setup.outputs.tox-env }}
-          path: allure-report
-          retention-days: 1
-
-      - name: Check Test Results
-        if: steps.tests.outcome == 'failure'
-        run: |
-          echo "❌ Tests failed! Check the Allure Report for details."
-          exit 1
+          browser-name: ${{ matrix.browser-name }}
+          tox-env: ${{ steps.setup-tox.outputs.tox-env }}
