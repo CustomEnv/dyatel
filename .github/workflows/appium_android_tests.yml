@@ -14,15 +14,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22.12.0'
-
       - name: Setup Environment
         id: setup
         uses: ./.github/actions/setup
         with:
           python-version: '3.8'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.12.0'
 
       - name: Install Appium & UiAutomator2 Driver
         run: |
@@ -30,22 +30,22 @@ jobs:
           npm install -g appium@2.14.0
           appium driver install uiautomator2@3.9.0
 
-      - name: Set Up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Set Up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android Licenses
-        run: yes | sdkmanager --licenses || true
-
-      - name: Set Environment Variables
-        run: |
-          echo "ANDROID_AVD_HOME=$HOME/.android/avd" >> $GITHUB_ENV
-          echo "ANDROID_SDK_HOME=$HOME/.android" >> $GITHUB_ENV
+#      - name: Set Up JDK 17
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: 'temurin'
+#          java-version: '17'
+#
+#      - name: Set Up Android SDK
+#        uses: android-actions/setup-android@v3
+#
+#      - name: Accept Android Licenses
+#        run: yes | sdkmanager --licenses || true
+#
+#      - name: Set Environment Variables
+#        run: |
+#          echo "ANDROID_AVD_HOME=$HOME/.android/avd" >> $GITHUB_ENV
+#          echo "ANDROID_SDK_HOME=$HOME/.android" >> $GITHUB_ENV
 
       - name: Start Appium Server in the Background
         run: |
