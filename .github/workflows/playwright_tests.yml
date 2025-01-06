@@ -26,7 +26,7 @@ jobs:
 
       - name: Setup Environment
         id: setup
-        uses: ./.github/actions/tox
+        uses: ./.github/actions/setup
         with:
           python-version: ${{ matrix.python-version }}
 
