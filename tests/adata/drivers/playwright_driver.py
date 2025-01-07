@@ -16,7 +16,6 @@ class PlaywrightDriver:
             cls._instance = browser.launch(headless=entities.config.getoption('headless'))
 
         context = cls._instance.new_context()
-        context.tracing.start(**Trace(name='name', title='title', screenshots=True).__dict__)
         driver = context.new_page()
 
         return Driver(driver=driver, context=context, instance=cls._instance)
