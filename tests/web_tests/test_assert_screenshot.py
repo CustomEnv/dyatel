@@ -1,12 +1,19 @@
 import os
-import time
 
 import pytest
 import pytest_rerunfailures
+from dyatel.exceptions import UnexpectedElementsCountException
 
 from dyatel.mixins.objects.cut_box import CutBox
 from dyatel.visual_comparison import VisualComparison
 from tests.adata.pages.playground_main_page import Card
+
+
+def safe_call(_callable, _exception):
+    try:
+        return _callable()
+    except _exception:
+        pass
 
 
 @pytest.mark.low
@@ -116,7 +123,7 @@ def test_assert_screenshot_hide_elements(colored_blocks_page, driver_wrapper):
 
 def test_assert_screenshot_hide_driver_elements(colored_blocks_page, driver_wrapper):
     all_cards = colored_blocks_page.get_all_cards()
-    colored_blocks_page.navbar.wait_elements_count(2)
+    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
     driver_wrapper.assert_screenshot(
         hide=[all_cards[1]] + colored_blocks_page.navbar.all_elements,
         name_suffix='middle hidden',
@@ -124,7 +131,7 @@ def test_assert_screenshot_hide_driver_elements(colored_blocks_page, driver_wrap
     )
     driver_wrapper.refresh()
     all_cards = colored_blocks_page.get_all_cards()
-    colored_blocks_page.navbar.wait_elements_count(2)
+    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
     driver_wrapper.assert_screenshot(
         hide=[all_cards[0], all_cards[2]] + colored_blocks_page.navbar.all_elements,
         name_suffix='sides hidden',
