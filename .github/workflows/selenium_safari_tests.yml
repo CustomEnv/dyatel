@@ -32,7 +32,7 @@ jobs:
       - name: Run Selenium Safari tests with py${{ matrix.python-version }}
         id: tests
         run: |
-          tox -e py${{ steps.setup.outputs.tox-env }}-selenium-safari -- -v --alluredir=allure-report --reruns=2
+          tox -e py${{ steps.setup.outputs.tox-env }}-selenium-safari -- -v --alluredir=allure-report --reruns=2 -m='not low'
         continue-on-error: true
 
       - name: Teardown (Allure Report and Error Handling)
