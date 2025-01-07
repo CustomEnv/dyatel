@@ -37,4 +37,5 @@ def get_ios_desired_caps():
         'browserName': 'Safari',
         'newCommandTimeout': 3000,
         'wdaLaunchTimeout': 120000,
+        'autoWebview': True,
     }

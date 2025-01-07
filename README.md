@@ -28,6 +28,9 @@
     <a href="https://github.com/CustomEnv/dyatel/actions/workflows/appium_android_tests.yml">
         <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/appium_android_tests.yml?logo=github&label=Android%20Tests&labelColor=%232E353B">
     </a>
+    <a href="https://github.com/CustomEnv/dyatel/actions/workflows/appium_ios_tests.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/dyatel/appium_ios_tests.yml?logo=github&label=iOS%20Tests&labelColor=%232E353B">
+    </a>
 </p>
 
 
