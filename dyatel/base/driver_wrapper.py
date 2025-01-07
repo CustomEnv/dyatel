@@ -5,7 +5,11 @@ from typing import Union, Type, List, Tuple, Any
 from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
-from playwright.sync_api import Browser as PlaywrightBrowser
+from playwright.sync_api import (
+    Browser as PlaywrightBrowser,
+    BrowserContext as PlaywrightContext,
+    Page as PlaywrightDriver,
+)
 
 from dyatel.mixins.objects.cut_box import CutBox
 from dyatel.mixins.objects.driver import Driver
@@ -104,7 +108,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
     browser_name = None
 
-    driver: Driver
+    driver: Union[SeleniumDriver, AppiumDriver, PlaywrightDriver]
 
     def __new__(cls, *args, **kwargs):
         if cls.session.sessions_count() == 0:
