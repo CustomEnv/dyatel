@@ -2,6 +2,37 @@
 
 <br>
 
+## v2.4.0  
+*Release date: 2025-01-..*
+
+### Added  
+- `DriverWrapper.is_safari` method  
+- `DriverWrapper.is_firefox` method  
+- `DriverWrapper.is_chrome` method  
+- `InvalidLocatorException` for locator validation  
+- `VisualComparison` now removes actual and diff files upon successful assertions  
+- Internal CI pipelines with test
+
+### Removed  
+- `DriverWrapper.switch_to_parent_frame` method
+
+### Changed  
+- `DriverWrapper.get_inner_window_size` now returns a `Size` object instead of a dictionary  
+- `Element.click` now uses JavaScript click for Safari driver  
+- `Element.click_outside` now has default arguments `x=-5, y=-5` for all platforms  
+- `VisualComparison` dummy elements' `style.position` changed from `"fixed"` to `"absolute"`  
+- `VisualComparison` dummy elements' `style.top/left` now account for page scroll  
+- `VisualComparison` now includes a `sleep(0.1)` delay if `fill_background` or `remove` actions are specified after an action
+- Documentation for most of the methods was improved
+
+### Fixed  
+- `DriverWrapper.save_screenshot` no longer throws an error when called without the optional `screenshot_base` argument  
+- `Element.save_screenshot` no longer throws an error when called without the optional `screenshot_base` argument  
+- `VisualComparison.assert_screenshot` with the argument `threshold=0` now respects the provided value instead of defaulting  
+- `VisualComparison` under `soft_generate_reference` no longer takes two images (actual → assertion → reference)  
+
+---
+
 ## v2.3.2
 *Release date: 2024-12-19*
 
