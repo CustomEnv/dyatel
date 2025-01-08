@@ -71,11 +71,13 @@ class MainPage(Page):
 ```python
 import pytest  # noqa
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
+
 from dyatel.base.driver_wrapper import DriverWrapper
+from dyatel.mixins.objects.driver import Driver
 
 @pytest.fixture
 def driver_wrapper():
-    selenium_driver = ChromeWebDriver()
+    selenium_driver = Driver(driver=ChromeWebDriver())
     return DriverWrapper(selenium_driver)
 ```
 
@@ -87,17 +89,24 @@ def driver_wrapper():
 ```python
 import pytest  # noqa
 from appium.webdriver.webdriver import WebDriver as SourceAppiumDriver
+from appium.options.common.base import AppiumOptions
+
 from dyatel.base.driver_wrapper import DriverWrapper
+from dyatel.mixins.objects.driver import Driver
+
 
 @pytest.fixture
 def driver_wrapper():
     caps = {}  # Your device capabilities
     appium_ip, appium_port = None, None  # Your appium ip and port
+    options = AppiumOptions().load_capabilities(caps)
+    
     appium_driver = SourceAppiumDriver(
        command_executor=f'http://{appium_ip}:{appium_port}/wd/hub',
-       desired_capabilities=caps
+       options=options
     )
-    return DriverWrapper(appium_driver)
+    
+    return DriverWrapper(Driver(driver=appium_driver))
 ```
 
 ---
@@ -112,13 +121,18 @@ Dyatel Wrapper supports only sync API of playwright
 ```python
 import pytest  # noqa
 from playwright.sync_api import sync_playwright
+from dyatel.mixins.objects.driver import Driver
+
 from dyatel.base.driver_wrapper import DriverWrapper
 
 
 @pytest.fixture
 def driver_wrapper():
-    playwright_driver = sync_playwright().start().chromium.launch()
-    return DriverWrapper(playwright_driver)
+    instance = sync_playwright().start().chromium.launch()
+    context = instance.new_context()
+    page = context.new_page()
+    
+    return DriverWrapper(Driver(driver=page, context=context, instance=instance))
 ```
 
 ---

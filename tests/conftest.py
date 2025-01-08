@@ -6,6 +6,7 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.safari.options import Options as SafariOptions
 
 from dyatel.base.driver_wrapper import DriverWrapper
+from dyatel.mixins.objects.driver import Driver
 from dyatel.utils.logs import dyatel_logs_settings
 from dyatel.visual_comparison import VisualComparison
 from tests.adata.drivers.driver_entities import DriverEntities
@@ -98,8 +99,8 @@ def redirect(request):
     yield
     print()
     if DriverWrapper.session.sessions_count() > 0:
-        driver_wrapper = request.getfixturevalue('driver_wrapper')
-        driver_wrapper.get('data:,', silent=True)  # noqa
+        dw = request.getfixturevalue('driver_wrapper')
+        dw.get('data:,', silent=True)
 
 
 @pytest.fixture
@@ -117,7 +118,7 @@ def driver_wrapper(driver_entities):
 
 
 def driver_func(driver_entities):
-    driver = DriverFactory.create_driver(driver_entities)
+    driver: Driver = DriverFactory.create_driver(driver_entities)
 
     driver_wrapper = DriverWrapper(driver)
 

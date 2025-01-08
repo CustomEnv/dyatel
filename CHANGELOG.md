@@ -3,7 +3,7 @@
 <br>
 
 ## v2.4.0  
-*Release date: 2025-01-08*
+*Release date: 2025-01-..*
 
 ### Added  
 - `DriverWrapper.is_safari` method
@@ -30,6 +30,20 @@
 - `Element.save_screenshot` no longer throws an error when called without the optional `screenshot_base` argument
 - `VisualComparison.assert_screenshot` with the argument `threshold=0` now respects the provided value instead of defaulting
 - `VisualComparison` under `soft_generate_reference` no longer takes two images (actual → assertion → reference)
+
+---
+
+## v2.3.3
+*Release date: 2025-01-09*
+
+### Added
+- `dyatel.mixins/objects.driver.Driver` object
+
+### Changed
+- **Breaking:** `DriverWrapper` initialization now requires a `Driver` object
+- **Breaking:** Playwright's `context` and `page` creation have been moved out of `dyatel-wrapper`
+
+**Note:** Examples of the new logic can be found in the [ReadTheDocs documentation](https://dyatel-wrapper.readthedocs.io/getting_started.html#selenium-driver-setup)
 
 ---
 
