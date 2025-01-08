@@ -2,6 +2,20 @@
 
 <br>
 
+## v2.3.3
+*Release date: 2025-01-..*
+
+### Added
+- `dyatel.mixins/objects.driver.Driver` object
+
+### Changed
+- **Breaking:** `DriverWrapper` initialization now requires a `Driver` object
+- **Breaking:** Playwright's `context` and `page` creation have been moved out of `dyatel-wrapper`
+
+**Note:** Examples of the new logic can be found in the [ReadTheDocs documentation](https://dyatel-wrapper.readthedocs.io/getting_started.html#selenium-driver-setup)
+
+---
+
 ## v2.3.2
 *Release date: 2024-12-19*
 
