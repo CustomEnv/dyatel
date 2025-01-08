@@ -2,7 +2,7 @@
 
 ```{toctree}
 ---
-hidden:
+maxdepth: 1
 ---
 
 ./dw_interface

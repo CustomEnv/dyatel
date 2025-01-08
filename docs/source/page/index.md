@@ -2,9 +2,8 @@
 
 ```{toctree}
 ---
-hidden:
+maxdepth: 1
 ---
-
 ./key_features
 ./best_practices
 ./interface

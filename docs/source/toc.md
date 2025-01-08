@@ -15,10 +15,10 @@ caption: User Guide
 ---
 
 getting_started
-driver_wrapper/index
-page/index
-group/index
-element/index
+./driver_wrapper/index
+./page/index
+./group/index
+./element/index
 ```
 
 ```{toctree}
@@ -28,9 +28,9 @@ includehidden:
 caption: Other
 ---
 
-other/objects_initialisation
-other/visual_comparison
-other/locator_object
+./other/objects_initialisation
+./other/visual_comparison
+./other/locator_object
 ```
 
 
@@ -41,7 +41,7 @@ includehidden:
 caption: Development
 ---
 
-change_log
+./change_log
 ```
 
 

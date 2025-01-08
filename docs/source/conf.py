@@ -61,6 +61,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
+html_baseurl = "https://dyatel-wrapper.readthedocs.io/"
 html_theme = "furo"
 html_theme_options = {
     "light_logo": "dark_logo.png",
