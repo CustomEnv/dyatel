@@ -7,13 +7,14 @@ from selenium.webdriver.safari.webdriver import WebDriver as SafariWebDriver
 from selenium.webdriver.remote.webdriver import WebDriver as Remote
 
 from dyatel.base.driver_wrapper import DriverWrapperSessions
+from dyatel.mixins.objects.driver import Driver
 from tests.adata.drivers.driver_entities import DriverEntities
 
 
 class SeleniumDriver:
 
     @staticmethod
-    def create_selenium_driver(entities: DriverEntities):
+    def create_selenium_driver(entities: DriverEntities) -> Driver:
         driver_name = entities.driver_name
         options = None
         remote_url = "http://127.0.0.1:4444"
@@ -42,4 +43,4 @@ class SeleniumDriver:
 
         driver.set_window_position(0, 0)  # FIXME
 
-        return driver
+        return Driver(driver=driver)

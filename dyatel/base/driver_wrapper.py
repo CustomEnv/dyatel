@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import Union, Type, List, Tuple, Any, Optional, TYPE_CHECKING
+from typing import Union, Type, List, Tuple, Any, TYPE_CHECKING
 
 from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 from playwright.sync_api import (
     Browser as PlaywrightBrowser,
-    BrowserContext as PlaywrightContext,
     Page as PlaywrightDriver,
 )
 
 from dyatel.mixins.objects.cut_box import CutBox
 from dyatel.mixins.objects.size import Size
+from dyatel.mixins.objects.driver import Driver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
 from dyatel.dyatel_play.play_driver import PlayDriver
@@ -116,8 +116,6 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     browser_name: Union[str, None] = None
 
     driver: Union[SeleniumDriver, AppiumDriver, PlaywrightDriver]
-    instance: PlaywrightBrowser  # Only for playwright instance
-    context: PlaywrightContext  # Only for playwright instance
 
     def __new__(cls, *args, **kwargs):
         if cls.session.sessions_count() == 0:
@@ -141,13 +139,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
         return f'{cls.__name__}({self.label}={self.driver}) at {hex(id(self))}, platform={label}'
 
-    def __init__(
-            self,
-            driver: Union[PlaywrightBrowser, AppiumDriver, SeleniumDriver],
-            mobile_resolution: Optional[bool] = False,
-            *args,
-            **kwargs
-    ):
+    def __init__(self, driver: Driver):
         """
         Initializing of driver wrapper based on given driver source
 
@@ -156,8 +148,8 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         self.driver = driver
         self.session.add_session(self)
         self.label = f'{self.session.all_sessions.index(self) + 1}_driver'
-        self.__init_base_class__(*args, **kwargs)
-        if mobile_resolution:
+        self.__init_base_class__()
+        if driver.is_mobile_resolution:
             self.is_mobile_resolution = True
             self.is_desktop = False
             self.is_mobile = True
@@ -362,13 +354,13 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
         :return: None
         """
-        if isinstance(self.driver, PlaywrightBrowser):
+        if isinstance(self.driver.instance, PlaywrightBrowser):
             self.is_playwright = True
             self._base_cls = PlayDriver
-        elif isinstance(self.driver, AppiumDriver):
+        elif isinstance(self.driver.driver, AppiumDriver):
             self.is_appium = True
             self._base_cls = MobileDriver
-        elif isinstance(self.driver, SeleniumDriver):
+        elif isinstance(self.driver.driver, SeleniumDriver):
             self.is_selenium = True
             self._base_cls = WebDriver
         else:
