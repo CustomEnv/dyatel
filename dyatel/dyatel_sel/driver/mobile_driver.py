@@ -13,13 +13,14 @@ class MobileDriver(CoreDriver):
 
     bundle_id: Optional[str]
 
-    def __init__(self, driver: AppiumDriver, *args, **kwargs):  # noqa
+    def __init__(self, driver_container: Driver, *args, **kwargs):  # noqa
         """
         Initializing of mobile driver with appium
 
-        :param driver: appium driver to initialize
+        :param driver_container: Driver that contains appium driver object
         """
-        self.caps = driver.capabilities
+        self.driver: AppiumDriver = driver_container.driver
+        self.caps = self.driver.capabilities
         self.browser_name = self.caps.get('browserName', None)
         self.is_web = bool(self.browser_name) or False
         self.is_app = self.caps.get('app', False)
@@ -39,7 +40,7 @@ class MobileDriver(CoreDriver):
 
         self.native_safari = NativeSafari(self)
 
-        CoreDriver.__init__(self, driver=driver)
+        CoreDriver.__init__(self, driver=self.driver)
 
     def is_app_installed(self) -> bool:
         """

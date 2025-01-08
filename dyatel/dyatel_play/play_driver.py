@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from typing import List, Union, Any
 
+from playwright._impl._errors import Error as PlaywrightError  # noqa
+
 from PIL import Image
 from playwright.sync_api import Locator, Page, Browser, BrowserContext
-from dyatel.dyatel_play.helpers.Trace import Trace
 
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
+from dyatel.mixins.objects.driver import Driver
 from dyatel.shared_utils import get_image
 from dyatel.utils.internal_utils import get_timeout_in_ms, WAIT_UNIT
 from dyatel.utils.logs import Logging
@@ -14,25 +16,18 @@ from dyatel.utils.logs import Logging
 
 class PlayDriver(Logging, DriverWrapperABC):
 
-    instance: Browser
-    context: BrowserContext
-    driver: Page
-
-    def __init__(self, driver: Browser, trace: Trace = None, *args, **kwargs):
+    def __init__(self, driver_container: Driver):
         """
         Initializing of desktop web driver with playwright
 
-        :param driver: playwright driver to initialize
+        :param driver_container: Driver that contains playwright instance, context and driver objects
         """
         self.is_desktop = True
-        self.trace = trace
-        self.instance = driver
-        self.context = driver.new_context(*args, **kwargs)
 
-        if trace:
-            self.context.tracing.start(**trace.__dict__)
+        self.instance: Browser = driver_container.instance
+        self.context: BrowserContext = driver_container.context
+        self.driver: Page = driver_container.driver
 
-        self.driver = self.context.new_page()
         self.original_tab = self.driver
         self.browser_name = self.instance.browser_type.name
 
@@ -124,8 +119,11 @@ class PlayDriver(Logging, DriverWrapperABC):
         :param trace_path: Playwright only: path for the trace
         :return: None
         """
-        if self.trace and trace_path:
-            self.context.tracing.stop(path=trace_path)
+        if trace_path:
+            try:
+                self.context.tracing.stop(path=trace_path)
+            except PlaywrightError:
+                pass
 
         self.driver.close()
         self.context.close()
