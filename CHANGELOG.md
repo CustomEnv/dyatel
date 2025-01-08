@@ -3,7 +3,7 @@
 <br>
 
 ## v2.3.3
-*Release date: 2025-01-..*
+*Release date: 2025-01-09*
 
 ### Added
 - `dyatel.mixins/objects.driver.Driver` object
