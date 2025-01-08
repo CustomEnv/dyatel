@@ -5,8 +5,8 @@
 hidden:
 ---
 
-dw_interface
-dws_interface
+./dw_interface
+./dws_interface
 ```
 
 ## Overview

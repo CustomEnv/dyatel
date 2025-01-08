@@ -5,9 +5,9 @@
 hidden:
 ---
 
-key_features
-best_practices
-interface
+./key_features
+./best_practices
+./interface
 ```
 
 ## Overview
