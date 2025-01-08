@@ -111,8 +111,12 @@ def mocked_selenium_mobile_driver():
 @pytest.fixture
 def mocked_play_driver():
     PlayDriver.__init__ = MagicMock()
-    driver_wrapper = MockedDriverWrapper(Driver(driver=None, instance=Browser(MagicMock())))
-    driver_wrapper.driver = PlaywrightSourcePage(MagicMock())
+    driver_wrapper = MockedDriverWrapper(
+        Driver(
+            driver=PlaywrightSourcePage(MagicMock()),
+            instance=Browser(MagicMock())
+        )
+    )
     driver_wrapper.is_desktop = True
     return driver_wrapper
 

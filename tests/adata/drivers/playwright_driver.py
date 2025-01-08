@@ -1,4 +1,3 @@
-from dyatel.dyatel_play.helpers.Trace import Trace
 from playwright.sync_api import sync_playwright
 
 from dyatel.mixins.objects.driver import Driver
