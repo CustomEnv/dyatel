@@ -11,4 +11,4 @@ For the actual method signatures, please refer to the `dyatel.base.group.Group` 
 The `Group` class is a fundamental building block for creating Page Object Models (POM) in web testing. 
 It provides a comprehensive set of methods, identical to the `Element` class. 
 
-**Refer to the {doc}`Element Interface <../element/interface>` for available APIs.**
+**Refer to the {doc}`Element Interface <../element_object/interface>` for available APIs.**
