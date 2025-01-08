@@ -20,7 +20,7 @@ as an attribute within a `Group` class, its locator is searched within the conte
 
 The `Group` class offers flexibility in defining parent-child relationships. 
 The `parent` arg of `Element` can be set to `False` to opt out of automatic assignment or to any other `Element` 
-to create custom hierarchies. For more details, how `Element` object works refer to {doc}`Element documentation <../element/index>`
+to create custom hierarchies. For more details, how `Element` object works refer to {doc}`Element documentation <../element_object/index>`
 
 <br>
 

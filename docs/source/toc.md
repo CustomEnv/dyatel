@@ -16,9 +16,9 @@ caption: User Guide
 
 getting_started
 driver_wrapper/index
-page/index
-group/index
-element/index
+page_object/index
+group_object/index
+element_object/index
 ```
 
 ```{toctree}
