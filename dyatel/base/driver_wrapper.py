@@ -5,11 +5,7 @@ from typing import Union, Type, List, Tuple, Any
 from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
-from playwright.sync_api import (
-    Browser as PlaywrightBrowser,
-    BrowserContext as PlaywrightContext,
-    Page as PlaywrightDriver,
-)
+from playwright.sync_api import Page as PlaywrightDriver
 
 from dyatel.mixins.objects.cut_box import CutBox
 from dyatel.mixins.objects.driver import Driver
@@ -82,6 +78,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     _object = 'driver_wrapper'
     _base_cls: Type[PlayDriver, MobileDriver, WebDriver] = None
 
+    driver: Union[SeleniumDriver, AppiumDriver, PlaywrightDriver]
     session: DriverWrapperSessions = DriverWrapperSessions
 
     anchor = None
@@ -107,8 +104,6 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     is_real_device = False
 
     browser_name = None
-
-    driver: Union[SeleniumDriver, AppiumDriver, PlaywrightDriver]
 
     def __new__(cls, *args, **kwargs):
         if cls.session.sessions_count() == 0:
@@ -138,7 +133,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
         :param driver: appium or selenium or playwright driver to initialize
         """
-        self.driver = driver
+        self.__driver_container = driver
         self.session.add_session(self)
         self.label = f'{self.session.all_sessions.index(self) + 1}_driver'
         self.__init_base_class__()
@@ -270,26 +265,28 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
         return True, f'No visual mismatch found for entire screen'
 
-    def __init_base_class__(self, *args, **kwargs) -> None:
+    def __init_base_class__(self) -> None:
         """
         Get driver wrapper class in according to given driver source, and set him as base class
 
         :return: None
         """
-        if isinstance(self.driver.instance, PlaywrightBrowser):
+        source_driver = self.__driver_container.driver
+
+        if isinstance(source_driver, PlaywrightDriver):
             self.is_playwright = True
             self._base_cls = PlayDriver
-        elif isinstance(self.driver.driver, AppiumDriver):
+        elif isinstance(source_driver, AppiumDriver):
             self.is_appium = True
             self._base_cls = MobileDriver
-        elif isinstance(self.driver.driver, SeleniumDriver):
+        elif isinstance(source_driver, SeleniumDriver):
             self.is_selenium = True
             self._base_cls = WebDriver
         else:
             raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')
 
         self._set_static(self._base_cls)
-        self._base_cls.__init__(self, driver=self.driver, *args, **kwargs)
+        self._base_cls.__init__(self, driver_container=self.__driver_container)
 
         for name, value in self.__dict__.items():
             setattr(self.__class__, name, value)

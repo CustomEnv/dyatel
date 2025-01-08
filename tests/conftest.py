@@ -70,8 +70,8 @@ def redirect(request):
     yield
     print()
     if DriverWrapper.session.sessions_count() > 0:
-        driver_wrapper = request.getfixturevalue('driver_wrapper')
-        driver_wrapper.get('data:,', silent=True)
+        dw = request.getfixturevalue('driver_wrapper')
+        dw.get('data:,', silent=True)
 
 
 @pytest.fixture

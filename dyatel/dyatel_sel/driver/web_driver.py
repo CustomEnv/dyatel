@@ -8,13 +8,13 @@ from dyatel.mixins.objects.driver import Driver
 
 class WebDriver(CoreDriver):
 
-    def __init__(self, driver: Driver, *args, **kwargs):  # noqa
+    def __init__(self, driver_container: Driver, *args, **kwargs):  # noqa
         """
         Initializing of desktop web driver with selenium
 
-        :param driver: selenium driver to initialize
+        :param driver_container: Driver that contains selenium driver object
         """
-        self.driver : SeleniumWebDriver = driver.driver
+        self.driver : SeleniumWebDriver = driver_container.driver
         self.is_desktop = True
         self.original_tab = self.driver.current_window_handle
         self.browser_name = self.driver.caps.get('browserName', None)

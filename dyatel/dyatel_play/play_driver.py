@@ -16,17 +16,17 @@ from dyatel.utils.logs import Logging
 
 class PlayDriver(Logging, DriverWrapperABC):
 
-    def __init__(self, driver: Driver):
+    def __init__(self, driver_container: Driver):
         """
         Initializing of desktop web driver with playwright
 
-        :param driver: playwright driver to initialize
+        :param driver_container: Driver that contains playwright instance, context and driver objects
         """
         self.is_desktop = True
 
-        self.instance: Browser = driver.instance
-        self.context: BrowserContext = driver.context
-        self.driver: Page = driver.driver
+        self.instance: Browser = driver_container.instance
+        self.context: BrowserContext = driver_container.context
+        self.driver: Page = driver_container.driver
 
         self.original_tab = self.driver
         self.browser_name = self.instance.browser_type.name
