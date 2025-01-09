@@ -24,6 +24,8 @@
 - `VisualComparison` dummy elements' `style.position` changed from `"fixed"` to `"absolute"`
 - `VisualComparison` dummy elements' `style.top/left` now account for page scroll
 - `VisualComparison` now includes a `sleep(0.1)` delay if `fill_background` or `remove` actions are specified after an action
+- The Safari browser on Appium and Selenium uses the `innerText` DOM property instead of the driver's `text` API to improve compatibility with other platforms
+- The Safari browser on Selenium uses JavaScript-based `click` instead of the driver's `click` API to enhance compatibility with other platforms
 - Documentation for most methods has been improved
 
 ### Fixed  
