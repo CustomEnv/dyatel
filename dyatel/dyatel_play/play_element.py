@@ -106,7 +106,7 @@ class PlayElement(ElementABC, Logging, ABC):
         if force_wait:
             self.wait_visibility(silent=True)
 
-        self._first_element.click(*args, **kwargs)
+        self._first_element.click(**kwargs)
         return self
 
     def click_outside(self, x: int = -5, y: int = -5) -> PlayElement:
