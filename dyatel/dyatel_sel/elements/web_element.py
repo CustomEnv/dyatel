@@ -4,6 +4,7 @@ from abc import ABC
 from typing import Union
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
+from dyatel.js_scripts import js_click
 from dyatel.mixins.objects.locator import take_locator_type, Locator
 from dyatel.utils.internal_utils import calculate_coordinate_to_click
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type
@@ -19,6 +20,34 @@ class WebElement(CoreElement, ABC):
         """
         self.locator = get_platform_locator(self)
         self.locator_type = take_locator_type(locator) or get_selenium_locator_type(self.locator)
+
+    def click(self, *, force_wait: bool = True, **kwargs) -> WebElement:
+        """
+        Clicks on the element.
+
+        :param force_wait: If :obj:`True`, waits for element visibility before clicking.
+        :type force_wait: bool
+
+        **Selenium/Appium:**
+
+        Selenium Safari using js click instead.
+
+        :param kwargs: compatibility arg for playwright
+
+        **Playwright:**
+
+        :param kwargs: `any kwargs params from source API <https://playwright.dev/python/docs/api/class-locator#locator-click>`_
+
+        :return: :class:`WebElement`
+        """
+        if self.driver_wrapper.is_safari:
+            self.log(f'Click into "{self.name}"')
+            self.execute_script(js_click)
+        else:
+            CoreElement.click(self, force_wait=force_wait, **kwargs)
+
+        return self
+
 
     def hover(self, silent: bool = False) -> WebElement:
         """

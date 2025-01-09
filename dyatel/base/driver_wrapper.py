@@ -150,33 +150,6 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             self.is_desktop = False
             self.is_mobile = True
 
-    @cached_property
-    def is_safari(self) -> bool:
-        """
-        Returns :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
-
-        :return: :obj:`bool`- :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
-        """
-        return self.browser_name.lower() == 'safari'
-
-    @cached_property
-    def is_chrome(self) -> bool:
-        """
-        Returns :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
-
-        :return: :obj:`bool`- :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
-        """
-        return self.browser_name.lower() == 'chrome'
-
-    @cached_property
-    def is_firefox(self) -> bool:
-        """
-        Returns :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
-
-        :return: :obj:`bool`- :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
-        """
-        return self.browser_name.lower() == 'firefox'
-
     def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """
         Quit the driver instance.

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import cached_property
 from typing import List, Union, Any
 
 from playwright._impl._errors import Error as PlaywrightError  # noqa
@@ -30,6 +31,33 @@ class PlayDriver(Logging, DriverWrapperABC):
 
         self.original_tab = self.driver
         self.browser_name = self.instance.browser_type.name
+
+    @cached_property
+    def is_safari(self) -> bool:
+        """
+        Returns :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
+
+        :return: :obj:`bool`- :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
+        """
+        return self.browser_name.lower() == 'webkit'
+
+    @cached_property
+    def is_chrome(self) -> bool:
+        """
+        Returns :obj:`True` if the current driver is Chrome, otherwise :obj:`False`.
+
+        :return: :obj:`bool`- :obj:`True` if the current driver is Chrome, otherwise :obj:`False`.
+        """
+        return self.browser_name.lower() == 'chromium'
+
+    @cached_property
+    def is_firefox(self) -> bool:
+        """
+        Returns :obj:`True` if the current driver is Firefox, otherwise :obj:`False`.
+
+        :return: :obj:`bool`- :obj:`True` if the current driver is Firefox, otherwise :obj:`False`.
+        """
+        return self.browser_name.lower() == 'firefox'
 
     def wait(self, timeout: Union[int, float] = WAIT_UNIT) -> PlayDriver:
         """

@@ -59,18 +59,18 @@ class DriverWrapperABC(ABC):
     @cached_property
     def is_chrome(self) -> bool:
         """
-        Returns :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
+        Returns :obj:`True` if the current driver is Chrome, otherwise :obj:`False`.
 
-        :return: :obj:`bool`- :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
+        :return: :obj:`bool`- :obj:`True` if the current driver is Chrome, otherwise :obj:`False`.
         """
         raise NotImplementedError()
 
     @cached_property
     def is_firefox(self) -> bool:
         """
-        Returns :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
+        Returns :obj:`True` if the current driver is Firefox, otherwise :obj:`False`.
 
-        :return: :obj:`bool`- :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
+        :return: :obj:`bool`- :obj:`True` if the current driver is Firefox, otherwise :obj:`False`.
         """
         raise NotImplementedError()
 

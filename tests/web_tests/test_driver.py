@@ -6,6 +6,27 @@ from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import SecondPlaygroundMainPage
 
 
+@pytest.mark.skip_platform('chrome', 'firefox', reason='Test case is not relevant for current driver')
+def test_is_safari_driver(driver_wrapper):
+    assert driver_wrapper.is_safari
+    assert not driver_wrapper.is_chrome
+    assert not driver_wrapper.is_firefox
+
+
+@pytest.mark.skip_platform('safari', 'firefox', reason='Test case is not relevant for current driver')
+def test_is_chrome_driver(driver_wrapper):
+    assert driver_wrapper.is_chrome
+    assert not driver_wrapper.is_safari
+    assert not driver_wrapper.is_firefox
+
+
+@pytest.mark.skip_platform('chrome', 'safari', reason='Test case is not relevant for current driver')
+def test_is_firefox_driver(driver_wrapper):
+    assert driver_wrapper.is_firefox
+    assert not driver_wrapper.is_safari
+    assert not driver_wrapper.is_chrome
+
+
 def test_driver_cookies(driver_wrapper, mouse_event_page):
     driver_wrapper.set_cookie([{'name': 'sample_cookie', 'value': '123', 'path': '/', 'domain': 'http://example'}])
 

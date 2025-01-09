@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from functools import cached_property
 from typing import Union, List, Any, TYPE_CHECKING
 
 from PIL import Image
@@ -32,6 +33,33 @@ class CoreDriver(Logging, DriverWrapperABC):
         :param driver: appium or selenium driver to initialize
         """
         driver.implicitly_wait(0.001)  # reduce selenium wait
+
+    @cached_property
+    def is_safari(self) -> bool:
+        """
+        Returns :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
+
+        :return: :obj:`bool`- :obj:`True` if the current driver is Safari, otherwise :obj:`False`.
+        """
+        return self.browser_name.lower() == 'safari'
+
+    @cached_property
+    def is_chrome(self) -> bool:
+        """
+        Returns :obj:`True` if the current driver is Chrome, otherwise :obj:`False`.
+
+        :return: :obj:`bool`- :obj:`True` if the current driver is Chrome, otherwise :obj:`False`.
+        """
+        return self.browser_name.lower() == 'chrome'
+
+    @cached_property
+    def is_firefox(self) -> bool:
+        """
+        Returns :obj:`True` if the current driver is Firefox, otherwise :obj:`False`.
+
+        :return: :obj:`bool`- :obj:`True` if the current driver is Firefox, otherwise :obj:`False`.
+        """
+        return self.browser_name.lower() == 'firefox'
 
     def wait(self, timeout: Union[int, float] = WAIT_UNIT) -> CoreDriver:
         """

@@ -75,7 +75,7 @@ class CoreElement(ElementABC, ABC):
 
     # Element interaction
 
-    def click(self, force_wait: bool = True, *args, **kwargs) -> CoreElement:
+    def click(self, force_wait: bool = True, **kwargs) -> CoreElement:
         """
         Clicks on the element.
 
@@ -84,12 +84,12 @@ class CoreElement(ElementABC, ABC):
 
         **Selenium/Appium:**
 
-        :param args: compatibility arg for playwright
+        Selenium Safari using js click instead.
+
         :param kwargs: compatibility arg for playwright
 
         **Playwright:**
 
-        :param args: `any args params from source API <https://playwright.dev/python/docs/api/class-locator#locator-click>`_
         :param kwargs: `any kwargs params from source API <https://playwright.dev/python/docs/api/class-locator#locator-click>`_
 
         :return: :class:`CoreElement`

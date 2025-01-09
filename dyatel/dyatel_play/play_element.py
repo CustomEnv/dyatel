@@ -82,7 +82,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
     # Element interaction
 
-    def click(self, force_wait: bool = True, *args, **kwargs) -> PlayElement:
+    def click(self, force_wait: bool = True, **kwargs) -> PlayElement:
         """
         Clicks on the element.
 
@@ -91,12 +91,12 @@ class PlayElement(ElementABC, Logging, ABC):
 
         **Selenium/Appium:**
 
-        :param args: compatibility arg for playwright
+        Selenium Safari using js click instead.
+
         :param kwargs: compatibility arg for playwright
 
         **Playwright:**
 
-        :param args: `any args params from source API <https://playwright.dev/python/docs/api/class-locator#locator-click>`_
         :param kwargs: `any kwargs params from source API <https://playwright.dev/python/docs/api/class-locator#locator-click>`_
 
         :return: :class:`PlayElement`

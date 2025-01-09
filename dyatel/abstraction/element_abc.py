@@ -59,7 +59,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def click(self, force_wait: bool = True, *args, **kwargs) -> Element:
+    def click(self, force_wait: bool = True, **kwargs) -> Element:
         """
         Clicks on the element.
 
@@ -68,12 +68,12 @@ class ElementABC(MixinABC, ABC):
 
         **Selenium/Appium:**
 
-        :param args: compatibility arg for playwright
+        Selenium Safari using js click instead.
+
         :param kwargs: compatibility arg for playwright
 
         **Playwright:**
 
-        :param args: `any args params from source API <https://playwright.dev/python/docs/api/class-locator#locator-click>`_
         :param kwargs: `any kwargs params from source API <https://playwright.dev/python/docs/api/class-locator#locator-click>`_
 
         :return: :class:`Element`
