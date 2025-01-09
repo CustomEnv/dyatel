@@ -75,7 +75,7 @@ class CoreElement(ElementABC, ABC):
 
     # Element interaction
 
-    def click(self, force_wait: bool = True, **kwargs) -> CoreElement:
+    def click(self, *, force_wait: bool = True, **kwargs) -> CoreElement:
         """
         Clicks on the element.
 

@@ -59,7 +59,7 @@ class ElementABC(MixinABC, ABC):
         """
         raise NotImplementedError()
 
-    def click(self, force_wait: bool = True, **kwargs) -> Element:
+    def click(self, *, force_wait: bool = True, **kwargs) -> Element:
         """
         Clicks on the element.
 

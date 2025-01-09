@@ -39,6 +39,10 @@ def get_methods_and_names(_class):
 def get_signature(_func):
     return str(inspect.signature(_func).parameters).replace('"', '').replace("'", '')
 
+def get_signature_additional(_func):
+    """ Useful for checking * in methods arguments """
+    return str(inspect.signature(_func)).split(' ->')[0]
+
 
 def compare_methods_bulk(_class, _abc, _main_class):
     """
@@ -60,7 +64,6 @@ def compare_methods_bulk(_class, _abc, _main_class):
         func1 = cls1_methods[method]
         func2 = cls2_methods[method]
 
-
         # Compare signatures
         if inspect.isfunction(func1):
             if not inspect.isfunction(func2):
@@ -68,6 +71,9 @@ def compare_methods_bulk(_class, _abc, _main_class):
 
             if get_signature(func1) != get_signature(func2):
                 results[method] = "Signatures do not match"
+
+            if get_signature_additional(func1) != get_signature_additional(func2):
+                results[method] = "Additional signatures do not match"
 
         if isinstance(func1, property):
             if not isinstance(func2, property):

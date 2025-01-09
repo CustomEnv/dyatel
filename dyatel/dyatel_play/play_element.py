@@ -82,7 +82,7 @@ class PlayElement(ElementABC, Logging, ABC):
 
     # Element interaction
 
-    def click(self, force_wait: bool = True, **kwargs) -> PlayElement:
+    def click(self, *, force_wait: bool = True, **kwargs) -> PlayElement:
         """
         Clicks on the element.
 
