@@ -103,12 +103,7 @@ class CoreElement(ElementABC, ABC):
         while time.time() - start_time < HALF_WAIT_EL:
             try:
                 element = self.wait_enabled(silent=True).element
-
-                if self.driver_wrapper.is_safari:
-                    self.execute_script(js_click)
-                else:
-                    element.click()
-
+                element.click()
                 return self
             except (
                     SeleniumElementNotInteractableException,
