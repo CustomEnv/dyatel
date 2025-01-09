@@ -6,11 +6,11 @@ from functools import lru_cache
 from os.path import basename
 from typing import Any
 
-from dyatel import project_name
+from dyatel import org_project_name
 from dyatel.utils.internal_utils import get_frame, is_driver_wrapper
 
 
-logger = logging.getLogger(project_name)
+logger = logging.getLogger(org_project_name)
 
 
 class LogLevel:

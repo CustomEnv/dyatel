@@ -15,6 +15,7 @@
 
 ### Removed  
 - `DriverWrapper.switch_to_parent_frame` method
+- `dyatel/dyatel_play/helpers/trace.py` module
 
 ### Changed  
 - `DriverWrapper.get_inner_window_size` now returns a `Size` object instead of a dictionary

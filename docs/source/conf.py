@@ -7,16 +7,16 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../..'))
 
-from dyatel import dyatel_version
+from dyatel import project_version, project_name
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'dyatel-wrapper'
+project = project_name
 copyright = '2024, Podolian Vladimir'
 author = 'Podolian Vladimir'
 
-release = dyatel_version
+release = project_version
 version = release
 
 
