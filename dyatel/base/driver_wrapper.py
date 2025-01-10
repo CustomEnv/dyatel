@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Union, Type, List, Tuple, Any
+from functools import cached_property
+from typing import Union, Type, List, Tuple, Any, TYPE_CHECKING
 
 from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -8,6 +9,7 @@ from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 from playwright.sync_api import Page as PlaywrightDriver
 
 from dyatel.mixins.objects.cut_box import CutBox
+from dyatel.mixins.objects.size import Size
 from dyatel.mixins.objects.driver import Driver
 from dyatel.visual_comparison import VisualComparison
 from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
@@ -21,15 +23,19 @@ from dyatel.utils.internal_utils import get_attributes_from_object, get_child_el
 from dyatel.utils.logs import Logging, LogLevel
 
 
+if TYPE_CHECKING:
+    from dyatel.base.element import Element  # Import the concrete class for documentation purposes
+
+
 class DriverWrapperSessions:
     all_sessions: List[DriverWrapper] = []
 
     @classmethod
     def add_session(cls, driver_wrapper: DriverWrapper) -> None:
         """
-        Add DriverWrapper object to pool
+        Adds a :obj:`DriverWrapper` object to the session pool.
 
-        :param driver_wrapper: DriverWrapper object
+        :param driver_wrapper: The :obj:`DriverWrapper` instance to add to the pool.
         :return: None
         """
         cls.all_sessions.append(driver_wrapper)
@@ -37,9 +43,9 @@ class DriverWrapperSessions:
     @classmethod
     def remove_session(cls, driver_wrapper: DriverWrapper) -> None:
         """
-        Remove DriverWrapper object from pool
+        Removes a :obj:`DriverWrapper` object from the session pool.
 
-        :param driver_wrapper: DriverWrapper object
+        :param driver_wrapper: The :obj:`DriverWrapper` instance to remove from the pool.
         :return: None
         """
         cls.all_sessions.remove(driver_wrapper)
@@ -47,27 +53,29 @@ class DriverWrapperSessions:
     @classmethod
     def sessions_count(cls) -> int:
         """
-        Get initialised DriverWrapper objects count
+        Get the count of initialized :obj:`DriverWrapper` objects.
 
-        :return: number of sessions
+        :return: :obj:`int` - The number of initialized sessions.
         """
         return len(cls.all_sessions)
 
     @classmethod
     def first_session(cls) -> Union[DriverWrapper, None]:
         """
-        Get first DriverWrapper object from pool
+        Get the first :obj:`DriverWrapper` object from the session pool.
 
-        :return: first DriverWrapper object or None
+        :return: The first :obj:`DriverWrapper` object in the pool, or `None` if no session exists.
+        :rtype: typing.Union[DriverWrapper, None]
         """
         return cls.all_sessions[0] if cls.all_sessions else None
 
     @classmethod
     def is_connected(cls) -> bool:
         """
-        Get connection status with any DriverWrapper object in pool
+        Check the connection status of any :obj:`DriverWrapper` object in the pool.
 
-        :return: True if any DriverWrapper object is available
+        :return: :obj:`bool` - :obj:`True` if at least one :obj:`DriverWrapper` object is available,
+          otherwise :obj:`False`.
         """
         return any(cls.all_sessions)
 
@@ -75,35 +83,35 @@ class DriverWrapperSessions:
 class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     """ Driver object crossroad """
 
-    _object = 'driver_wrapper'
+    _object: str = 'driver_wrapper'
     _base_cls: Type[PlayDriver, MobileDriver, WebDriver] = None
 
     driver: Union[SeleniumDriver, AppiumDriver, PlaywrightDriver]
     session: DriverWrapperSessions = DriverWrapperSessions
 
-    anchor = None
+    anchor: Union[Element, None] = None
 
-    is_desktop = False
-    is_selenium = False
-    is_playwright = False
-    is_mobile_resolution = False
+    is_desktop: bool = False
+    is_selenium: bool = False
+    is_playwright: bool = False
+    is_mobile_resolution: bool = False
 
-    is_appium = False
-    is_mobile = False
-    is_tablet = False
+    is_appium: bool = False
+    is_mobile: bool = False
+    is_tablet: bool = False
 
-    is_ios = False
-    is_ios_tablet = False
-    is_ios_mobile = False
+    is_ios: bool = False
+    is_ios_tablet: bool = False
+    is_ios_mobile: bool = False
 
-    is_android = False
-    is_android_tablet = False
-    is_android_mobile = False
+    is_android: bool = False
+    is_android_tablet: bool = False
+    is_android_mobile: bool = False
 
-    is_simulator = False
-    is_real_device = False
+    is_simulator: bool = False
+    is_real_device: bool = False
 
-    browser_name = None
+    browser_name: Union[str, None] = None
 
     def __new__(cls, *args, **kwargs):
         if cls.session.sessions_count() == 0:
@@ -144,11 +152,22 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
     def quit(self, silent: bool = False, trace_path: str = 'trace.zip'):
         """
-        Quit the driver instance
+        Quit the driver instance.
 
-        :param silent: erase log
-        :param trace_path: Playwright only: path for the trace
-        :return: None
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+
+        **Selenium/Appium:**
+
+        :param trace_path: Compatibility argument for Playwright.
+        :type trace_path: str
+
+        **Playwright:**
+
+        :param trace_path: Path to the trace file.
+        :type trace_path: str
+
+        :return: :obj:`None`
         """
         if not silent:
             self.log('Quit driver instance')
@@ -156,35 +175,38 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         self._base_cls.quit(self, trace_path)
         self.session.remove_session(self)
 
-    def get_inner_window_size(self) -> dict:
+    def get_inner_window_size(self) -> Size:
         """
-        Get inner size of driver window
+        Retrieve the inner size of the driver window.
 
-        :return: {'height': value, 'width': value}
+        :return: :class:`Size` - An object representing the window's dimensions.
         """
-        return {
-            'height': self.execute_script(get_inner_height_js),
-            'width': self.execute_script(get_inner_width_js)
-        }
+        return Size(
+            height=self.execute_script(get_inner_height_js),
+            width=self.execute_script(get_inner_width_js)
+        )
 
     def save_screenshot(
             self,
             file_name: str,
-            screenshot_base: Union[bytes, Image] = None,
+            screenshot_base: Union[Image, bytes] = None,
             convert_type: str = None
     ) -> Image:
         """
-        Takes full driver screenshot and saving with given path/filename
+        Takes a full screenshot of the driver and saves it to the specified path/filename.
 
-        :param file_name: path/filename
-        :param screenshot_base: use given image binary instead of taking a new screenshot
-        :param convert_type: convert image type before save
-        :return: PIL Image object
+        :param file_name: Path or filename for the screenshot.
+        :type file_name: str
+        :param screenshot_base: Screenshot binary or image to use (optional).
+        :type screenshot_base: :obj:`bytes`, :class:`PIL.Image.Image`
+        :param convert_type: Image conversion type before saving (optional).
+        :type convert_type: str
+        :return: :class:`PIL.Image.Image`
         """
         self.log(f'Save driver screenshot')
 
         image_object = screenshot_base
-        if type(screenshot_base) is bytes:
+        if isinstance(screenshot_base, bytes) or screenshot_base is None:
             image_object = self.screenshot_image(screenshot_base)
 
         if convert_type:
@@ -206,17 +228,33 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             hide: Union[Any, List[Any]] = None,
     ) -> None:
         """
-        Assert given (by name) and taken screenshot equals
+        Asserts that the given screenshot matches the currently taken screenshot.
 
-        :param filename: full screenshot name. Custom filename will be used if empty string given
-        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
-        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
-        :param threshold: possible threshold
-        :param delay: delay before taking screenshot
-        :param remove: remove elements from screenshot
-        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
-        :param hide: hide elements from page before taking screenshot
-        :return: None
+        :param filename: The full name of the screenshot file.
+          If empty - filename will be generated based on test name & :class:`Element` ``name`` argument & platform.
+        :type filename: str
+        :param test_name: The custom test name for generated filename.
+          If empty - it will be determined automatically.
+        :type test_name: str
+        :param name_suffix: A suffix to add to the filename.
+          Useful for distinguishing between positive and negative cases for the same :class:`Element` during one test.
+        :type name_suffix: str
+        :param threshold: The acceptable threshold for comparing screenshots.
+          If :obj:`None` - takes default threshold or calculate its automatically based on screenshot size.
+        :type threshold: typing.Optional[int or float]
+        :param delay: The delay in seconds before taking the screenshot.
+          If :obj:`None` - takes default delay.
+        :type delay: typing.Optional[int or float]
+        :param remove: :class:`Element` to remove from the screenshot.
+          Can be a single element or a list of elements.
+        :type remove: typing.Optional[Element or typing.List[Element]]
+        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+            If :obj:`None`, no region is cut.
+        :type cut_box: typing.Optional[CutBox]
+        :param hide: :class:`Element` to hide in the screenshot.
+          Can be a single element or a list of elements.
+        :type hide: typing.Optional[Element or typing.List[Element]]
+        :return: :obj:`None`
         """
         delay = delay or VisualComparison.default_delay
         remove = [remove] if type(remove) is not list and remove else remove
@@ -244,17 +282,31 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             hide: Union[Any, List[Any]] = None,
     ) -> Tuple[bool, str]:
         """
-        Soft assert given (by name) and taken screenshot equals
+        Compares the currently taken screenshot to the expected screenshot and returns a result.
 
-        :param filename: full screenshot name. Custom filename will be used if empty string given
-        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
-        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
-        :param threshold: possible threshold
-        :param delay: delay before taking screenshot
-        :param remove: remove elements from screenshot
-        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
-        :param hide: hide elements from page before taking screenshot
-        :return: bool - True: screenshots equal; False: screenshots mismatch;
+        :param filename: The full name of the screenshot file.
+          If empty - filename will be generated based on test name & :class:`Element` ``name`` argument & platform.
+        :type filename: str
+        :param test_name: The custom test name for generated filename.
+          If empty - it will be determined automatically.
+        :type test_name: str
+        :param name_suffix: A suffix to add to the filename.
+          Useful for distinguishing between positive and negative cases for the same :class:`Element` during one test.
+        :type name_suffix: str
+        :param threshold: The acceptable threshold for comparing screenshots.
+          If :obj:`None` - takes default threshold or calculate its automatically based on screenshot size.
+        :type threshold: typing.Optional[int or float]
+        :param delay: The delay in seconds before taking the screenshot.
+          If :obj:`None` - takes default delay.
+        :type delay: typing.Optional[int or float]
+        :param remove: :class:`Element` to remove from the screenshot.
+        :type remove: typing.Optional[Element or typing.List[Element]]
+        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+            If :obj:`None`, no region is cut.
+        :type cut_box: typing.Optional[CutBox]
+        :param hide: :class:`Element` to hide in the screenshot.
+          Can be a single element or a list of elements.
+        :return: :class:`typing.Tuple` (:class:`bool`, :class:`str`) - result state and result message
         """
         try:
             self.assert_screenshot(filename, test_name, name_suffix, threshold, delay, remove, cut_box, hide)

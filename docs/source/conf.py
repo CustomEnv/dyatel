@@ -7,17 +7,18 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../..'))
 
-from dyatel import dyatel_version
+from dyatel import project_version, project_name
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'dyatel-wrapper'
+project = project_name
 copyright = '2024, Podolian Vladimir'
 author = 'Podolian Vladimir'
 
-release = dyatel_version
+release = project_version
 version = release
+
 
 print('the path is: ', sys.path[0])
 
@@ -30,9 +31,10 @@ extensions = [
     'sphinx.ext.duration',
     'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
+    'sphinx.ext.autodoc.typehints',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
 ]
 
 source_dirs = ['../../dyatel']
@@ -45,9 +47,12 @@ intersphinx_mapping = {
     'selenium': ('https://www.selenium.dev/selenium/docs/api/py/', None),
     # 'playwright': ('https://playwright.dev/python/docs', None),
 }
+
 intersphinx_disabled_domains = ['std']
+autodoc_member_order = 'bysource'
 
 templates_path = ['_templates']
+html_static_path = ['_static']
 
 source_suffix = ['.rst', '.md']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -57,12 +62,10 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "furo"
-html_static_path = ['_static']
 html_theme_options = {
     "light_logo": "dark_logo.png",
     "dark_logo": "light_logo.png",
 }
-autodoc_member_order = 'bysource'
 
 
 # -- Options for EPUB output

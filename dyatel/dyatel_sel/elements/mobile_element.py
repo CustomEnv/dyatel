@@ -26,13 +26,15 @@ class MobileElement(CoreElement, ABC):
         locator_type = take_locator_type(locator) or get_selenium_locator_type(self.locator)
         self.locator, self.locator_type = get_appium_selector(self.locator, locator_type)
 
-    def click_outside(self, x: int = 0, y: int = -5) -> MobileElement:
+    def click_outside(self, x: int = -5, y: int = -5) -> MobileElement:
         """
-        Click outside of element. By default, 5px above  of element
+        Perform a click outside the current element, by default 5px left and above it.
 
-        :param x: x offset of element to tap
-        :param y: y offset of element to tap
-        :return: self
+        :param x: Horizontal offset from the element to click.
+        :type x: int
+        :param y: Vertical offset from the element to click.
+        :type y: int
+        :return: :class:`MobileElement`
         """
         if self.driver_wrapper.is_web_context:
             if not self.is_fully_visible(silent=True):
@@ -48,12 +50,13 @@ class MobileElement(CoreElement, ABC):
         self.driver_wrapper.click_by_coordinates(x=x, y=y, silent=True)
         return self
 
-    def click_into_center(self, silent: bool = True) -> MobileElement:
+    def click_into_center(self, silent: bool = False) -> MobileElement:
         """
-        Click into the center of element
+        Clicks at the center of the element.
 
-        :param silent: erase log message
-        :return: self
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`MobileElement`
         """
         if self.driver_wrapper.is_web_context:
             if not self.is_fully_visible(silent=True):
@@ -73,10 +76,11 @@ class MobileElement(CoreElement, ABC):
 
     def hover(self, silent: bool = False) -> MobileElement:
         """
-        Hover over current element
+        Hover the mouse over the current element.
 
-        :param silent: erase log
-        :return: self
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`MobileElement`
         """
         if not silent:
             self.log(f'Hover over "{self.name}"')
@@ -86,19 +90,22 @@ class MobileElement(CoreElement, ABC):
 
     def hover_outside(self, x: int = 0, y: int = -5) -> MobileElement:
         """
-        Hover outside from current element. By default, 5px above  of element
+        Hover the mouse outside the current element, by default 5px above it.
 
-        :param x: x-offset of element to hover(tap)
-        :param y: y-offset of element to hover(tap)
-        :return: self
+        :param x: Horizontal offset from the element to hover.
+        :type x: int
+        :param y: Vertical offset from the element to hover.
+        :type y: int
+        :return: :class:`MobileElement`
         """
         return self.click_outside(x=x, y=y)
 
     def click_in_alert(self) -> MobileElement:
         """
-        Click on element in alert with switch to native context
+        Perform a click on an element inside an alert box (Mobile only).
+        **Note:** Automatically switches to native context of the browser.
 
-        :return: self
+        :return: :class:`MobileElement`
         """
         try:
             self.driver_wrapper.switch_to_native()
@@ -112,10 +119,13 @@ class MobileElement(CoreElement, ABC):
 
     def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
-        Get Image object with scaled screenshot of current screenshot
-        iOS: Take driver screenshot and crop manually element from it
+        Returns a :class:`PIL.Image.Image` object representing the screenshot of the web element.
+        Appium iOS: Take driver screenshot and crop manually element from it
 
-        :return: PIL Image object
+        :param screenshot_base: Screenshot binary data (optional).
+          If :obj:`None` is provided then takes a new screenshot
+        :type screenshot_base: bytes
+        :return: :class:`PIL.Image.Image`
         """
         if self.driver_wrapper.is_ios:
             element_box = self._element_box()
@@ -133,9 +143,9 @@ class MobileElement(CoreElement, ABC):
     @property
     def size(self) -> Size:
         """
-        Get Size object of current element
+        Get the size of the current element, including width and height.
 
-        :return: Size(width/height) obj
+        :return: :class:`Size` - An object representing the element's dimensions.
         """
         if self.driver_wrapper.is_native_context:
             return Size(**self.element.size)
@@ -145,9 +155,9 @@ class MobileElement(CoreElement, ABC):
     @property
     def location(self) -> Location:
         """
-        Get Location object of current element
+        Get the location of the current element, including the x and y coordinates.
 
-        :return: Location(x/y) obj
+        :return: :class:`Location` - An object representing the element's position.
         """
         if self.driver_wrapper.is_native_context:
             return Location(**self.element.location)

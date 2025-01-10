@@ -31,7 +31,7 @@ class DriverWrapperException(Exception):
 
         if self._timeout:
             self._msg += f'after {self._timeout} seconds. '
-        if self._actual is not None and self._expected is not None:
+        if self._expected is not None:
             self._msg += f'Actual: {self.wrap_by_quotes(self._actual)}; ' \
                          f'Expected: {self.wrap_by_quotes(self._expected)}. '
         if self._info:
@@ -40,7 +40,13 @@ class DriverWrapperException(Exception):
         return self._msg.rstrip()
 
     def wrap_by_quotes(self, data):
-        return f'"{data}"' if isinstance(data, str) else data
+        if data is None:
+            data = ""
+
+        if isinstance(data, str):
+            return f'"{data}"'
+
+        return data
 
 
 class UnexpectedElementsCountException(DriverWrapperException):
@@ -116,5 +122,12 @@ class UnsuitableArgumentsException(DriverWrapperException):
 class NotInitializedException(DriverWrapperException):
     """
     Thrown when getting access to not initialized object
+    """
+    pass
+
+
+class InvalidLocatorException(DriverWrapperException):
+    """
+    Thrown when locator is invalid
     """
     pass

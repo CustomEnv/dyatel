@@ -1,5 +1,5 @@
 import inspect
-import time
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -19,7 +19,14 @@ def enable_skip():
 
 
 def test_skip_visual_comparison(enable_skip):
-    start = time.time()
-    VisualComparison(None, None).assert_screenshot(*default_parameters(VisualComparison.assert_screenshot))
-    end = time.time() - start
-    assert end < 0.001
+    params = default_parameters(VisualComparison.assert_screenshot)
+    instance = VisualComparison(None, None)
+
+    instance._get_screenshot_name = MagicMock(return_value='test_screenshot')
+    instance._save_screenshot = MagicMock()
+    instance._assert_same_images = MagicMock()
+
+    instance.assert_screenshot(*params)
+    instance._get_screenshot_name.assert_not_called()
+    instance._save_screenshot.assert_not_called()
+    instance._assert_same_images.assert_not_called()

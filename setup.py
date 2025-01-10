@@ -1,20 +1,16 @@
 import os
 import shutil
 
-from dyatel import dyatel_version
+from dyatel import project_version, org_project_name, project_name
 from setuptools import setup
 
 with open('README.md') as f:
     description = f.read()
 
 
-pypi_name = 'dyatel-wrapper'
-project_name = 'dyatel'
-egg_name = pypi_name.replace('-', '_')
-
-
 def cleanup():
     home_dir = os.getcwd()
+    egg_name = project_name.replace('-', '_')
     shutil.rmtree(f'{home_dir}/dist', ignore_errors=True)
     shutil.rmtree(f'{home_dir}/{egg_name}.egg-info', ignore_errors=True)
 
@@ -24,9 +20,9 @@ def cleanup():
 def get_packages(root_dir):
     all_dirs = [root_dir]
 
-    for dirpath, dirnames, _ in os.walk(project_name):
+    for dirpath, dirnames, _ in os.walk(org_project_name):
         for dirname in dirnames:
-            relative_path = os.path.relpath(os.path.join(dirpath, dirname), project_name)
+            relative_path = os.path.relpath(os.path.join(dirpath, dirname), org_project_name)
             subdir = os.path.join(root_dir, relative_path).replace(os.path.sep, '.')
             if '__' not in subdir:
                 all_dirs.append(subdir)
@@ -40,10 +36,10 @@ cleanup()
 
 
 setup(
-    name=pypi_name,
-    version=dyatel_version,
-    url=f'https://github.com/EnvInc/{project_name}',
-    packages=get_packages(project_name),
+    name=project_name,
+    version=project_version,
+    url=f'https://github.com/CustomEnv/{org_project_name}',
+    packages=get_packages(org_project_name),
     install_requires=[
         'Appium-Python-Client>=2.1.2',
         'numpy>=1.18.1',
@@ -60,10 +56,10 @@ setup(
     author_email='vladimir.podolyan64@gmail.com',
     author='Podolian Vladimir',
     project_urls={
-        'Source': f'https://github.com/EnvInc/{project_name}',
-        'Tracker': f'https://github.com/EnvInc/{project_name}/issues',
-        'Documentation': f'https://{pypi_name}.readthedocs.io',
-        'Changelog': f'https://github.com/EnvInc/{project_name}/blob/master/CHANGELOG.md'
+        'Source': f'https://github.com/CustomEnv/{org_project_name}',
+        'Tracker': f'https://github.com/CustomEnv/{org_project_name}/issues',
+        'Documentation': f'https://{project_name}.readthedocs.io',
+        'Changelog': f'https://github.com/CustomEnv/{org_project_name}/blob/master/CHANGELOG.md'
     },
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -75,6 +71,6 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Quality Assurance',
         'Topic :: Software Development :: Testing :: Acceptance',
-        'License :: OSI Approved :: Apache Software License'
+        'License :: OSI Approved :: MIT License'
     ],
 )

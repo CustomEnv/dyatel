@@ -6,10 +6,11 @@ from functools import lru_cache
 from os.path import basename
 from typing import Any
 
+from dyatel import org_project_name
 from dyatel.utils.internal_utils import get_frame, is_driver_wrapper
 
 
-logger = logging.getLogger('dyatel')
+logger = logging.getLogger(org_project_name)
 
 
 class LogLevel:
@@ -40,13 +41,20 @@ def dyatel_logs_settings(level: str = LogLevel.INFO) -> None:
 
 def autolog(message: Any, level: str = LogLevel.INFO) -> None:
     """
-    Log message in format:
-      ~ [time][level][module][function:line] <message>
-      ~ [Aug 14][16:04:22.767][I][play_element.py][is_displayed:328] Check visibility of "Mouse page"
+    Logs a message with detailed context in the following format:
 
-    :param message: info message
-    :param level: log level
-    :return: None
+    .. code-block:: text
+
+        # Format
+        [time][level][module][function:line] <message>
+        # Example
+        [Aug 14][16:04:22.767][I][play_element.py][is_displayed:328] Check visibility of "Mouse page"
+
+    :param message: The log message to record.
+    :type message: str
+    :param level: The logging level, which should be one of the values from :class:`LogLevel`
+    :type level: str
+    :return: :obj:`None`
     """
     _send_log_message(str(message), level)
 
@@ -55,13 +63,20 @@ class Logging:
 
     def log(self: Any, message: str, level: str = LogLevel.INFO) -> None:
         """
-        Log message in format:
-          ~ [time][level][driver_index][module][function:line] <message>
-          ~ [Aug 14][16:04:22.767][I][2_driver][play_element.py][is_displayed:328] Check visibility of "Mouse page"
+        Logs a message with detailed context in the following format:
 
-        :param message: info message
-        :param level: log level
-        :return: None
+        .. code-block:: text
+
+           # Format
+           [time][level][driver_index][module][function:line] <message>
+           # Example
+           [Aug 14][16:04:22.767][I][2_driver][play_element.py][is_displayed:328] Check visibility of "Mouse page"
+
+        :param message: The log message to record.
+        :type message: str
+        :param level: The logging level, which should be one of the values from :class:`LogLevel`
+        :type level: str
+        :return: :obj:`None`
         """
         if is_driver_wrapper(self):
             label = self.label

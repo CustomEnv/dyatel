@@ -3,6 +3,7 @@ import os
 import pytest
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.safari.options import Options as SafariOptions
 
 from dyatel.base.driver_wrapper import DriverWrapper
 from dyatel.mixins.objects.driver import Driver
@@ -10,6 +11,7 @@ from dyatel.utils.logs import dyatel_logs_settings
 from dyatel.visual_comparison import VisualComparison
 from tests.adata.drivers.driver_entities import DriverEntities
 from tests.adata.drivers.driver_factory import DriverFactory
+from tests.adata.pages.colored_blocks_page import ColoredBlocksPage
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.forms_page import FormsPage
 from tests.adata.pages.frames_page import FramesPage
@@ -32,8 +34,9 @@ def pytest_addoption(parser):
     parser.addoption('--sv', action='store_true', help='Generate reference images in visual tests')
     parser.addoption('--hgr', action='store_true', help='Hard generate reference images in visual tests')
     parser.addoption('--sgr', action='store_true', help='Soft generate reference images in visual tests')
-    parser.addoption('--appium-port', default='1000')
-    parser.addoption('--appium-ip', default='0.0.0.0')
+    parser.addoption('--appium-port', default='4723')
+    parser.addoption('--appium-ip', default='127.0.0.1')
+    parser.addoption('--env', default='local', choices=['local', 'remote'])
 
 
 @pytest.fixture(scope='session')
@@ -47,10 +50,28 @@ def platform(request):
 
 
 @pytest.fixture(scope='session')
+def driver_entities(request, firefox_options, chrome_options, safari_options, driver_name):
+    return DriverEntities(
+        request=request,
+        driver_name=driver_name,
+        selenium_chrome_options=chrome_options,
+        selenium_firefox_options=firefox_options,
+        selenium_safari_options=safari_options,
+        **vars(request.config.option),
+    )
+
+
+@pytest.fixture(scope='session')
 def chrome_options(request):
     options = ChromeOptions()
     if request.config.getoption('headless'):
         options.add_argument('--headless=new')
+    options.add_argument('--no-sandbox')
+    options.add_argument("--disable-gpu")
+    options.add_argument("--remote-allow-origins=*")
+    options.add_argument("--hide-scrollbars")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     return options
 
@@ -59,7 +80,15 @@ def chrome_options(request):
 def firefox_options(request):
     options = FirefoxOptions()
     if request.config.getoption('headless'):
-        options.add_argument('--headless=new')
+        options.add_argument('--headless')
+    return options
+
+
+@pytest.fixture(scope='session')
+def safari_options():
+    options = SafariOptions()
+    options.automatic_inspection = False
+    options.automatic_profiling = False
     return options
 
 
@@ -75,22 +104,21 @@ def redirect(request):
 
 
 @pytest.fixture
-def second_driver_wrapper(request, driver_name, platform, chrome_options, firefox_options):
-    driver = driver_func(**locals())
+def second_driver_wrapper(driver_entities):
+    driver = driver_func(driver_entities)
     yield driver
     driver.quit(silent=True)
 
 
 @pytest.fixture(scope='session')
-def driver_wrapper(request, driver_name, platform, chrome_options, firefox_options):
-    driver = driver_func(**locals())
+def driver_wrapper(driver_entities):
+    driver = driver_func(driver_entities)
     yield driver
     driver.quit(silent=True)
 
 
-def driver_func(request, driver_name, platform, chrome_options, firefox_options):
-    entities = DriverEntities(request, driver_name, platform, chrome_options, firefox_options)
-    driver: Driver = DriverFactory.create_driver(entities)
+def driver_func(driver_entities):
+    driver: Driver = DriverFactory.create_driver(driver_entities)
 
     driver_wrapper = DriverWrapper(driver)
 
@@ -108,13 +136,16 @@ def visual_comparisons_settings(request):
     VisualComparison.soft_visual_reference_generation = request.config.getoption('--sgr')
     VisualComparison.skip_screenshot_comparison = request.config.getoption('--sv')
     VisualComparison.default_threshold = 0.1
-    VisualComparison.default_delay = 0.1
     VisualComparison.test_item = request.node
 
 
 def pytest_collection_modifyitems(items):
     for item in items:
-        skip_platform(item=item, platform=item.session.config.getoption("--platform"))
+        skip_platform(
+            item=item,
+            platform=item.session.config.getoption("--platform"),
+            browser=item.session.config.getoption("--driver")
+        )
 
 
 @pytest.fixture
@@ -125,6 +156,11 @@ def base_playground_page(driver_wrapper):
 @pytest.fixture
 def second_playground_page(driver_wrapper):
     return SecondPlaygroundMainPage().open_page()
+
+
+@pytest.fixture
+def colored_blocks_page(driver_wrapper):
+    return ColoredBlocksPage().open_page()
 
 
 @pytest.fixture

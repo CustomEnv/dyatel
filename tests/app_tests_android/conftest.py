@@ -9,7 +9,7 @@ from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
 
 from dyatel.shared_utils import rescale_image, shell_running_command, shell_command
-from tests.settings import android_desired_caps, android_device_start_timeout, appium_logs_path
+from tests.settings import get_android_desired_caps, android_device_start_timeout, appium_logs_path
 
 
 def pytest_addoption(parser):
@@ -48,7 +48,7 @@ def appium(request):
 @pytest.fixture(scope='session')
 def emulator():
     """ Programmatically start and stop emulator. """
-    device_name = android_desired_caps['deviceName']
+    device_name = get_android_desired_caps()['deviceName']
     logging.info(f'Starting emulator {device_name}')
     process = shell_running_command(f'emulator -avd {device_name}')
     logging.info(f'Wait until emulator {device_name} booted:')
@@ -81,8 +81,8 @@ def mobile_driver(request, emulator):
     all_pytest_markers = [marker.name for marker in request.node.own_markers]
 
     logging.info('Installing & launching android app')
-    android_desired_caps.update({'app': 'https://testingbot.com/appium/sample.apk'})
-    appium_driver = AppiumDriver(command_executor=command_exc, desired_capabilities=android_desired_caps)
+    get_android_desired_caps.update({'app': 'https://testingbot.com/appium/sample.apk'})
+    appium_driver = AppiumDriver(command_executor=command_exc, desired_capabilities=get_android_desired_caps)
     mobile_driver = MobileDriver(driver=appium_driver)
     logging.info('Android app ready')
 

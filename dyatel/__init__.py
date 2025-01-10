@@ -1,1 +1,3 @@
-dyatel_version = '2.3.3'
+project_version = '2.4.0'
+org_project_name = 'dyatel'
+project_name = 'dyatel-wrapper'

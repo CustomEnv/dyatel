@@ -11,10 +11,14 @@ from dyatel.base.driver_wrapper import DriverWrapper, DriverWrapperSessions
 
 def get_driver_wrapper_from_object(obj: Union[DriverWrapper, Any]):
     """
-    Get driver wrapper from custom object
+    Retrieves the driver wrapper from a given object. The object can either be a :class:`DriverWrapper` instance
+      or an object that contains a ``driver_wrapper`` attribute.
 
-    :param obj: custom object. Can be driver_wrapper or object with driver_wrapper
-    :return: driver wrapper object
+    :param obj: The source object, which can either be a :class:`DriverWrapper` instance or an object that
+      contains a `driver_wrapper` attribute.
+    :type obj: DriverWrapper or typing.Any
+    :return: The extracted :class:`DriverWrapper` instance.
+    :raises Exception: If the object does not contain a ``driver_wrapper`` attribute or is of an invalid type.
     """
     if obj is None:
         return DriverWrapperSessions.first_session()
@@ -37,22 +41,31 @@ class DriverMixin:
     @property
     def driver(self) -> Union[SeleniumWebDriver, AppiumWebDriver, PlaywrightSourcePage]:
         """
-        Get source driver instance
+        Retrieves the source driver instance, which could be a Selenium, Appium, or Playwright driver.
 
-        :return: SeleniumWebDriver/AppiumWebDriver/PlaywrightSourcePage
+        :return: Current source driver that assigned for this object, which is either \n
+          :class:`selenium.webdriver.remote.webdriver.WebDriver` or\n
+          :class:`appium.webdriver.webdriver.WebDriver` or\n
+          :class:`playwright.sync_api.Page` instance.
         """
         return getattr(self.driver_wrapper, 'driver', None)
 
     @property
     def driver_wrapper(self) -> DriverWrapper:
         """
-        Get source driver wrapper instance
+        Retrieves the driver wrapper instance.
 
-        :return: driver_wrapper
+        :return: The current :class:`DriverWrapper` instance that assigned for this object.
+        :rtype: DriverWrapper
         """
         return self._driver_wrapper
 
     @driver_wrapper.setter
     def driver_wrapper(self, driver_wrapper: DriverWrapper):
-        """ Set source driver wrapper instance """
+        """
+        Sets the driver wrapper instance, for this object.
+
+        :param driver_wrapper: The class:`DriverWrapper` instance to be set.
+        :type driver_wrapper: DriverWrapper
+        """
         self._driver_wrapper = driver_wrapper

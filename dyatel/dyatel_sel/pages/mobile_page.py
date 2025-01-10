@@ -4,11 +4,10 @@ import time
 from abc import ABC
 from typing import Union
 
-from dyatel.abstraction.page_abc import PageABC
 from dyatel.dyatel_sel.core.core_page import CorePage
 
 
-class MobilePage(CorePage, PageABC, ABC):
+class MobilePage(CorePage, ABC):
 
     def swipe(
             self,
@@ -20,15 +19,21 @@ class MobilePage(CorePage, PageABC, ABC):
             sleep: Union[int, float] = 0
     ) -> MobilePage:
         """
-        Swipe from one point to another point, for an optional duration
+        Appium only: Swipe from one point to another, with an optional duration and post-swipe delay.
 
-        :param start_x: x-coordinate at which to start
-        :param start_y: y-coordinate at which to start
-        :param end_x: x-coordinate at which to stop
-        :param end_y: y-coordinate at which to stop
-        :param duration: time to take the swipe, in ms
-        :param sleep: delay after swipe
-        :return: self
+        :param start_x: The x-coordinate at which to start the swipe.
+        :type start_x: int
+        :param start_y: The y-coordinate at which to start the swipe.
+        :type start_y: int
+        :param end_x: The x-coordinate at which to end the swipe.
+        :type end_x: int
+        :param end_y: The y-coordinate at which to end the swipe.
+        :type end_y: int
+        :param duration: The duration of the swipe in milliseconds.
+        :type duration: int
+        :param sleep: The delay (in seconds) after completing the swipe.
+        :type sleep: Union[int, float]
+        :return: :obj:`MobilePage` - The current instance of the page object.
         """
         self.driver.swipe(start_x, start_y, end_x, end_y, duration)
         time.sleep(sleep)
@@ -36,18 +41,18 @@ class MobilePage(CorePage, PageABC, ABC):
 
     def swipe_down(self) -> MobilePage:
         """
-        Swipe page down
+        Scroll the page downward using a swipe gesture.
 
-        :return: self
+        :return: :obj:`MobilePage` - The current instance of the page object.
         """
         self.swipe(0, 500, 0, 100, sleep=0.1)
         return self
 
     def swipe_up(self) -> MobilePage:
         """
-        Swipe page up
+        Scroll the page upward using a swipe gesture.
 
-        :return: self
+        :return: :obj:`MobilePage` - The current instance of the page object.
         """
         self.swipe(0, 100, 0, 500, sleep=0.1)
         return self

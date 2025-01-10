@@ -7,6 +7,7 @@ from copy import copy
 from functools import lru_cache, wraps
 from typing import Any, Union, Callable
 
+from dyatel.mixins.objects.size import Size
 from dyatel.mixins.objects.wait_result import Result
 from selenium.common.exceptions import StaleElementReferenceException as SeleniumStaleElementReferenceException
 
@@ -232,7 +233,7 @@ def get_attributes_from_object(reference_obj: Any) -> dict:
     return items
 
 
-def is_target_on_screen(x: int, y: int, possible_range: dict):
+def is_target_on_screen(x: int, y: int, possible_range: Size):
     """
     Check is given coordinates fit into given range
     An safe value will be applied:
@@ -245,8 +246,8 @@ def is_target_on_screen(x: int, y: int, possible_range: dict):
     :return: bool
     """
     safe_value = 2
-    is_x_on_screen = x in range(possible_range['width'] + safe_value)
-    is_y_on_screen = y in range(possible_range['height'] + safe_value)
+    is_x_on_screen = x in range(possible_range.width + safe_value)
+    is_y_on_screen = y in range(possible_range.height + safe_value)
     return is_x_on_screen and is_y_on_screen
 
 

@@ -2,6 +2,40 @@
 
 <br>
 
+## v2.4.0  
+*Release date: 2025-01-10*
+
+### Added  
+- `DriverWrapper.is_safari` method
+- `DriverWrapper.is_firefox` method
+- `DriverWrapper.is_chrome` method
+- `InvalidLocatorException` for locator validation
+- `VisualComparison` now removes actual and diff files upon successful assertions
+- Internal CI pipelines with tests
+
+### Removed  
+- `DriverWrapper.switch_to_parent_frame` method
+- `dyatel/dyatel_play/helpers/trace.py` module
+
+### Changed  
+- `DriverWrapper.get_inner_window_size` now returns a `Size` object instead of a dictionary
+- `Element.click` now uses a JavaScript click for the Safari driver
+- `Element.click_outside` now has default arguments `x=-5, y=-5` across all platforms
+- `VisualComparison` dummy elements' `style.position` changed from `"fixed"` to `"absolute"`
+- `VisualComparison` dummy elements' `style.top/left` now account for page scroll
+- `VisualComparison` now includes a `sleep(0.1)` delay if `fill_background` or `remove` actions are specified after an action
+- The Safari browser on Appium and Selenium uses the `innerText` DOM property instead of the driver's `text` API to improve compatibility with other platforms
+- The Safari browser on Selenium uses JavaScript-based `click` instead of the driver's `click` API to enhance compatibility with other platforms
+- Documentation for most methods has been improved
+
+### Fixed  
+- `DriverWrapper.save_screenshot` no longer throws an error when called without the optional `screenshot_base` argument
+- `Element.save_screenshot` no longer throws an error when called without the optional `screenshot_base` argument
+- `VisualComparison.assert_screenshot` with the argument `threshold=0` now respects the provided value instead of defaulting
+- `VisualComparison` under `soft_generate_reference` no longer takes two images (actual → assertion → reference)
+
+---
+
 ## v2.3.3
 *Release date: 2025-01-09*
 
@@ -54,8 +88,8 @@
 - **Breaking:** `locator_type`, `mobile`, `ios`, `android`, and `desktop` kwargs removed
 - **Breaking:** Most `Element` methods have been renamed
 - **Breaking:** `DriverWrapper.execute_script` now uses the `Element` object instead of the source element object
-- **Breaking:** `MobileDriver.get_top_bar_height` method changed to the `top_bar_height` property 
-- **Breaking:** `MobileDriver.get_bottom_bar_height` method changed to the `bottom_bar_height` property 
+- **Breaking:** `MobileDriver.get_top_bar_height` method renamed to the `top_bar_height` property 
+- **Breaking:** `MobileDriver.get_bottom_bar_height` method renamed to the `bottom_bar_height` property 
 - `Element.scroll_into_view` method now uses `ScrollTo` & `ScrollTypes` constants
 - Default timeout for `Element.wait_hidden_without_error` reduced to 2.5 seconds since it's a negative wait
 - Default timeout for `Element.wait_visibility_without_error` reduced to 2.5 seconds since it's a negative wait

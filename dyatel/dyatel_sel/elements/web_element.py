@@ -4,6 +4,7 @@ from abc import ABC
 from typing import Union
 
 from dyatel.dyatel_sel.core.core_element import CoreElement
+from dyatel.js_scripts import js_click
 from dyatel.mixins.objects.locator import take_locator_type, Locator
 from dyatel.utils.internal_utils import calculate_coordinate_to_click
 from dyatel.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type
@@ -20,12 +21,41 @@ class WebElement(CoreElement, ABC):
         self.locator = get_platform_locator(self)
         self.locator_type = take_locator_type(locator) or get_selenium_locator_type(self.locator)
 
+    def click(self, *, force_wait: bool = True, **kwargs) -> WebElement:
+        """
+        Clicks on the element.
+
+        :param force_wait: If :obj:`True`, waits for element visibility before clicking.
+        :type force_wait: bool
+
+        **Selenium/Appium:**
+
+        Selenium Safari using js click instead.
+
+        :param kwargs: compatibility arg for playwright
+
+        **Playwright:**
+
+        :param kwargs: `any kwargs params from source API <https://playwright.dev/python/docs/api/class-locator#locator-click>`_
+
+        :return: :class:`WebElement`
+        """
+        if self.driver_wrapper.is_safari:
+            self.log(f'Click into "{self.name}"')
+            self.execute_script(js_click)
+        else:
+            CoreElement.click(self, force_wait=force_wait, **kwargs)
+
+        return self
+
+
     def hover(self, silent: bool = False) -> WebElement:
         """
-        Hover over current element
+        Hover the mouse over the current element.
 
-        :param silent: erase log
-        :return: self
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`WebElement`
         """
         if not silent:
             self.log(f'Hover over "{self.name}"')
@@ -39,11 +69,13 @@ class WebElement(CoreElement, ABC):
 
     def hover_outside(self, x: int = 0, y: int = -5) -> WebElement:
         """
-        Hover outside from current element
+        Hover the mouse outside the current element, by default 5px above it.
 
-        :param x: x-offset of element to hover
-        :param y: y-offset of element to hover
-        :return: self
+        :param x: Horizontal offset from the element to hover.
+        :type x: int
+        :param y: Vertical offset from the element to hover.
+        :type y: int
+        :return: :class:`WebElement`
         """
         self.log(f'Hover outside from "{self.name}"')
 
@@ -56,13 +88,15 @@ class WebElement(CoreElement, ABC):
             .perform()
         return self
 
-    def click_outside(self, x: int = -1, y: int = -1) -> WebElement:
+    def click_outside(self, x: int = -5, y: int = -5) -> WebElement:
         """
-        Click outside of element. By default, 1px above and 1px left of element
+        Perform a click outside the current element, by default 5px left and above it.
 
-        :param x: x offset of element to click
-        :param y: y offset of element to click
-        :return: self
+        :param x: Horizontal offset from the element to click.
+        :type x: int
+        :param y: Vertical offset from the element to click.
+        :type y: int
+        :return: :class:`WebElement`
         """
         self.log(f'Click outside from "{self.name}"')
 
@@ -76,10 +110,11 @@ class WebElement(CoreElement, ABC):
 
     def click_into_center(self, silent: bool = False) -> WebElement:
         """
-        Click into the center of element
+        Clicks at the center of the element.
 
-        :param silent: erase log message
-        :return: self
+        :param silent: If :obj:`True`, suppresses logging.
+        :type silent: bool
+        :return: :class:`WebElement`
         """
         if not self.is_fully_visible(silent=True):
             self.scroll_into_view()

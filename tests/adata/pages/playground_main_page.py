@@ -39,7 +39,7 @@ class PlaygroundMainPage(Page):
 
 class SecondPlaygroundMainPage(Page):
     def __init__(self, driver_wrapper=None):
-        self.url = f'{domain_name}/{repo_name}/index.html'
+        self.url = f'{domain_name}/{repo_name}'
         self.dw = driver_wrapper
         super().__init__('//h1[.="The Playground"]', name='Second playground main page', driver_wrapper=driver_wrapper)
 

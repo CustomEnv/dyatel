@@ -6,6 +6,27 @@ from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import SecondPlaygroundMainPage
 
 
+@pytest.mark.skip_platform('chrome', 'firefox', reason='Test case is not relevant for current driver')
+def test_is_safari_driver(driver_wrapper):
+    assert driver_wrapper.is_safari
+    assert not driver_wrapper.is_chrome
+    assert not driver_wrapper.is_firefox
+
+
+@pytest.mark.skip_platform('safari', 'firefox', reason='Test case is not relevant for current driver')
+def test_is_chrome_driver(driver_wrapper):
+    assert driver_wrapper.is_chrome
+    assert not driver_wrapper.is_safari
+    assert not driver_wrapper.is_firefox
+
+
+@pytest.mark.skip_platform('chrome', 'safari', reason='Test case is not relevant for current driver')
+def test_is_firefox_driver(driver_wrapper):
+    assert driver_wrapper.is_firefox
+    assert not driver_wrapper.is_safari
+    assert not driver_wrapper.is_chrome
+
+
 def test_driver_cookies(driver_wrapper, mouse_event_page):
     driver_wrapper.set_cookie([{'name': 'sample_cookie', 'value': '123', 'path': '/', 'domain': 'http://example'}])
 
@@ -32,6 +53,7 @@ def test_driver_execute_script_with_args(driver_wrapper, mouse_event_page):
     assert main_page.wait_page_loaded().is_page_opened()
 
 
+@pytest.mark.low
 def test_second_driver_different_page(driver_wrapper, second_driver_wrapper):
     mouse_page = MouseEventPage(second_driver_wrapper)
     pizza_page = PizzaOrderPage(driver_wrapper)
@@ -52,6 +74,7 @@ def test_second_driver_different_page(driver_wrapper, second_driver_wrapper):
     assert pizza_page.quantity_input.is_displayed()
 
 
+@pytest.mark.low
 def test_second_driver_same_page(driver_wrapper, second_driver_wrapper):
     mouse_page1 = MouseEventPage(driver_wrapper)
     mouse_page2 = MouseEventPage(second_driver_wrapper)
@@ -69,6 +92,7 @@ def test_second_driver_same_page(driver_wrapper, second_driver_wrapper):
     assert mouse_page1.is_page_opened()
 
 
+@pytest.mark.low
 def test_second_driver_by_arg(driver_wrapper, second_driver_wrapper):
     pizza_page = PizzaOrderPage(driver_wrapper)
     mouse_page = MouseEventPage(second_driver_wrapper)
@@ -89,6 +113,7 @@ def test_second_driver_by_arg(driver_wrapper, second_driver_wrapper):
     assert pizza_page.quantity_input.is_displayed()
 
 
+@pytest.mark.low
 def test_second_driver_compatibility(driver_wrapper, second_driver_wrapper):
     assert driver_wrapper.get_inner_window_size()
     assert second_driver_wrapper.get_inner_window_size()
@@ -104,6 +129,7 @@ def test_driver_tabs(driver_wrapper, second_playground_page):
     driver_wrapper.close_unused_tabs()
 
 
+@pytest.mark.low
 def test_parent_in_hidden_element(driver_wrapper, second_driver_wrapper):
     pizza_page = PizzaOrderPage(driver_wrapper)
     mouse_page = MouseEventPage(second_driver_wrapper)
@@ -126,6 +152,7 @@ def test_parent_in_hidden_element(driver_wrapper, second_driver_wrapper):
     assert pizza_page.input_with_value('SMALL').wait_visibility(timeout=2).is_displayed()  # button without specified driver
 
 
+@pytest.mark.low
 def test_driver_in_hidden_group(driver_wrapper, second_driver_wrapper):
     pizza_page = PizzaOrderPage(driver_wrapper)
     mouse_page = MouseEventPage(second_driver_wrapper)
@@ -143,6 +170,7 @@ def test_driver_in_hidden_group(driver_wrapper, second_driver_wrapper):
     assert pizza_page.quantity_input.is_displayed()
 
 
+@pytest.mark.low
 def test_driver_in_hidden_page(driver_wrapper, second_driver_wrapper):
     base_page1 = SecondPlaygroundMainPage(driver_wrapper).open_page()
     base_page2 = SecondPlaygroundMainPage(second_driver_wrapper).open_page()
@@ -154,6 +182,7 @@ def test_driver_in_hidden_page(driver_wrapper, second_driver_wrapper):
     assert keyboard_page.input_area.wait_visibility(timeout=2).is_displayed()
 
 
+@pytest.mark.low
 def test_second_driver_in_parent_element(driver_wrapper, second_driver_wrapper):
     mouse_page2 = MouseEventPage(second_driver_wrapper)
     mouse_page2.open_page()
