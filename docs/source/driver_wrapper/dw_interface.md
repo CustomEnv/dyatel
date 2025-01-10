@@ -5,7 +5,7 @@ This is auto-generated interface documentation for the abstract `DriverWrapper` 
 
 This is essential for providing a comprehensive overview of all available methods for the `DriverWrapper` object.
 
-For the actual signature, please refer to `dyatel.base.driver_wrapper.DriverWrapper`.
+For the actual signature, please refer to `mops.base.driver_wrapper.DriverWrapper`.
 ```
 
 `DriverWrapper` provides a unified interface for managing different types of drivers (e.g., _Playwright_, _Appium_, _Selenium_),
@@ -16,7 +16,7 @@ Additionally, it offers advanced methods which be found below.
 <br>
 
 ```{eval-rst}  
-.. autoclass:: dyatel.base.driver_wrapper.DriverWrapper
+.. autoclass:: mops.base.driver_wrapper.DriverWrapper
    :members:
    :undoc-members:
    :inherited-members:

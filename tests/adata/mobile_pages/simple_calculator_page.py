@@ -1,8 +1,8 @@
 from appium.webdriver.common.appiumby import AppiumBy
 
-from dyatel.base.element import Element
-from dyatel.base.page import Page
-from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from mops.base.element import Element
+from mops.base.page import Page
+from mops.selenium.core.core_driver import CoreDriver
 
 
 class CalculatorPage(Page):

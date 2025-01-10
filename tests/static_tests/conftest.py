@@ -1,20 +1,20 @@
 import pytest
-from dyatel.mixins.objects.driver import Driver
+from mops.mixins.objects.driver import Driver
 from mock.mock import MagicMock
 
 from playwright.sync_api import Browser, Page as PlaywrightSourcePage
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 
-from dyatel.base.driver_wrapper import DriverWrapper, DriverWrapperSessions
-from dyatel.dyatel_play.play_driver import PlayDriver
-from dyatel.dyatel_sel.core.core_driver import CoreDriver
+from mops.base.driver_wrapper import DriverWrapper, DriverWrapperSessions
+from mops.playwright.play_driver import PlayDriver
+from mops.selenium.core.core_driver import CoreDriver
 
 
 class MockedDriverWrapper(DriverWrapper):
 
     def dummy_element(self):
-        from dyatel.base.element import Element
+        from mops.base.element import Element
         return Element('dummy element', driver_wrapper=self)
 
 

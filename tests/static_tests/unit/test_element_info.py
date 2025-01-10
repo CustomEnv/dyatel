@@ -1,7 +1,7 @@
-from dyatel.base.element import Element
-from dyatel.base.group import Group
-from dyatel.mixins.internal_mixin import get_element_info
-from dyatel.mixins.objects.locator import Locator
+from mops.base.element import Element
+from mops.base.group import Group
+from mops.mixins.internal_mixin import get_element_info
+from mops.mixins.objects.locator import Locator
 
 
 class SomeGroup(Group):

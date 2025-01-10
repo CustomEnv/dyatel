@@ -36,14 +36,15 @@ This is crucial for ensuring that your interactions with the page occur only aft
 #### Example Usage
 
 ```python
-from dyatel.base.page import Page
-from dyatel.base.element import Element
+from mops.base.page import Page
+from mops.base.element import Element
+
 
 class LoginPage(Page):
-    
+
     def __init__(self):
         super().__init__('.login.page', name='Login page')
-    
+
     loader = Element('.loader', name='loader', wait=False)
     form = Element('.login.form', name='login form', wait=True)
 
@@ -87,18 +88,19 @@ This method checks several conditions to confirm that the page is in the expecte
 #### Example Usage
 
 ```python
-from dyatel.base.page import Page
-from dyatel.base.element import Element
+from mops.base.page import Page
+from mops.base.element import Element
+
 
 class LoginPage(Page):
-    
+
     def __init__(self):
         super().__init__('.login.page', name='Login page')
-    
+
     loader = Element('.loader', name='loader', wait=False)
     form = Element('.login.form', name='login form', wait=True)
 
-    
+
 # pytest usage
 def test_wait_page_load(driver_wrapper):
     assert LoginPage().is_page_opened(with_elements=True, with_url=False)

@@ -2,25 +2,25 @@ import inspect
 
 import pytest
 
-from dyatel.abstraction.driver_wrapper_abc import DriverWrapperABC
-from dyatel.abstraction.element_abc import ElementABC
-from dyatel.abstraction.page_abc import PageABC
-from dyatel.base.driver_wrapper import DriverWrapper
-from dyatel.base.element import Element
-from dyatel.base.page import Page
-from dyatel.dyatel_play.play_driver import PlayDriver
+from mops.abstraction.driver_wrapper_abc import DriverWrapperABC
+from mops.abstraction.element_abc import ElementABC
+from mops.abstraction.page_abc import PageABC
+from mops.base.driver_wrapper import DriverWrapper
+from mops.base.element import Element
+from mops.base.page import Page
+from mops.playwright.play_driver import PlayDriver
 
-from dyatel.dyatel_play.play_element import PlayElement
-from dyatel.dyatel_play.play_page import PlayPage
-from dyatel.dyatel_sel.core.core_driver import CoreDriver
-from dyatel.dyatel_sel.core.core_element import CoreElement
-from dyatel.dyatel_sel.core.core_page import CorePage
-from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
-from dyatel.dyatel_sel.driver.web_driver import WebDriver
-from dyatel.dyatel_sel.elements.mobile_element import MobileElement
-from dyatel.dyatel_sel.elements.web_element import WebElement
-from dyatel.dyatel_sel.pages.mobile_page import MobilePage
-from dyatel.dyatel_sel.pages.web_page import WebPage
+from mops.playwright.play_element import PlayElement
+from mops.playwright.play_page import PlayPage
+from mops.selenium.core.core_driver import CoreDriver
+from mops.selenium.core.core_element import CoreElement
+from mops.selenium.core.core_page import CorePage
+from mops.selenium.driver.mobile_driver import MobileDriver
+from mops.selenium.driver.web_driver import WebDriver
+from mops.selenium.elements.mobile_element import MobileElement
+from mops.selenium.elements.web_element import WebElement
+from mops.selenium.pages.mobile_page import MobilePage
+from mops.selenium.pages.web_page import WebPage
 
 
 def get_methods_and_names(_class):

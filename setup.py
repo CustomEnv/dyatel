@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from dyatel import project_version, org_project_name, project_name
+from mops import project_version, org_project_name, project_name
 from setuptools import setup
 
 with open('README.md') as f:

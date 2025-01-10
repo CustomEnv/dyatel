@@ -7,7 +7,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../..'))
 
-from dyatel import project_version, project_name
+from mops import project_version, project_name
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -37,7 +37,7 @@ extensions = [
     'sphinx.ext.napoleon',
 ]
 
-source_dirs = ['../../dyatel']
+source_dirs = ['../../mops']
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),

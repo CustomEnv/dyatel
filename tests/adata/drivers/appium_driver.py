@@ -1,7 +1,7 @@
 from appium.webdriver.webdriver import WebDriver as SourceAppiumDriver
 
-from dyatel.base.driver_wrapper import DriverWrapperSessions
-from dyatel.mixins.objects.driver import Driver
+from mops.base.driver_wrapper import DriverWrapperSessions
+from mops.mixins.objects.driver import Driver
 from tests.adata.drivers.driver_entities import DriverEntities
 from tests.adata.drivers.selenium_driver import SeleniumDriver
 from appium.options.common.base import AppiumOptions

@@ -51,7 +51,7 @@ hidden:
 caption: Project Links
 ---
 
-GitHub <https://github.com/CustomEnv/dyatel>
-PyPI <https://pypi.org/project/dyatel-wrapper/>
+GitHub <https://github.com/CustomEnv/mops>
+PyPI <https://pypi.org/project/mops/>
 ```
 

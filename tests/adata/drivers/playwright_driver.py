@@ -1,6 +1,6 @@
 from playwright.sync_api import sync_playwright
 
-from dyatel.mixins.objects.driver import Driver
+from mops.mixins.objects.driver import Driver
 from tests.adata.drivers.driver_entities import DriverEntities
 
 

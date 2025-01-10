@@ -2,13 +2,13 @@
 
 <br>
 
-To get started with Dyatel Wrapper, follow these steps:
+To get started with <Mops>, follow these steps:
 
 ## 1. Installation
-Install Dyatel Wrapper via pip:
+Install Mops via pip:
 
 ```bash
-pip3 install dyatel-wrapper
+pip3 install mops
 ```
 
 ---
@@ -18,12 +18,13 @@ pip3 install dyatel-wrapper
 <br>
 
 ```{note}
-For the PageObject example, the [Dyatel Wrapper Playground](https://customenv.github.io/dyatel-playground/) page is used.
+For the PageObject example, the [UI Automation Playground](https://customenv.github.io/dyatel-playground/) site is used.
 ``` 
+
 ```python
-from dyatel.base.element import Element
-from dyatel.base.group import Group
-from dyatel.base.page import Page
+from mops.base.element import Element
+from mops.base.group import Group
+from mops.base.page import Page
 
 
 class Card(Group):
@@ -34,19 +35,19 @@ class Card(Group):
 
 
 class BasicControlsSection(Group):
-    
+
     def __init__(self):
         super().__init__('//*[contains(@class, "card") and .//*[.="Basic Form Controls"]]', name='For page')
-        
+
     python_checkbox = Element('check_python', name='python checkbox')
     checkbox_label = Element('check_validate', name='checkbox label')
-    
+
 
 class FormsPage(Page):
-    
+
     def __init__(self):
         super().__init__('.container', name='Forms page')
-        
+
     controls_section = BasicControlsSection()
 
 
@@ -68,12 +69,14 @@ class MainPage(Page):
 <br>
 
 ### Selenium driver setup
+
 ```python
 import pytest  # noqa
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
 
-from dyatel.base.driver_wrapper import DriverWrapper
-from dyatel.mixins.objects.driver import Driver
+from mops.base.driver_wrapper import DriverWrapper
+from mops.mixins.objects.driver import Driver
+
 
 @pytest.fixture
 def driver_wrapper():
@@ -86,13 +89,14 @@ def driver_wrapper():
 <br>
 
 ### Appium driver setup
+
 ```python
 import pytest  # noqa
 from appium.webdriver.webdriver import WebDriver as SourceAppiumDriver
 from appium.options.common.base import AppiumOptions
 
-from dyatel.base.driver_wrapper import DriverWrapper
-from dyatel.mixins.objects.driver import Driver
+from mops.base.driver_wrapper import DriverWrapper
+from mops.mixins.objects.driver import Driver
 
 
 @pytest.fixture
@@ -100,12 +104,12 @@ def driver_wrapper():
     caps = {}  # Your device capabilities
     appium_ip, appium_port = None, None  # Your appium ip and port
     options = AppiumOptions().load_capabilities(caps)
-    
+
     appium_driver = SourceAppiumDriver(
-       command_executor=f'http://{appium_ip}:{appium_port}/wd/hub',
-       options=options
+        command_executor=f'http://{appium_ip}:{appium_port}/wd/hub',
+        options=options
     )
-    
+
     return DriverWrapper(Driver(driver=appium_driver))
 ```
 
@@ -116,14 +120,15 @@ def driver_wrapper():
 ### Playwright driver setup
 
 ```{attention}
-Dyatel Wrapper supports only sync API of playwright
+Mops supports only sync API of playwright
 ```
+
 ```python
 import pytest  # noqa
 from playwright.sync_api import sync_playwright
-from dyatel.mixins.objects.driver import Driver
+from mops.mixins.objects.driver import Driver
 
-from dyatel.base.driver_wrapper import DriverWrapper
+from mops.base.driver_wrapper import DriverWrapper
 
 
 @pytest.fixture
@@ -131,7 +136,7 @@ def driver_wrapper():
     instance = sync_playwright().start().chromium.launch()
     context = instance.new_context()
     page = context.new_page()
-    
+
     return DriverWrapper(Driver(driver=page, context=context, instance=instance))
 ```
 

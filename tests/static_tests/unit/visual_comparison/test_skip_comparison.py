@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from dyatel.visual_comparison import VisualComparison
+from mops.visual_comparison import VisualComparison
 
 
 def default_parameters(func):

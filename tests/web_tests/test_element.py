@@ -2,9 +2,9 @@ import random
 
 import pytest
 
-from dyatel.mixins.internal_mixin import get_element_info
+from mops.mixins.internal_mixin import get_element_info
 from tests.adata.pages.expected_condition_page import WaitValueCardBroken
-from dyatel.exceptions import NoSuchElementException, NoSuchParentException
+from mops.exceptions import NoSuchElementException, NoSuchParentException
 from tests.adata.pages.keyboard_page import KeyboardPage
 
 
@@ -154,6 +154,6 @@ def test_all_elements_recursion(base_playground_page):
 
 
 def test_element_execute_script(forms_page, driver_wrapper):
-    new_text = 'dyatel wrapper automation'
+    new_text = 'driver wrapper automation'
     forms_page.controls_form.german_slider.execute_script('arguments[0].textContent = arguments[1];', new_text)
     assert forms_page.controls_form.german_slider.text == new_text

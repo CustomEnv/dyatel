@@ -1,11 +1,11 @@
-from dyatel.base.element import Element
-from dyatel.base.page import Page
-from tests.settings import domain_name, repo_name
+from mops.base.element import Element
+from mops.base.page import Page
+from tests.settings import domain_name, automation_playground_repo_name
 
 
 class PizzaOrderPage(Page):
     def __init__(self, driver_wrapper=None):
-        self.url = f'{domain_name}/{repo_name}/order_submit.html'
+        self.url = f'{domain_name}/{automation_playground_repo_name}/order_submit.html'
         super().__init__('//h3[contains(., "Pizza House")]', name='Pizza order page', driver_wrapper=driver_wrapper)
 
     submit_button = Element('submit_button', name='submit order button')
