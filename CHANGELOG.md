@@ -3,7 +3,7 @@
 <br>
 
 ## v2.4.0  
-*Release date: 2025-01-..*
+*Release date: 2025-01-10*
 
 ### Added  
 - `DriverWrapper.is_safari` method
