@@ -2,6 +2,20 @@
 
 <br>
 
+## v2.5.0  
+*Release date: 2025-01-..*
+
+### Breaking: Project renamed
+
+### Changed 
+- Dev: pyproject.toml integrated instead of setup.py
+- Dev: UV integrated
+
+### Removed
+- Dev: tox usage removed
+
+---
+
 ## v2.4.0  
 *Release date: 2025-01-10*
 

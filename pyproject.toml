@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mops"
+dynamic = ["version"]
+description = "Wrapper of Selenium, Appium and Playwright with single API"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+    { name = "Podolian Vladimir", email = "vladimir.podolyan64@gmail.com" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing :: Acceptance",
+]
+
+dependencies = [
+    "Appium-Python-Client>=3.1.0",
+    "playwright>=1.41.0",
+    "selenium>=4.12.0",
+
+    "numpy>=2.0.1; python_version >= '3.11'",
+    "numpy>=1.24.2, <2.0.0; python_version >='3.8' and python_version <= '3.10'",
+
+    "opencv-python>=4.10.0.84; python_version>='3.11'",
+    "opencv-python>=4.5.5.64, <4.10.0.84; python_version>='3.8' and python_version <= '3.10'",
+
+    "scikit-image>=0.24.0; python_version>='3.11'",
+    "scikit-image>=0.20.0, <0.24.0; python_version>='3.8' and python_version <= '3.10'",
+
+    "Pillow>=10.4.0; python_version>='3.12'",
+    "Pillow>=9.4.0, <10.4.0; python_version>='3.8' and python_version <= '3.11'",
+]
+
+[tool.uv]
+package = false
+dev-dependencies = [
+    # Project requirements
+    "Appium-Python-Client==3.1.0",
+    "playwright==1.41.0",
+    "selenium==4.12.0",
+
+    # Tests requirements
+    "mock==4.0.3",
+    "pytest==7.4.3",
+    "allure-pytest==2.12.0",
+    "pytest-rerunfailures==11.1",
+
+    # Docs requirements
+    "furo==2024.8.6",
+    "sphinx==7.1.2",
+    "myst-parser==3.0.1",
+]
+
+[project.urls]
+Changelog = "https://github.com/CustomEnv/mops/blob/master/CHANGELOG.md"
+Documentation = "https://mops.readthedocs.io"
+Homepage = "https://github.com/CustomEnv/mops"
+Source = "https://github.com/CustomEnv/mops"
+Tracker = "https://github.com/CustomEnv/mops/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mops**"]
+exclude = ["tests", "docs", ".github"]
+
+[tool.setuptools.dynamic]
+version = { attr = "mops.__version__" }
+
+# Temporary workaround for https://github.com/astral-sh/uv/issues/9513, https://github.com/pypa/setuptools/issues/4759
+[tool.setuptools]
+license-files = []

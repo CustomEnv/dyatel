@@ -1,4 +1,3 @@
-from mops import project_name
 from selenium.webdriver import Keys as SeleniumSourceKeys
 
 from mops.base.driver_wrapper import DriverWrapper
@@ -86,7 +85,7 @@ class Interceptor(type):
         if DriverWrapper.is_selenium:
             return getattr(SeleniumKeys, item)
         else:
-            return getattr(PlaywrightKeys, item, NotImplementedError(f'Key is not added to {project_name} framework'))
+            return getattr(PlaywrightKeys, item, NotImplementedError(f'Key is not added to Mops framework'))
 
 
 class KeyboardKeys(SeleniumKeys, PlaywrightKeys, metaclass=Interceptor):

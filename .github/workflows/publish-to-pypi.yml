@@ -1,0 +1,28 @@
+name: Publish to PyPI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    name: Upload to PyPI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        id: setup
+        uses: ./.github/actions/setup
+        with:
+          python-version: '3.8'
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish package to PyPI
+        run: |
+          uv publish --token ${{ secrets.PYPI_API_TOKEN }}

@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - '**'
+    paths-ignore:
+      - 'docs/**'
+      - 'tests/static_tests/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - '.gitignore'
 
 jobs:
   ios-tests:
@@ -36,7 +43,7 @@ jobs:
       - name: Run Appium Safari tests
         id: tests
         run: |
-          tox -e py38-ios-web -- -v --alluredir=allure-report -m='not low' --reruns=2
+          uv run --no-config pytest tests/web_tests --platform ios --driver safari -v --alluredir=allure-report --reruns=2 -m='not low'
         continue-on-error: true
 
       - name: Teardown (Allure Report and Error Handling)
@@ -44,5 +51,4 @@ jobs:
         uses: ./.github/actions/teardown
         with:
           browser-name: "safari"
-          tox-env: "38"
           engine: "appium"

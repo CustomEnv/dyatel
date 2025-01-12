@@ -3,7 +3,14 @@ name: Static Tests
 on:
   push:
     branches:
-      - '**'  # Trigger on push to any branch
+      - '**'
+    paths-ignore:
+      - 'docs/**'
+      - 'tests/web_tests/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - '.gitignore'
 
 jobs:
   static:
@@ -26,4 +33,4 @@ jobs:
 
       - name: Run Static tests with ${{ matrix.python-version }}
         run: |
-          tox -e py${{ steps.setup.outputs.tox-env }}-static
+          uv run --no-config pytest tests/static_tests

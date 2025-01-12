@@ -1,4 +1,6 @@
-<h1 align="center">mops</h1>
+<p align="center">
+  <a href="https://mops.readthedocs.io"><img src="https://raw.githubusercontent.com/CustomEnv/mops/master/docs/source/_static/preview.png"></a>
+</p>
 
 <h2 align="center">Automation Beyond Limits</h2>
 
@@ -10,27 +12,15 @@
 
 <p align="center">
     <a href="https://mops.readthedocs.io"><img alt="Documentation Status" src="https://img.shields.io/readthedocs/mops?logo=readthedocs&labelColor=%232E353B&label=docs"></a>
-    <a href="https://github.com/CustomEnv/mops/actions/workflows/static_tests.yml">
-        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/mops/static_tests.yml?logo=github&label=Unit%20Tests&labelColor=%232E353B">
-    </a>
-    <a href="https://github.com/CustomEnv/mops/actions/workflows/playwright_tests.yml">
-        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/mops/playwright_tests.yml?logo=github&label=Playwright%20Tests&labelColor=%232E353B">
-    </a>
+    <a href="https://github.com/CustomEnv/mops/actions/workflows/static_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/mops/static_tests.yml?branch=master&logo=github&label=Unit%20Tests&labelColor=%232E353B"></a>
+    <a href="https://github.com/CustomEnv/mops/actions/workflows/playwright_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/mops/playwright_tests.yml?branch=master&logo=github&label=Playwright%20Tests&labelColor=%232E353B"></a>
 </p> 
 
 <p align="center">
-    <a href="https://github.com/CustomEnv/mops/actions/workflows/selenium_tests.yml">
-        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/mops/selenium_tests.yml?logo=github&label=Selenium%20Tests&labelColor=%232E353B">
-    </a>
-    <a href="https://github.com/CustomEnv/mops/actions/workflows/selenium_safari_tests.yml">
-        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/mops/selenium_safari_tests.yml?logo=github&label=Selenium%20Safari%20Tests&labelColor=%232E353B">
-    </a>
-    <a href="https://github.com/CustomEnv/mops/actions/workflows/appium_android_tests.yml">
-        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/mops/appium_android_tests.yml?logo=github&label=Android%20Tests&labelColor=%232E353B">
-    </a>
-    <a href="https://github.com/CustomEnv/mops/actions/workflows/appium_ios_tests.yml">
-        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/mops/appium_ios_tests.yml?logo=github&label=iOS%20Tests&labelColor=%232E353B">
-    </a>
+    <a href="https://github.com/CustomEnv/mops/actions/workflows/selenium_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/mops/selenium_tests.yml?branch=master&logo=github&label=Selenium%20Tests&labelColor=%232E353B"></a>
+    <a href="https://github.com/CustomEnv/mops/actions/workflows/selenium_safari_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/mops/selenium_safari_tests.yml?branch=master&logo=github&label=Selenium%20Safari%20Tests&labelColor=%232E353B"></a>
+    <a href="https://github.com/CustomEnv/mops/actions/workflows/appium_android_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/mops/appium_android_tests.yml?branch=master&logo=github&label=Android%20Tests&labelColor=%232E353B"></a>
+    <a href="https://github.com/CustomEnv/mops/actions/workflows/appium_ios_tests.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/CustomEnv/mops/appium_ios_tests.yml?branch=master&logo=github&label=iOS%20Tests&labelColor=%232E353B"></a>
 </p>
 
 

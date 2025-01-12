@@ -6,11 +6,10 @@ from functools import lru_cache
 from os.path import basename
 from typing import Any
 
-from mops import org_project_name
 from mops.utils.internal_utils import get_frame, is_driver_wrapper
 
 
-logger = logging.getLogger(org_project_name)
+logger = logging.getLogger('mops')
 
 
 class LogLevel:

@@ -3,7 +3,7 @@ import os
 domain_name = 'https://customenv.github.io'
 automation_playground_repo_name = 'dyatel-playground'
 
-appium_logs_path = '.tox/.tmp/logs/android_appium.txt'
+appium_logs_path = '.venv/.tmp/logs/android_appium.txt'
 android_device_start_timeout = 60
 
 def get_android_desired_caps():
