@@ -5,7 +5,7 @@
 ## v3.0.0  
 *Release date: 2025-01-13*
 
-### Breaking: Project renamed
+### Breaking: Project renamed to `mops`
 
 ### Changed 
 - Dev: pyproject.toml integrated instead of setup.py
