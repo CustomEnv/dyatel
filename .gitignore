@@ -44,7 +44,6 @@ pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
-.tox/
 .nox/
 .coverage
 .coverage.*
@@ -168,3 +167,12 @@ cython_debug/
 # Visual tests output
 /tests/adata/visual/output
 /tests/adata/visual/difference
+
+# Not needed references:
+/tests/adata/visual/reference/test_assert_screenshot_negative_missmatch_action_cards*
+/tests/adata/visual/reference/test_assert_screenshot_negative_different_sizes_action_cards*
+
+# Allure report
+/allure-report
+/tests/adata/artifacts
+tests/adata/visual/reference/reference_with_rerun.png

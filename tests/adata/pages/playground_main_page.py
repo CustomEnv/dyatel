@@ -4,12 +4,13 @@ from typing import List
 
 from selenium.webdriver.common.by import By
 
-from dyatel.base.element import Element
-from dyatel.base.group import Group
-from dyatel.base.page import Page
+from mops.base.element import Element
+from mops.base.group import Group
+from mops.base.page import Page
+from mops.mixins.objects.locator import Locator
 from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 from tests.adata.pages.keyboard_page import KeyboardPage
-from tests.settings import domain_name, repo_name
+from tests.settings import domain_name, automation_playground_repo_name
 
 
 class PlaygroundMainPage(Page):
@@ -27,7 +28,6 @@ class PlaygroundMainPage(Page):
     overview_section_broken = Element('overviewshka', name='broken overview section')
     kube = Element('.img-fluid', name='rubik\'s cube')
     any_link = Element('a', name='any link')
-    kube_invalid_locator = Element('.img-fluid', locator_type=By.XPATH, name='rubik\'s cube with invalid locator')
     kube_broken = Element('.img-fluid .not-available', name='rubik\'s cube broken locator')
     kube_parent = Element('.img-fluid', name='kube with parent', parent=description_section)
     kube_wrong_parent = Element('.img-fluid', name='kube with wrong parent', parent=overview_section)
@@ -39,9 +39,11 @@ class PlaygroundMainPage(Page):
 
 class SecondPlaygroundMainPage(Page):
     def __init__(self, driver_wrapper=None):
-        self.url = f'{domain_name}/{repo_name}/index.html'
+        self.url = f'{domain_name}/{automation_playground_repo_name}'
         self.dw = driver_wrapper
         super().__init__('//h1[.="The Playground"]', name='Second playground main page', driver_wrapper=driver_wrapper)
+
+    row_with_cards = Element('.row', name='row with cards')
 
     def get_all_cards(self) -> List[Card]:
         return Card(self.dw).all_elements

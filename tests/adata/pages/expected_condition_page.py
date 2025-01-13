@@ -1,12 +1,13 @@
-from dyatel.base.element import Element
-from dyatel.base.group import Group
-from dyatel.base.page import Page
-from tests.settings import domain_name, repo_name
+from mops.base.element import Element
+from mops.base.group import Group
+from mops.base.page import Page
+from mops.mixins.objects.locator import Locator
+from tests.settings import domain_name, automation_playground_repo_name
 
 
 class ExpectedConditionPage(Page):
     def __init__(self):
-        self.url = f'{domain_name}/{repo_name}/expected_conditions.html'
+        self.url = f'{domain_name}/{automation_playground_repo_name}/expected_conditions.html'
         self.value_card = WaitValueCard()
         self.element_card = WaitElementCard()
         self.frame_card = WaitFrameCard()
@@ -24,8 +25,8 @@ class ExpectedConditionPage(Page):
     confirm_badge = Element('confirm_ok_badge', name='confirm badge')
     canceled_badge = Element('confirm_cancelled_badge', name='cancelled badge')
 
-    alert_ok_button = Element(ios='//XCUIElementTypeStaticText[@name="OK"]', name='accept alert button')
-    alert_cancel_button = Element(ios='//XCUIElementTypeStaticText[@name="Cancel"]', name='cancel alert button')
+    alert_ok_button = Element(Locator('', ios='//XCUIElementTypeStaticText[@name="OK"]'), name='accept alert button')
+    alert_cancel_button = Element(Locator('', ios='//XCUIElementTypeStaticText[@name="Cancel"]'), name='cancel alert button')
 
     def set_min_and_max_wait(self, min_wait=1, max_wait=1):
         self.min_wait_input.set_text(min_wait)

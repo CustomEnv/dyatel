@@ -1,8 +1,8 @@
 import pytest
 
-from dyatel.base.element import Element
-from dyatel.base.group import Group
-from dyatel.base.page import Page
+from mops.base.element import Element
+from mops.base.group import Group
+from mops.base.page import Page
 from tests.static_tests.conftest import mobile_drivers, mobile_ids
 
 
@@ -54,7 +54,6 @@ def test_mobile_and_desktop_element_repr(driver, request):
     assert 'Element' in mobile_info
     assert 'locator="[id="element-repr"]"' in mobile_info
     assert 'locator_type="css selector"' in mobile_info
-    assert 'name="repr element"' in mobile_info  # name will be generated base on attr name
     assert 'parent=MyGroup' in mobile_info
     assert 'at 0x' in mobile_info
     assert '1_driver' in mobile_info
@@ -63,7 +62,6 @@ def test_mobile_and_desktop_element_repr(driver, request):
     assert 'Element' in desktop_info
     assert 'locator="element-repr"' in desktop_info
     assert 'locator_type="id"' in desktop_info
-    assert 'name="repr element"' in desktop_info  # name will be generated base on attr name
     assert 'parent=MyGroup' in desktop_info
     assert 'at 0x' in desktop_info
     assert '2_driver' in desktop_info

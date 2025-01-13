@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from dyatel.base.element import Element
-from dyatel.base.group import Group
-from dyatel.base.page import Page
-from tests.settings import domain_name, repo_name
+from mops.base.element import Element
+from mops.base.group import Group
+from mops.base.page import Page
+from tests.settings import domain_name, automation_playground_repo_name
 
 
 class MouseEventPage(Page):
     def __init__(self, driver_wrapper=None):
-        self.url = f'{domain_name}/{repo_name}/mouse_events_v2.html'
+        self.url = f'{domain_name}/{automation_playground_repo_name}/mouse_events_v2.html'
         super().__init__('//h2[.="Mouse Click Actions"]', name='Mouse events page', driver_wrapper=driver_wrapper)
 
     choose_language_button = Element('button.dropbtn', name='"Choose language" button', wait=True)
@@ -61,7 +61,7 @@ class MouseClickCard(Group):
         return Element('button', name='any button custom parent', parent=self.y_result)
 
     def get_result_coordinates(self):
-        return [int(element.wait_element_text().text.split(' ')[1]) for element in (self.x_result, self.y_result)]
+        return [int(element.wait_for_text().text.split(' ')[1]) for element in (self.x_result, self.y_result)]
 
     def get_click_area_middle(self):
         el_rect = self.click_area.get_rect()

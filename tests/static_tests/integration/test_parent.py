@@ -1,7 +1,7 @@
 import pytest
 
-from dyatel.base.element import Element
-from dyatel.base.group import Group
+from mops.base.element import Element
+from mops.base.group import Group
 from tests.static_tests.conftest import selenium_drivers, selenium_ids
 
 

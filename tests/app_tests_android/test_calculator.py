@@ -33,9 +33,9 @@ def calculator_page(mobile_driver):
 def test_calculator_sum(calculator_page, case):
     """ Test sum of two values in simple (only sum) calculator app """
     a_input_text, b_input_text = case['a'], case['b']
-    calculator_page.input_a.wait_element().type_text(a_input_text)
-    calculator_page.input_b.wait_element().type_text(b_input_text)
-    assert calculator_page.input_sum.wait_element().text == str(a_input_text + b_input_text)
+    calculator_page.input_a.wait_visibility().type_text(a_input_text)
+    calculator_page.input_b.wait_visibility().type_text(b_input_text)
+    assert calculator_page.input_sum.wait_visibility().text == str(a_input_text + b_input_text)
 
 
 @allure.severity(allure.severity_level.NORMAL)
@@ -51,17 +51,17 @@ def test_calculator_sum(calculator_page, case):
 )
 def test_calculator_input_restriction(mobile_driver, calculator_page, case):
     """ Test restriction of typing invalid characters """
-    calculator_page.input_a.wait_element().type_text(case['text'])
-    calculator_page.input_b.wait_element().type_text(case['text'])
-    assert calculator_page.input_sum.wait_element().text == ''
+    calculator_page.input_a.wait_visibility().type_text(case['text'])
+    calculator_page.input_b.wait_visibility().type_text(case['text'])
+    assert calculator_page.input_sum.wait_visibility().text == ''
 
 
 @pytest.mark.xfail(reason='App crashed after clear input text')
 @allure.severity(allure.severity_level.CRITICAL)
 def test_calculator_clear_input(calculator_page):
     """ Test clearing the inputs """
-    calculator_page.input_a.wait_element().type_text(randint(1, 100))
-    calculator_page.input_b.wait_element().type_text(randint(1, 100))
+    calculator_page.input_a.wait_visibility().type_text(randint(1, 100))
+    calculator_page.input_b.wait_visibility().type_text(randint(1, 100))
 
     calculator_page.input_a.clear_text()
     calculator_page.input_b.clear_text()

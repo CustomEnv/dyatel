@@ -1,0 +1,66 @@
+name: Appium Android Chrome Tests
+
+on:
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - 'docs/**'
+      - 'tests/static_tests/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - '.gitignore'
+
+jobs:
+  android-tests:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        id: setup
+        uses: ./.github/actions/setup
+        with:
+          python-version: '3.8'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.12.0'
+
+      - name: Install Appium & UiAutomator2 Driver
+        run: |
+          npm install -g npm@10.9.0
+          npm install -g appium@2.14.0
+          appium driver install uiautomator2@3.9.0
+
+      - name: Start Appium Server in the Background
+        run: |
+          nohup appium --allow-insecure chromedriver_autodownload > appium.log 2>&1 &
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # https://github.com/ReactiveCircus/android-emulator-runner
+      - uses: reactivecircus/android-emulator-runner@v2.33.0
+        name: Android Tests
+        id: tests
+        continue-on-error: true
+        with:
+          script: uv run --no-config pytest tests/web_tests --platform android --driver chrome -v --alluredir=allure-report --reruns=2 -m='not low'
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+
+      - name: Teardown (Allure Report and Error Handling)
+        if: ${{ steps.tests.outcome == 'failure' }}
+        uses: ./.github/actions/teardown
+        with:
+          browser-name: "chrome"
+          engine: "appium"

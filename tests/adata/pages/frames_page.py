@@ -1,6 +1,6 @@
-from dyatel.base.element import Element
-from dyatel.base.page import Page
-from tests.settings import domain_name, repo_name
+from mops.base.element import Element
+from mops.base.page import Page
+from tests.settings import domain_name, automation_playground_repo_name
 
 
 class Frame(Element):
@@ -10,7 +10,7 @@ class Frame(Element):
 
 class FramesPage(Page):
     def __init__(self):
-        self.url = f'{domain_name}/{repo_name}/frames.html'
+        self.url = f'{domain_name}/{automation_playground_repo_name}/frames.html'
         super().__init__('//h1[.="Frames Page"]', name='Frames page')
 
     frame1 = Frame('frame1', name='frame 1')

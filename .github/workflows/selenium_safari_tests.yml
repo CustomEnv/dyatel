@@ -1,0 +1,44 @@
+name: Selenium Safari Tests
+
+on:
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - 'docs/**'
+      - 'tests/static_tests'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - '.gitignore'
+jobs:
+  selenium-safari:
+    runs-on: macos-13
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ "3.8", "3.12" ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        id: setup
+        uses: ./.github/actions/setup
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run Selenium Safari tests with py${{ matrix.python-version }}
+        id: tests
+        run: |
+          uv run --no-config pytest tests/web_tests --platform selenium --driver safari -v --alluredir=allure-report --reruns=2 -m='not low'
+        continue-on-error: true
+
+      - name: Teardown (Allure Report and Error Handling)
+        if: ${{ steps.tests.outcome == 'failure' }}
+        uses: ./.github/actions/teardown
+        with:
+          browser-name: "safari"
+          engine: "selenium"

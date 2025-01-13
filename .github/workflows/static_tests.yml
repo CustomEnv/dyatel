@@ -1,0 +1,36 @@
+name: Static Tests
+
+on:
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - 'docs/**'
+      - 'tests/web_tests/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - '.gitignore'
+
+jobs:
+  static:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        id: setup
+        uses: ./.github/actions/setup
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run Static tests with ${{ matrix.python-version }}
+        run: |
+          uv run --no-config pytest tests/static_tests

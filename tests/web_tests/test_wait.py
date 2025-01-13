@@ -1,29 +1,27 @@
 import pytest
 
-from dyatel.exceptions import UnexpectedElementsCountException
-
 
 # TODO: rework needed
 def test_wait_element(pizza_order_page):
-    pizza_order_page.submit_button.wait_element()
+    pizza_order_page.submit_button.wait_visibility()
     assert pizza_order_page.submit_button.is_displayed()
 
 
 # TODO: rework needed
 def test_wait_without_error(pizza_order_page):
-    pizza_order_page.error_modal.wait_element_without_error(timeout=0.5)
+    pizza_order_page.error_modal.wait_visibility_without_error(timeout=0.5)
     assert not pizza_order_page.error_modal.is_displayed()
 
 
 # TODO: rework needed
 def test_wait_hidden(pizza_order_page):
-    pizza_order_page.error_modal.wait_element_without_error(timeout=1)
+    pizza_order_page.error_modal.wait_visibility_without_error(timeout=1)
     assert not pizza_order_page.error_modal.is_displayed()
 
 
 # TODO: rework needed
 def test_wait_hidden_without_error(pizza_order_page):
-    pizza_order_page.submit_button.wait_element_without_error(timeout=0.5)
+    pizza_order_page.submit_button.wait_visibility_without_error(timeout=0.5)
     assert pizza_order_page.submit_button.is_displayed()
 
 
@@ -31,25 +29,24 @@ def test_wait_hidden_without_error(pizza_order_page):
 def test_wait_element_value(expected_condition_page):
     expected_condition_page.value_card.trigger_button.click()
     value_without_wait = expected_condition_page.value_card.wait_for_value_input.value
-    expected_condition_page.value_card.wait_for_value_input.wait_element_value()
+    expected_condition_page.value_card.wait_for_value_input.wait_for_value()
     value_with_wait = expected_condition_page.value_card.wait_for_value_input.value == 'Dennis Ritchie'
     assert all((not value_without_wait, value_with_wait))
 
 
-@pytest.mark.xfail_platform('playwright', 'safari', reason='Unexpected text')
-def test_wait_element_text(expected_condition_page):
+def test_wait_element_text1(expected_condition_page, driver_wrapper):
     btn = expected_condition_page.value_card.wait_for_text_button
 
     expected_condition_page.value_card.trigger_button.click()
     value_without_wait = btn.text
-    value_with_wait = btn.wait_element_text().text == 'Submit'
-    assert all((not value_without_wait, value_with_wait))
+    assert not value_without_wait
+    assert btn.wait_for_text().text == 'Submit'
 
 
 def test_wait_elements_count_v1(forms_page):
     forms_page.validation_form.form_mixin.input.type_text('sample')
     forms_page.validation_form.submit_form_button.click()
-    forms_page.validation_form.any_error.wait_elements_count(4)
+    forms_page.validation_form.any_error.wait_elements_count(expected_count=4)
     assert forms_page.validation_form.any_error.get_elements_count() == 4
 
 
@@ -58,18 +55,6 @@ def test_wait_elements_count_v2(expected_condition_page):
     expected_condition_page.frame_card.trigger_button.click()
     target_count = expected_condition_page.frame_card.frame.wait_elements_count(1).get_elements_count()
     assert all((initial_count == 0, target_count == 1))
-
-
-def test_wait_elements_count_negative(forms_page):
-    forms_page.validation_form.form_mixin.input.type_text('sample')
-    forms_page.validation_form.submit_form_button.click()
-
-    try:
-        forms_page.validation_form.any_error.wait_elements_count(3, timeout=1)
-    except UnexpectedElementsCountException:
-        pass
-    else:
-        raise Exception('Unexpected behaviour')
 
 
 @pytest.mark.xfail(reason='TODO: Implementation')

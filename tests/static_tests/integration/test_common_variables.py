@@ -1,11 +1,12 @@
 import pytest
 from selenium.webdriver.common.by import By
 
-from dyatel.base.element import Element
-from dyatel.base.page import Page
-from dyatel.utils.selector_synchronizer import selenium_locator_types
-from dyatel.exceptions import InvalidSelectorException
-from dyatel.utils.internal_utils import all_tags
+from mops.base.element import Element
+from mops.base.page import Page
+from mops.mixins.objects.locator import Locator
+from mops.utils.selector_synchronizer import selenium_locator_types
+from mops.exceptions import InvalidSelectorException
+from mops.utils.internal_utils import all_tags
 from tests.static_tests.conftest import selenium_ids, selenium_drivers, all_drivers, all_ids
 
 tags = {'header h4', *all_tags}
@@ -48,12 +49,12 @@ def test_base_class_auto_id_locator_mobile(locator, mocked_android_driver):
 @pytest.mark.parametrize('driver', selenium_drivers, ids=selenium_ids)
 def test_specify_css_locator_type(request, driver):
     request.getfixturevalue(driver)
-    assert Element('[href="/loaddelay"]', By.CSS_SELECTOR, '', '', False).locator_type == By.CSS_SELECTOR
+    assert Element(Locator('[href="/loaddelay"]', By.CSS_SELECTOR)).locator_type == By.CSS_SELECTOR
 
 
 @pytest.mark.parametrize('locator', tags)
 def test_specify_class_name_locator_type_mobile(locator, mocked_selenium_driver):
-    assert Element(locator, By.CLASS_NAME).locator_type == By.CLASS_NAME
+    assert Element(Locator(locator, By.CLASS_NAME)).locator_type == By.CLASS_NAME
 
 
 @pytest.mark.parametrize('locator', tags)

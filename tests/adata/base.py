@@ -1,6 +1,6 @@
-from dyatel.base.element import Element
-from dyatel.base.group import Group
-from dyatel.base.page import Page
+from mops.base.element import Element
+from mops.base.group import Group
+from mops.base.page import Page
 
 
 class SomePage(Page):

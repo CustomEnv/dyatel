@@ -1,3 +1,4 @@
+from mops.mixins.objects.driver import Driver
 from tests.adata.drivers.playwright_driver import PlaywrightDriver
 from tests.adata.drivers.appium_driver import AppiumDriver
 from tests.adata.drivers.driver_entities import DriverEntities
@@ -7,7 +8,7 @@ from tests.adata.drivers.selenium_driver import SeleniumDriver
 class DriverFactory:
 
     @staticmethod
-    def create_driver(entities: DriverEntities):
+    def create_driver(entities: DriverEntities) -> Driver:
 
         is_mobile = entities.platform in ('ios', 'android')
 

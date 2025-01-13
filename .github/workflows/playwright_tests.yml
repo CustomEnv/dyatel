@@ -1,0 +1,56 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - 'docs/**'
+      - 'tests/static_tests/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - '.gitignore'
+
+jobs:
+  playwright-docker:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser-name: [ "chrome", "firefox", "safari" ]
+        python-version: [ "3.8", "3.12.7" ]  # 3.12.8 (latest) Throws unexpected error inside container
+
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.41.0-jammy
+      options: --ipc=host
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        id: setup
+        uses: ./.github/actions/setup
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Needed for Firefox
+      - name: Set HOME to /root
+        run: |
+          echo "HOME=/root" >> $GITHUB_ENV
+
+      - name: Run Playwright ${{ matrix.browser-name }} tests with py${{ matrix.python-version }}
+        id: tests
+        run: |
+          uv run --no-config pytest tests/web_tests --platform playwright --driver ${{ matrix.browser-name }} --headless -v --alluredir=allure-report --reruns=2
+        continue-on-error: true
+
+      - name: Teardown (Allure Report and Error Handling)
+        if: ${{ steps.tests.outcome == 'failure' }}
+        uses: ./.github/actions/teardown
+        with:
+          browser-name: ${{ matrix.browser-name }}
+          engine: "playwright"

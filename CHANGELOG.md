@@ -1,4 +1,259 @@
-# Dyatel Changelog
+# Mops Changelog
+
+<br>
+
+## v3.0.0  
+*Release date: 2025-01-13*
+
+### Breaking: Project renamed
+
+### Changed 
+- Dev: pyproject.toml integrated instead of setup.py
+- Dev: UV integrated
+
+### Removed
+- Dev: tox usage removed
+
+---
+
+## v2.4.0  
+*Release date: 2025-01-10*
+
+### Added  
+- `DriverWrapper.is_safari` method
+- `DriverWrapper.is_firefox` method
+- `DriverWrapper.is_chrome` method
+- `InvalidLocatorException` for locator validation
+- `VisualComparison` now removes actual and diff files upon successful assertions
+- Internal CI pipelines with tests
+
+### Removed  
+- `DriverWrapper.switch_to_parent_frame` method
+- `dyatel/dyatel_play/helpers/trace.py` module
+
+### Changed  
+- `DriverWrapper.get_inner_window_size` now returns a `Size` object instead of a dictionary
+- `Element.click` now uses a JavaScript click for the Safari driver
+- `Element.click_outside` now has default arguments `x=-5, y=-5` across all platforms
+- `VisualComparison` dummy elements' `style.position` changed from `"fixed"` to `"absolute"`
+- `VisualComparison` dummy elements' `style.top/left` now account for page scroll
+- `VisualComparison` now includes a `sleep(0.1)` delay if `fill_background` or `remove` actions are specified after an action
+- The Safari browser on Appium and Selenium uses the `innerText` DOM property instead of the driver's `text` API to improve compatibility with other platforms
+- The Safari browser on Selenium uses JavaScript-based `click` instead of the driver's `click` API to enhance compatibility with other platforms
+- Documentation for most methods has been improved
+
+### Fixed  
+- `DriverWrapper.save_screenshot` no longer throws an error when called without the optional `screenshot_base` argument
+- `Element.save_screenshot` no longer throws an error when called without the optional `screenshot_base` argument
+- `VisualComparison.assert_screenshot` with the argument `threshold=0` now respects the provided value instead of defaulting
+- `VisualComparison` under `soft_generate_reference` no longer takes two images (actual → assertion → reference)
+
+---
+
+## v2.3.3
+*Release date: 2025-01-09*
+
+### Added
+- `dyatel.mixins/objects.driver.Driver` object
+
+### Changed
+- **Breaking:** `DriverWrapper` initialization now requires a `Driver` object
+- **Breaking:** Playwright's `context` and `page` creation have been moved out of `dyatel-wrapper`
+
+**Note:** Examples of the new logic can be found in the [ReadTheDocs documentation](https://dyatel-wrapper.readthedocs.io/getting_started.html#selenium-driver-setup)
+
+---
+
+## v2.3.2
+*Release date: 2024-12-19*
+
+### Changed
+- Supported Python-Appium-Client version changed from `2.11.1` to `3.1.0`
+- Supported appium version changed from `2.2.1` to `2.12.1`
+- Supported xcuitest version changed from `5.0.0` to `7.28.3`
+- Supported uiautomator2 version changed from `2.34.1` to `3.9.0`
+
+---
+
+## v2.3.1
+*Release date: 2024-12-16*
+
+### Fixed
+- Memory leak due to misuse of lru_cache
+
+---
+
+## v2.3.0
+*Release date: 2024-09-12*
+
+### Added
+- [ReadTheDocs documentation](https://dyatel-wrapper.readthedocs.io/)
+- `Locator` object
+- `CutBox` object
+- `tablet` locator support
+- `ScrollTo` & `ScrollTypes` constants
+- `VisualComparison.assert_screenshot` now supports the use of the `CutBox` object
+- `Element.execute_script` method, which automatically sets itself to script arguments
+- Selenium only: 0.1 seconds delay between requests for all waiting methods
+- Playwright only: 0.1 seconds delay between requests for a few waiting methods
+- Appium only: exponential delay starting at 0.1 seconds between requests for all waiting methods
+
+### Changed
+- **Breaking:** `locator_type`, `mobile`, `ios`, `android`, and `desktop` kwargs removed
+- **Breaking:** Most `Element` methods have been renamed
+- **Breaking:** `DriverWrapper.execute_script` now uses the `Element` object instead of the source element object
+- **Breaking:** `MobileDriver.get_top_bar_height` method renamed to the `top_bar_height` property 
+- **Breaking:** `MobileDriver.get_bottom_bar_height` method renamed to the `bottom_bar_height` property 
+- `Element.scroll_into_view` method now uses `ScrollTo` & `ScrollTypes` constants
+- Default timeout for `Element.wait_hidden_without_error` reduced to 2.5 seconds since it's a negative wait
+- Default timeout for `Element.wait_visibility_without_error` reduced to 2.5 seconds since it's a negative wait
+- Selenium & Appium only: `Element.click` now retries on `ElementNotInteractableException`, `ElementClickInterceptedException`, `StaleElementReferenceException` exceptions
+- Automatically generated `name` argument, based on the attribute name, has been removed
+
+### Fixed
+- Playwright: Appending of dummy elements inside `Element.assert_screenshot`
+- Playwright: `DriverWrapper.execute_script` error when multiple elements are available
+
+### Reworked
+- Mobile `top_bar_height` and `bottom_bar_height` now use `NativeContext` & `NativeSafari` objects
+- Most `Element` `wait` methods are now resolved with the `wait_condition` decorator
+
+---
+
+## v2.2.15
+*Release date: 2024-08-13*
+
+### Added  
+- Python 3.11 and 3.12 support
+
+---
+
+## v2.2.14
+*Release date: 2024-07-24*
+
+### Added  
+- assert_screenshot: possibility to hide objects before taking screenshot
+- assert_screenshot: the diff image save on a different sized screenshots (reference/output)
+- assert_screenshot: allure attachments increased for some cases 
+- assert_screenshot: auto label `mobile` for mobile resolution screenshots
+
+### Fixed
+- assert_screenshot: bug with default.png for screenshots with given names fixed
+
+---
+
+## v2.2.12 & v2.2.13
+*Release date: 2024-06-08*
+
+### Added  
+- iPad support 
+
+---
+
+## v2.2.11
+*Release date: 2024-05-29*
+
+### Changed 
+- Minimum playwright version is 1.41.0
+
+---
+
+## v2.2.1
+*Release date: 2024-04-16*
+
+### Added 
+- `DriverWrapper.is_tablet`
+- `DriverWrapper.is_appium` 
+- `DriverWrapper.is_ios_tablet` 
+- `DriverWrapper.is_ios_mobile` 
+- `DriverWrapper.is_android_tablet` 
+- `DriverWrapper.is_android_mobile` 
+
+### Fixed
+- `Element.is_fully_visible` calculation 
+- `Element.is_visible` calculation 
+
+---
+
+## v2.2.0
+*Release date: 2024-03-04*
+
+### Added
+- `Element.size` method
+- `Element.location` method
+- `Element.wait_element_size` method
+- `DriverWrapper.assert_screenshot` method
+- `DriverWrapper.soft_assert_screenshot` method
+- `DriverWrapper.wait` method
+- `DriverWrapper/Element.screenshot_image` method
+
+### Changed 
+- `DriverWrapper/Element.screenshot_base` method now return image binary
+- `DriverWrapper/Element.save_screenshot` method now saves screenshot and moved to base class
+- iOS only: `DriverWrapper.screenshot_base` returns image binary without native controls
+- iOS only: `Element.screenshot_base` screenshot size for some elements could be changed
+
+
+### Fixed 
+- Type annotations
+- `Element.is_visible/is_fully_visible` calculation
+- iOS only: `Element.get_bottom_bar_height` calculation
+
+---
+
+## v2.1.9
+*Release date: 2024-02-22*
+
+### Added
+- Playwright `context.tracing` support
+
+---
+
+## v2.1.8
+*Release date: 2024-01-04*
+
+### Added
+- Playwright `new_context` args supports
+
+---
+
+## v2.1.7
+*Release date: 2023-12-05*
+
+### Added
+- VisualComparison: Dynamic threshold calculation
+
+---
+
+## v2.1.6
+*Release date: 2023-11-26*
+
+### Fixed
+- Performance fixes for session with 2 or more browser windows
+
+---
+
+## v2.1.5
+*Release date: 2023-10-17*
+
+### Fixed
+- Typo fix inside `MobileDriver`
+
+---
+
+## v2.1.4
+*Release date: 2023-10-16*
+
+### Fixed
+- Internal usage of Element class inside DriverWrapper
+
+### Changed
+- AssertionError output of visual comparison
+
+### Added
+- Soft visual reference generation
+- Soft assert screenshot
+- `LogLevel` class
 
 ---
 

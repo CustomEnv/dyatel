@@ -1,14 +1,17 @@
-from dyatel.base.element import Element
-from dyatel.base.group import Group
-from dyatel.mixins.internal_mixin import get_element_info
+from mops.base.element import Element
+from mops.base.group import Group
+from mops.mixins.internal_mixin import get_element_info
+from mops.mixins.objects.locator import Locator
 
 
 class SomeGroup(Group):
     def __init__(self, driver_wrapper=None):
-        super().__init__('group', ios='gielement', android='gaelement', driver_wrapper=driver_wrapper)
+        super().__init__(Locator('group', ios='gielement', android='gaelement'), driver_wrapper=driver_wrapper)
 
     el = Element('element')
-    mel = Element('delement', ios='ielement', android='aelement')
+    mel = Element(
+        Locator('delement', ios='ielement', android='aelement')
+    )
 
 
 def test_get_element_info(mocked_selenium_driver):
