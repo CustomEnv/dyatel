@@ -1,2 +1,2 @@
-__version__ = '0.0.1a3'
+__version__ = '3.0.0'
 __project_name__ = 'mops'

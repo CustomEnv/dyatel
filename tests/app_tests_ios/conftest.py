@@ -28,7 +28,7 @@ def appium(request):
         args=[
             '-a', appium_ip,
             '-p', appium_port,
-            '-g', '.tox/.tmp/logs/ios_appium.txt'
+            '-g', '.venv/.tmp/logs/ios_appium.txt'
         ],
         timeout_ms=5000,
     )

@@ -18,7 +18,7 @@ pip3 install mops
 <br>
 
 ```{note}
-For the PageObject example, the [UI Automation Playground](https://customenv.github.io/dyatel-playground/) site is used.
+For the PageObject example, the [UI Automation Playground](https://customenv.github.io/test-automation-playground/) site is used.
 ``` 
 
 ```python
@@ -152,7 +152,7 @@ from ... import MainPage  # noqa
 
 # pytest function
 def test_example(driver_wrapper):
-    driver_wrapper.get("https://customenv.github.io/dyatel-playground/")
+    driver_wrapper.get("https://customenv.github.io/test-automation-playground/")
     forms_page = MainPage().navigate_to_frames_page()
     
     assert forms_page.is_page_opened(), 'Forms Page is not opened after navigation'

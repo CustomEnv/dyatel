@@ -2,8 +2,8 @@
 
 <br>
 
-## v2.5.0  
-*Release date: 2025-01-..*
+## v3.0.0  
+*Release date: 2025-01-13*
 
 ### Breaking: Project renamed
 
