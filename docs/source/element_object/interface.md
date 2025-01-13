@@ -5,7 +5,7 @@ This is auto-generated interface documentation for the abstract `Element` class.
 
 This is essential for providing a comprehensive overview of all available methods for the `Element` object.
 
-For the actual signature, please refer to `dyatel.base.element.Element`.
+For the actual signature, please refer to `mops.base.element.Element`.
 ```
 
 
@@ -19,7 +19,7 @@ It provides a comprehensive set of methods that allow you to interact with vario
 <br>
 
 ```{eval-rst}  
-.. autoclass:: dyatel.base.element.Element
+.. autoclass:: mops.base.element.Element
    :members:
    :undoc-members:
    :inherited-members:

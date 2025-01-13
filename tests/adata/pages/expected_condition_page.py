@@ -1,13 +1,13 @@
-from dyatel.base.element import Element
-from dyatel.base.group import Group
-from dyatel.base.page import Page
-from dyatel.mixins.objects.locator import Locator
-from tests.settings import domain_name, repo_name
+from mops.base.element import Element
+from mops.base.group import Group
+from mops.base.page import Page
+from mops.mixins.objects.locator import Locator
+from tests.settings import domain_name, automation_playground_repo_name
 
 
 class ExpectedConditionPage(Page):
     def __init__(self):
-        self.url = f'{domain_name}/{repo_name}/expected_conditions.html'
+        self.url = f'{domain_name}/{automation_playground_repo_name}/expected_conditions.html'
         self.value_card = WaitValueCard()
         self.element_card = WaitElementCard()
         self.frame_card = WaitFrameCard()

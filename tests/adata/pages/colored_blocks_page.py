@@ -1,9 +1,9 @@
 from typing import List
 
-from dyatel.base.element import Element
-from dyatel.base.group import Group
-from dyatel.base.page import Page
-from tests.settings import domain_name, repo_name
+from mops.base.element import Element
+from mops.base.group import Group
+from mops.base.page import Page
+from tests.settings import domain_name, automation_playground_repo_name
 
 
 class Row(Group):
@@ -17,7 +17,7 @@ class ColoredBlocksPage(Page):
     def __init__(self):
         super().__init__('colored-blocks-page', name='Colored blocks page')
 
-    url = f'{domain_name}/{repo_name}/colored_blocks.html'
+    url = f'{domain_name}/{automation_playground_repo_name}/colored_blocks.html'
 
     blocks_container = Element('.container', name='colored blocks container')
     row1 = Row('row-1', name='first blocks row')

@@ -1,9 +1,9 @@
 import pytest
 
-from dyatel.base.element import Element
-from dyatel.base.group import Group
-from dyatel.mixins.objects.locator import Locator
-from dyatel.utils.selector_synchronizer import get_platform_locator
+from mops.base.element import Element
+from mops.base.group import Group
+from mops.mixins.objects.locator import Locator
+from mops.utils.selector_synchronizer import get_platform_locator
 from tests.static_tests.conftest import mobile_ids, mobile_drivers, desktop_drivers, desktop_ids, mocked_ios_driver
 
 

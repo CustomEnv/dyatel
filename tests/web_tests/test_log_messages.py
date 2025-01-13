@@ -1,5 +1,5 @@
 import pytest
-from dyatel.mixins.objects.size import Size
+from mops.mixins.objects.size import Size
 
 
 @pytest.mark.medium

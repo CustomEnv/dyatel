@@ -1,4 +1,4 @@
-from dyatel.visual_comparison import VisualComparison
+from mops.visual_comparison import VisualComparison
 
 
 def test_remove_unexpected_underscores():

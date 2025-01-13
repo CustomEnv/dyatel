@@ -3,8 +3,14 @@ name: Selenium Safari Tests
 on:
   push:
     branches:
-      - '**'  # Trigger on push to any branch
-
+      - '**'
+    paths-ignore:
+      - 'docs/**'
+      - 'tests/static_tests'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - '.gitignore'
 jobs:
   selenium-safari:
     runs-on: macos-13
@@ -24,15 +30,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Enable Safari Remote Automation
-        run: |
-          safaridriver --version
-          sudo safaridriver --enable
-
       - name: Run Selenium Safari tests with py${{ matrix.python-version }}
         id: tests
         run: |
-          tox -e py${{ steps.setup.outputs.tox-env }}-selenium-safari -- -v --alluredir=allure-report --reruns=2 -m='not low'
+          uv run --no-config pytest tests/web_tests --platform selenium --driver safari -v --alluredir=allure-report --reruns=2 -m='not low'
         continue-on-error: true
 
       - name: Teardown (Allure Report and Error Handling)
@@ -40,5 +41,4 @@ jobs:
         uses: ./.github/actions/teardown
         with:
           browser-name: "safari"
-          tox-env: ${{ steps.setup.outputs.tox-env }}
           engine: "selenium"

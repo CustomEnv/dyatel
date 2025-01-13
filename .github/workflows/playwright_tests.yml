@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - '**'
+    paths-ignore:
+      - 'docs/**'
+      - 'tests/static_tests/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - '.gitignore'
 
 jobs:
   playwright-docker:
@@ -38,7 +45,7 @@ jobs:
       - name: Run Playwright ${{ matrix.browser-name }} tests with py${{ matrix.python-version }}
         id: tests
         run: |
-          tox -e py${{ steps.setup.outputs.tox-env }}-playwright-${{ matrix.browser-name }} -- --headless -v --alluredir=allure-report --reruns=2
+          uv run --no-config pytest tests/web_tests --platform playwright --driver ${{ matrix.browser-name }} --headless -v --alluredir=allure-report --reruns=2
         continue-on-error: true
 
       - name: Teardown (Allure Report and Error Handling)
@@ -46,5 +53,4 @@ jobs:
         uses: ./.github/actions/teardown
         with:
           browser-name: ${{ matrix.browser-name }}
-          tox-env: ${{ steps.setup.outputs.tox-env }}
           engine: "playwright"

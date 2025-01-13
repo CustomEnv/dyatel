@@ -39,8 +39,9 @@ When a `Group` contains many elements (more than 8-10), it is advisable to group
 Here’s how you can organize a `Group` object with a large number of elements by grouping them logically:
 
 ```python
-from dyatel.base.group import Group
-from dyatel.base.element import Element
+from mops.base.group import Group
+from mops.base.element import Element
+
 
 class SeeMoreSection(Group):
 
@@ -110,8 +111,9 @@ By following this approach, you achieve:
 ### Bad practice
 
 ```python
-from dyatel.base.group import Group
-from dyatel.base.element import Element
+from mops.base.group import Group
+from mops.base.element import Element
+
 
 class SeeMoreSection(Group):
 
@@ -120,11 +122,11 @@ class SeeMoreSection(Group):
 
     # Footer Controls
     see_more_footer_main_control = Element('#footer-main', name='footer main control')
-    see_more_footer_logout_button = Element('#footer-logout', name='Footer Logout Button', 
+    see_more_footer_logout_button = Element('#footer-logout', name='Footer Logout Button',
                                             parent=see_more_footer_main_control)
     see_more_footer_help_link = Element('#footer-help', name='Footer Help Link',
                                         parent=see_more_footer_main_control)
-    see_more_footer_contact_us = Element('#footer-contact', name='Footer Contact Us', 
+    see_more_footer_contact_us = Element('#footer-contact', name='Footer Contact Us',
                                          parent=see_more_footer_main_control)
 
     # Header Controls
@@ -142,17 +144,19 @@ class SeeMoreSection(Group):
 ### Good practice
 
 ```python
-from dyatel.base.group import Group
-from dyatel.base.element import Element
+from mops.base.group import Group
+from mops.base.element import Element
+
 
 class SeeMoreFooter(Group):
-    
+
     def __init__(self):
         super().__init__('#footer-main', name='footer main control')
-        
+
     see_more_footer_logout_button = Element('#footer-logout', name='Footer Logout Button')
     see_more_footer_help_link = Element('#footer-help', name='Footer Help Link')
     see_more_footer_contact_us = Element('#footer-contact', name='Footer Contact Us')
+
 
 class SeeMoreSection(Group):
 

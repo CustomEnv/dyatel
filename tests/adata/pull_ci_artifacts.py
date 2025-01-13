@@ -14,7 +14,7 @@ import requests
 from PIL import Image
 
 
-REPO = 'CustomEnv/dyatel'
+REPO = 'CustomEnv/mops'
 ARTIFACT_NAME = 'allure-report'
 
 
@@ -89,7 +89,7 @@ class DownloadArtifacts:
 
     def download_artefact_and_replace_references(self):
 
-        assert self.launch_args.token, 'Env varaible GH_TOKEN or --token arg required'
+        assert self.launch_args.token, 'Env variable GH_TOKEN or --token arg required'
         os.makedirs(self.launch_args.output_dir, exist_ok=True)
         reference_updater = UpdateReferences(self.launch_args.output_dir)
         bae_api_url = 'https://api.github.com'

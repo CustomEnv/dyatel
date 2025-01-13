@@ -1,4 +1,4 @@
-from dyatel.base.element import Element
+from mops.base.element import Element
 
 
 replaced_data = [1, 2, 3]

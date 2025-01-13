@@ -48,36 +48,39 @@ objects as attributes, those too will be initialized.
 ```python
 from typing import Union, Any
 
-from dyatel.base.page import Page
-from dyatel.base.group import Group
-from dyatel.base.element import Element
-from dyatel.base.driver_wrapper import DriverWrapper
+from mops.base.page import Page
+from mops.base.group import Group
+from mops.base.element import Element
+from mops.base.driver_wrapper import DriverWrapper
+
 
 # POM
 class LoginPage(Page):
     def __init__(self, driver_wrapper: Union[Any, DriverWrapper]):
         super().__init__(locator="//form[@id='login']", name="Login Page", driver_wrapper=driver_wrapper)
-    
+
     username_field = Element('.username_field', name='username field')
-    password_field = Element('.password_field', name='password field')    
-    login_button = Element('.login_button', name='login button')    
+    password_field = Element('.password_field', name='password field')
+    login_button = Element('.login_button', name='login button')
 
 # PCOM
+
+
 class LoginSection(Group):
     def __init__(self, driver_wrapper: Union[Any, DriverWrapper]):
         super().__init__(locator="//form[@id='section']", name="Login section", driver_wrapper=driver_wrapper)
-    
+
     username_field = Element('.username_field', name='username field')
-    password_field = Element('.password_field', name='password field')    
-    login_button = Element('.login_button', name='login button')    
+    password_field = Element('.password_field', name='password field')
+    login_button = Element('.login_button', name='login button')
+
+# The framework allow to use Element as base class, but it's better to not use it as POM/PCOM
 
 
-# DyatelWrapper project allow to use Element as base class, but it's better to not use it as POM/PCOM
 # But it's possible to use it as a wrapper for Element for extend/change some logic
 class Tooltip(Element):
-
     tooltip_container = Element('.tooltip', name='base tooltip')
-        
+
     @property
     def text(self):
         return self.tooltip_container.text

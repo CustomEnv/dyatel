@@ -14,15 +14,15 @@ This allows you to organize and manage multiple UI elements within a container o
 ### Code example
 
 ```python
-from dyatel.base.page import Page
-from dyatel.base.element import Element
+from mops.base.page import Page
+from mops.base.element import Element
 
 
 class IndexPage(Page):
-    
+
     def __init__(self):
         super().__init__()
-    
+
     login_button = Element('button.login', name='login button')
     signup_button = Element('button.signup', name='signup button')
 ```
@@ -39,12 +39,12 @@ This is particularly useful when you need to add specific behaviors or propertie
 ### Code example
 
 ```python
-from dyatel.base.page import Page
-from dyatel.base.element import Element
+from mops.base.page import Page
+from mops.base.element import Element
 
 
 class IndexButton(Element):
-    
+
     def __init__(self, locator: str, name: str = ''):
         name = name or locator
         super().__init__(f'button.{locator}', name=f'{name} button')
@@ -53,12 +53,13 @@ class IndexButton(Element):
         # Add custom behavior here
         super().click()
 
+
 # Using previous PO with IndexButton
 class IndexPage(Page):
-    
+
     def __init__(self):
         super().__init__()
-    
+
     login_button = IndexButton('login')
     signup_button = IndexButton('signup')
 ```

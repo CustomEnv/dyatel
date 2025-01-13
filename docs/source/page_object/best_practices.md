@@ -31,8 +31,9 @@ When a page contains many elements (more than 8-10), it is advisable to group th
 Here’s how you can organize a Page Object with a large number of elements by grouping them logically:
 
 ```python
-from dyatel.base.page import Page
-from dyatel.base.element import Element
+from mops.base.page import Page
+from mops.base.element import Element
+
 
 class DashboardPage(Page):
 
@@ -43,12 +44,12 @@ class DashboardPage(Page):
     footer_logout_button = Element('#footer-logout', name='Footer Logout Button')
     footer_help_link = Element('#footer-help', name='Footer Help Link')
     footer_contact_us = Element('#footer-contact', name='Footer Contact Us')
-    
+
     # Header Controls
     header_notifications_icon = Element('#header-notifications', name='Header Notifications Icon')
     header_user_profile = Element('#header-profile', name='Header User Profile')
     header_search_box = Element('#header-search', name='Header Search Box')
-    
+
     # Main Content Controls
     main_content_title = Element('#main-title', name='Main Content Title')
     main_content_body = Element('#main-body', name='Main Content Body')
@@ -65,6 +66,7 @@ class DashboardPage(Page):
         Verify that the dashboard page is opened.
         """
         return self.is_page_opened(with_elements=True, with_url=True)
+
 
 DashboardPage().navigate_to_settings()
 ```
@@ -94,37 +96,39 @@ This not only makes the `Page` class cleaner but also allows for better organiza
 Below is an example demonstrating how to refactor a `Page` class by moving elements into separate `Group` classes:
 
 ```python
-from dyatel.base.page import Page
-from dyatel.base.group import Group
-from dyatel.base.element import Element
+from mops.base.page import Page
+from mops.base.group import Group
+from mops.base.element import Element
+
 
 class Header(Group):
     def __init__(self):
         super().__init__(...)
-    
+
     notifications_icon = Element('#header-notifications', name='Header Notifications Icon')
     user_profile_button = Element('#header-profile', name='Header User Profile')
     search_box = Element('#header-search', name='Header Search Box')
-    
+
     def navigate_to_settings(self):
         """
         Navigate to the settings page.
         """
         self.user_profile_button.click()
 
+
 class DashboardPage(Page):
 
     def __init__(self):
         super().__init__(...)
-        
+
     # Sections
     header = Header()
-        
+
     # Footer Controls
     footer_logout_button = Element('#footer-logout', name='Footer Logout Button')
     footer_help_link = Element('#footer-help', name='Footer Help Link')
     footer_contact_us = Element('#footer-contact', name='Footer Contact Us')
-    
+
     # Main Content Controls
     main_content_title = Element('#main-title', name='Main Content Title')
     main_content_body = Element('#main-body', name='Main Content Body')
@@ -135,7 +139,8 @@ class DashboardPage(Page):
         """
         return self.is_page_opened(with_elements=True, with_url=True)
 
-DashboardPage().header.navigate_to_settings() 
+
+DashboardPage().header.navigate_to_settings()
 # or
 Header().navigate_to_settings()
 ```

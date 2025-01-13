@@ -12,7 +12,7 @@ This centralization aids in resource management and simplifies the coordination 
 <br>
 
 ```{eval-rst}  
-.. autoclass:: dyatel.base.driver_wrapper.DriverWrapperSessions
+.. autoclass:: mops.base.driver_wrapper.DriverWrapperSessions
    :members:
    :undoc-members:
 ```

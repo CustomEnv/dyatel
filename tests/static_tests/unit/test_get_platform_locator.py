@@ -1,9 +1,9 @@
 from types import SimpleNamespace
 
 import pytest
-from dyatel.exceptions import InvalidLocatorException
-from dyatel.mixins.objects.locator import Locator
-from dyatel.utils.selector_synchronizer import get_platform_locator
+from mops.exceptions import InvalidLocatorException
+from mops.mixins.objects.locator import Locator
+from mops.utils.selector_synchronizer import get_platform_locator
 
 
 obj_name = 'namespace(driver_wrapper=namespace'

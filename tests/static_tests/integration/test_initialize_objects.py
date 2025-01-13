@@ -1,6 +1,6 @@
-from dyatel.base.element import Element
-from dyatel.base.group import Group
-from dyatel.exceptions import NotInitializedException
+from mops.base.element import Element
+from mops.base.group import Group
+from mops.exceptions import NotInitializedException
 
 
 class Section(Group):

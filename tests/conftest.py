@@ -5,10 +5,10 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.safari.options import Options as SafariOptions
 
-from dyatel.base.driver_wrapper import DriverWrapper
-from dyatel.mixins.objects.driver import Driver
-from dyatel.utils.logs import dyatel_logs_settings
-from dyatel.visual_comparison import VisualComparison
+from mops.base.driver_wrapper import DriverWrapper
+from mops.mixins.objects.driver import Driver
+from mops.utils.logs import driver_wrapper_logs_settings
+from mops.visual_comparison import VisualComparison
 from tests.adata.drivers.driver_entities import DriverEntities
 from tests.adata.drivers.driver_factory import DriverFactory
 from tests.adata.pages.colored_blocks_page import ColoredBlocksPage
@@ -23,7 +23,7 @@ from tests.adata.pages.playground_main_page import PlaygroundMainPage, SecondPla
 from tests.adata.pytest_utils import skip_platform
 
 
-dyatel_logs_settings()
+driver_wrapper_logs_settings()
 
 
 def pytest_addoption(parser):

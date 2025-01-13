@@ -1,7 +1,7 @@
 import pytest
 
-from dyatel.exceptions import *
-from dyatel.mixins.objects.size import Size
+from mops.exceptions import *
+from mops.mixins.objects.size import Size
 
 timeout = 0.5
 

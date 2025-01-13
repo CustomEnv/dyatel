@@ -15,7 +15,7 @@ By centralizing locators in a single `Locator` object, it simplifies the codebas
 ## Interface
 
 ```{eval-rst}  
-.. autoclass:: dyatel.mixins.objects.locator.Locator
+.. autoclass:: mops.mixins.objects.locator.Locator
    :members: 
    
    .. attribute:: default: Optional[str] = None

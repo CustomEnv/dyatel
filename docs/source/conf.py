@@ -7,16 +7,16 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../..'))
 
-from dyatel import project_version, project_name
+from mops import __version__, __project_name__
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = project_name
-copyright = '2024, Podolian Vladimir'
+project = __project_name__
+copyright = '2025, Podolian Vladimir'
 author = 'Podolian Vladimir'
 
-release = project_version
+release = __version__
 version = release
 
 
@@ -37,7 +37,7 @@ extensions = [
     'sphinx.ext.napoleon',
 ]
 
-source_dirs = ['../../dyatel']
+source_dirs = ['../../mops']
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
@@ -64,7 +64,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = "furo"
 html_theme_options = {
     "light_logo": "dark_logo.png",
-    "dark_logo": "light_logo.png",
+    "dark_logo": "transparent_logo.png",
 }
 
 

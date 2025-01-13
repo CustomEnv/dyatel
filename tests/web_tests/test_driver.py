@@ -1,6 +1,6 @@
 import pytest
 
-from dyatel.base.driver_wrapper import DriverWrapper
+from mops.base.driver_wrapper import DriverWrapper
 from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import SecondPlaygroundMainPage

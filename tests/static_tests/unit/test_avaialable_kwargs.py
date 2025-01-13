@@ -1,4 +1,4 @@
-from dyatel.mixins.internal_mixin import InternalMixin, available_kwarg_keys
+from mops.mixins.internal_mixin import InternalMixin, available_kwarg_keys
 
 
 def test_check_kwargs_negative():

@@ -3,10 +3,10 @@ from types import SimpleNamespace
 from typing import Union
 
 import pytest
-from dyatel.exceptions import TimeoutException
-from dyatel.utils.internal_utils import wait_condition, WAIT_METHODS_DELAY
-from dyatel.utils.logs import autolog
-from dyatel.mixins.objects.wait_result import Result
+from mops.exceptions import TimeoutException
+from mops.utils.internal_utils import wait_condition, WAIT_METHODS_DELAY
+from mops.utils.logs import autolog
+from mops.mixins.objects.wait_result import Result
 
 
 namespace_default_cals_count = 3

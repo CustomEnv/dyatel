@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - '**'
+    paths-ignore:
+      - 'docs/**'
+      - 'tests/static_tests/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - '.gitignore'
 
 jobs:
   android-tests:
@@ -28,8 +35,6 @@ jobs:
           npm install -g npm@10.9.0
           npm install -g appium@2.14.0
           appium driver install uiautomator2@3.9.0
-#          npm install -g appium-doctor  # Uncomment for debug
-#          appium-doctor  # Uncomment for debug
 
       - name: Start Appium Server in the Background
         run: |
@@ -47,7 +52,7 @@ jobs:
         id: tests
         continue-on-error: true
         with:
-          script: tox -e py38-android-web -- -v --alluredir=allure-report -m='not low' --reruns=2
+          script: uv run --no-config pytest tests/web_tests --platform android --driver chrome -v --alluredir=allure-report --reruns=2 -m='not low'
           api-level: 33
           target: google_apis
           arch: x86_64
@@ -58,5 +63,4 @@ jobs:
         uses: ./.github/actions/teardown
         with:
           browser-name: "chrome"
-          tox-env: "38"
           engine: "appium"

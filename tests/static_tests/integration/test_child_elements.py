@@ -1,5 +1,5 @@
-from dyatel.base.element import Element
-from dyatel.base.group import Group
+from mops.base.element import Element
+from mops.base.group import Group
 
 
 class Section1:

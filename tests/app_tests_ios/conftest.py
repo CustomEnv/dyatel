@@ -7,8 +7,8 @@ from appium.webdriver.appium_service import AppiumService
 from allure_commons.types import AttachmentType
 
 from tests.settings import get_ios_desired_caps
-from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
-from dyatel.shared_utils import rescale_image, shell_running_command, shell_command
+from mops.selenium.driver.mobile_driver import MobileDriver
+from mops.shared_utils import rescale_image, shell_running_command, shell_command
 
 
 def pytest_addoption(parser):
@@ -28,7 +28,7 @@ def appium(request):
         args=[
             '-a', appium_ip,
             '-p', appium_port,
-            '-g', '.tox/.tmp/logs/ios_appium.txt'
+            '-g', '.venv/.tmp/logs/ios_appium.txt'
         ],
         timeout_ms=5000,
     )

@@ -3,7 +3,14 @@ name: Selenium Selenoid Tests
 on:
   push:
     branches:
-      - '**'  # Trigger on push to any branch
+      - '**'
+    paths-ignore:
+      - 'docs/**'
+      - 'tests/static_tests/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - '.gitignore'
 
 jobs:
   selenium-selenoid:
@@ -40,7 +47,7 @@ jobs:
       - name: Run Selenium ${{ env.BROWSER }} tests with py${{ matrix.python-version }}
         id: tests
         run: |
-          tox -e py${{ steps.setup.outputs.tox-env }}-selenium-${{ env.BROWSER }} -- --env remote --headless -v --alluredir=allure-report --reruns=2
+          uv run --no-config pytest tests/web_tests --platform selenium --driver ${{ env.BROWSER }} --env remote --headless -v --alluredir=allure-report --reruns=2
         continue-on-error: true
 
       - name: Teardown (Allure Report and Error Handling)
@@ -48,5 +55,4 @@ jobs:
         uses: ./.github/actions/teardown
         with:
           browser-name: ${{ env.BROWSER }}
-          tox-env: ${{ steps.setup.outputs.tox-env }}
           engine: "selenium"

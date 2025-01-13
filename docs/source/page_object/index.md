@@ -12,7 +12,7 @@ interface
 
 ## Overview
 
-The `Page` class in Dyatel Wrapper is designed to act as a flexible and adaptable page object, essential for 
+The `Page` class in Mops is designed to act as a flexible and adaptable page object, essential for 
 implementing the Page Object Model (POM). It dynamically adjusts its base class and behavior based on the underlying
 driver (`PlayPage` for _playwright_, `MobilePage` for _appium_, or `WebPage` for _selenium_), allowing for consistent
 and reusable page objects across different platforms.

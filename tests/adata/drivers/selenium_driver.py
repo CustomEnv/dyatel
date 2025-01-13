@@ -6,8 +6,8 @@ from selenium.webdriver.firefox.webdriver import WebDriver as GeckoWebDriver
 from selenium.webdriver.safari.webdriver import WebDriver as SafariWebDriver
 from selenium.webdriver.remote.webdriver import WebDriver as Remote
 
-from dyatel.base.driver_wrapper import DriverWrapperSessions
-from dyatel.mixins.objects.driver import Driver
+from mops.base.driver_wrapper import DriverWrapperSessions
+from mops.mixins.objects.driver import Driver
 from tests.adata.drivers.driver_entities import DriverEntities
 
 

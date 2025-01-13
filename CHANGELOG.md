@@ -1,6 +1,20 @@
-# Dyatel Changelog
+# Mops Changelog
 
 <br>
+
+## v3.0.0  
+*Release date: 2025-01-13*
+
+### Breaking: Project renamed
+
+### Changed 
+- Dev: pyproject.toml integrated instead of setup.py
+- Dev: UV integrated
+
+### Removed
+- Dev: tox usage removed
+
+---
 
 ## v2.4.0  
 *Release date: 2025-01-10*

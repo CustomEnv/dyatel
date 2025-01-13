@@ -17,7 +17,7 @@ The class also handles dynamic thresholds, image comparison metrics, and can gen
 ## Interface
 
 ```{eval-rst}  
-.. autoclass:: dyatel.visual_comparison.VisualComparison 
+.. autoclass:: mops.visual_comparison.VisualComparison 
    :exclude-members: calculate_threshold 
    :members: assert_screenshot
    

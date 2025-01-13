@@ -6,9 +6,9 @@ import allure
 from allure_commons.types import AttachmentType
 from appium.webdriver.appium_service import AppiumService
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
-from dyatel.dyatel_sel.driver.mobile_driver import MobileDriver
+from mops.selenium.driver.mobile_driver import MobileDriver
 
-from dyatel.shared_utils import rescale_image, shell_running_command, shell_command
+from mops.shared_utils import rescale_image, shell_running_command, shell_command
 from tests.settings import get_android_desired_caps, android_device_start_timeout, appium_logs_path
 
 
