@@ -678,4 +678,4 @@ class CoreElement(ElementABC, ABC):
         :param obj: CoreElement object
         :return: None, SeleniumWebElement, AppiumWebElement
         """
-        return getattr(obj, "_element", None)
+        return getattr(obj, '_element', None)
