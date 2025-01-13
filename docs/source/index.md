@@ -2,7 +2,7 @@
 
 ```{note}
 Previously known as [dyatel-wrapper](https://github.com/CustomEnv/dyatel-wrapper). 
-This project follows the versioning of `dyatel-wrapper`.
+This project follows the versioning of `dyatel-wrapper`
 ```
 
 Mops is a powerful Python framework that seamlessly wraps over Selenium, Appium, and sync Playwright,
